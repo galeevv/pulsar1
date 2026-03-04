@@ -1,0 +1,32 @@
+import Link from "next/link";
+
+import { Orbit } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+
+export function LandingHeader() {
+  return (
+    <header className="sticky top-4 z-50">
+      <div className="mx-auto w-full max-w-[1200px] px-6">
+        <div className="rounded-card border border-border/70 bg-background/70 px-3 py-3 backdrop-blur md:px-3 md:py-3">
+          <div className="flex items-center justify-between gap-6">
+            <Link
+              aria-label="Pulsar"
+              className="flex items-center gap-2 pl-2 text-foreground transition-colors"
+              href="/"
+            >
+              <Orbit className="h-6 w-6 text-foreground" />
+              <span className="text-logo font-semibold tracking-wide">
+                PULSAR
+              </span>
+            </Link>
+
+            <Button asChild className="h-10 px-button-x" radius="card">
+              <Link href="/login">Войти</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}

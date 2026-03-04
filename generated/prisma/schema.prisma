@@ -1,0 +1,261 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum PaymentRequestStatus {
+  CREATED
+  MARKED_PAID
+  APPROVED
+  REJECTED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  REVOKED
+  EXPIRED
+}
+
+enum DeviceSlotStatus {
+  FREE
+  ACTIVE
+  BLOCKED
+}
+
+enum IntegrationProvider {
+  MARZBAN
+}
+
+enum IntegrationTargetType {
+  SUBSCRIPTION
+  DEVICE_SLOT
+  PAYMENT_REQUEST
+  USER
+}
+
+enum IntegrationSyncStatus {
+  SUCCESS
+  ERROR
+}
+
+model User {
+  id                   String                @id @default(cuid())
+  username             String                @unique
+  passwordHash         String
+  role                 Role                  @default(USER)
+  credits              Int                   @default(0)
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  inviteCodesUsed      InviteCode[]          @relation("InviteCodeUsedBy")
+  referralCodesCreated ReferralCode[]        @relation("ReferralCodeOwner")
+  referralCodeUse      ReferralCodeUse?      @relation("ReferralCodeUseByUser")
+  paymentRequests      PaymentRequest[]
+  subscriptions        Subscription[]
+  promoCodeRedemptions PromoCodeRedemption[]
+  sessions             Session[]
+}
+
+model InviteCode {
+  id           String    @id @default(cuid())
+  code         String    @unique
+  isEnabled    Boolean   @default(true)
+  expiresAt    DateTime?
+  createdAt    DateTime  @default(now())
+  usedAt       DateTime?
+  usedByUserId String?   @unique
+  usedBy       User?     @relation("InviteCodeUsedBy", fields: [usedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([isEnabled])
+  @@index([expiresAt])
+}
+
+model ReferralCode {
+  id            String            @id @default(cuid())
+  code          String            @unique
+  discountPct   Int               @default(50)
+  rewardCredits Int               @default(100)
+  isEnabled     Boolean           @default(true)
+  expiresAt     DateTime?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  ownerUserId   String?
+  ownerUser     User?             @relation("ReferralCodeOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
+  uses          ReferralCodeUse[]
+
+  @@index([isEnabled])
+  @@index([expiresAt])
+}
+
+model ReferralCodeUse {
+  id                    String       @id @default(cuid())
+  referralCodeId        String
+  referredUserId        String       @unique
+  discountPctSnapshot   Int
+  rewardCreditsSnapshot Int
+  rewardGrantedAt       DateTime?
+  createdAt             DateTime     @default(now())
+  referralCode          ReferralCode @relation(fields: [referralCodeId], references: [id], onDelete: Cascade)
+  referredUser          User         @relation("ReferralCodeUseByUser", fields: [referredUserId], references: [id], onDelete: Cascade)
+
+  @@index([referralCodeId])
+  @@index([rewardGrantedAt])
+}
+
+model PromoCode {
+  id             String                @id @default(cuid())
+  code           String                @unique
+  creditAmount   Int
+  maxRedemptions Int
+  isEnabled      Boolean               @default(true)
+  expiresAt      DateTime?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  redemptions    PromoCodeRedemption[]
+
+  @@index([isEnabled])
+  @@index([expiresAt])
+}
+
+model PromoCodeRedemption {
+  id          String    @id @default(cuid())
+  promoCodeId String
+  userId      String
+  createdAt   DateTime  @default(now())
+  promoCode   PromoCode @relation(fields: [promoCodeId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([promoCodeId, userId])
+  @@index([promoCodeId])
+  @@index([userId])
+}
+
+model ReferralProgramSettings {
+  id                   Int      @id @default(1)
+  isEnabled            Boolean  @default(true)
+  defaultDiscountPct   Int      @default(50)
+  defaultRewardCredits Int      @default(100)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+model Tariff {
+  id              String           @id @default(cuid())
+  name            String
+  periodMonths    Int
+  priceRub        Int
+  deviceLimit     Int
+  isEnabled       Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  paymentRequests PaymentRequest[]
+
+  @@index([isEnabled])
+}
+
+model PaymentRequest {
+  id           String               @id @default(cuid())
+  userId       String
+  tariffId     String?
+  tariffName   String
+  periodMonths Int
+  deviceLimit  Int
+  amountRub    Int
+  status       PaymentRequestStatus @default(CREATED)
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  markedPaidAt DateTime?
+  approvedAt   DateTime?
+  rejectedAt   DateTime?
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tariff       Tariff?              @relation(fields: [tariffId], references: [id], onDelete: SetNull)
+  subscription Subscription?
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Subscription {
+  id               String             @id @default(cuid())
+  userId           String
+  paymentRequestId String?            @unique
+  tariffName       String
+  periodMonths     Int
+  deviceLimit      Int
+  status           SubscriptionStatus @default(ACTIVE)
+  startedAt        DateTime
+  endsAt           DateTime
+  revokedAt        DateTime?
+  marzbanUsername  String?            @unique
+  marzbanStatus    String?
+  marzbanDataJson  String?
+  provisionedAt    DateTime?
+  lastSyncAt       DateTime?
+  lastSyncError    String?
+  subscriptionUrl  String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  paymentRequest   PaymentRequest?    @relation(fields: [paymentRequestId], references: [id], onDelete: SetNull)
+  deviceSlots      DeviceSlot[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([endsAt])
+}
+
+model DeviceSlot {
+  id              String           @id @default(cuid())
+  subscriptionId  String
+  slotIndex       Int
+  status          DeviceSlotStatus @default(FREE)
+  label           String?
+  marzbanUsername String?
+  configUrl       String?
+  lastSyncAt      DateTime?
+  lastSyncError   String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  subscription    Subscription     @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@unique([subscriptionId, slotIndex])
+  @@index([status])
+}
+
+model IntegrationSyncLog {
+  id           String                @id @default(cuid())
+  provider     IntegrationProvider
+  operation    String
+  targetType   IntegrationTargetType
+  targetId     String
+  status       IntegrationSyncStatus
+  requestJson  String?
+  responseJson String?
+  errorMessage String?
+  createdAt    DateTime              @default(now())
+
+  @@index([provider, createdAt])
+  @@index([targetType, targetId])
+  @@index([status, createdAt])
+}
+
+model Session {
+  id        String   @id
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([expiresAt])
+}
