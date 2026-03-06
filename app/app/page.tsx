@@ -28,7 +28,7 @@ export default async function AppPage({
   const session = await getCurrentSession();
 
   if (!session) {
-    redirect("/login?mode=login&error=Сначала войдите в аккаунт.");
+    redirect("/");
   }
 
   if (session.role !== "USER") {
@@ -45,7 +45,7 @@ export default async function AppPage({
   ]);
 
   if (!benefitsData || !subscriptionData) {
-    redirect("/login?mode=login&error=Сначала войдите в аккаунт.");
+    redirect("/");
   }
 
   return (

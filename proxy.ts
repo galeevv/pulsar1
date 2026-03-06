@@ -60,21 +60,14 @@ export function proxy(request: NextRequest) {
 
   if (pathname.startsWith("/app") && !session) {
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    url.search = "?mode=login&error=%D0%A1%D0%BD%D0%B0%D1%87%D0%B0%D0%BB%D0%B0%20%D0%B2%D0%BE%D0%B9%D0%B4%D0%B8%D1%82%D0%B5%20%D0%B2%20%D0%B0%D0%BA%D0%BA%D0%B0%D1%83%D0%BD%D1%82.";
+    url.pathname = "/";
+    url.search = "";
     return NextResponse.redirect(url);
   }
 
   if (pathname.startsWith("/admin") && !session) {
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    url.search = "?mode=login&error=%D0%A1%D0%BD%D0%B0%D1%87%D0%B0%D0%BB%D0%B0%20%D0%B2%D0%BE%D0%B9%D0%B4%D0%B8%D1%82%D0%B5%20%D0%B2%20%D0%B0%D0%BA%D0%BA%D0%B0%D1%83%D0%BD%D1%82.";
-    return NextResponse.redirect(url);
-  }
-
-  if (pathname === "/login" && session) {
-    const url = request.nextUrl.clone();
-    url.pathname = session.role === "ADMIN" ? "/admin" : "/app";
+    url.pathname = "/";
     url.search = "";
     return NextResponse.redirect(url);
   }

@@ -68,12 +68,12 @@ export function AppBenefitsSection({
                 <div className="flex items-center gap-3">
                   <div
                     className={cn(
-                      "inline-flex size-8 items-center justify-center rounded-card border border-border bg-background/60"
+                      "inline-flex h-[44px] w-[44px] items-center justify-center rounded-card border border-border bg-background/60"
                     )}
                   >
                     <Handshake
                       className={cn(
-                        "size-4",
+                        "size-[22px]",
                         referralProgramSettings.isEnabled ? "text-white" : "text-muted-foreground"
                       )}
                     />

@@ -52,7 +52,7 @@ export function AppTariffsSection({
 }) {
   return (
     <AppSectionShell
-      description="Выберите план, выполните перевод по реквизитам и подтвердите оплату. Доступ активируется сразу, а затем проходит проверку администратором."
+      description="Выберите план, выполните перевод и подтвердите оплату."
       eyebrow="PLANS"
       id="tariffs"
       title="Выбор тарифа"
