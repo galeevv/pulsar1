@@ -1,11 +1,11 @@
-import { Gift, Sparkles } from "lucide-react";
+import { Gift, Handshake, Sparkles } from "lucide-react";
 
 import { applyPromoCodeAction, generateOwnReferralCodeAction } from "@/app/app/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 import { AppSectionShell } from "./app-section-shell";
-import { AppStatusPill } from "./app-status-pill";
 import { AppSurface } from "./app-surface";
 
 type ReferralProgramSettings = {
@@ -42,12 +42,18 @@ export function AppBenefitsSection({
   promoCodeRedemptions: PromoRedemption[];
   referralProgramSettings: ReferralProgramSettings;
 }) {
+  const canGenerate =
+    canGenerateReferralCode &&
+    referralProgramSettings.isEnabled &&
+    hasApprovedPayment &&
+    !ownReferralCode;
+
   return (
     <AppSectionShell
-      description="Здесь уже доступны реальные действия: пользователь может сгенерировать свой referral-код по глобальным правилам и применить promo-код для пополнения баланса."
-      eyebrow="BENEFITS"
+      description="Управление бонусной механикой: личный referral-код, условия начисления и применение промокодов для пополнения баланса."
+      eyebrow="BONUSES"
       id="benefits"
-      title="Рефералка и промокоды"
+      title="Реферальная программа и промокоды"
     >
       <div className="grid gap-6 xl:grid-cols-2">
         <AppSurface>
@@ -57,20 +63,31 @@ export function AppBenefitsSection({
               <p className="text-sm font-semibold">Реферальная система</p>
             </div>
 
-            <div className="rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">
-                    Новому пользователю: скидка {referralProgramSettings.defaultDiscountPct}%
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Автору кода: {referralProgramSettings.defaultRewardCredits} кредитов
-                  </p>
+            <div className="space-y-2">
+              <div className="rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md">
+                <div className="flex items-center gap-3">
+                  <div
+                    className={cn(
+                      "inline-flex size-8 items-center justify-center rounded-card border border-border bg-background/60"
+                    )}
+                  >
+                    <Handshake
+                      className={cn(
+                        "size-4",
+                        referralProgramSettings.isEnabled ? "text-white" : "text-muted-foreground"
+                      )}
+                    />
+                  </div>
+                  <div
+                    className={cn(
+                      "space-y-1 text-sm",
+                      referralProgramSettings.isEnabled ? "text-white" : "text-muted-foreground"
+                    )}
+                  >
+                    <p>Другу скидка {referralProgramSettings.defaultDiscountPct}%</p>
+                    <p>Вам {referralProgramSettings.defaultRewardCredits} кредитов</p>
+                  </div>
                 </div>
-                <AppStatusPill
-                  label={referralProgramSettings.isEnabled ? "Включена" : "Выключена"}
-                  tone={referralProgramSettings.isEnabled ? "success" : "default"}
-                />
               </div>
             </div>
 
@@ -87,28 +104,22 @@ export function AppBenefitsSection({
             ) : (
               <div className="rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md">
                 <p className="text-sm text-muted-foreground">
-                  У вас пока нет referral-кода. На текущем этапе его можно сгенерировать только
-                  один раз.
+                  У вас пока нет referral-кода. На текущем этапе его можно сгенерировать только один раз.
                 </p>
               </div>
             )}
 
             <form action={generateOwnReferralCodeAction}>
-              <Button
-                className="h-button w-full px-button-x"
-                disabled={!canGenerateReferralCode}
-                radius="card"
-                type="submit"
-              >
+              <Button className="h-button w-full px-button-x" disabled={!canGenerate} radius="card" type="submit">
                 {ownReferralCode ? "ReferralCode уже создан" : "Сгенерировать ReferralCode"}
               </Button>
             </form>
 
-            {!canGenerateReferralCode && !ownReferralCode ? (
+            {!canGenerate && !ownReferralCode ? (
               <p className="text-sm text-muted-foreground">
-                {hasApprovedPayment
-                  ? "Генерация сейчас недоступна из-за глобальных настроек реферальной системы."
-                  : "ReferralCode станет доступен после первой подтвержденной оплаты."}
+                {!hasApprovedPayment
+                  ? "ReferralCode станет доступен после первой подтвержденной оплаты."
+                  : "Генерация сейчас недоступна из-за глобальных настроек реферальной системы."}
               </p>
             ) : null}
           </div>
@@ -122,8 +133,8 @@ export function AppBenefitsSection({
             </div>
 
             <p className="text-sm text-muted-foreground">
-              Промокод пополняет внутренний баланс фиксированным количеством кредитов. Один и тот
-              же код нельзя применить дважды на одном аккаунте.
+              Промокод пополняет внутренний баланс фиксированным количеством кредитов. Один и тот же код
+              нельзя применить дважды на одном аккаунте.
             </p>
 
             <form action={applyPromoCodeAction} className="space-y-4">
@@ -131,12 +142,7 @@ export function AppBenefitsSection({
                 <label className="mb-2 block text-sm font-medium" htmlFor="promo-code-input">
                   PromoCode
                 </label>
-                <Input
-                  id="promo-code-input"
-                  name="code"
-                  placeholder="Введите промокод"
-                  required
-                />
+                <Input id="promo-code-input" name="code" placeholder="Введите промокод" required />
               </div>
 
               <Button className="h-button w-full px-button-x" radius="card" type="submit">
@@ -144,7 +150,7 @@ export function AppBenefitsSection({
               </Button>
             </form>
 
-            <div className="space-y-3">
+            <div className="space-y-2">
               <p className="text-sm font-semibold">Последние применения</p>
               {promoCodeRedemptions.length ? (
                 promoCodeRedemptions.map((item) => (
@@ -153,16 +159,12 @@ export function AppBenefitsSection({
                     className="rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md"
                   >
                     <p className="text-sm font-semibold">{item.promoCode.code}</p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      +{item.promoCode.creditAmount} кредитов
-                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">+{item.promoCode.creditAmount} кредитов</p>
                   </div>
                 ))
               ) : (
                 <div className="rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md">
-                  <p className="text-sm text-muted-foreground">
-                    Промокоды еще не применялись.
-                  </p>
+                  <p className="text-sm text-muted-foreground">Промокоды еще не применялись.</p>
                 </div>
               )}
             </div>

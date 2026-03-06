@@ -1,16 +1,32 @@
-import { Tags } from "lucide-react";
+import { CreditCard, Landmark, Tags } from "lucide-react";
 
+import { confirmTariffPaymentAction } from "@/app/app/actions";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 import { AppSectionShell } from "./app-section-shell";
 import { AppSurface } from "./app-surface";
 
 type TariffItem = {
   deviceLimit: number;
+  devicePriceRub: number;
   id: string;
   name: string;
   periodMonths: number;
   priceRub: number;
+};
+
+const PAYMENT_DETAILS = {
+  bankName: "Т-Банк",
+  cardNumber: "2200 7001 2345 6789",
+  cardOwner: "PULSAR SERVICE",
 };
 
 function getPeriodLabel(periodMonths: number) {
@@ -25,6 +41,10 @@ function getPeriodLabel(periodMonths: number) {
   return `${periodMonths} месяцев`;
 }
 
+function getTariffTotalPrice(tariff: TariffItem) {
+  return tariff.priceRub * tariff.periodMonths + tariff.devicePriceRub * tariff.deviceLimit;
+}
+
 export function AppTariffsSection({
   tariffs,
 }: {
@@ -32,10 +52,10 @@ export function AppTariffsSection({
 }) {
   return (
     <AppSectionShell
-      description="Здесь пользователь видит реальные тарифы из базы данных и сможет выбрать нужный вариант перед созданием платежной заявки."
-      eyebrow="TARIFFS"
+      description="Выберите план, выполните перевод по реквизитам и подтвердите оплату. Доступ активируется сразу, а затем проходит проверку администратором."
+      eyebrow="PLANS"
       id="tariffs"
-      title="Тарифы"
+      title="Выбор тарифа"
     >
       {tariffs.length ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -49,13 +69,60 @@ export function AppTariffsSection({
                 <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
                   {getPeriodLabel(plan.periodMonths)}
                 </p>
-                <p className="text-2xl font-semibold tracking-tight">{plan.priceRub} ₽</p>
+                <p className="text-2xl font-semibold tracking-tight">{plan.priceRub} ₽ / мес.</p>
                 <p className="text-sm text-muted-foreground">
-                  {plan.deviceLimit} {plan.deviceLimit === 1 ? "устройство" : "устройств"}
+                  {plan.devicePriceRub} ₽ / устройство • {plan.deviceLimit}{" "}
+                  {plan.deviceLimit === 1 ? "устройство" : "устройств"}
                 </p>
-                <Button className="h-button w-full px-button-x" radius="card" type="button">
-                  Выбрать
-                </Button>
+
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="h-button w-full px-button-x" radius="card" type="button">
+                      {getTariffTotalPrice(plan)} ₽
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>{plan.name}</DialogTitle>
+                      <DialogDescription>
+                        К оплате: {getTariffTotalPrice(plan)} ₽ за {getPeriodLabel(plan.periodMonths)}.
+                      </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-3 rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md">
+                      <div className="flex items-start gap-2">
+                        <Landmark className="mt-0.5 size-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium">Банк</p>
+                          <p className="text-sm text-muted-foreground">{PAYMENT_DETAILS.bankName}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CreditCard className="mt-0.5 size-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium">Карта</p>
+                          <p className="text-sm text-muted-foreground">
+                            {PAYMENT_DETAILS.cardNumber}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {PAYMENT_DETAILS.cardOwner}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <p className="text-sm text-muted-foreground">
+                      После перевода нажмите «Оплачено». Доступ будет активирован сразу.
+                    </p>
+
+                    <form action={confirmTariffPaymentAction}>
+                      <input name="tariffId" type="hidden" value={plan.id} />
+                      <Button className="h-button w-full px-button-x" radius="card" type="submit">
+                        Оплачено
+                      </Button>
+                    </form>
+                  </DialogContent>
+                </Dialog>
               </div>
             </AppSurface>
           ))}

@@ -86,6 +86,15 @@ export async function approvePaymentRequestAction(formData: FormData) {
     redirect(buildRedirectUrl({ anchor: "#payments", error: "Заявка уже отклонена." }));
   }
 
+  if (paymentRequest.status !== "MARKED_PAID") {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#payments",
+        error: "Подтвердить можно только заявку со статусом «Оплачено».",
+      })
+    );
+  }
+
   const approvedBefore = await prisma.paymentRequest.count({
     where: {
       id: {

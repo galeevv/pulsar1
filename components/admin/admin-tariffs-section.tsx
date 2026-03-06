@@ -10,12 +10,17 @@ import { AdminSurface } from "./admin-surface";
 type TariffItem = {
   createdAt: Date;
   deviceLimit: number;
+  devicePriceRub: number;
   id: string;
   isEnabled: boolean;
   name: string;
   periodMonths: number;
   priceRub: number;
 };
+
+function getTariffTotalPrice(tariff: TariffItem) {
+  return tariff.priceRub * tariff.periodMonths + tariff.devicePriceRub * tariff.deviceLimit;
+}
 
 export function AdminTariffsSection({
   tariffs,
@@ -48,9 +53,23 @@ export function AdminTariffsSection({
 
             <div>
               <label className="mb-2 block text-sm font-medium" htmlFor="tariff-price">
-                Цена (рубли)
+                Цена одного месяца (рубли)
               </label>
               <Input id="tariff-price" min="1" name="priceRub" required type="number" />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium" htmlFor="tariff-device-price">
+                Цена одного устройства (рубли)
+              </label>
+              <Input
+                defaultValue={0}
+                id="tariff-device-price"
+                min="0"
+                name="devicePriceRub"
+                required
+                type="number"
+              />
             </div>
 
             <div>
@@ -82,7 +101,11 @@ export function AdminTariffsSection({
                     <div className="space-y-1">
                       <p className="text-sm font-semibold">{tariff.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        {tariff.periodMonths} мес. • {tariff.priceRub} ₽ • {tariff.deviceLimit} устройств
+                        {tariff.periodMonths} мес. • {tariff.priceRub} ₽/мес. •{" "}
+                        {tariff.devicePriceRub} ₽/устройство • {tariff.deviceLimit} устройств
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Итого: {getTariffTotalPrice(tariff)} ₽
                       </p>
                     </div>
                     <AdminStatusPill
@@ -107,11 +130,25 @@ export function AdminTariffsSection({
                       />
                     </div>
                     <div>
-                      <label className="mb-2 block text-sm font-medium">Цена (рубли)</label>
+                      <label className="mb-2 block text-sm font-medium">
+                        Цена одного месяца (рубли)
+                      </label>
                       <Input
                         defaultValue={tariff.priceRub}
                         min="1"
                         name="priceRub"
+                        required
+                        type="number"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-medium">
+                        Цена одного устройства (рубли)
+                      </label>
+                      <Input
+                        defaultValue={tariff.devicePriceRub}
+                        min="0"
+                        name="devicePriceRub"
                         required
                         type="number"
                       />

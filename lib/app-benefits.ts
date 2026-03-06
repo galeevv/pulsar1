@@ -31,7 +31,13 @@ export async function getAppBenefitsData(username: string) {
     return null;
   }
 
-  const [referralProgramSettings, ownReferralCode, approvedPaymentsCount] = await Promise.all([
+  const [
+    referralProgramSettings,
+    ownReferralCode,
+    approvedPaymentsCount,
+    totalInvitedCount,
+    activeInvitedCount,
+  ] = await Promise.all([
     prisma.referralProgramSettings.upsert({
       create: {
         defaultDiscountPct: 50,
@@ -56,6 +62,27 @@ export async function getAppBenefitsData(username: string) {
         userId: user.id,
       },
     }),
+    prisma.referralCodeUse.count({
+      where: {
+        referralCode: {
+          ownerUserId: user.id,
+        },
+      },
+    }),
+    prisma.referralCodeUse.count({
+      where: {
+        referralCode: {
+          ownerUserId: user.id,
+        },
+        referredUser: {
+          paymentRequests: {
+            some: {
+              status: "APPROVED",
+            },
+          },
+        },
+      },
+    }),
   ]);
 
   const hasApprovedPayment = approvedPaymentsCount > 0;
@@ -68,6 +95,10 @@ export async function getAppBenefitsData(username: string) {
     ownReferralCode,
     promoCodeRedemptions: user.promoCodeRedemptions,
     referralProgramSettings,
+    referralStats: {
+      activeInvitedCount,
+      totalInvitedCount,
+    },
     user: {
       credits: user.credits,
       id: user.id,

@@ -32,7 +32,7 @@ export default async function AdminPage({
   const session = await getCurrentSession();
 
   if (!session) {
-    redirect("/login?mode=login&error=РЎРЅР°С‡Р°Р»Р° РІРѕР№РґРёС‚Рµ РІ Р°РєРєР°СѓРЅС‚.");
+    redirect("/login?mode=login&error=Сначала войдите в аккаунт.");
   }
 
   if (session.role !== "ADMIN") {

@@ -2,7 +2,7 @@ import { createHmac, randomUUID, scryptSync, timingSafeEqual } from "node:crypto
 
 import { cookies } from "next/headers";
 
-import { Role } from "@/generated/prisma";
+import { Prisma, Role } from "@/generated/prisma";
 import { prisma } from "@/lib/prisma";
 
 type SessionPayload = {
@@ -21,6 +21,8 @@ type SessionSnapshot = {
 const COOKIE_NAME = "pulsar_session";
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 7;
 const SESSION_SECRET = process.env.SESSION_SECRET;
+const INVALID_REGISTRATION_CODE_ERROR = "INVALID_REGISTRATION_CODE";
+const INVITE_CODE_ALREADY_USED_ERROR = "INVITE_CODE_ALREADY_USED";
 
 if (process.env.NODE_ENV === "production" && !SESSION_SECRET) {
   throw new Error("SESSION_SECRET is required in production.");
@@ -123,6 +125,10 @@ function isExpired(expiresAt: Date | null) {
 }
 
 export async function ensureBootstrapData() {
+  if (process.env.NODE_ENV === "production") {
+    return;
+  }
+
   const adminExists = await prisma.user.count({
     where: { role: Role.ADMIN },
   });
@@ -131,18 +137,20 @@ export async function ensureBootstrapData() {
     return;
   }
 
-  const bootstrapUsernameRaw = process.env.BOOTSTRAP_ADMIN_USERNAME ?? "galeev";
-  const bootstrapPassword = process.env.BOOTSTRAP_ADMIN_PASSWORD ?? "123123123";
+  const bootstrapUsernameRaw = process.env.BOOTSTRAP_ADMIN_USERNAME ?? "admin";
+  const bootstrapPassword = process.env.BOOTSTRAP_ADMIN_PASSWORD ?? "admin12345";
   const bootstrapUsername = normalizeUsername(bootstrapUsernameRaw);
+
+  if (!isValidMarzbanCompatibleUsername(bootstrapUsername) || bootstrapPassword.length < 8) {
+    return;
+  }
 
   try {
     await prisma.user.create({
       data: {
         passwordHash: hashPassword(bootstrapPassword),
         role: Role.ADMIN,
-        username: isValidMarzbanCompatibleUsername(bootstrapUsername)
-          ? bootstrapUsername
-          : "galeev",
+        username: bootstrapUsername,
       },
     });
   } catch {
@@ -171,10 +179,9 @@ export async function getCurrentSession() {
   });
 
   if (!session || session.expiresAt.getTime() <= Date.now()) {
-    await clearSession();
-    if (session) {
-      await prisma.session.delete({ where: { id: session.id } });
-    }
+    await prisma.session.deleteMany({
+      where: { id: payload.sessionId },
+    });
     return null;
   }
 
@@ -309,69 +316,105 @@ export async function attemptRegistration(input: {
     };
   }
 
-  const [inviteCode, referralCode] = await Promise.all([
-    prisma.inviteCode.findUnique({
-      where: { code: normalizedCode },
-    }),
-    prisma.referralCode.findUnique({
-      where: { code: normalizedCode },
-    }),
-  ]);
+  try {
+    const user = await prisma.$transaction(async (tx) => {
+      const now = new Date();
+      const [inviteCode, referralCode] = await Promise.all([
+        tx.inviteCode.findUnique({
+          where: { code: normalizedCode },
+        }),
+        tx.referralCode.findUnique({
+          where: { code: normalizedCode },
+        }),
+      ]);
 
-  const validInviteCode =
-    inviteCode &&
-    inviteCode.isEnabled &&
-    !inviteCode.usedByUserId &&
-    !isExpired(inviteCode.expiresAt);
+      const validInviteCode =
+        inviteCode &&
+        inviteCode.isEnabled &&
+        !inviteCode.usedByUserId &&
+        !isExpired(inviteCode.expiresAt);
 
-  const validReferralCode =
-    referralCode && referralCode.isEnabled && !isExpired(referralCode.expiresAt);
+      const validReferralCode =
+        referralCode && referralCode.isEnabled && !isExpired(referralCode.expiresAt);
 
-  if (!validInviteCode && !validReferralCode) {
+      if (!validInviteCode && !validReferralCode) {
+        throw new Error(INVALID_REGISTRATION_CODE_ERROR);
+      }
+
+      const createdUser = await tx.user.create({
+        data: {
+          credits: 0,
+          passwordHash: hashPassword(password),
+          role: Role.USER,
+          username: normalizedUsername,
+        },
+      });
+
+      if (validInviteCode) {
+        const inviteClaim = await tx.inviteCode.updateMany({
+          data: {
+            isEnabled: false,
+            usedAt: now,
+            usedByUserId: createdUser.id,
+          },
+          where: {
+            id: inviteCode.id,
+            isEnabled: true,
+            OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
+            usedByUserId: null,
+          },
+        });
+
+        if (inviteClaim.count !== 1) {
+          throw new Error(INVITE_CODE_ALREADY_USED_ERROR);
+        }
+      }
+
+      if (validReferralCode) {
+        await tx.referralCodeUse.create({
+          data: {
+            discountPctSnapshot: referralCode.discountPct,
+            referralCodeId: referralCode.id,
+            referredUserId: createdUser.id,
+            rewardCreditsSnapshot: referralCode.rewardCredits,
+          },
+        });
+      }
+
+      return createdUser;
+    });
+
     return {
-      message: "Код недействителен, выключен, истек или уже использован.",
-      ok: false as const,
+      ok: true as const,
+      user: {
+        role: user.role,
+        username: user.username,
+      },
     };
+  } catch (error) {
+    if (error instanceof Error && error.message === INVALID_REGISTRATION_CODE_ERROR) {
+      return {
+        message: "Код недействителен, выключен, истек или уже использован.",
+        ok: false as const,
+      };
+    }
+
+    if (error instanceof Error && error.message === INVITE_CODE_ALREADY_USED_ERROR) {
+      return {
+        message: "Invite-код уже использован другим пользователем. Запросите новый код.",
+        ok: false as const,
+      };
+    }
+
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      return {
+        message: "Такой username уже существует.",
+        ok: false as const,
+      };
+    }
+
+    throw error;
   }
-
-  const user = await prisma.user.create({
-    data: {
-      credits: 0,
-      passwordHash: hashPassword(password),
-      role: Role.USER,
-      username: normalizedUsername,
-    },
-  });
-
-  if (validInviteCode) {
-    await prisma.inviteCode.update({
-      data: {
-        isEnabled: false,
-        usedAt: new Date(),
-        usedByUserId: user.id,
-      },
-      where: { id: inviteCode.id },
-    });
-  }
-
-  if (validReferralCode) {
-    await prisma.referralCodeUse.create({
-      data: {
-        discountPctSnapshot: referralCode.discountPct,
-        referralCodeId: referralCode.id,
-        referredUserId: user.id,
-        rewardCreditsSnapshot: referralCode.rewardCredits,
-      },
-    });
-  }
-
-  return {
-    ok: true as const,
-    user: {
-      role: user.role,
-      username: user.username,
-    },
-  };
 }
 
 export async function getDevCodes() {

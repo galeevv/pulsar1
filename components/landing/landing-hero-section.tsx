@@ -9,15 +9,15 @@ export function LandingHeroSection() {
       id="hero"
       className="scroll-mt-0 min-h-[100svh] pt-8 pb-10 md:pt-10 md:pb-12"
     >
-      <div className="grid min-h-[calc(100svh-152px)] grid-cols-1 items-center gap-6 md:grid-cols-2 md:gap-12">
-        <div className="order-2 space-y-6 md:order-1">
-          <h1 className="text-h1 font-semibold tracking-tight">
+      <div className="grid min-h-[calc(100svh-152px)] grid-cols-1 items-center gap-0 md:grid-cols-2 md:gap-12">
+        <div className="order-2 space-y-4 md:order-1 md:space-y-6">
+          <h1 className="text-4xl font-semibold tracking-tight sm:text-4xl md:text-h1">
             Сжатый гигант.
             <br />
             Ритм вселенной.
           </h1>
-          <p className="text-lead max-w-xl text-muted-foreground">
-            Пульс света, измеряющий время и расстояние.
+          <p className="max-w-xl text-base text-muted-foreground sm:text-base md:text-lead">
+            Пульс света для времени и расстояния.
             <br />
             Ядро стабильности в бескрайнем космосе.
           </p>

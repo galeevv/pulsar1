@@ -6,12 +6,8 @@ import { Button } from "@/components/ui/button";
 import { logoutAction } from "@/app/login/actions";
 
 const headerLinks = [
-  { href: "#overview", label: "Обзор" },
-  { href: "#profile", label: "Профиль" },
   { href: "#tariffs", label: "Тарифы" },
-  { href: "#payments", label: "Оплата" },
-  { href: "#subscription", label: "Подписка" },
-  { href: "#devices", label: "Устройства" },
+  { href: "#dashboard", label: "Dashboard" },
   { href: "#benefits", label: "Бонусы" },
 ];
 

@@ -152,6 +152,7 @@ model Tariff {
   name            String
   periodMonths    Int
   priceRub        Int
+  devicePriceRub  Int              @default(0)
   deviceLimit     Int
   isEnabled       Boolean          @default(true)
   createdAt       DateTime         @default(now())

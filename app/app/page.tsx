@@ -2,16 +2,11 @@ import { redirect } from "next/navigation";
 
 import { AppFeedbackToast } from "@/app/app/app-feedback-toast";
 import { AppBenefitsSection } from "@/components/app/app-benefits-section";
-import { AppDevicesSection } from "@/components/app/app-devices-section";
 import { AppHeader } from "@/components/app/app-header";
 import { AppOverviewSection } from "@/components/app/app-overview-section";
-import { AppPaymentsSection } from "@/components/app/app-payments-section";
-import { AppProfileSection } from "@/components/app/app-profile-section";
-import { AppSubscriptionSection } from "@/components/app/app-subscription-section";
 import { AppTariffsSection } from "@/components/app/app-tariffs-section";
 import { getAppBenefitsData } from "@/lib/app-benefits";
 import { getCurrentSession } from "@/lib/auth";
-import { getAppPaymentsData } from "@/lib/payment-management";
 import { getAppSubscriptionData } from "@/lib/subscription-management";
 import { getActiveTariffs } from "@/lib/tariff-management";
 
@@ -43,14 +38,13 @@ export default async function AppPage({
   const resolvedSearchParams = await searchParams;
   const error = getValue(resolvedSearchParams, "error");
   const notice = getValue(resolvedSearchParams, "notice");
-  const [benefitsData, paymentsData, subscriptionData, tariffs] = await Promise.all([
+  const [benefitsData, subscriptionData, tariffs] = await Promise.all([
     getAppBenefitsData(session.username),
-    getAppPaymentsData(session.username),
     getAppSubscriptionData(session.username),
     getActiveTariffs(),
   ]);
 
-  if (!benefitsData || !paymentsData || !subscriptionData) {
+  if (!benefitsData || !subscriptionData) {
     redirect("/login?mode=login&error=Сначала войдите в аккаунт.");
   }
 
@@ -64,19 +58,13 @@ export default async function AppPage({
       <AppHeader />
 
       <div className="mx-auto w-full max-w-[1200px] px-6 pb-24 pt-8">
-        <AppOverviewSection credits={benefitsData.user.credits} />
-        <AppProfileSection credits={benefitsData.user.credits} username={session.username} />
         <AppTariffsSection tariffs={tariffs} />
-        <AppPaymentsSection
-          openPaymentRequest={paymentsData.openPaymentRequest}
-          paymentRequests={paymentsData.paymentRequests}
-          tariffs={tariffs}
-        />
-        <AppSubscriptionSection
+        <AppOverviewSection
           activeSubscription={subscriptionData.activeSubscription}
-          latestSubscriptions={subscriptionData.latestSubscriptions}
+          credits={benefitsData.user.credits}
+          referralStats={benefitsData.referralStats}
+          username={benefitsData.user.username}
         />
-        <AppDevicesSection deviceSlots={subscriptionData.activeSubscription?.deviceSlots ?? []} />
         <AppBenefitsSection
           canGenerateReferralCode={benefitsData.canGenerateReferralCode}
           hasApprovedPayment={benefitsData.hasApprovedPayment}

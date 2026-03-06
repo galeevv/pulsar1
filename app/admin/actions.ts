@@ -397,6 +397,7 @@ export async function createTariffAction(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const periodMonths = Number.parseInt(String(formData.get("periodMonths") ?? ""), 10);
   const priceRub = Number.parseInt(String(formData.get("priceRub") ?? ""), 10);
+  const devicePriceRub = Number.parseInt(String(formData.get("devicePriceRub") ?? ""), 10);
   const deviceLimit = Number.parseInt(String(formData.get("deviceLimit") ?? ""), 10);
   const isEnabled = String(formData.get("isEnabled") ?? "") === "on";
 
@@ -412,7 +413,19 @@ export async function createTariffAction(formData: FormData) {
 
   if (!Number.isFinite(priceRub) || priceRub <= 0) {
     redirect(
-      buildRedirectUrl({ anchor: "#tariffs", error: "Цена тарифа должна быть больше 0." })
+      buildRedirectUrl({
+        anchor: "#tariffs",
+        error: "Цена одного месяца должна быть больше 0.",
+      })
+    );
+  }
+
+  if (!Number.isFinite(devicePriceRub) || devicePriceRub < 0) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#tariffs",
+        error: "Цена одного устройства не может быть отрицательной.",
+      })
     );
   }
 
@@ -428,6 +441,7 @@ export async function createTariffAction(formData: FormData) {
   await prisma.tariff.create({
     data: {
       deviceLimit,
+      devicePriceRub,
       isEnabled,
       name,
       periodMonths,
@@ -447,6 +461,7 @@ export async function updateTariffAction(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const periodMonths = Number.parseInt(String(formData.get("periodMonths") ?? ""), 10);
   const priceRub = Number.parseInt(String(formData.get("priceRub") ?? ""), 10);
+  const devicePriceRub = Number.parseInt(String(formData.get("devicePriceRub") ?? ""), 10);
   const deviceLimit = Number.parseInt(String(formData.get("deviceLimit") ?? ""), 10);
   const isEnabled = String(formData.get("isEnabled") ?? "") === "on";
 
@@ -466,7 +481,19 @@ export async function updateTariffAction(formData: FormData) {
 
   if (!Number.isFinite(priceRub) || priceRub <= 0) {
     redirect(
-      buildRedirectUrl({ anchor: "#tariffs", error: "Цена тарифа должна быть больше 0." })
+      buildRedirectUrl({
+        anchor: "#tariffs",
+        error: "Цена одного месяца должна быть больше 0.",
+      })
+    );
+  }
+
+  if (!Number.isFinite(devicePriceRub) || devicePriceRub < 0) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#tariffs",
+        error: "Цена одного устройства не может быть отрицательной.",
+      })
     );
   }
 
@@ -482,6 +509,7 @@ export async function updateTariffAction(formData: FormData) {
   await prisma.tariff.update({
     data: {
       deviceLimit,
+      devicePriceRub,
       isEnabled,
       name,
       periodMonths,

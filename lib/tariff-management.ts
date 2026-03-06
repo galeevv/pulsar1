@@ -8,7 +8,7 @@ export async function getAdminTariffs() {
 
 export async function getActiveTariffs() {
   return prisma.tariff.findMany({
-    orderBy: [{ priceRub: "asc" }, { createdAt: "asc" }],
+    orderBy: [{ priceRub: "asc" }, { devicePriceRub: "asc" }, { createdAt: "asc" }],
     where: { isEnabled: true },
   });
 }

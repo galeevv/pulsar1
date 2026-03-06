@@ -10225,12 +10225,14 @@ export namespace Prisma {
   export type TariffAvgAggregateOutputType = {
     periodMonths: number | null
     priceRub: number | null
+    devicePriceRub: number | null
     deviceLimit: number | null
   }
 
   export type TariffSumAggregateOutputType = {
     periodMonths: number | null
     priceRub: number | null
+    devicePriceRub: number | null
     deviceLimit: number | null
   }
 
@@ -10239,6 +10241,7 @@ export namespace Prisma {
     name: string | null
     periodMonths: number | null
     priceRub: number | null
+    devicePriceRub: number | null
     deviceLimit: number | null
     isEnabled: boolean | null
     createdAt: Date | null
@@ -10250,6 +10253,7 @@ export namespace Prisma {
     name: string | null
     periodMonths: number | null
     priceRub: number | null
+    devicePriceRub: number | null
     deviceLimit: number | null
     isEnabled: boolean | null
     createdAt: Date | null
@@ -10261,6 +10265,7 @@ export namespace Prisma {
     name: number
     periodMonths: number
     priceRub: number
+    devicePriceRub: number
     deviceLimit: number
     isEnabled: number
     createdAt: number
@@ -10272,12 +10277,14 @@ export namespace Prisma {
   export type TariffAvgAggregateInputType = {
     periodMonths?: true
     priceRub?: true
+    devicePriceRub?: true
     deviceLimit?: true
   }
 
   export type TariffSumAggregateInputType = {
     periodMonths?: true
     priceRub?: true
+    devicePriceRub?: true
     deviceLimit?: true
   }
 
@@ -10286,6 +10293,7 @@ export namespace Prisma {
     name?: true
     periodMonths?: true
     priceRub?: true
+    devicePriceRub?: true
     deviceLimit?: true
     isEnabled?: true
     createdAt?: true
@@ -10297,6 +10305,7 @@ export namespace Prisma {
     name?: true
     periodMonths?: true
     priceRub?: true
+    devicePriceRub?: true
     deviceLimit?: true
     isEnabled?: true
     createdAt?: true
@@ -10308,6 +10317,7 @@ export namespace Prisma {
     name?: true
     periodMonths?: true
     priceRub?: true
+    devicePriceRub?: true
     deviceLimit?: true
     isEnabled?: true
     createdAt?: true
@@ -10406,6 +10416,7 @@ export namespace Prisma {
     name: string
     periodMonths: number
     priceRub: number
+    devicePriceRub: number
     deviceLimit: number
     isEnabled: boolean
     createdAt: Date
@@ -10436,6 +10447,7 @@ export namespace Prisma {
     name?: boolean
     periodMonths?: boolean
     priceRub?: boolean
+    devicePriceRub?: boolean
     deviceLimit?: boolean
     isEnabled?: boolean
     createdAt?: boolean
@@ -10449,6 +10461,7 @@ export namespace Prisma {
     name?: boolean
     periodMonths?: boolean
     priceRub?: boolean
+    devicePriceRub?: boolean
     deviceLimit?: boolean
     isEnabled?: boolean
     createdAt?: boolean
@@ -10460,6 +10473,7 @@ export namespace Prisma {
     name?: boolean
     periodMonths?: boolean
     priceRub?: boolean
+    devicePriceRub?: boolean
     deviceLimit?: boolean
     isEnabled?: boolean
     createdAt?: boolean
@@ -10471,13 +10485,14 @@ export namespace Prisma {
     name?: boolean
     periodMonths?: boolean
     priceRub?: boolean
+    devicePriceRub?: boolean
     deviceLimit?: boolean
     isEnabled?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type TariffOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "periodMonths" | "priceRub" | "deviceLimit" | "isEnabled" | "createdAt" | "updatedAt", ExtArgs["result"]["tariff"]>
+  export type TariffOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "periodMonths" | "priceRub" | "devicePriceRub" | "deviceLimit" | "isEnabled" | "createdAt" | "updatedAt", ExtArgs["result"]["tariff"]>
   export type TariffInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     paymentRequests?: boolean | Tariff$paymentRequestsArgs<ExtArgs>
     _count?: boolean | TariffCountOutputTypeDefaultArgs<ExtArgs>
@@ -10495,6 +10510,7 @@ export namespace Prisma {
       name: string
       periodMonths: number
       priceRub: number
+      devicePriceRub: number
       deviceLimit: number
       isEnabled: boolean
       createdAt: Date
@@ -10927,6 +10943,7 @@ export namespace Prisma {
     readonly name: FieldRef<"Tariff", 'String'>
     readonly periodMonths: FieldRef<"Tariff", 'Int'>
     readonly priceRub: FieldRef<"Tariff", 'Int'>
+    readonly devicePriceRub: FieldRef<"Tariff", 'Int'>
     readonly deviceLimit: FieldRef<"Tariff", 'Int'>
     readonly isEnabled: FieldRef<"Tariff", 'Boolean'>
     readonly createdAt: FieldRef<"Tariff", 'DateTime'>
@@ -17332,6 +17349,7 @@ export namespace Prisma {
     name: 'name',
     periodMonths: 'periodMonths',
     priceRub: 'priceRub',
+    devicePriceRub: 'devicePriceRub',
     deviceLimit: 'deviceLimit',
     isEnabled: 'isEnabled',
     createdAt: 'createdAt',
@@ -18030,6 +18048,7 @@ export namespace Prisma {
     name?: StringFilter<"Tariff"> | string
     periodMonths?: IntFilter<"Tariff"> | number
     priceRub?: IntFilter<"Tariff"> | number
+    devicePriceRub?: IntFilter<"Tariff"> | number
     deviceLimit?: IntFilter<"Tariff"> | number
     isEnabled?: BoolFilter<"Tariff"> | boolean
     createdAt?: DateTimeFilter<"Tariff"> | Date | string
@@ -18042,6 +18061,7 @@ export namespace Prisma {
     name?: SortOrder
     periodMonths?: SortOrder
     priceRub?: SortOrder
+    devicePriceRub?: SortOrder
     deviceLimit?: SortOrder
     isEnabled?: SortOrder
     createdAt?: SortOrder
@@ -18057,6 +18077,7 @@ export namespace Prisma {
     name?: StringFilter<"Tariff"> | string
     periodMonths?: IntFilter<"Tariff"> | number
     priceRub?: IntFilter<"Tariff"> | number
+    devicePriceRub?: IntFilter<"Tariff"> | number
     deviceLimit?: IntFilter<"Tariff"> | number
     isEnabled?: BoolFilter<"Tariff"> | boolean
     createdAt?: DateTimeFilter<"Tariff"> | Date | string
@@ -18069,6 +18090,7 @@ export namespace Prisma {
     name?: SortOrder
     periodMonths?: SortOrder
     priceRub?: SortOrder
+    devicePriceRub?: SortOrder
     deviceLimit?: SortOrder
     isEnabled?: SortOrder
     createdAt?: SortOrder
@@ -18088,6 +18110,7 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"Tariff"> | string
     periodMonths?: IntWithAggregatesFilter<"Tariff"> | number
     priceRub?: IntWithAggregatesFilter<"Tariff"> | number
+    devicePriceRub?: IntWithAggregatesFilter<"Tariff"> | number
     deviceLimit?: IntWithAggregatesFilter<"Tariff"> | number
     isEnabled?: BoolWithAggregatesFilter<"Tariff"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Tariff"> | Date | string
@@ -19068,6 +19091,7 @@ export namespace Prisma {
     name: string
     periodMonths: number
     priceRub: number
+    devicePriceRub?: number
     deviceLimit: number
     isEnabled?: boolean
     createdAt?: Date | string
@@ -19080,6 +19104,7 @@ export namespace Prisma {
     name: string
     periodMonths: number
     priceRub: number
+    devicePriceRub?: number
     deviceLimit: number
     isEnabled?: boolean
     createdAt?: Date | string
@@ -19092,6 +19117,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     periodMonths?: IntFieldUpdateOperationsInput | number
     priceRub?: IntFieldUpdateOperationsInput | number
+    devicePriceRub?: IntFieldUpdateOperationsInput | number
     deviceLimit?: IntFieldUpdateOperationsInput | number
     isEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19104,6 +19130,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     periodMonths?: IntFieldUpdateOperationsInput | number
     priceRub?: IntFieldUpdateOperationsInput | number
+    devicePriceRub?: IntFieldUpdateOperationsInput | number
     deviceLimit?: IntFieldUpdateOperationsInput | number
     isEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19116,6 +19143,7 @@ export namespace Prisma {
     name: string
     periodMonths: number
     priceRub: number
+    devicePriceRub?: number
     deviceLimit: number
     isEnabled?: boolean
     createdAt?: Date | string
@@ -19127,6 +19155,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     periodMonths?: IntFieldUpdateOperationsInput | number
     priceRub?: IntFieldUpdateOperationsInput | number
+    devicePriceRub?: IntFieldUpdateOperationsInput | number
     deviceLimit?: IntFieldUpdateOperationsInput | number
     isEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19138,6 +19167,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     periodMonths?: IntFieldUpdateOperationsInput | number
     priceRub?: IntFieldUpdateOperationsInput | number
+    devicePriceRub?: IntFieldUpdateOperationsInput | number
     deviceLimit?: IntFieldUpdateOperationsInput | number
     isEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20193,6 +20223,7 @@ export namespace Prisma {
     name?: SortOrder
     periodMonths?: SortOrder
     priceRub?: SortOrder
+    devicePriceRub?: SortOrder
     deviceLimit?: SortOrder
     isEnabled?: SortOrder
     createdAt?: SortOrder
@@ -20202,6 +20233,7 @@ export namespace Prisma {
   export type TariffAvgOrderByAggregateInput = {
     periodMonths?: SortOrder
     priceRub?: SortOrder
+    devicePriceRub?: SortOrder
     deviceLimit?: SortOrder
   }
 
@@ -20210,6 +20242,7 @@ export namespace Prisma {
     name?: SortOrder
     periodMonths?: SortOrder
     priceRub?: SortOrder
+    devicePriceRub?: SortOrder
     deviceLimit?: SortOrder
     isEnabled?: SortOrder
     createdAt?: SortOrder
@@ -20221,6 +20254,7 @@ export namespace Prisma {
     name?: SortOrder
     periodMonths?: SortOrder
     priceRub?: SortOrder
+    devicePriceRub?: SortOrder
     deviceLimit?: SortOrder
     isEnabled?: SortOrder
     createdAt?: SortOrder
@@ -20230,6 +20264,7 @@ export namespace Prisma {
   export type TariffSumOrderByAggregateInput = {
     periodMonths?: SortOrder
     priceRub?: SortOrder
+    devicePriceRub?: SortOrder
     deviceLimit?: SortOrder
   }
 
@@ -22703,6 +22738,7 @@ export namespace Prisma {
     name: string
     periodMonths: number
     priceRub: number
+    devicePriceRub?: number
     deviceLimit: number
     isEnabled?: boolean
     createdAt?: Date | string
@@ -22714,6 +22750,7 @@ export namespace Prisma {
     name: string
     periodMonths: number
     priceRub: number
+    devicePriceRub?: number
     deviceLimit: number
     isEnabled?: boolean
     createdAt?: Date | string
@@ -22833,6 +22870,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     periodMonths?: IntFieldUpdateOperationsInput | number
     priceRub?: IntFieldUpdateOperationsInput | number
+    devicePriceRub?: IntFieldUpdateOperationsInput | number
     deviceLimit?: IntFieldUpdateOperationsInput | number
     isEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22844,6 +22882,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     periodMonths?: IntFieldUpdateOperationsInput | number
     priceRub?: IntFieldUpdateOperationsInput | number
+    devicePriceRub?: IntFieldUpdateOperationsInput | number
     deviceLimit?: IntFieldUpdateOperationsInput | number
     isEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

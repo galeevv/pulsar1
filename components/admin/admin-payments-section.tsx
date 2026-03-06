@@ -67,6 +67,7 @@ export function AdminPaymentsSection({
           {paymentRequests.map((item) => {
             const meta = getStatusMeta(item.status);
             const isFinal = item.status === "APPROVED" || item.status === "REJECTED";
+            const canReview = item.status === "MARKED_PAID";
 
             return (
               <AdminSurface key={item.id}>
@@ -91,7 +92,7 @@ export function AdminPaymentsSection({
                       <input name="id" type="hidden" value={item.id} />
                       <Button
                         className="h-button px-button-x"
-                        disabled={isFinal}
+                        disabled={isFinal || !canReview}
                         radius="card"
                         type="submit"
                       >
@@ -103,7 +104,7 @@ export function AdminPaymentsSection({
                       <input name="id" type="hidden" value={item.id} />
                       <Button
                         className="h-button px-button-x"
-                        disabled={isFinal}
+                        disabled={isFinal || !canReview}
                         radius="card"
                         type="submit"
                         variant="outline"

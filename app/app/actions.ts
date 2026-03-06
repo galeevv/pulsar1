@@ -34,6 +34,15 @@ function addMonths(date: Date, months: number) {
   return result;
 }
 
+function getTariffTotalAmount(tariff: {
+  deviceLimit: number;
+  devicePriceRub: number;
+  periodMonths: number;
+  priceRub: number;
+}) {
+  return tariff.priceRub * tariff.periodMonths + tariff.devicePriceRub * tariff.deviceLimit;
+}
+
 async function getUserActor() {
   const session = await getCurrentSession();
 
@@ -135,6 +144,128 @@ export async function applyPromoCodeAction(formData: FormData) {
   );
 }
 
+export async function confirmTariffPaymentAction(formData: FormData) {
+  const user = await getUserActor();
+  const tariffId = String(formData.get("tariffId") ?? "");
+
+  if (!tariffId) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#tariffs",
+        error: "Выберите тариф для оплаты.",
+      })
+    );
+  }
+
+  const [tariff, openPaymentRequest] = await Promise.all([
+    prisma.tariff.findFirst({
+      where: {
+        id: tariffId,
+        isEnabled: true,
+      },
+    }),
+    prisma.paymentRequest.findFirst({
+      where: {
+        status: {
+          in: ["CREATED", "MARKED_PAID"],
+        },
+        userId: user.id,
+      },
+    }),
+  ]);
+
+  if (!tariff) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#tariffs",
+        error: "Тариф не найден или уже отключен.",
+      })
+    );
+  }
+
+  if (openPaymentRequest) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#tariffs",
+        error: "У вас уже есть открытая заявка. Дождитесь решения администратора.",
+      })
+    );
+  }
+
+  const now = new Date();
+  let createdSubscriptionId: string | null = null;
+
+  await prisma.$transaction(async (tx) => {
+    const paymentRequest = await tx.paymentRequest.create({
+      data: {
+        amountRub: getTariffTotalAmount(tariff),
+        deviceLimit: tariff.deviceLimit,
+        markedPaidAt: now,
+        periodMonths: tariff.periodMonths,
+        status: "MARKED_PAID",
+        tariffId: tariff.id,
+        tariffName: tariff.name,
+        userId: user.id,
+      },
+    });
+
+    await tx.subscription.updateMany({
+      data: {
+        revokedAt: now,
+        status: "REVOKED",
+      },
+      where: {
+        status: "ACTIVE",
+        userId: user.id,
+      },
+    });
+
+    const createdSubscription = await tx.subscription.create({
+      data: {
+        deviceLimit: paymentRequest.deviceLimit,
+        endsAt: addMonths(now, paymentRequest.periodMonths),
+        paymentRequestId: paymentRequest.id,
+        periodMonths: paymentRequest.periodMonths,
+        startedAt: now,
+        status: "ACTIVE",
+        tariffName: paymentRequest.tariffName,
+        userId: user.id,
+      },
+    });
+
+    createdSubscriptionId = createdSubscription.id;
+
+    await tx.deviceSlot.createMany({
+      data: Array.from({ length: paymentRequest.deviceLimit }, (_, index) => ({
+        label: `Устройство ${index + 1}`,
+        slotIndex: index + 1,
+        status: "FREE",
+        subscriptionId: createdSubscription.id,
+      })),
+    });
+  });
+
+  let marzbanNotice = "";
+
+  if (createdSubscriptionId) {
+    const integrationResult = await issueSubscriptionInMarzban(createdSubscriptionId);
+
+    if (!integrationResult.ok) {
+      marzbanNotice =
+        " Подписка активирована локально, но выдача в Marzban завершилась с ошибкой. Проверьте раздел интеграции.";
+    }
+  }
+
+  revalidatePath("/app");
+  revalidatePath("/admin");
+  redirect(
+    buildRedirectUrl({
+      anchor: "#dashboard",
+      notice: `Оплата отмечена как выполненная. Подписка активирована сразу, администратор позже подтвердит перевод.${marzbanNotice}`,
+    })
+  );
+}
+
 export async function createPaymentRequestAction(formData: FormData) {
   const user = await getUserActor();
   const tariffId = String(formData.get("tariffId") ?? "");
@@ -185,7 +316,7 @@ export async function createPaymentRequestAction(formData: FormData) {
 
   await prisma.paymentRequest.create({
     data: {
-      amountRub: tariff.priceRub,
+      amountRub: getTariffTotalAmount(tariff),
       deviceLimit: tariff.deviceLimit,
       periodMonths: tariff.periodMonths,
       tariffId: tariff.id,

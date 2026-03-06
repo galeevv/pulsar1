@@ -191,6 +191,7 @@ exports.Prisma.TariffScalarFieldEnum = {
   name: 'name',
   periodMonths: 'periodMonths',
   priceRub: 'priceRub',
+  devicePriceRub: 'devicePriceRub',
   deviceLimit: 'deviceLimit',
   isEnabled: 'isEnabled',
   createdAt: 'createdAt',

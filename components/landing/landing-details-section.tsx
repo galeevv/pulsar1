@@ -27,19 +27,19 @@ const items = [
 export function LandingDetailsSection() {
   return (
     <section
-      className="scroll-mt-24 pb-16 md:scroll-mt-28 md:pb-24"
+      className="scroll-mt-24 pb-16 md:scroll-mt-28 md:pb-15"
       id="pulsar-details"
     >
       <div className="space-y-6">
         <div className="space-y-3">
-          <p className="text-eyebrow font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground sm:text-eyebrow">
             Что такое пульсар?
           </p>
           <div className="space-y-3">
-            <h2 className="text-h2 font-semibold tracking-tight">
+            <h2 className="text-2xl font-semibold tracking-tight sm:text-[28px] md:text-h2">
               Происхождение и основные характеристики
             </h2>
-            <p className="text-lead text-muted-foreground">
+            <p className="text-sm text-muted-foreground sm:text-base md:text-lead">
               Краткое описание формирования.
             </p>
           </div>
@@ -64,10 +64,10 @@ export function LandingDetailsSection() {
                 </div>
               </div>
 
-              <h3 className="mt-4 text-xl font-semibold tracking-tight">
+              <h3 className="mt-4 text-lg font-semibold tracking-tight sm:text-xl">
                 {item.title}
               </h3>
-              <p className="mt-2 text-base text-muted-foreground">
+              <p className="mt-2 text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7">
                 {item.description}
               </p>
             </article>
@@ -75,7 +75,7 @@ export function LandingDetailsSection() {
         </div>
 
         <div className="rounded-card border border-border bg-card/30 p-card md:p-card-md">
-          <p className="text-base leading-8 text-muted-foreground md:text-lg">
+          <p className="text-sm leading-7 text-muted-foreground sm:text-base sm:leading-8 md:text-lg">
             <span className="font-semibold text-foreground">Значимость:</span>{" "}
             стабильность периодов делает пульсары природными «точными часами»
             космоса.

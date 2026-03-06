@@ -18,7 +18,7 @@ export function AppSectionShell({
           {eyebrow}
         </p>
         <h2 className="text-h2 font-semibold tracking-tight">{title}</h2>
-        <p className="max-w-[760px] text-sm leading-7 text-muted-foreground md:text-base">
+        <p className="w-full text-sm leading-7 text-muted-foreground md:text-base">
           {description}
         </p>
       </div>
