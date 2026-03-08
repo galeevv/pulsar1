@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -8,6 +8,10 @@ import { getAppBenefitsData, validatePromoCodeForUser } from "@/lib/app-benefits
 import { getCurrentSession, normalizeCode } from "@/lib/auth";
 import { issueSubscriptionInMarzban } from "@/lib/marzban-integration";
 import { prisma } from "@/lib/prisma";
+import {
+  calculateSubscriptionPrice,
+  getAppSubscriptionConstructorData,
+} from "@/lib/subscription-constructor";
 
 function buildRedirectUrl(params: {
   anchor?: string;
@@ -34,13 +38,33 @@ function addMonths(date: Date, months: number) {
   return result;
 }
 
-function getTariffTotalAmount(tariff: {
-  deviceLimit: number;
-  devicePriceRub: number;
-  periodMonths: number;
-  priceRub: number;
-}) {
-  return tariff.priceRub * tariff.periodMonths + tariff.devicePriceRub * tariff.deviceLimit;
+function normalizeDiscountPct(discountPct: number) {
+  return Math.max(0, Math.min(100, discountPct));
+}
+
+async function getFirstPurchaseReferralDiscountPct(userId: string) {
+  const [approvedPaymentsCount, referralCodeUse] = await Promise.all([
+    prisma.paymentRequest.count({
+      where: {
+        status: "APPROVED",
+        userId,
+      },
+    }),
+    prisma.referralCodeUse.findUnique({
+      select: {
+        discountPctSnapshot: true,
+      },
+      where: {
+        referredUserId: userId,
+      },
+    }),
+  ]);
+
+  if (approvedPaymentsCount > 0 || !referralCodeUse) {
+    return 0;
+  }
+
+  return normalizeDiscountPct(referralCodeUse.discountPctSnapshot);
 }
 
 async function getUserActor() {
@@ -66,6 +90,231 @@ async function getUserActor() {
   return user;
 }
 
+function parsePositiveInt(rawValue: FormDataEntryValue | null) {
+  const parsed = Number.parseInt(String(rawValue ?? ""), 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return null;
+  }
+
+  return parsed;
+}
+
+async function parseAndValidateConstructorSelection(
+  userId: string,
+  formData: FormData
+) {
+  const months = parsePositiveInt(formData.get("months"));
+  const devices = parsePositiveInt(formData.get("devices"));
+
+  if (!months) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#tariffs",
+        error: "Выберите срок подписки.",
+      })
+    );
+  }
+
+  if (!devices) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#tariffs",
+        error: "Выберите количество устройств.",
+      })
+    );
+  }
+
+  const [{ durationRules, pricingSettings }, openPaymentRequest, activeSubscription, referralDiscountPct] =
+    await Promise.all([
+      getAppSubscriptionConstructorData(),
+      prisma.paymentRequest.findFirst({
+        where: {
+          status: {
+            in: ["CREATED", "MARKED_PAID"],
+          },
+          userId,
+        },
+      }),
+      prisma.subscription.findFirst({
+        include: {
+          paymentRequest: {
+            select: {
+              status: true,
+            },
+          },
+        },
+        orderBy: [{ startsAt: "desc" }, { startedAt: "desc" }],
+        where: {
+          status: "ACTIVE",
+          userId,
+        },
+      }),
+      getFirstPurchaseReferralDiscountPct(userId),
+    ]);
+
+  if (openPaymentRequest) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#tariffs",
+        error: "У вас уже есть открытая заявка на оплату. Дождитесь проверки администратором.",
+      })
+    );
+  }
+
+  if (devices < pricingSettings.minDevices || devices > pricingSettings.maxDevices) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#tariffs",
+        error: `Количество устройств должно быть в диапазоне ${pricingSettings.minDevices}..${pricingSettings.maxDevices}.`,
+      })
+    );
+  }
+
+  const durationRule = durationRules.find((item) => item.months === months);
+
+  if (!durationRule) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#tariffs",
+        error: "Выбранный срок отключен администратором.",
+      })
+    );
+  }
+
+  if (activeSubscription) {
+    const activePaymentStatus = activeSubscription.paymentRequest?.status;
+
+    if (activePaymentStatus !== "APPROVED") {
+      redirect(
+        buildRedirectUrl({
+          anchor: "#tariffs",
+          error:
+            "Продление доступно только после подтверждения администратором текущей оплаты подписки.",
+        })
+      );
+    }
+  }
+
+  const price = calculateSubscriptionPrice({
+    baseDeviceMonthlyPrice: pricingSettings.baseDeviceMonthlyPrice,
+    devices,
+    durationDiscountPercent: durationRule.discountPercent,
+    extraDeviceMonthlyPrice: pricingSettings.extraDeviceMonthlyPrice,
+    months,
+    referralDiscountPercent: referralDiscountPct,
+    vpnMonthlyPrice: durationRule.monthlyPrice,
+  });
+
+  return {
+    activeSubscription,
+    months,
+    pricingSettings,
+    price,
+  };
+}
+
+async function createSubscriptionFromPaidRequest(input: {
+  now: Date;
+  paymentRequest: {
+    amountRub: number;
+    baseDeviceMonthlyPriceSnapshot: number;
+    currency: string;
+    deviceLimit: number;
+    devices: number;
+    durationDiscountPercentSnapshot: number;
+    extraDeviceMonthlyPriceSnapshot: number;
+    id: string;
+    monthlyPriceSnapshot: number;
+    months: number;
+    referralDiscountPercentSnapshot: number;
+    tariffName: string;
+  };
+  tx: Omit<
+    typeof prisma,
+    "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends"
+  >;
+  userId: string;
+}) {
+  const activeSubscription = await input.tx.subscription.findFirst({
+    orderBy: [{ startsAt: "desc" }, { startedAt: "desc" }],
+    where: {
+      status: "ACTIVE",
+      userId: input.userId,
+    },
+  });
+
+  const now = input.now;
+  const previousStartAt = activeSubscription?.startsAt ?? activeSubscription?.startedAt ?? now;
+  const extensionBaseDate = activeSubscription?.expiresAt ?? activeSubscription?.endsAt ?? now;
+  const nextExpiresAt = addMonths(extensionBaseDate, input.paymentRequest.months);
+  const nextMonthsPurchased =
+    (activeSubscription?.monthsPurchased ?? activeSubscription?.periodMonths ?? 0) +
+    input.paymentRequest.months;
+  const nextTotalPaid = (activeSubscription?.totalPaid ?? 0) + input.paymentRequest.amountRub;
+
+  if (activeSubscription) {
+    await input.tx.subscription.update({
+      data: {
+        marzbanUsername: null,
+        revokedAt: now,
+        status: "REVOKED",
+      },
+      where: {
+        id: activeSubscription.id,
+      },
+    });
+
+    await input.tx.deviceSlot.updateMany({
+      data: {
+        status: "BLOCKED",
+      },
+      where: {
+        subscriptionId: activeSubscription.id,
+      },
+    });
+  }
+
+  const createdSubscription = await input.tx.subscription.create({
+    data: {
+      baseDeviceMonthlyPriceSnapshot: input.paymentRequest.baseDeviceMonthlyPriceSnapshot,
+      currency: input.paymentRequest.currency,
+      deviceLimit: input.paymentRequest.deviceLimit,
+      devices: input.paymentRequest.devices,
+      durationDiscountPercentSnapshot: input.paymentRequest.durationDiscountPercentSnapshot,
+      endsAt: nextExpiresAt,
+      expiresAt: nextExpiresAt,
+      extraDeviceMonthlyPriceSnapshot: input.paymentRequest.extraDeviceMonthlyPriceSnapshot,
+      monthlyPriceSnapshot: input.paymentRequest.monthlyPriceSnapshot,
+      monthsPurchased: nextMonthsPurchased,
+      paymentRequestId: input.paymentRequest.id,
+      pendingDevices: null,
+      periodMonths: input.paymentRequest.months,
+      referralDiscountPercentSnapshot: input.paymentRequest.referralDiscountPercentSnapshot,
+      startsAt: previousStartAt,
+      startedAt: previousStartAt,
+      status: "ACTIVE",
+      tariffName: input.paymentRequest.tariffName,
+      totalPaid: nextTotalPaid,
+      userId: input.userId,
+    },
+  });
+
+  await input.tx.deviceSlot.createMany({
+    data: Array.from({ length: input.paymentRequest.devices }, (_, index) => ({
+      label: `Device ${index + 1}`,
+      slotIndex: index + 1,
+      status: "FREE",
+      subscriptionId: createdSubscription.id,
+    })),
+  });
+
+  return createdSubscription.id;
+}
+
+function buildConstructorTariffName(months: number, devices: number) {
+  return `Constructor: ${months}m / ${devices} devices`;
+}
+
 export async function generateOwnReferralCodeAction() {
   const user = await getUserActor();
   const appBenefitsData = await getAppBenefitsData(user.username);
@@ -77,7 +326,7 @@ export async function generateOwnReferralCodeAction() {
   if (!appBenefitsData.referralProgramSettings.isEnabled) {
     redirect(
       buildRedirectUrl({
-        error: "Реферальная система временно выключена.",
+        error: "Реферальная программа сейчас отключена.",
       })
     );
   }
@@ -85,13 +334,13 @@ export async function generateOwnReferralCodeAction() {
   if (!appBenefitsData.hasApprovedPayment) {
     redirect(
       buildRedirectUrl({
-        error: "ReferralCode станет доступен после первой подтвержденной оплаты.",
+        error: "Реферальный код доступен после первой подтвержденной оплаты.",
       })
     );
   }
 
   if (appBenefitsData.ownReferralCode) {
-    redirect(buildRedirectUrl({ error: "У вас уже есть referral-код." }));
+    redirect(buildRedirectUrl({ error: "У вас уже есть реферальный код." }));
   }
 
   const code = normalizeCode(generateReferralCodeValue());
@@ -107,7 +356,7 @@ export async function generateOwnReferralCodeAction() {
   });
 
   revalidatePath("/app");
-  redirect(buildRedirectUrl({ notice: "Ваш referral-код создан." }));
+  redirect(buildRedirectUrl({ notice: "Ваш реферальный код создан." }));
 }
 
 export async function applyPromoCodeAction(formData: FormData) {
@@ -139,109 +388,45 @@ export async function applyPromoCodeAction(formData: FormData) {
   revalidatePath("/app");
   redirect(
     buildRedirectUrl({
-      notice: `Промокод применен. Баланс пополнен на ${validation.promoCode.creditAmount} кредитов.`,
+      notice: `Промокод применен. Баланс увеличен на ${validation.promoCode.creditAmount} кредитов.`,
     })
   );
 }
 
 export async function confirmTariffPaymentAction(formData: FormData) {
   const user = await getUserActor();
-  const tariffId = String(formData.get("tariffId") ?? "");
-
-  if (!tariffId) {
-    redirect(
-      buildRedirectUrl({
-        anchor: "#tariffs",
-        error: "Выберите тариф для оплаты.",
-      })
-    );
-  }
-
-  const [tariff, openPaymentRequest] = await Promise.all([
-    prisma.tariff.findFirst({
-      where: {
-        id: tariffId,
-        isEnabled: true,
-      },
-    }),
-    prisma.paymentRequest.findFirst({
-      where: {
-        status: {
-          in: ["CREATED", "MARKED_PAID"],
-        },
-        userId: user.id,
-      },
-    }),
-  ]);
-
-  if (!tariff) {
-    redirect(
-      buildRedirectUrl({
-        anchor: "#tariffs",
-        error: "Тариф не найден или уже отключен.",
-      })
-    );
-  }
-
-  if (openPaymentRequest) {
-    redirect(
-      buildRedirectUrl({
-        anchor: "#tariffs",
-        error: "У вас уже есть открытая заявка. Дождитесь решения администратора.",
-      })
-    );
-  }
-
+  const validated = await parseAndValidateConstructorSelection(user.id, formData);
   const now = new Date();
   let createdSubscriptionId: string | null = null;
 
   await prisma.$transaction(async (tx) => {
     const paymentRequest = await tx.paymentRequest.create({
       data: {
-        amountRub: getTariffTotalAmount(tariff),
-        deviceLimit: tariff.deviceLimit,
+        amountRub: validated.price.finalTotalRub,
+        baseDeviceMonthlyPriceSnapshot: validated.price.baseDeviceMonthlyPrice,
+        currency: "RUB",
+        deviceLimit: validated.price.devices,
+        devices: validated.price.devices,
+        durationDiscountPercentSnapshot: validated.price.durationDiscountPercent,
+        extraDeviceMonthlyPriceSnapshot: validated.price.extraDeviceMonthlyPrice,
         markedPaidAt: now,
-        periodMonths: tariff.periodMonths,
+        method: "BANK_TRANSFER",
+        monthlyPriceSnapshot: validated.price.monthlyPrice,
+        months: validated.price.months,
+        periodMonths: validated.price.months,
+        referralDiscountPercentSnapshot: validated.price.referralDiscountPercent,
         status: "MARKED_PAID",
-        tariffId: tariff.id,
-        tariffName: tariff.name,
+        tariffName: buildConstructorTariffName(validated.price.months, validated.price.devices),
+        totalPriceBeforeDiscountRubSnapshot: validated.price.totalBeforeDiscountRub,
         userId: user.id,
       },
     });
 
-    await tx.subscription.updateMany({
-      data: {
-        revokedAt: now,
-        status: "REVOKED",
-      },
-      where: {
-        status: "ACTIVE",
-        userId: user.id,
-      },
-    });
-
-    const createdSubscription = await tx.subscription.create({
-      data: {
-        deviceLimit: paymentRequest.deviceLimit,
-        endsAt: addMonths(now, paymentRequest.periodMonths),
-        paymentRequestId: paymentRequest.id,
-        periodMonths: paymentRequest.periodMonths,
-        startedAt: now,
-        status: "ACTIVE",
-        tariffName: paymentRequest.tariffName,
-        userId: user.id,
-      },
-    });
-
-    createdSubscriptionId = createdSubscription.id;
-
-    await tx.deviceSlot.createMany({
-      data: Array.from({ length: paymentRequest.deviceLimit }, (_, index) => ({
-        label: `Устройство ${index + 1}`,
-        slotIndex: index + 1,
-        status: "FREE",
-        subscriptionId: createdSubscription.id,
-      })),
+    createdSubscriptionId = await createSubscriptionFromPaidRequest({
+      now,
+      paymentRequest: paymentRequest,
+      tx,
+      userId: user.id,
     });
   });
 
@@ -252,7 +437,7 @@ export async function confirmTariffPaymentAction(formData: FormData) {
 
     if (!integrationResult.ok) {
       marzbanNotice =
-        " Подписка активирована локально, но выдача в Marzban завершилась с ошибкой. Проверьте раздел интеграции.";
+        " Подписка активирована локально, но выдача в Marzban не удалась. Проверьте интеграции в админке.";
     }
   }
 
@@ -261,155 +446,151 @@ export async function confirmTariffPaymentAction(formData: FormData) {
   redirect(
     buildRedirectUrl({
       anchor: "#dashboard",
-      notice: `Оплата отмечена как выполненная. Подписка активирована сразу, администратор позже подтвердит перевод.${marzbanNotice}`,
+      notice: `Оплата отмечена как выполненная. Подписка активирована сразу и ожидает проверки администратором.${marzbanNotice}`,
     })
   );
 }
 
-export async function createPaymentRequestAction(formData: FormData) {
+export async function payTariffWithCreditsAction(formData: FormData) {
   const user = await getUserActor();
-  const tariffId = String(formData.get("tariffId") ?? "");
-
-  if (!tariffId) {
-    redirect(
-      buildRedirectUrl({
-        anchor: "#payments",
-        error: "Выберите тариф для создания заявки.",
-      })
-    );
-  }
-
-  const [tariff, openPaymentRequest] = await Promise.all([
-    prisma.tariff.findFirst({
-      where: {
-        id: tariffId,
-        isEnabled: true,
-      },
-    }),
-    prisma.paymentRequest.findFirst({
-      where: {
-        status: {
-          in: ["CREATED", "MARKED_PAID"],
-        },
-        userId: user.id,
-      },
-    }),
-  ]);
-
-  if (!tariff) {
-    redirect(
-      buildRedirectUrl({
-        anchor: "#payments",
-        error: "Тариф не найден или уже отключен.",
-      })
-    );
-  }
-
-  if (openPaymentRequest) {
-    redirect(
-      buildRedirectUrl({
-        anchor: "#payments",
-        error: "У вас уже есть активная заявка. Сначала завершите ее.",
-      })
-    );
-  }
-
-  await prisma.paymentRequest.create({
-    data: {
-      amountRub: getTariffTotalAmount(tariff),
-      deviceLimit: tariff.deviceLimit,
-      periodMonths: tariff.periodMonths,
-      tariffId: tariff.id,
-      tariffName: tariff.name,
-      userId: user.id,
-    },
-  });
-
-  revalidatePath("/app");
-  revalidatePath("/admin");
-  redirect(
-    buildRedirectUrl({
-      anchor: "#payments",
-      notice: "Платежная заявка создана. После перевода нажмите «Оплачено».",
-    })
-  );
-}
-
-export async function markPaymentRequestPaidAction(formData: FormData) {
-  const user = await getUserActor();
-  const paymentRequestId = String(formData.get("paymentRequestId") ?? "");
-
-  if (!paymentRequestId) {
-    redirect(buildRedirectUrl({ anchor: "#payments", error: "Заявка не найдена." }));
-  }
-
-  const paymentRequest = await prisma.paymentRequest.findFirst({
-    where: {
-      id: paymentRequestId,
-      userId: user.id,
-    },
-  });
-
-  if (!paymentRequest) {
-    redirect(buildRedirectUrl({ anchor: "#payments", error: "Заявка не найдена." }));
-  }
-
-  if (paymentRequest.status !== "CREATED") {
-    redirect(
-      buildRedirectUrl({
-        anchor: "#payments",
-        error: "Эту заявку уже нельзя отметить как оплаченную повторно.",
-      })
-    );
-  }
+  const validated = await parseAndValidateConstructorSelection(user.id, formData);
 
   const now = new Date();
   let createdSubscriptionId: string | null = null;
+  let chargedRub = 0;
+  let appliedDiscountPct = 0;
+  let referralRewardGranted = false;
 
-  await prisma.$transaction(async (tx) => {
-    await tx.paymentRequest.update({
-      data: {
-        markedPaidAt: now,
-        status: "MARKED_PAID",
-      },
-      where: { id: paymentRequest.id },
+  try {
+    await prisma.$transaction(async (tx) => {
+      const [approvedBefore, referredUse] = await Promise.all([
+        tx.paymentRequest.count({
+          where: {
+            status: "APPROVED",
+            userId: user.id,
+          },
+        }),
+        tx.referralCodeUse.findUnique({
+          include: {
+            referralCode: {
+              select: {
+                ownerUserId: true,
+              },
+            },
+          },
+          where: {
+            referredUserId: user.id,
+          },
+        }),
+      ]);
+
+      appliedDiscountPct =
+        approvedBefore === 0 && referredUse
+          ? normalizeDiscountPct(referredUse.discountPctSnapshot)
+          : 0;
+
+      const recalculated = calculateSubscriptionPrice({
+        baseDeviceMonthlyPrice: validated.price.baseDeviceMonthlyPrice,
+        devices: validated.price.devices,
+        durationDiscountPercent: validated.price.durationDiscountPercent,
+        extraDeviceMonthlyPrice: validated.pricingSettings.extraDeviceMonthlyPrice,
+        months: validated.price.months,
+        referralDiscountPercent: appliedDiscountPct,
+        vpnMonthlyPrice: validated.price.vpnMonthlyPrice,
+      });
+
+      chargedRub = recalculated.finalTotalRub;
+
+      const debitResult = await tx.user.updateMany({
+        data: {
+          credits: {
+            decrement: chargedRub,
+          },
+        },
+        where: {
+          credits: {
+            gte: chargedRub,
+          },
+          id: user.id,
+        },
+      });
+
+      if (debitResult.count !== 1) {
+        throw new Error("INSUFFICIENT_CREDITS");
+      }
+
+      const paymentRequest = await tx.paymentRequest.create({
+        data: {
+          amountRub: recalculated.finalTotalRub,
+          approvedAt: now,
+          baseDeviceMonthlyPriceSnapshot: recalculated.baseDeviceMonthlyPrice,
+          currency: "RUB",
+          deviceLimit: recalculated.devices,
+          devices: recalculated.devices,
+          durationDiscountPercentSnapshot: recalculated.durationDiscountPercent,
+          extraDeviceMonthlyPriceSnapshot: recalculated.extraDeviceMonthlyPrice,
+          markedPaidAt: now,
+          method: "CREDITS",
+          monthlyPriceSnapshot: recalculated.monthlyPrice,
+          months: recalculated.months,
+          periodMonths: recalculated.months,
+          referralDiscountPercentSnapshot: recalculated.referralDiscountPercent,
+          status: "APPROVED",
+          tariffName: buildConstructorTariffName(recalculated.months, recalculated.devices),
+          totalPriceBeforeDiscountRubSnapshot: recalculated.totalBeforeDiscountRub,
+          userId: user.id,
+        },
+      });
+
+      createdSubscriptionId = await createSubscriptionFromPaidRequest({
+        now,
+        paymentRequest: paymentRequest,
+        tx,
+        userId: user.id,
+      });
+
+      const canGrantReferralReward =
+        approvedBefore === 0 &&
+        Boolean(referredUse && !referredUse.rewardGrantedAt && referredUse.referralCode.ownerUserId);
+
+      if (canGrantReferralReward && referredUse?.referralCode.ownerUserId) {
+        await tx.user.update({
+          data: {
+            credits: {
+              increment: referredUse.rewardCreditsSnapshot,
+            },
+          },
+          where: {
+            id: referredUse.referralCode.ownerUserId,
+          },
+        });
+
+        await tx.referralCodeUse.update({
+          data: {
+            rewardGrantedAt: now,
+          },
+          where: {
+            id: referredUse.id,
+          },
+        });
+
+        referralRewardGranted = true;
+      }
     });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "";
 
-    await tx.subscription.updateMany({
-      data: {
-        revokedAt: now,
-        status: "REVOKED",
-      },
-      where: {
-        status: "ACTIVE",
-        userId: paymentRequest.userId,
-      },
-    });
+    if (message === "INSUFFICIENT_CREDITS") {
+      redirect(
+        buildRedirectUrl({
+          anchor: "#tariffs",
+          error: "Недостаточно кредитов для этой оплаты.",
+        })
+      );
+    }
 
-    const createdSubscription = await tx.subscription.create({
-      data: {
-        deviceLimit: paymentRequest.deviceLimit,
-        endsAt: addMonths(now, paymentRequest.periodMonths),
-        paymentRequestId: paymentRequest.id,
-        periodMonths: paymentRequest.periodMonths,
-        startedAt: now,
-        status: "ACTIVE",
-        tariffName: paymentRequest.tariffName,
-        userId: paymentRequest.userId,
-      },
-    });
-
-    createdSubscriptionId = createdSubscription.id;
-
-    await tx.deviceSlot.createMany({
-      data: Array.from({ length: paymentRequest.deviceLimit }, (_, index) => ({
-        label: `Устройство ${index + 1}`,
-        slotIndex: index + 1,
-        status: "FREE",
-        subscriptionId: createdSubscription.id,
-      })),
-    });
-  });
+    throw error;
+  }
 
   let marzbanNotice = "";
 
@@ -418,16 +599,44 @@ export async function markPaymentRequestPaidAction(formData: FormData) {
 
     if (!integrationResult.ok) {
       marzbanNotice =
-        " Подписка активирована локально, но выдача в Marzban завершилась с ошибкой. Проверьте раздел интеграции.";
+        " Подписка активирована локально, но выдача в Marzban не удалась. Проверьте интеграции в админке.";
     }
   }
 
   revalidatePath("/app");
   revalidatePath("/admin");
+  const discountNotice =
+    appliedDiscountPct > 0
+      ? ` Применена реферальная скидка первой покупки ${appliedDiscountPct}%.`
+      : "";
+  const rewardNotice = referralRewardGranted
+    ? " Владельцу кода начислена реферальная награда."
+    : "";
+
   redirect(
     buildRedirectUrl({
-      anchor: "#payments",
-      notice: `Подписка активирована сразу. Администратор позже проверит оплату и при необходимости отзовет доступ.${marzbanNotice}`,
+      anchor: "#dashboard",
+      notice: `Оплата кредитами завершена: списано эквивалент ${chargedRub} ₽.${discountNotice}${rewardNotice}${marzbanNotice}`,
+    })
+  );
+}
+
+export async function createPaymentRequestAction(_formData: FormData) {
+  void _formData;
+  redirect(
+    buildRedirectUrl({
+      anchor: "#tariffs",
+      error: "Это действие устарело. Используйте оплату через конструктор подписки.",
+    })
+  );
+}
+
+export async function markPaymentRequestPaidAction(_formData: FormData) {
+  void _formData;
+  redirect(
+    buildRedirectUrl({
+      anchor: "#tariffs",
+      error: "Это действие устарело. Используйте оплату через конструктор подписки.",
     })
   );
 }

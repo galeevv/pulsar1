@@ -24,6 +24,18 @@ function getValue(
   return Array.isArray(value) ? value[0] : value;
 }
 
+function decodeSearchParam(value: string | undefined) {
+  if (!value) {
+    return undefined;
+  }
+
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 export default async function AdminPage({
   searchParams,
 }: {
@@ -47,8 +59,8 @@ export default async function AdminPage({
   return (
     <main className="min-h-screen bg-background text-foreground">
       <AdminFeedbackToast
-        error={error ? decodeURIComponent(error) : undefined}
-        notice={notice ? decodeURIComponent(notice) : undefined}
+        error={decodeSearchParam(error)}
+        notice={decodeSearchParam(notice)}
       />
 
       <AdminHeader />
@@ -63,7 +75,10 @@ export default async function AdminPage({
           referralProgramSettings={dashboardData.referralProgramSettings}
         />
         <AdminPromoCodesSection promoCodes={dashboardData.promoCodes} />
-        <AdminTariffsSection tariffs={dashboardData.tariffs} />
+        <AdminTariffsSection
+          durationRules={dashboardData.subscriptionDurationRules}
+          pricingSettings={dashboardData.subscriptionPricingSettings}
+        />
         <AdminPaymentsSection paymentRequests={dashboardData.paymentRequests} />
         <AdminOperationsSection
           deviceSlotStats={dashboardData.deviceSlotStats}

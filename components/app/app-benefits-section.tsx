@@ -80,7 +80,7 @@ export function AppBenefitsSection({
                   </div>
                   <div
                     className={cn(
-                      "space-y-1 text-sm",
+                      "space-y-0 text-sm",
                       referralProgramSettings.isEnabled ? "text-white" : "text-muted-foreground"
                     )}
                   >
@@ -116,7 +116,7 @@ export function AppBenefitsSection({
             </form>
 
             {!canGenerate && !ownReferralCode ? (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-[12px] text-muted-foreground">
                 {!hasApprovedPayment
                   ? "ReferralCode станет доступен после первой подтвержденной оплаты."
                   : "Генерация сейчас недоступна из-за глобальных настроек реферальной системы."}

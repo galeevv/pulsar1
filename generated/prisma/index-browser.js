@@ -186,14 +186,22 @@ exports.Prisma.ReferralProgramSettingsScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.TariffScalarFieldEnum = {
+exports.Prisma.SubscriptionDurationRuleScalarFieldEnum = {
   id: 'id',
-  name: 'name',
-  periodMonths: 'periodMonths',
-  priceRub: 'priceRub',
-  devicePriceRub: 'devicePriceRub',
-  deviceLimit: 'deviceLimit',
-  isEnabled: 'isEnabled',
+  months: 'months',
+  monthlyPrice: 'monthlyPrice',
+  discountPercent: 'discountPercent',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SubscriptionPricingSettingsScalarFieldEnum = {
+  id: 'id',
+  minDevices: 'minDevices',
+  maxDevices: 'maxDevices',
+  baseDeviceMonthlyPrice: 'baseDeviceMonthlyPrice',
+  extraDeviceMonthlyPrice: 'extraDeviceMonthlyPrice',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -201,12 +209,21 @@ exports.Prisma.TariffScalarFieldEnum = {
 exports.Prisma.PaymentRequestScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  tariffId: 'tariffId',
   tariffName: 'tariffName',
   periodMonths: 'periodMonths',
   deviceLimit: 'deviceLimit',
   amountRub: 'amountRub',
   status: 'status',
+  method: 'method',
+  months: 'months',
+  devices: 'devices',
+  currency: 'currency',
+  baseDeviceMonthlyPriceSnapshot: 'baseDeviceMonthlyPriceSnapshot',
+  extraDeviceMonthlyPriceSnapshot: 'extraDeviceMonthlyPriceSnapshot',
+  monthlyPriceSnapshot: 'monthlyPriceSnapshot',
+  durationDiscountPercentSnapshot: 'durationDiscountPercentSnapshot',
+  referralDiscountPercentSnapshot: 'referralDiscountPercentSnapshot',
+  totalPriceBeforeDiscountRubSnapshot: 'totalPriceBeforeDiscountRubSnapshot',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   markedPaidAt: 'markedPaidAt',
@@ -221,6 +238,18 @@ exports.Prisma.SubscriptionScalarFieldEnum = {
   tariffName: 'tariffName',
   periodMonths: 'periodMonths',
   deviceLimit: 'deviceLimit',
+  devices: 'devices',
+  pendingDevices: 'pendingDevices',
+  startsAt: 'startsAt',
+  expiresAt: 'expiresAt',
+  monthsPurchased: 'monthsPurchased',
+  totalPaid: 'totalPaid',
+  currency: 'currency',
+  baseDeviceMonthlyPriceSnapshot: 'baseDeviceMonthlyPriceSnapshot',
+  extraDeviceMonthlyPriceSnapshot: 'extraDeviceMonthlyPriceSnapshot',
+  monthlyPriceSnapshot: 'monthlyPriceSnapshot',
+  durationDiscountPercentSnapshot: 'durationDiscountPercentSnapshot',
+  referralDiscountPercentSnapshot: 'referralDiscountPercentSnapshot',
   status: 'status',
   startedAt: 'startedAt',
   endsAt: 'endsAt',
@@ -292,6 +321,11 @@ exports.PaymentRequestStatus = exports.$Enums.PaymentRequestStatus = {
   REJECTED: 'REJECTED'
 };
 
+exports.PaymentMethod = exports.$Enums.PaymentMethod = {
+  BANK_TRANSFER: 'BANK_TRANSFER',
+  CREDITS: 'CREDITS'
+};
+
 exports.SubscriptionStatus = exports.$Enums.SubscriptionStatus = {
   ACTIVE: 'ACTIVE',
   REVOKED: 'REVOKED',
@@ -328,7 +362,8 @@ exports.Prisma.ModelName = {
   PromoCode: 'PromoCode',
   PromoCodeRedemption: 'PromoCodeRedemption',
   ReferralProgramSettings: 'ReferralProgramSettings',
-  Tariff: 'Tariff',
+  SubscriptionDurationRule: 'SubscriptionDurationRule',
+  SubscriptionPricingSettings: 'SubscriptionPricingSettings',
   PaymentRequest: 'PaymentRequest',
   Subscription: 'Subscription',
   DeviceSlot: 'DeviceSlot',

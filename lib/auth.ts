@@ -125,37 +125,8 @@ function isExpired(expiresAt: Date | null) {
 }
 
 export async function ensureBootstrapData() {
-  if (process.env.NODE_ENV === "production") {
-    return;
-  }
-
-  const adminExists = await prisma.user.count({
-    where: { role: Role.ADMIN },
-  });
-
-  if (adminExists > 0) {
-    return;
-  }
-
-  const bootstrapUsernameRaw = process.env.BOOTSTRAP_ADMIN_USERNAME ?? "admin";
-  const bootstrapPassword = process.env.BOOTSTRAP_ADMIN_PASSWORD ?? "admin12345";
-  const bootstrapUsername = normalizeUsername(bootstrapUsernameRaw);
-
-  if (!isValidMarzbanCompatibleUsername(bootstrapUsername) || bootstrapPassword.length < 8) {
-    return;
-  }
-
-  try {
-    await prisma.user.create({
-      data: {
-        passwordHash: hashPassword(bootstrapPassword),
-        role: Role.ADMIN,
-        username: bootstrapUsername,
-      },
-    });
-  } catch {
-    // Ignore concurrent bootstrap race if another request created admin first.
-  }
+  // Admin bootstrap is explicit-only via `npm run admin:bootstrap`.
+  return;
 }
 
 export async function getCurrentSession() {

@@ -1,4 +1,4 @@
-import { approvePaymentRequestAction, rejectPaymentRequestAction } from "@/app/admin/payment-actions";
+﻿import { approvePaymentRequestAction, rejectPaymentRequestAction } from "@/app/admin/payment-actions";
 import { Button } from "@/components/ui/button";
 
 import { AdminSectionShell } from "./admin-section-shell";
@@ -8,9 +8,10 @@ import { AdminSurface } from "./admin-surface";
 type PaymentRequestItem = {
   amountRub: number;
   createdAt: Date;
-  deviceLimit: number;
+  devices: number;
   id: string;
-  periodMonths: number;
+  method: "BANK_TRANSFER" | "CREDITS";
+  months: number;
   status: "APPROVED" | "CREATED" | "MARKED_PAID" | "REJECTED";
   tariffName: string;
   user: {
@@ -76,7 +77,8 @@ export function AdminPaymentsSection({
                     <div className="space-y-1">
                       <p className="text-sm font-semibold">{item.user.username}</p>
                       <p className="text-sm text-muted-foreground">
-                        {item.tariffName} • {item.periodMonths} мес. • {item.deviceLimit} устройств
+                        {item.tariffName} • {item.months} мес. • {item.devices} устройств •{" "}
+                        {item.method === "CREDITS" ? "credits" : "bank transfer"}
                       </p>
                     </div>
                     <div className="flex flex-col items-start gap-2 md:items-end">

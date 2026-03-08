@@ -23,6 +23,11 @@ export async function getAppBenefitsData(username: string) {
         orderBy: { createdAt: "desc" },
         take: 5,
       },
+      referralCodeUse: {
+        select: {
+          discountPctSnapshot: true,
+        },
+      },
     },
     where: { username },
   });
@@ -88,9 +93,14 @@ export async function getAppBenefitsData(username: string) {
   const hasApprovedPayment = approvedPaymentsCount > 0;
   const canGenerateReferralCode =
     referralProgramSettings.isEnabled && hasApprovedPayment && !ownReferralCode;
+  const firstPurchaseDiscountPct =
+    !hasApprovedPayment && user.referralCodeUse
+      ? Math.max(0, Math.min(100, user.referralCodeUse.discountPctSnapshot))
+      : 0;
 
   return {
     canGenerateReferralCode,
+    firstPurchaseDiscountPct,
     hasApprovedPayment,
     ownReferralCode,
     promoCodeRedemptions: user.promoCodeRedemptions,

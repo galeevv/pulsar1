@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -391,134 +391,281 @@ export async function togglePromoCodeAction(formData: FormData) {
   );
 }
 
-export async function createTariffAction(formData: FormData) {
+export async function saveSubscriptionDurationRulesAction(formData: FormData) {
   await getAdminActor();
 
-  const name = String(formData.get("name") ?? "").trim();
-  const periodMonths = Number.parseInt(String(formData.get("periodMonths") ?? ""), 10);
-  const priceRub = Number.parseInt(String(formData.get("priceRub") ?? ""), 10);
-  const devicePriceRub = Number.parseInt(String(formData.get("devicePriceRub") ?? ""), 10);
-  const deviceLimit = Number.parseInt(String(formData.get("deviceLimit") ?? ""), 10);
-  const isEnabled = String(formData.get("isEnabled") ?? "") === "on";
+  const rawRows = String(formData.get("rulesJson") ?? "");
+  const minDevices = Number.parseInt(String(formData.get("minDevices") ?? ""), 10);
+  const maxDevices = Number.parseInt(String(formData.get("maxDevices") ?? ""), 10);
+  const baseDeviceMonthlyPrice = Number.parseInt(
+    String(formData.get("baseDeviceMonthlyPrice") ?? ""),
+    10
+  );
+  const extraDeviceMonthlyPrice = Number.parseInt(
+    String(formData.get("extraDeviceMonthlyPrice") ?? ""),
+    10
+  );
+  const durationMonthlyPrice = Number.parseInt(
+    String(formData.get("durationMonthlyPrice") ?? ""),
+    10
+  );
+  let parsedRows: Array<{
+    id?: string;
+    months: number;
+    discountPercent: number;
+  }> = [];
 
-  if (!name) {
-    redirect(buildRedirectUrl({ anchor: "#tariffs", error: "Укажите название тарифа." }));
+  try {
+    parsedRows = JSON.parse(rawRows) as Array<{
+      id?: string;
+      months: number;
+      discountPercent: number;
+    }>;
+  } catch {
+    redirect(buildRedirectUrl({ anchor: "#tariffs", error: "Некорректные данные таблицы сроков." }));
   }
 
-  if (!Number.isFinite(periodMonths) || periodMonths <= 0) {
-    redirect(
-      buildRedirectUrl({ anchor: "#tariffs", error: "Период тарифа должен быть больше 0." })
-    );
+  if (!Array.isArray(parsedRows) || parsedRows.length === 0) {
+    redirect(buildRedirectUrl({ anchor: "#tariffs", error: "Добавьте хотя бы один срок подписки." }));
   }
 
-  if (!Number.isFinite(priceRub) || priceRub <= 0) {
+  if (!Number.isFinite(baseDeviceMonthlyPrice) || baseDeviceMonthlyPrice < 0) {
     redirect(
       buildRedirectUrl({
         anchor: "#tariffs",
-        error: "Цена одного месяца должна быть больше 0.",
+        error: "Базовая цена в месяц (1 устройство) должна быть 0 или больше.",
       })
     );
   }
 
-  if (!Number.isFinite(devicePriceRub) || devicePriceRub < 0) {
+  if (!Number.isFinite(extraDeviceMonthlyPrice) || extraDeviceMonthlyPrice < 0) {
     redirect(
       buildRedirectUrl({
         anchor: "#tariffs",
-        error: "Цена одного устройства не может быть отрицательной.",
+        error: "Цена доп. устройства в месяц должна быть 0 или больше.",
       })
     );
   }
 
-  if (!Number.isFinite(deviceLimit) || deviceLimit <= 0) {
+  if (!Number.isFinite(durationMonthlyPrice) || durationMonthlyPrice < 0) {
     redirect(
       buildRedirectUrl({
         anchor: "#tariffs",
-        error: "Количество устройств должно быть больше 0.",
+        error: "Цена/мес должна быть 0 или больше.",
       })
     );
   }
 
-  await prisma.tariff.create({
-    data: {
-      deviceLimit,
-      devicePriceRub,
-      isEnabled,
-      name,
-      periodMonths,
-      priceRub,
-    },
+  if (!Number.isFinite(minDevices) || minDevices <= 0) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#tariffs",
+        error: "Минимум устройств должен быть больше 0.",
+      })
+    );
+  }
+
+  if (!Number.isFinite(maxDevices) || maxDevices < minDevices) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#tariffs",
+        error: "Максимум устройств должен быть больше или равен минимуму.",
+      })
+    );
+  }
+
+  if (maxDevices > 10) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#tariffs",
+        error: "Максимум устройств не может быть больше 10.",
+      })
+    );
+  }
+
+  const normalizedRows = parsedRows.map((row) => ({
+    discountPercent: Number.parseInt(String(row.discountPercent), 10),
+    id: row.id ? String(row.id) : undefined,
+    months: Number.parseInt(String(row.months), 10),
+  }));
+
+  const duplicateCheck = new Set<number>();
+  for (const row of normalizedRows) {
+    if (!Number.isFinite(row.months) || row.months <= 0 || row.months > 120) {
+      redirect(
+        buildRedirectUrl({
+          anchor: "#tariffs",
+          error: "Срок должен быть в диапазоне от 1 до 120 месяцев.",
+        })
+      );
+    }
+
+    if (duplicateCheck.has(row.months)) {
+      redirect(
+        buildRedirectUrl({
+          anchor: "#tariffs",
+          error: "Сроки должны быть уникальными.",
+        })
+      );
+    }
+    duplicateCheck.add(row.months);
+    if (!Number.isFinite(row.discountPercent) || row.discountPercent < 0 || row.discountPercent > 100) {
+      redirect(
+        buildRedirectUrl({
+          anchor: "#tariffs",
+          error: "Скидка должна быть целым числом от 0 до 100.",
+        })
+      );
+    }
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.subscriptionPricingSettings.upsert({
+      create: {
+        baseDeviceMonthlyPrice,
+        extraDeviceMonthlyPrice,
+        id: 1,
+        maxDevices,
+        minDevices,
+      },
+      update: {
+        baseDeviceMonthlyPrice,
+        extraDeviceMonthlyPrice,
+        maxDevices,
+        minDevices,
+      },
+      where: { id: 1 },
+    });
+
+    const existingRows = await tx.subscriptionDurationRule.findMany({
+      select: { id: true },
+    });
+
+    const submittedIds = new Set(
+      normalizedRows.map((row) => row.id).filter((id): id is string => Boolean(id))
+    );
+    const idsToDelete = existingRows
+      .map((row) => row.id)
+      .filter((id) => !submittedIds.has(id));
+
+    if (idsToDelete.length > 0) {
+      await tx.subscriptionDurationRule.deleteMany({
+        where: {
+          id: {
+            in: idsToDelete,
+          },
+        },
+      });
+    }
+
+    for (const row of normalizedRows) {
+      if (row.id) {
+        await tx.subscriptionDurationRule.update({
+          data: {
+            discountPercent: row.discountPercent,
+            isActive: true,
+            monthlyPrice: durationMonthlyPrice,
+            months: row.months,
+          },
+          where: { id: row.id },
+        });
+      } else {
+        await tx.subscriptionDurationRule.create({
+          data: {
+            discountPercent: row.discountPercent,
+            isActive: true,
+            monthlyPrice: durationMonthlyPrice,
+            months: row.months,
+          },
+        });
+      }
+    }
   });
 
   revalidatePath("/admin");
   revalidatePath("/app");
-  redirect(buildRedirectUrl({ anchor: "#tariffs", notice: "Тариф создан." }));
+  redirect(buildRedirectUrl({ anchor: "#tariffs", notice: "Настройки тарифа сохранены." }));
 }
 
-export async function updateTariffAction(formData: FormData) {
+export async function updateSubscriptionPricingSettingsAction(formData: FormData) {
   await getAdminActor();
 
-  const id = String(formData.get("id") ?? "");
-  const name = String(formData.get("name") ?? "").trim();
-  const periodMonths = Number.parseInt(String(formData.get("periodMonths") ?? ""), 10);
-  const priceRub = Number.parseInt(String(formData.get("priceRub") ?? ""), 10);
-  const devicePriceRub = Number.parseInt(String(formData.get("devicePriceRub") ?? ""), 10);
-  const deviceLimit = Number.parseInt(String(formData.get("deviceLimit") ?? ""), 10);
-  const isEnabled = String(formData.get("isEnabled") ?? "") === "on";
+  const minDevices = Number.parseInt(String(formData.get("minDevices") ?? ""), 10);
+  const maxDevices = Number.parseInt(String(formData.get("maxDevices") ?? ""), 10);
+  const baseDeviceMonthlyPrice = Number.parseInt(
+    String(formData.get("baseDeviceMonthlyPrice") ?? ""),
+    10
+  );
+  const extraDeviceMonthlyPrice = Number.parseInt(
+    String(formData.get("extraDeviceMonthlyPrice") ?? ""),
+    10
+  );
 
-  if (!id) {
-    redirect(buildRedirectUrl({ anchor: "#tariffs", error: "Тариф не найден." }));
-  }
-
-  if (!name) {
-    redirect(buildRedirectUrl({ anchor: "#tariffs", error: "Укажите название тарифа." }));
-  }
-
-  if (!Number.isFinite(periodMonths) || periodMonths <= 0) {
-    redirect(
-      buildRedirectUrl({ anchor: "#tariffs", error: "Период тарифа должен быть больше 0." })
-    );
-  }
-
-  if (!Number.isFinite(priceRub) || priceRub <= 0) {
+  if (!Number.isFinite(minDevices) || minDevices <= 0) {
     redirect(
       buildRedirectUrl({
         anchor: "#tariffs",
-        error: "Цена одного месяца должна быть больше 0.",
+        error: "Минимум устройств должен быть больше 0.",
       })
     );
   }
 
-  if (!Number.isFinite(devicePriceRub) || devicePriceRub < 0) {
+  if (!Number.isFinite(maxDevices) || maxDevices < minDevices) {
     redirect(
       buildRedirectUrl({
         anchor: "#tariffs",
-        error: "Цена одного устройства не может быть отрицательной.",
+        error: "Максимум устройств должен быть больше или равен минимуму.",
       })
     );
   }
 
-  if (!Number.isFinite(deviceLimit) || deviceLimit <= 0) {
+  if (maxDevices > 10) {
     redirect(
       buildRedirectUrl({
         anchor: "#tariffs",
-        error: "Количество устройств должно быть больше 0.",
+        error: "Максимум устройств не может быть больше 10.",
       })
     );
   }
 
-  await prisma.tariff.update({
-    data: {
-      deviceLimit,
-      devicePriceRub,
-      isEnabled,
-      name,
-      periodMonths,
-      priceRub,
+  if (!Number.isFinite(baseDeviceMonthlyPrice) || baseDeviceMonthlyPrice < 0) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#tariffs",
+        error: "Базовая цена за месяц должна быть 0 или больше.",
+      })
+    );
+  }
+
+  if (!Number.isFinite(extraDeviceMonthlyPrice) || extraDeviceMonthlyPrice < 0) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#tariffs",
+        error: "Цена доп. устройства в месяц должна быть 0 или больше.",
+      })
+    );
+  }
+
+  await prisma.subscriptionPricingSettings.upsert({
+    create: {
+      baseDeviceMonthlyPrice,
+      extraDeviceMonthlyPrice,
+      id: 1,
+      maxDevices,
+      minDevices,
     },
-    where: { id },
+    update: {
+      baseDeviceMonthlyPrice,
+      extraDeviceMonthlyPrice,
+      maxDevices,
+      minDevices,
+    },
+    where: {
+      id: 1,
+    },
   });
 
   revalidatePath("/admin");
   revalidatePath("/app");
-  redirect(buildRedirectUrl({ anchor: "#tariffs", notice: "Тариф сохранен." }));
+  redirect(buildRedirectUrl({ anchor: "#tariffs", notice: "Настройки стоимости сохранены." }));
 }

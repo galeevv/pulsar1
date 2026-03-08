@@ -16,6 +16,7 @@ import { getCurrentSession, getSessionDestination } from "@/lib/auth";
 import { loginAction, registerAction } from "./actions";
 import { LoginFeedbackToast } from "./login-feedback-toast";
 import { LoginModeTabs } from "./login-mode-tabs";
+import { RegisterCodeField } from "./register-code-field";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -25,6 +26,18 @@ function getValue(
 ) {
   const value = searchParams[key];
   return Array.isArray(value) ? value[0] : value;
+}
+
+function decodeSearchParam(value: string | undefined) {
+  if (!value) {
+    return undefined;
+  }
+
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
 }
 
 export default async function LoginPage({
@@ -44,7 +57,7 @@ export default async function LoginPage({
 
   return (
     <main className="flex min-h-screen items-center justify-center px-6 py-16">
-      <LoginFeedbackToast error={error ? decodeURIComponent(error) : undefined} />
+      <LoginFeedbackToast error={decodeSearchParam(error)} />
 
       <section className="w-full max-w-[560px] rounded-hero border border-border/70 bg-card/70 p-6 backdrop-blur md:p-6">
         <Breadcrumb>
@@ -56,9 +69,7 @@ export default async function LoginPage({
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>
-                {mode === "login" ? "Авторизация" : "Регистрация"}
-              </BreadcrumbPage>
+              <BreadcrumbPage>{mode === "login" ? "Авторизация" : "Регистрация"}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -147,17 +158,7 @@ export default async function LoginPage({
               />
             </div>
 
-            <div>
-              <label className="mb-2 block text-sm font-medium" htmlFor="register-code">
-                Invite Code
-              </label>
-              <Input
-                id="register-code"
-                name="code"
-                placeholder="Введите invite или referral код"
-                required
-              />
-            </div>
+            <RegisterCodeField />
 
             <div className="pt-2">
               <Button className="h-button w-full px-button-x" radius="card" type="submit">

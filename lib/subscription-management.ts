@@ -10,9 +10,18 @@ async function expireSubscriptionsIfNeeded(userId: string) {
       status: "EXPIRED",
     },
     where: {
-      endsAt: {
-        lte: now,
-      },
+      OR: [
+        {
+          expiresAt: {
+            lte: now,
+          },
+        },
+        {
+          endsAt: {
+            lte: now,
+          },
+        },
+      ],
       status: "ACTIVE",
       userId,
     },
@@ -38,8 +47,13 @@ export async function getAppSubscriptionData(username: string) {
       deviceSlots: {
         orderBy: { slotIndex: "asc" },
       },
+      paymentRequest: {
+        select: {
+          status: true,
+        },
+      },
     },
-    orderBy: [{ startedAt: "desc" }],
+    orderBy: [{ startsAt: "desc" }, { startedAt: "desc" }],
     where: {
       status: "ACTIVE",
       userId: user.id,
@@ -47,7 +61,7 @@ export async function getAppSubscriptionData(username: string) {
   });
 
   const latestSubscriptions = await prisma.subscription.findMany({
-    orderBy: { startedAt: "desc" },
+    orderBy: [{ startsAt: "desc" }, { startedAt: "desc" }],
     take: 5,
     where: { userId: user.id },
   });

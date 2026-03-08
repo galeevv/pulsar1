@@ -47,6 +47,11 @@ enum IntegrationSyncStatus {
   ERROR
 }
 
+enum PaymentMethod {
+  BANK_TRANSFER
+  CREDITS
+}
+
 model User {
   id                   String                @id @default(cuid())
   username             String                @unique
@@ -147,71 +152,100 @@ model ReferralProgramSettings {
   updatedAt            DateTime @updatedAt
 }
 
-model Tariff {
-  id              String           @id @default(cuid())
-  name            String
-  periodMonths    Int
-  priceRub        Int
-  devicePriceRub  Int              @default(0)
-  deviceLimit     Int
-  isEnabled       Boolean          @default(true)
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  paymentRequests PaymentRequest[]
+model SubscriptionDurationRule {
+  id              String   @id @default(cuid())
+  months          Int      @unique
+  monthlyPrice    Int      @default(299)
+  discountPercent Int      @default(0)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-  @@index([isEnabled])
+  @@index([isActive])
+}
+
+model SubscriptionPricingSettings {
+  id                      Int      @id @default(1)
+  minDevices              Int      @default(1)
+  maxDevices              Int      @default(5)
+  baseDeviceMonthlyPrice  Int      @default(299)
+  extraDeviceMonthlyPrice Int      @default(100)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
 }
 
 model PaymentRequest {
-  id           String               @id @default(cuid())
-  userId       String
-  tariffId     String?
-  tariffName   String
-  periodMonths Int
-  deviceLimit  Int
-  amountRub    Int
-  status       PaymentRequestStatus @default(CREATED)
-  createdAt    DateTime             @default(now())
-  updatedAt    DateTime             @updatedAt
-  markedPaidAt DateTime?
-  approvedAt   DateTime?
-  rejectedAt   DateTime?
-  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tariff       Tariff?              @relation(fields: [tariffId], references: [id], onDelete: SetNull)
-  subscription Subscription?
+  id                                  String               @id @default(cuid())
+  userId                              String
+  tariffName                          String
+  periodMonths                        Int
+  deviceLimit                         Int
+  amountRub                           Int
+  status                              PaymentRequestStatus @default(CREATED)
+  method                              PaymentMethod        @default(BANK_TRANSFER)
+  months                              Int                  @default(1)
+  devices                             Int                  @default(1)
+  currency                            String               @default("RUB")
+  baseDeviceMonthlyPriceSnapshot      Int                  @default(0)
+  extraDeviceMonthlyPriceSnapshot     Int                  @default(0)
+  monthlyPriceSnapshot                Int                  @default(0)
+  durationDiscountPercentSnapshot     Int                  @default(0)
+  referralDiscountPercentSnapshot     Int                  @default(0)
+  totalPriceBeforeDiscountRubSnapshot Int                  @default(0)
+  createdAt                           DateTime             @default(now())
+  updatedAt                           DateTime             @updatedAt
+  markedPaidAt                        DateTime?
+  approvedAt                          DateTime?
+  rejectedAt                          DateTime?
+  user                                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription                        Subscription?
 
   @@index([userId])
   @@index([status])
+  @@index([method])
   @@index([createdAt])
 }
 
 model Subscription {
-  id               String             @id @default(cuid())
-  userId           String
-  paymentRequestId String?            @unique
-  tariffName       String
-  periodMonths     Int
-  deviceLimit      Int
-  status           SubscriptionStatus @default(ACTIVE)
-  startedAt        DateTime
-  endsAt           DateTime
-  revokedAt        DateTime?
-  marzbanUsername  String?            @unique
-  marzbanStatus    String?
-  marzbanDataJson  String?
-  provisionedAt    DateTime?
-  lastSyncAt       DateTime?
-  lastSyncError    String?
-  subscriptionUrl  String?
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  paymentRequest   PaymentRequest?    @relation(fields: [paymentRequestId], references: [id], onDelete: SetNull)
-  deviceSlots      DeviceSlot[]
+  id                              String             @id @default(cuid())
+  userId                          String
+  paymentRequestId                String?            @unique
+  tariffName                      String
+  periodMonths                    Int
+  deviceLimit                     Int
+  devices                         Int                @default(1)
+  pendingDevices                  Int?
+  startsAt                        DateTime?
+  expiresAt                       DateTime?
+  monthsPurchased                 Int                @default(1)
+  totalPaid                       Int                @default(0)
+  currency                        String             @default("RUB")
+  baseDeviceMonthlyPriceSnapshot  Int                @default(0)
+  extraDeviceMonthlyPriceSnapshot Int                @default(0)
+  monthlyPriceSnapshot            Int                @default(0)
+  durationDiscountPercentSnapshot Int                @default(0)
+  referralDiscountPercentSnapshot Int                @default(0)
+  status                          SubscriptionStatus @default(ACTIVE)
+  startedAt                       DateTime
+  endsAt                          DateTime
+  revokedAt                       DateTime?
+  marzbanUsername                 String?            @unique
+  marzbanStatus                   String?
+  marzbanDataJson                 String?
+  provisionedAt                   DateTime?
+  lastSyncAt                      DateTime?
+  lastSyncError                   String?
+  subscriptionUrl                 String?
+  createdAt                       DateTime           @default(now())
+  updatedAt                       DateTime           @updatedAt
+  user                            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  paymentRequest                  PaymentRequest?    @relation(fields: [paymentRequestId], references: [id], onDelete: SetNull)
+  deviceSlots                     DeviceSlot[]
 
   @@index([userId])
   @@index([status])
   @@index([endsAt])
+  @@index([expiresAt])
 }
 
 model DeviceSlot {

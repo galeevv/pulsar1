@@ -1,6 +1,7 @@
 import { randomBytes } from "node:crypto";
 
 import { prisma } from "@/lib/prisma";
+import { getAdminSubscriptionConstructorData } from "@/lib/subscription-constructor";
 
 import { ensureBootstrapData, normalizeCode } from "./auth";
 
@@ -35,13 +36,14 @@ export async function isCodeTakenAcrossSystem(code: string) {
 export async function getAdminDashboardData() {
   await ensureBootstrapData();
 
+  const constructorData = await getAdminSubscriptionConstructorData();
+
   const [
     users,
     inviteCodes,
     referralCodes,
     promoCodes,
     referralProgramSettings,
-    tariffs,
     paymentRequests,
     activeSubscriptions,
     expiredSubscriptions,
@@ -102,9 +104,6 @@ export async function getAdminDashboardData() {
         update: {},
         where: { id: 1 },
       }),
-      prisma.tariff.findMany({
-        orderBy: [{ isEnabled: "desc" }, { createdAt: "desc" }],
-      }),
       prisma.paymentRequest.findMany({
         include: {
           user: {
@@ -155,12 +154,13 @@ export async function getAdminDashboardData() {
     recentSubscriptions,
     referralProgramSettings,
     referralCodes,
+    subscriptionDurationRules: constructorData.durationRules,
+    subscriptionPricingSettings: constructorData.pricingSettings,
     subscriptionStats: {
       active: activeSubscriptions,
       expired: expiredSubscriptions,
       revoked: revokedSubscriptions,
     },
-    tariffs,
     users,
   };
 }
