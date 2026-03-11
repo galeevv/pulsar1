@@ -10,6 +10,7 @@ import {
   isCodeTakenAcrossSystem,
 } from "@/lib/admin-code-management";
 import { getCurrentSession, normalizeCode } from "@/lib/auth";
+import { saveUserAgreementText } from "@/lib/legal-documents";
 import { prisma } from "@/lib/prisma";
 
 function buildRedirectUrl(params: {
@@ -668,4 +669,85 @@ export async function updateSubscriptionPricingSettingsAction(formData: FormData
   revalidatePath("/admin");
   revalidatePath("/app");
   redirect(buildRedirectUrl({ anchor: "#tariffs", notice: "Настройки стоимости сохранены." }));
+}
+
+export async function updateServiceCapacitySettingsAction(formData: FormData) {
+  await getAdminActor();
+
+  const maxActiveSubscriptions = Number.parseInt(
+    String(formData.get("maxActiveSubscriptions") ?? ""),
+    10
+  );
+
+  if (!Number.isFinite(maxActiveSubscriptions) || maxActiveSubscriptions < 0) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#operations",
+        error: "MAX_ACTIVE_SUBSCRIPTIONS должен быть целым числом от 0 и выше.",
+      })
+    );
+  }
+
+  if (maxActiveSubscriptions > 100000) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#operations",
+        error: "MAX_ACTIVE_SUBSCRIPTIONS слишком большой (максимум 100000).",
+      })
+    );
+  }
+
+  await prisma.serviceCapacitySettings.upsert({
+    create: {
+      id: 1,
+      maxActiveSubscriptions,
+    },
+    update: {
+      maxActiveSubscriptions,
+    },
+    where: { id: 1 },
+  });
+
+  revalidatePath("/admin");
+  revalidatePath("/app");
+  redirect(
+    buildRedirectUrl({
+      anchor: "#operations",
+      notice:
+        maxActiveSubscriptions === 0
+          ? "Лимит активных подписок отключен."
+          : "Лимит активных подписок сохранен.",
+    })
+  );
+}
+
+export async function updateUserAgreementAction(formData: FormData) {
+  await getAdminActor();
+
+  const rawText = String(formData.get("userAgreementText") ?? "");
+  const normalizedText = rawText.trim();
+
+  if (!normalizedText) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#rules",
+        error: "Текст пользовательского соглашения не может быть пустым.",
+      })
+    );
+  }
+
+  if (normalizedText.length > 40000) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#rules",
+        error: "Текст пользовательского соглашения слишком длинный.",
+      })
+    );
+  }
+
+  await saveUserAgreementText(normalizedText);
+
+  revalidatePath("/admin");
+  revalidatePath("/rules");
+  redirect(buildRedirectUrl({ anchor: "#rules", notice: "Пользовательское соглашение обновлено." }));
 }

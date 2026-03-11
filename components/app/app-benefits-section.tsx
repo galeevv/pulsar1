@@ -53,7 +53,7 @@ export function AppBenefitsSection({
       description="Управление бонусной механикой: личный referral-код, условия начисления и применение промокодов для пополнения баланса."
       eyebrow="BONUSES"
       id="benefits"
-      title="Реферальная программа и промокоды"
+      title="Реферальная система и промокоды"
     >
       <div className="grid gap-6 xl:grid-cols-2">
         <AppSurface>

@@ -9,6 +9,8 @@ import { AdminOverviewSection } from "@/components/admin/admin-overview-section"
 import { AdminPaymentsSection } from "@/components/admin/admin-payments-section";
 import { AdminPromoCodesSection } from "@/components/admin/admin-promo-codes-section";
 import { AdminReferralCodesSection } from "@/components/admin/admin-referral-codes-section";
+import { AdminRulesSection } from "@/components/admin/admin-rules-section";
+import { AdminSupportSection } from "@/components/admin/admin-support-section";
 import { AdminTariffsSection } from "@/components/admin/admin-tariffs-section";
 import { AdminUsersSection } from "@/components/admin/admin-users-section";
 import { getCurrentSession } from "@/lib/auth";
@@ -75,14 +77,17 @@ export default async function AdminPage({
           referralProgramSettings={dashboardData.referralProgramSettings}
         />
         <AdminPromoCodesSection promoCodes={dashboardData.promoCodes} />
+        <AdminRulesSection userAgreementText={dashboardData.userAgreementText} />
         <AdminTariffsSection
           durationRules={dashboardData.subscriptionDurationRules}
           pricingSettings={dashboardData.subscriptionPricingSettings}
         />
         <AdminPaymentsSection paymentRequests={dashboardData.paymentRequests} />
+        <AdminSupportSection />
         <AdminOperationsSection
           deviceSlotStats={dashboardData.deviceSlotStats}
           recentSubscriptions={dashboardData.recentSubscriptions}
+          serviceCapacitySettings={dashboardData.serviceCapacitySettings}
           subscriptionStats={dashboardData.subscriptionStats}
         />
       </div>

@@ -65,6 +65,8 @@ model User {
   referralCodeUse      ReferralCodeUse?      @relation("ReferralCodeUseByUser")
   paymentRequests      PaymentRequest[]
   subscriptions        Subscription[]
+  supportMessages      SupportMessage[]      @relation("SupportMessageSender")
+  supportTickets       SupportTicket[]
   promoCodeRedemptions PromoCodeRedemption[]
   sessions             Session[]
 }
@@ -150,6 +152,59 @@ model ReferralProgramSettings {
   defaultRewardCredits Int      @default(100)
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
+}
+
+model LegalDocumentSettings {
+  id                Int      @id @default(1)
+  userAgreementText String   @default("")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model ServiceCapacitySettings {
+  id                     Int      @id @default(1)
+  maxActiveSubscriptions Int      @default(0)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+model SupportTicket {
+  id              Int              @id @default(autoincrement())
+  userId          String           @map("user_id")
+  subject         String
+  category        String
+  status          String           @default("open")
+  priority        String?
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  lastMessageAt   DateTime?        @map("last_message_at")
+  closedAt        DateTime?        @map("closed_at")
+  adminLastReadAt DateTime?        @map("admin_last_read_at")
+  userLastReadAt  DateTime?        @map("user_last_read_at")
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages        SupportMessage[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([lastMessageAt])
+  @@index([userId, status, lastMessageAt])
+  @@map("support_tickets")
+}
+
+model SupportMessage {
+  id         Int           @id @default(autoincrement())
+  ticketId   Int           @map("ticket_id")
+  senderType String        @map("sender_type")
+  senderId   String?       @map("sender_id")
+  message    String
+  createdAt  DateTime      @default(now()) @map("created_at")
+  ticket     SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  sender     User?         @relation("SupportMessageSender", fields: [senderId], references: [id], onDelete: SetNull)
+
+  @@index([ticketId])
+  @@index([createdAt])
+  @@index([ticketId, createdAt])
+  @@map("support_messages")
 }
 
 model SubscriptionDurationRule {

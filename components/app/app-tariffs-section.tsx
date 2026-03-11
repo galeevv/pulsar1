@@ -76,16 +76,22 @@ export function AppTariffsSection({
   activeSubscriptionStartAtIso,
   canExtendSubscription,
   credits,
+  currentActiveSubscriptionsCount,
   durationRules,
   firstPurchaseDiscountPct,
+  isCapacityBlockedForNewSubscriptions,
+  maxActiveSubscriptions,
   pricingSettings,
 }: {
   activeSubscriptionEndAtIso: string | null;
   activeSubscriptionStartAtIso: string | null;
   canExtendSubscription: boolean;
   credits: number;
+  currentActiveSubscriptionsCount: number;
   durationRules: DurationRuleItem[];
   firstPurchaseDiscountPct: number;
+  isCapacityBlockedForNewSubscriptions: boolean;
+  maxActiveSubscriptions: number;
   pricingSettings: PricingSettings;
 }) {
   const sortedRules = useMemo(
@@ -127,7 +133,11 @@ export function AppTariffsSection({
   const previewEndsAt = addMonths(previewEndBaseDate, effectiveSelectedMonths);
 
   const checkoutDisabled =
-    !canExtendSubscription || !isDeviceRangeValid || !selectedRule || !calculatedPrice;
+    !canExtendSubscription ||
+    isCapacityBlockedForNewSubscriptions ||
+    !isDeviceRangeValid ||
+    !selectedRule ||
+    !calculatedPrice;
   const hasEnoughCredits = calculatedPrice ? credits >= calculatedPrice.finalTotalRub : false;
   const hasReferralDiscount =
     firstPurchaseDiscountPct > 0 &&
@@ -138,7 +148,7 @@ export function AppTariffsSection({
 
   return (
     <AppSectionShell
-      description="Настройте тариф: выберите срок и количество устройств."
+      description="Настройте тариф: срок и устройства."
       eyebrow="TARIFFS"
       id="tariffs"
       title="Покупка подписки"
@@ -268,6 +278,15 @@ export function AppTariffsSection({
               </p>
             ) : null}
 
+            {isCapacityBlockedForNewSubscriptions ? (
+              <p className="text-sm text-muted-foreground">
+                Свободных мест сейчас нет.
+                {maxActiveSubscriptions > 0
+                  ? ` Активных подписок: ${currentActiveSubscriptionsCount} из ${maxActiveSubscriptions}.`
+                  : ""}
+              </p>
+            ) : null}
+
             <Dialog>
               <DialogTrigger asChild>
                 <Button
@@ -356,4 +375,3 @@ export function AppTariffsSection({
     </AppSectionShell>
   );
 }
-

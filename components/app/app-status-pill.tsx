@@ -14,7 +14,7 @@ export function AppStatusPill({
 
   return (
     <span
-      className={`inline-flex h-8 items-center rounded-pill border px-3 text-xs font-medium tracking-wide ${toneClass}`}
+      className={`inline-flex h-8 items-center justify-center rounded-pill border px-3 text-center text-xs font-medium tracking-wide ${toneClass}`}
     >
       {label}
     </span>

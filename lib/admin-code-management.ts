@@ -1,7 +1,9 @@
 import { randomBytes } from "node:crypto";
 
 import { prisma } from "@/lib/prisma";
+import { getUserAgreementText } from "@/lib/legal-documents";
 import { getAdminSubscriptionConstructorData } from "@/lib/subscription-constructor";
+import { getServiceCapacitySettings } from "@/lib/service-capacity";
 
 import { ensureBootstrapData, normalizeCode } from "./auth";
 
@@ -37,6 +39,8 @@ export async function getAdminDashboardData() {
   await ensureBootstrapData();
 
   const constructorData = await getAdminSubscriptionConstructorData();
+  const userAgreementTextPromise = getUserAgreementText();
+  const serviceCapacitySettingsPromise = getServiceCapacitySettings();
 
   const [
     users,
@@ -52,6 +56,8 @@ export async function getAdminDashboardData() {
     activeDeviceSlots,
     blockedDeviceSlots,
     recentSubscriptions,
+    userAgreementText,
+    serviceCapacitySettings,
   ] =
     await Promise.all([
       prisma.user.findMany({
@@ -140,6 +146,8 @@ export async function getAdminDashboardData() {
         orderBy: { createdAt: "desc" },
         take: 6,
       }),
+      userAgreementTextPromise,
+      serviceCapacitySettingsPromise,
     ]);
 
   return {
@@ -153,6 +161,8 @@ export async function getAdminDashboardData() {
     promoCodes,
     recentSubscriptions,
     referralProgramSettings,
+    serviceCapacitySettings,
+    userAgreementText,
     referralCodes,
     subscriptionDurationRules: constructorData.durationRules,
     subscriptionPricingSettings: constructorData.pricingSettings,

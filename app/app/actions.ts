@@ -6,12 +6,19 @@ import { redirect } from "next/navigation";
 import { generateReferralCodeValue } from "@/lib/admin-code-management";
 import { getAppBenefitsData, validatePromoCodeForUser } from "@/lib/app-benefits";
 import { getCurrentSession, normalizeCode } from "@/lib/auth";
-import { issueSubscriptionInMarzban } from "@/lib/marzban-integration";
 import { prisma } from "@/lib/prisma";
+import {
+  isActiveSubscriptionsLimitReached,
+} from "@/lib/service-capacity";
 import {
   calculateSubscriptionPrice,
   getAppSubscriptionConstructorData,
 } from "@/lib/subscription-constructor";
+import {
+  issueSubscriptionInXui,
+  revokeSubscriptionInXui,
+  syncSubscriptionInXui,
+} from "@/lib/xui-integration";
 
 function buildRedirectUrl(params: {
   anchor?: string;
@@ -242,6 +249,31 @@ async function createSubscriptionFromPaidRequest(input: {
       userId: input.userId,
     },
   });
+  const serviceCapacitySettings = await input.tx.serviceCapacitySettings.upsert({
+    create: {
+      id: 1,
+      maxActiveSubscriptions: 0,
+    },
+    update: {},
+    where: { id: 1 },
+  });
+
+  if (!activeSubscription && serviceCapacitySettings.maxActiveSubscriptions > 0) {
+    const activeSubscriptionsCount = await input.tx.subscription.count({
+      where: {
+        status: "ACTIVE",
+      },
+    });
+
+    if (
+      isActiveSubscriptionsLimitReached({
+        activeSubscriptionsCount,
+        maxActiveSubscriptions: serviceCapacitySettings.maxActiveSubscriptions,
+      })
+    ) {
+      throw new Error("ACTIVE_SUBSCRIPTIONS_LIMIT_REACHED");
+    }
+  }
 
   const now = input.now;
   const previousStartAt = activeSubscription?.startsAt ?? activeSubscription?.startedAt ?? now;
@@ -308,7 +340,10 @@ async function createSubscriptionFromPaidRequest(input: {
     })),
   });
 
-  return createdSubscription.id;
+  return {
+    createdSubscriptionId: createdSubscription.id,
+    revokedSubscriptionId: activeSubscription?.id ?? null,
+  };
 }
 
 function buildConstructorTariffName(months: number, devices: number) {
@@ -398,46 +433,74 @@ export async function confirmTariffPaymentAction(formData: FormData) {
   const validated = await parseAndValidateConstructorSelection(user.id, formData);
   const now = new Date();
   let createdSubscriptionId: string | null = null;
+  let revokedSubscriptionId: string | null = null;
 
-  await prisma.$transaction(async (tx) => {
-    const paymentRequest = await tx.paymentRequest.create({
-      data: {
-        amountRub: validated.price.finalTotalRub,
-        baseDeviceMonthlyPriceSnapshot: validated.price.baseDeviceMonthlyPrice,
-        currency: "RUB",
-        deviceLimit: validated.price.devices,
-        devices: validated.price.devices,
-        durationDiscountPercentSnapshot: validated.price.durationDiscountPercent,
-        extraDeviceMonthlyPriceSnapshot: validated.price.extraDeviceMonthlyPrice,
-        markedPaidAt: now,
-        method: "BANK_TRANSFER",
-        monthlyPriceSnapshot: validated.price.monthlyPrice,
-        months: validated.price.months,
-        periodMonths: validated.price.months,
-        referralDiscountPercentSnapshot: validated.price.referralDiscountPercent,
-        status: "MARKED_PAID",
-        tariffName: buildConstructorTariffName(validated.price.months, validated.price.devices),
-        totalPriceBeforeDiscountRubSnapshot: validated.price.totalBeforeDiscountRub,
+  try {
+    await prisma.$transaction(async (tx) => {
+      const paymentRequest = await tx.paymentRequest.create({
+        data: {
+          amountRub: validated.price.finalTotalRub,
+          baseDeviceMonthlyPriceSnapshot: validated.price.baseDeviceMonthlyPrice,
+          currency: "RUB",
+          deviceLimit: validated.price.devices,
+          devices: validated.price.devices,
+          durationDiscountPercentSnapshot: validated.price.durationDiscountPercent,
+          extraDeviceMonthlyPriceSnapshot: validated.price.extraDeviceMonthlyPrice,
+          markedPaidAt: now,
+          method: "BANK_TRANSFER",
+          monthlyPriceSnapshot: validated.price.monthlyPrice,
+          months: validated.price.months,
+          periodMonths: validated.price.months,
+          referralDiscountPercentSnapshot: validated.price.referralDiscountPercent,
+          status: "MARKED_PAID",
+          tariffName: buildConstructorTariffName(validated.price.months, validated.price.devices),
+          totalPriceBeforeDiscountRubSnapshot: validated.price.totalBeforeDiscountRub,
+          userId: user.id,
+        },
+      });
+
+      const creationResult = await createSubscriptionFromPaidRequest({
+        now,
+        paymentRequest: paymentRequest,
+        tx,
         userId: user.id,
-      },
-    });
+      });
 
-    createdSubscriptionId = await createSubscriptionFromPaidRequest({
-      now,
-      paymentRequest: paymentRequest,
-      tx,
-      userId: user.id,
+      createdSubscriptionId = creationResult.createdSubscriptionId;
+      revokedSubscriptionId = creationResult.revokedSubscriptionId;
     });
-  });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "";
 
-  let marzbanNotice = "";
+    if (message === "ACTIVE_SUBSCRIPTIONS_LIMIT_REACHED") {
+      redirect(
+        buildRedirectUrl({
+          anchor: "#tariffs",
+          error: "Свободных мест сейчас нет.",
+        })
+      );
+    }
+
+    throw error;
+  }
+
+  let integrationNotice = "";
+
+  if (revokedSubscriptionId) {
+    const revokeResult = await revokeSubscriptionInXui(revokedSubscriptionId);
+
+    if (!revokeResult.ok) {
+      integrationNotice +=
+        " Предыдущие конфиги отозваны локально, но удаление клиентов в 3x-ui завершилось ошибкой.";
+    }
+  }
 
   if (createdSubscriptionId) {
-    const integrationResult = await issueSubscriptionInMarzban(createdSubscriptionId);
+    const integrationResult = await issueSubscriptionInXui(createdSubscriptionId);
 
     if (!integrationResult.ok) {
-      marzbanNotice =
-        " Подписка активирована локально, но выдача в Marzban не удалась. Проверьте интеграции в админке.";
+      integrationNotice +=
+        " Подписка активирована локально, но выдача в 3x-ui не удалась. Проверьте интеграции в админке.";
     }
   }
 
@@ -446,7 +509,7 @@ export async function confirmTariffPaymentAction(formData: FormData) {
   redirect(
     buildRedirectUrl({
       anchor: "#dashboard",
-      notice: `Оплата отмечена как выполненная. Подписка активирована сразу и ожидает проверки администратором.${marzbanNotice}`,
+      notice: `Оплата отмечена как выполненная. Подписка активирована сразу и ожидает проверки администратором.${integrationNotice}`,
     })
   );
 }
@@ -457,6 +520,7 @@ export async function payTariffWithCreditsAction(formData: FormData) {
 
   const now = new Date();
   let createdSubscriptionId: string | null = null;
+  let revokedSubscriptionId: string | null = null;
   let chargedRub = 0;
   let appliedDiscountPct = 0;
   let referralRewardGranted = false;
@@ -542,12 +606,14 @@ export async function payTariffWithCreditsAction(formData: FormData) {
         },
       });
 
-      createdSubscriptionId = await createSubscriptionFromPaidRequest({
+      const creationResult = await createSubscriptionFromPaidRequest({
         now,
         paymentRequest: paymentRequest,
         tx,
         userId: user.id,
       });
+      createdSubscriptionId = creationResult.createdSubscriptionId;
+      revokedSubscriptionId = creationResult.revokedSubscriptionId;
 
       const canGrantReferralReward =
         approvedBefore === 0 &&
@@ -589,17 +655,35 @@ export async function payTariffWithCreditsAction(formData: FormData) {
       );
     }
 
+    if (message === "ACTIVE_SUBSCRIPTIONS_LIMIT_REACHED") {
+      redirect(
+        buildRedirectUrl({
+          anchor: "#tariffs",
+          error: "Свободных мест сейчас нет.",
+        })
+      );
+    }
+
     throw error;
   }
 
-  let marzbanNotice = "";
+  let integrationNotice = "";
+
+  if (revokedSubscriptionId) {
+    const revokeResult = await revokeSubscriptionInXui(revokedSubscriptionId);
+
+    if (!revokeResult.ok) {
+      integrationNotice +=
+        " Предыдущие конфиги отозваны локально, но удаление клиентов в 3x-ui завершилось ошибкой.";
+    }
+  }
 
   if (createdSubscriptionId) {
-    const integrationResult = await issueSubscriptionInMarzban(createdSubscriptionId);
+    const integrationResult = await issueSubscriptionInXui(createdSubscriptionId);
 
     if (!integrationResult.ok) {
-      marzbanNotice =
-        " Подписка активирована локально, но выдача в Marzban не удалась. Проверьте интеграции в админке.";
+      integrationNotice +=
+        " Подписка активирована локально, но выдача в 3x-ui не удалась. Проверьте интеграции в админке.";
     }
   }
 
@@ -616,7 +700,173 @@ export async function payTariffWithCreditsAction(formData: FormData) {
   redirect(
     buildRedirectUrl({
       anchor: "#dashboard",
-      notice: `Оплата кредитами завершена: списано эквивалент ${chargedRub} ₽.${discountNotice}${rewardNotice}${marzbanNotice}`,
+      notice: `Оплата кредитами завершена: списано эквивалент ${chargedRub} ₽.${discountNotice}${rewardNotice}${integrationNotice}`,
+    })
+  );
+}
+
+async function getManagedSlotForUser(input: { slotId: string; userId: string }) {
+  const slot = await prisma.deviceSlot.findUnique({
+    include: {
+      subscription: {
+        select: {
+          deviceLimit: true,
+          id: true,
+          paymentRequest: {
+            select: {
+              status: true,
+            },
+          },
+          status: true,
+          userId: true,
+        },
+      },
+    },
+    where: { id: input.slotId },
+  });
+
+  if (!slot || slot.subscription.userId !== input.userId) {
+    return null;
+  }
+
+  if (slot.subscription.status !== "ACTIVE") {
+    return null;
+  }
+
+  return slot;
+}
+
+export async function activateDeviceSlotAction(formData: FormData) {
+  const user = await getUserActor();
+  const slotId = String(formData.get("slotId") ?? "");
+
+  if (!slotId) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#dashboard",
+        error: "Слот не найден.",
+      })
+    );
+  }
+
+  const slot = await getManagedSlotForUser({ slotId, userId: user.id });
+
+  if (!slot) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#dashboard",
+        error: "Слот недоступен для управления.",
+      })
+    );
+  }
+
+  if (slot.status === "BLOCKED") {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#dashboard",
+        error: "Слот заблокирован и не может быть активирован.",
+      })
+    );
+  }
+
+  if (slot.status === "ACTIVE") {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#dashboard",
+        notice: `Слот ${slot.slotIndex} уже активен.`,
+      })
+    );
+  }
+
+  const activeCount = await prisma.deviceSlot.count({
+    where: {
+      status: "ACTIVE",
+      subscriptionId: slot.subscription.id,
+    },
+  });
+
+  if (activeCount >= slot.subscription.deviceLimit) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#dashboard",
+        error: `Лимит устройств (${slot.subscription.deviceLimit}) уже достигнут.`,
+      })
+    );
+  }
+
+  await prisma.deviceSlot.update({
+    data: {
+      status: "ACTIVE",
+    },
+    where: { id: slot.id },
+  });
+
+  const syncResult = await syncSubscriptionInXui(slot.subscription.id);
+  const syncNotice = syncResult.ok
+    ? ""
+    : " 3x-ui вернул ошибку синхронизации, проверьте логи интеграции.";
+
+  revalidatePath("/app");
+  revalidatePath("/admin");
+  redirect(
+    buildRedirectUrl({
+      anchor: "#dashboard",
+      notice: `Слот ${slot.slotIndex} активирован.${syncNotice}`,
+    })
+  );
+}
+
+export async function deactivateDeviceSlotAction(formData: FormData) {
+  const user = await getUserActor();
+  const slotId = String(formData.get("slotId") ?? "");
+
+  if (!slotId) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#dashboard",
+        error: "Слот не найден.",
+      })
+    );
+  }
+
+  const slot = await getManagedSlotForUser({ slotId, userId: user.id });
+
+  if (!slot) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#dashboard",
+        error: "Слот недоступен для управления.",
+      })
+    );
+  }
+
+  if (slot.status !== "ACTIVE") {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#dashboard",
+        notice: `Слот ${slot.slotIndex} уже неактивен.`,
+      })
+    );
+  }
+
+  await prisma.deviceSlot.update({
+    data: {
+      status: "FREE",
+    },
+    where: { id: slot.id },
+  });
+
+  const syncResult = await syncSubscriptionInXui(slot.subscription.id);
+  const syncNotice = syncResult.ok
+    ? ""
+    : " 3x-ui вернул ошибку синхронизации, проверьте логи интеграции.";
+
+  revalidatePath("/app");
+  revalidatePath("/admin");
+  redirect(
+    buildRedirectUrl({
+      anchor: "#dashboard",
+      notice: `Слот ${slot.slotIndex} деактивирован.${syncNotice}`,
     })
   );
 }

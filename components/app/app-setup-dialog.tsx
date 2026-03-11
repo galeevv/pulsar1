@@ -157,13 +157,13 @@ export function AppSetupDialog({
   }
 
   const showBackButton = step !== "start";
-  const displaySubscriptionUrlMobile = formatSubscriptionUrlForDisplay(subscriptionUrl, 4);
-  const displaySubscriptionUrlDesktop = formatSubscriptionUrlForDisplay(subscriptionUrl, 12);
+  const displaySubscriptionUrlMobile = formatSubscriptionUrlForDisplay(subscriptionUrl, 8);
+  const displaySubscriptionUrlDesktop = formatSubscriptionUrlForDisplay(subscriptionUrl, 20);
 
   return (
     <Dialog onOpenChange={handleOpenChange} open={open}>
       <DialogTrigger asChild>
-        <Button
+        <Button 
           className="h-button w-full px-button-x"
           disabled={!subscriptionUrl}
           radius="card"

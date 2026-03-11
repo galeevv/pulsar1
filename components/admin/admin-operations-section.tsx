@@ -1,5 +1,9 @@
 import { Activity, Logs, Shield, Smartphone } from "lucide-react";
 
+import { updateServiceCapacitySettingsAction } from "@/app/admin/actions";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
 import { AdminSectionShell } from "./admin-section-shell";
 import { AdminSurface } from "./admin-surface";
 
@@ -29,6 +33,7 @@ function statusLabel(status: SubscriptionPreview["status"]) {
 export function AdminOperationsSection({
   deviceSlotStats,
   recentSubscriptions,
+  serviceCapacitySettings,
   subscriptionStats,
 }: {
   deviceSlotStats: {
@@ -37,6 +42,9 @@ export function AdminOperationsSection({
     free: number;
   };
   recentSubscriptions: SubscriptionPreview[];
+  serviceCapacitySettings: {
+    maxActiveSubscriptions: number;
+  };
   subscriptionStats: {
     active: number;
     expired: number;
@@ -67,9 +75,14 @@ export function AdminOperationsSection({
     { label: "Заблокировано", value: `${deviceSlotStats.blocked}` },
   ];
 
+  const activeUsersCount = subscriptionStats.active;
+  const maxActiveSubscriptions = serviceCapacitySettings.maxActiveSubscriptions;
+  const seatsLeft =
+    maxActiveSubscriptions > 0 ? Math.max(0, maxActiveSubscriptions - activeUsersCount) : null;
+
   return (
     <AdminSectionShell
-      description="Подписки и device slots теперь считаются из реальных данных. Здесь видны основные метрики и последние события по подпискам."
+      description="Подписки и device slots считаются из реальных данных. Ниже метрики, последние события и глобальный лимит активных подписок."
       eyebrow="OPERATIONS"
       id="operations"
       title="Подписки, устройства и журнал"
@@ -139,12 +152,42 @@ export function AdminOperationsSection({
               ))
             ) : (
               <div className="rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md">
-                <p className="text-sm text-muted-foreground">
-                  Событий по подпискам пока нет.
-                </p>
+                <p className="text-sm text-muted-foreground">Событий по подпискам пока нет.</p>
               </div>
             )}
           </div>
+        </AdminSurface>
+      </div>
+
+      <div className="mt-6">
+        <AdminSurface>
+          <form action={updateServiceCapacitySettingsAction} className="space-y-4">
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold">MAX_ACTIVE_SUBSCRIPTIONS</h3>
+              <p className="text-sm text-muted-foreground">
+                Глобальный ceiling на число пользователей со статусом подписки `ACTIVE`.
+                Продления существующих клиентов разрешены даже при заполненном лимите.
+              </p>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-[minmax(0,220px)_minmax(0,1fr)] md:items-center">
+              <Input
+                min="0"
+                name="maxActiveSubscriptions"
+                type="number"
+                defaultValue={maxActiveSubscriptions}
+              />
+              <p className="text-sm text-muted-foreground">
+                {maxActiveSubscriptions === 0
+                  ? `Лимит отключен. Сейчас активных: ${activeUsersCount}.`
+                  : `Сейчас активных: ${activeUsersCount} из ${maxActiveSubscriptions}. Свободно: ${seatsLeft}.`}
+              </p>
+            </div>
+
+            <Button className="h-button px-button-x" radius="card" type="submit">
+              Сохранить лимит
+            </Button>
+          </form>
         </AdminSurface>
       </div>
     </AdminSectionShell>

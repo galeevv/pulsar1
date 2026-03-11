@@ -1,6 +1,11 @@
-﻿import { BadgeCheck, CalendarClock, Link2, Send, Smartphone, Wallet } from "lucide-react";
+import { BadgeCheck, CalendarClock, Link2, Send, Smartphone, Wallet } from "lucide-react";
 
+import {
+  activateDeviceSlotAction,
+  deactivateDeviceSlotAction,
+} from "@/app/app/actions";
 import { Button } from "@/components/ui/button";
+import { SupportDialog } from "@/components/support/support-dialog";
 
 import { AppCopySubscriptionButton } from "./app-copy-subscription-button";
 import { AppSectionShell } from "./app-section-shell";
@@ -11,8 +16,10 @@ import { AppSurface } from "./app-surface";
 type ActiveSubscriptionItem = {
   deviceLimit: number;
   deviceSlots: Array<{
+    configUrl: string | null;
     id: string;
     label: string | null;
+    lastSyncError: string | null;
     slotIndex: number;
     status: "ACTIVE" | "BLOCKED" | "FREE";
   }>;
@@ -85,6 +92,9 @@ export function AppOverviewSection({
   const devicesCount = activeSubscription
     ? Math.max(activeSubscription.devices, activeSubscription.deviceLimit)
     : 0;
+  const firstFreeSlot = activeSubscription
+    ? activeSubscription.deviceSlots.find((slot) => slot.status === "FREE") ?? null
+    : null;
 
   return (
     <AppSectionShell
@@ -124,6 +134,7 @@ export function AppOverviewSection({
                 <Send className="size-4" />
                 Мы в телеграме
               </a>
+              <SupportDialog />
             </div>
           </AppSurface>
 
@@ -160,7 +171,7 @@ export function AppOverviewSection({
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <Link2 className="size-4 text-muted-foreground" />
-                  <p className="text-sm font-medium">Ссылка подписки</p>
+                  <p className="text-sm font-medium">Ссылка подписки (первый активный слот)</p>
                 </div>
                 <AppCopySubscriptionButton subscriptionUrl={activeSubscription?.subscriptionUrl ?? null} />
               </div>
@@ -190,17 +201,56 @@ export function AppOverviewSection({
                           {slot.label ?? `Устройство ${slot.slotIndex}`}
                         </p>
                         <p className="text-muted-foreground">Статус: {mapSlotStatus(slot.status)}</p>
+                        {slot.lastSyncError ? (
+                          <p className="break-words text-xs text-destructive">
+                            Ошибка синхронизации: {slot.lastSyncError}
+                          </p>
+                        ) : null}
                       </div>
-                      <Button className="h-button px-button-x" disabled radius="card" type="button" variant="outline">
-                        Удалить (скоро)
-                      </Button>
+
+                      {slot.status === "ACTIVE" ? (
+                        <div className="flex w-full flex-col gap-2 md:w-[380px]">
+                          <AppCopySubscriptionButton subscriptionUrl={slot.configUrl} />
+                          <form action={deactivateDeviceSlotAction}>
+                            <input name="slotId" type="hidden" value={slot.id} />
+                            <Button
+                              className="h-button w-full px-button-x"
+                              radius="card"
+                              type="submit"
+                              variant="outline"
+                            >
+                              Отключить слот
+                            </Button>
+                          </form>
+                        </div>
+                      ) : slot.status === "FREE" ? (
+                        <form action={activateDeviceSlotAction}>
+                          <input name="slotId" type="hidden" value={slot.id} />
+                          <Button className="h-button px-button-x" radius="card" type="submit">
+                            Активировать слот
+                          </Button>
+                        </form>
+                      ) : (
+                        <Button className="h-button px-button-x" disabled radius="card" type="button" variant="outline">
+                          Слот заблокирован
+                        </Button>
+                      )}
                     </div>
                   ))}
                 </div>
 
-                <Button className="h-button w-full px-button-x" disabled radius="card" type="button" variant="outline">
-                  Добавить устройство (скоро)
-                </Button>
+                {firstFreeSlot ? (
+                  <form action={activateDeviceSlotAction}>
+                    <input name="slotId" type="hidden" value={firstFreeSlot.id} />
+                    <Button className="h-button w-full px-button-x" radius="card" type="submit" variant="outline">
+                      Активировать следующий свободный слот
+                    </Button>
+                  </form>
+                ) : (
+                  <Button className="h-button w-full px-button-x" disabled radius="card" type="button" variant="outline">
+                    Свободных слотов больше нет
+                  </Button>
+                )}
               </>
             ) : (
               <p className="text-sm text-muted-foreground">

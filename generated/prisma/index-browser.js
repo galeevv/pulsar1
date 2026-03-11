@@ -186,6 +186,44 @@ exports.Prisma.ReferralProgramSettingsScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.LegalDocumentSettingsScalarFieldEnum = {
+  id: 'id',
+  userAgreementText: 'userAgreementText',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ServiceCapacitySettingsScalarFieldEnum = {
+  id: 'id',
+  maxActiveSubscriptions: 'maxActiveSubscriptions',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SupportTicketScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  subject: 'subject',
+  category: 'category',
+  status: 'status',
+  priority: 'priority',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  lastMessageAt: 'lastMessageAt',
+  closedAt: 'closedAt',
+  adminLastReadAt: 'adminLastReadAt',
+  userLastReadAt: 'userLastReadAt'
+};
+
+exports.Prisma.SupportMessageScalarFieldEnum = {
+  id: 'id',
+  ticketId: 'ticketId',
+  senderType: 'senderType',
+  senderId: 'senderId',
+  message: 'message',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SubscriptionDurationRuleScalarFieldEnum = {
   id: 'id',
   months: 'months',
@@ -362,6 +400,10 @@ exports.Prisma.ModelName = {
   PromoCode: 'PromoCode',
   PromoCodeRedemption: 'PromoCodeRedemption',
   ReferralProgramSettings: 'ReferralProgramSettings',
+  LegalDocumentSettings: 'LegalDocumentSettings',
+  ServiceCapacitySettings: 'ServiceCapacitySettings',
+  SupportTicket: 'SupportTicket',
+  SupportMessage: 'SupportMessage',
   SubscriptionDurationRule: 'SubscriptionDurationRule',
   SubscriptionPricingSettings: 'SubscriptionPricingSettings',
   PaymentRequest: 'PaymentRequest',

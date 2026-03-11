@@ -1,6 +1,6 @@
 ﻿# Pulsar System Handbook
 
-Last updated: 2026-03-07
+Last updated: 2026-03-11
 
 ## 1) Product Scope (MVP)
 
@@ -8,11 +8,16 @@ Pulsar is a private access service with:
 
 - Landing: `/`
 - Login/Register: `/login`
+- Rules: `/rules`
 - User dashboard: `/app`
 - Admin dashboard: `/admin`
-- Marzban integration: `panel.1pulsar.space` (server-side only)
+- 3x-ui integration: `panel.1pulsar.space` (server-side only)
 
 Registration is closed and works only by `invite` or `referral` code.
+
+Agent onboarding companion:
+
+- `docs/dev-ai-agent-context.md`
 
 ## 2) Tech Stack
 
@@ -47,9 +52,8 @@ Price model (server-side authoritative):
 - `vpnTotalAfterDurationDiscount = (vpnMonthlyPrice * months) * (1 - durationDiscount)`
 - `devicesTotal = devicesMonthlyPrice * months`
 - `totalAfterDurationDiscount = vpnTotalAfterDurationDiscount + devicesTotal`
-- `firstMonthVpnAfterDurationDiscount = vpnMonthlyPrice * (1 - durationDiscount)`
-- `referralDiscountAmount = firstMonthVpnAfterDurationDiscount * referralDiscount`
-- `finalTotal = totalAfterDurationDiscount - referralDiscountAmount` (first-purchase referral, only on first VPN month)
+- `appliedReferralDiscount = months === 1 ? referralDiscount : 0`
+- `finalTotal = totalAfterDurationDiscount * (1 - appliedReferralDiscount)` (first-purchase referral, only for 1-month purchase)
 - final result is rounded to RUB integer
 
 `/app` and `/admin` preview use the same shared helper as server-side checkout (`calculateSubscriptionPrice`), but final amount is still always validated/recalculated on server.
@@ -66,17 +70,24 @@ Bank transfer flow:
 1. User configures constructor and clicks final-price CTA.
 2. User sends transfer and clicks `Оплачено`.
 3. System creates `PaymentRequest` in `MARKED_PAID` and immediately issues local subscription.
-4. System attempts Marzban provisioning.
+4. System attempts 3x-ui provisioning (strict slots: all free slots become active and each slot gets its own x-ui client with `limitIp=2`).
 5. Admin later verifies transfer:
-   - `APPROVED`: confirmation + Marzban sync
-   - `REJECTED`: local revoke + Marzban revoke attempt
+   - `APPROVED`: confirmation + 3x-ui sync
+   - `REJECTED`: local revoke + 3x-ui revoke attempt
 
 Credits flow:
 
 1. User configures constructor and clicks `Оплатить кредитами`.
 2. Credits are debited atomically.
 3. `PaymentRequest` is created as `APPROVED`.
-4. Subscription is issued immediately + Marzban provisioning attempt.
+4. Subscription is issued immediately + 3x-ui provisioning attempt.
+
+Global active-subscription capacity:
+
+- Admin can set `MAX_ACTIVE_SUBSCRIPTIONS` in `/admin` (Operations block).
+- `0` means no limit.
+- If limit is reached, new purchases for users without active subscription are blocked with notice `Свободных мест сейчас нет`.
+- Extension for users with current active subscription remains allowed.
 
 ### 3.4 Extension Rules
 
@@ -103,9 +114,10 @@ Dashboard includes:
 
 - account/balance/referral counters
 - subscription state + dates + URL copy + setup dialog
-- `Устройства` block (prepared UI layer):
-  - shows slots list
-  - `Удалить` and `Добавить устройство` are safe placeholders for future device-slot backend actions
+- `Устройства` block (strict slot control):
+  - each slot has independent x-ui client (`UUID`) and own subscription link
+  - user can activate/deactivate individual slots from dashboard
+  - active dashboard link points to the first active slot (for quick onboarding)
 
 ### 3.6 Referral Program
 
@@ -118,6 +130,21 @@ Dashboard includes:
 - Promo code redemption adds credits to user balance.
 - Credits can be used directly in constructor checkout (`Оплатить кредитами`).
 
+### 3.8 Support Tickets (Embedded)
+
+- Support is embedded into dashboard `/app` via a single `SupportDialog` (not a separate page).
+- Dialog states:
+  - `list`: current user ticket list
+  - `create`: create ticket form
+  - `detail`: ticket thread with replies and close action
+- User can access only own tickets.
+- Opening a ticket marks admin messages as read for user (`user_last_read_at` update).
+- Admin has a dedicated support section in `/admin`:
+  - ticket list with status/category filters and sorting
+  - unread indicator for new user messages
+  - ticket detail with status update and reply form
+- Opening a ticket in admin marks user messages as read for admin (`admin_last_read_at` update).
+
 ## 4) Data Model Overview
 
 Core entities:
@@ -127,23 +154,30 @@ Core entities:
 - `InviteCode`, `ReferralCode`, `ReferralCodeUse`
 - `PromoCode`, `PromoCodeRedemption`
 - `ReferralProgramSettings`
+- `ServiceCapacitySettings` (`maxActiveSubscriptions`, singleton)
 - `SubscriptionDurationRule` (`months`, `discountPercent`, `isActive`)
 - `SubscriptionPricingSettings` (`minDevices`, `maxDevices`, `baseDeviceMonthlyPrice`, `extraDeviceMonthlyPrice`)
+- `SupportTicket` + `SupportMessage` (ticket threads + unread timestamps)
 - `PaymentRequest` (status + method + constructor snapshots)
 - `Subscription` (active/revoked/expired + devices + starts/expires + payment snapshots)
 - `DeviceSlot`
-- `IntegrationSyncLog` (Marzban integration audit trail)
+- `IntegrationSyncLog` (VPN integration audit trail)
 
 Schema source: `prisma/schema.prisma`.
 
-## 5) Marzban Integration Rules
+## 5) 3x-ui Integration Rules
 
-- Never call Marzban from browser/client. Server-side only.
+- Never call 3x-ui from browser/client. Server-side only.
 - Trigger points:
   - issue/update on user payment action (`MARKED_PAID` and credits `APPROVED`)
   - sync on admin `APPROVED`
   - revoke on admin `REJECTED`
-- Health endpoint: `GET /api/integrations/marzban/health` (admin only).
+- Strict model: one x-ui client per `DeviceSlot`, each with `limitIp=2`.
+  Device limit is enforced by number of active slots, not by one shared client with `limitIp>1`.
+- Practical note: in x-ui, `limitIp` is enforced per client entry in each inbound. If backup inbound is enabled, one slot is represented in both inbounds, so effective concurrent IP count may increase if user actively uses both nodes at the same time.
+- `fail2ban` is optional server hardening (SSH/Nginx brute-force protection) and is not used to enforce per-device slot limits.
+- When backup inbound is enabled, each slot-client is provisioned on primary + backup inbound with shared `subId`.
+- Health endpoints: `GET /api/integrations/xui/health` and compatibility alias `GET /api/integrations/marzban/health` (admin only).
 - Integration logs are persisted in `IntegrationSyncLog`.
 
 Username policy:
@@ -158,17 +192,22 @@ Base:
 - `DATABASE_URL` (local default: `file:./prisma/dev.db`)
 - `SESSION_SECRET` (required in production)
 
-Marzban:
+3x-ui:
 
-- `MARZBAN_BASE_URL`
-- `MARZBAN_AUTH_MODE=password|token`
-- `MARZBAN_USERNAME`
-- `MARZBAN_PASSWORD`
-- `MARZBAN_TOKEN`
-- `MARZBAN_USERNAME_PREFIX`
-- `MARZBAN_TIMEOUT_MS`
-- `MARZBAN_VERIFY_TLS`
-- `MARZBAN_ENABLE_MOCK_FALLBACK`
+- `XUI_BASE_URL`
+- `XUI_WEB_BASE_PATH`
+- `XUI_PRIMARY_INBOUND_ID` (fallback to `XUI_INBOUND_ID` for backward compatibility)
+- `XUI_BACKUP_INBOUND_ID` (optional; if set, provisioning creates backup node in same subscription)
+- `XUI_USERNAME`
+- `XUI_PASSWORD`
+- `XUI_PANEL_BASIC_AUTH_USERNAME`
+- `XUI_PANEL_BASIC_AUTH_PASSWORD`
+- `XUI_SUBSCRIPTION_BASE_URL`
+- `XUI_CLIENT_FLOW`
+- `XUI_EMAIL_PREFIX`
+- `XUI_TIMEOUT_MS`
+- `XUI_VERIFY_TLS`
+- `XUI_ENABLE_MOCK_FALLBACK`
 
 Admin bootstrap:
 
@@ -229,8 +268,8 @@ Detailed production-safe runbook:
 ## 9) Security and Engineering Constraints
 
 - No secrets in `NEXT_PUBLIC_*`.
-- Do not log Marzban token/password.
-- Keep Marzban calls server-side only.
+- Do not log x-ui credentials.
+- Keep 3x-ui calls server-side only.
 - Keep changes incremental and testable.
 - Preserve existing MVP UX when changing backend internals.
 
@@ -245,7 +284,7 @@ Update this file when any of these change:
 - Registration/invite/referral logic
 - Dashboard onboarding UX
 - Admin access/bootstrap process
-- Marzban integration triggers/config
+- 3x-ui integration triggers/config
 - Environment variables
 - Deployment or operational procedures
 
@@ -271,7 +310,14 @@ When updating, do both:
 | 2026-03-08 | Unified constructor pricing formula set to `monthlyPrice -> duration discount -> referral discount` using device pricing components | Match latest pricing rule across `/app`, `/admin`, and server checkout |
 | 2026-03-08 | Restored constructor pricing where duration discount applies only to VPN component and device component is discounted only by referral | Reverted to previous commercial calculation model |
 | 2026-03-08 | Referral discount now applies only to first VPN month (after duration discount), not to all months/devices | Match updated referral discount business rule |
+| 2026-03-08 | Migrated server-side VPN integration layer from Marzban adapter to 3x-ui API adapter (`create/update/revoke/sync/sub links`) | Align control plane with deployed x-ui infrastructure and remove panel-browser dependency |
 | 2026-03-07 | Added dashboard `Устройства` block as prepared UI placeholder for future slot actions | Keep MVP UX ready for next device lifecycle iteration without risky backend overreach |
+| 2026-03-09 | Switched from shared-client `limitIp=N` to strict per-slot provisioning (`1 slot = 1 UUID = limitIp=1`) with dashboard slot activation/deactivation | Enforce real device limits, isolate compromises per device, and support per-device subscription links |
+| 2026-03-10 | Increased strict slot profile policy to `1 slot = 1 UUID = limitIp=2` | Reduce false positives for legitimate network switching (Wi-Fi/mobile) while keeping per-slot isolation |
+| 2026-03-10 | Added public `/rules` page and admin-managed legal text editor | Keep user agreement centrally managed in control-plane UI without code deploys |
+| 2026-03-10 | Referral discount now applies only when selected duration is exactly 1 month, and is calculated from full post-duration total | Match updated commercial rule for referral scope |
+| 2026-03-11 | Added admin-configurable `MAX_ACTIVE_SUBSCRIPTIONS` limit with checkout blocking for new users and extension exception for active users | Protect service capacity from overload while preserving renewals for current subscribers |
+| 2026-03-09 | Added `docs/dev-ai-agent-context.md` with practical architecture/device-control/API onboarding for AI agents | Reduce onboarding time and prevent regressions in VPN/device-limit logic during autonomous development |
 | 2026-03-06 | Added multi-step Happ setup dialog in Dashboard subscription block | Replace single connect button with clearer onboarding path across platforms |
 | 2026-03-05 | Production admin bootstrap moved to explicit command `npm run admin:bootstrap` | Avoid insecure runtime default credentials |
 | 2026-03-05 | Invite code consumption made atomic in registration transaction | Guarantee one-time invite usage under race conditions |

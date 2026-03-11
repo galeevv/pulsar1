@@ -1,6 +1,16 @@
 PRAGMA defer_foreign_keys=ON;
 PRAGMA foreign_keys=OFF;
 
+-- SQLite keeps index names globally unique. After table renames in this migration,
+-- old index names can conflict with newly created indexes on rebuilt tables.
+DROP INDEX IF EXISTS "User_username_key";
+DROP INDEX IF EXISTS "InviteCode_code_key";
+DROP INDEX IF EXISTS "InviteCode_usedByUserId_key";
+DROP INDEX IF EXISTS "ReferralCode_code_key";
+DROP INDEX IF EXISTS "ReferralCode_usedByUserId_key";
+DROP INDEX IF EXISTS "Session_userId_idx";
+DROP INDEX IF EXISTS "Session_expiresAt_idx";
+
 ALTER TABLE "InviteCode" RENAME TO "InviteCode_old";
 ALTER TABLE "ReferralCode" RENAME TO "ReferralCode_old";
 ALTER TABLE "User" RENAME TO "User_old";

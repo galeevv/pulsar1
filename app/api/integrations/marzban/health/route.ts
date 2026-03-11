@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getCurrentSession } from "@/lib/auth";
-import { getMarzbanAdapter } from "@/server/services/marzban";
+import { getXuiAdapter } from "@/server/services/xui";
 
 function toSafeErrorMessage(error: unknown) {
   if (error instanceof Error) {
@@ -35,20 +35,20 @@ export async function GET() {
   }
 
   try {
-    const adapter = getMarzbanAdapter();
+    const adapter = getXuiAdapter();
     await adapter.healthCheck();
 
     return NextResponse.json({
       checkedAt: new Date().toISOString(),
       ok: true,
-      provider: "MARZBAN",
+      provider: "XUI",
     });
   } catch (error) {
     return NextResponse.json(
       {
         error: toSafeErrorMessage(error),
         ok: false,
-        provider: "MARZBAN",
+        provider: "XUI",
       },
       { status: 503 }
     );

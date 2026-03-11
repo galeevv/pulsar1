@@ -5,9 +5,9 @@ import { redirect } from "next/navigation";
 
 import { getCurrentSession } from "@/lib/auth";
 import {
-  revokeSubscriptionInMarzban,
-  syncSubscriptionInMarzban,
-} from "@/lib/marzban-integration";
+  revokeSubscriptionInXui,
+  syncSubscriptionInXui,
+} from "@/lib/xui-integration";
 import { prisma } from "@/lib/prisma";
 
 function buildRedirectUrl(params: {
@@ -146,7 +146,7 @@ export async function approvePaymentRequestAction(formData: FormData) {
   let integrationNotice = "";
 
   if (paymentRequest.subscription?.id) {
-    const syncResult = await syncSubscriptionInMarzban(paymentRequest.subscription.id);
+    const syncResult = await syncSubscriptionInXui(paymentRequest.subscription.id);
 
     if (!syncResult.ok) {
       integrationNotice =
@@ -239,7 +239,7 @@ export async function rejectPaymentRequestAction(formData: FormData) {
   let integrationNotice = "";
 
   if (paymentRequest.subscription?.id) {
-    const revokeResult = await revokeSubscriptionInMarzban(paymentRequest.subscription.id);
+    const revokeResult = await revokeSubscriptionInXui(paymentRequest.subscription.id);
 
     if (!revokeResult.ok) {
       integrationNotice =

@@ -11,6 +11,8 @@ const headerLinks = [
   { href: "#invite-codes", label: "Invite" },
   { href: "#referral-codes", label: "Referral" },
   { href: "#promocodes", label: "Промокоды" },
+  { href: "#rules", label: "Правила" },
+  { href: "#support", label: "Поддержка" },
   { href: "#operations", label: "Операции" },
 ];
 

@@ -7,6 +7,7 @@ import { AppOverviewSection } from "@/components/app/app-overview-section";
 import { AppTariffsSection } from "@/components/app/app-tariffs-section";
 import { getAppBenefitsData } from "@/lib/app-benefits";
 import { getCurrentSession } from "@/lib/auth";
+import { getServiceCapacityState } from "@/lib/service-capacity";
 import { getAppSubscriptionConstructorData } from "@/lib/subscription-constructor";
 import { getAppSubscriptionData } from "@/lib/subscription-management";
 
@@ -50,10 +51,11 @@ export default async function AppPage({
   const resolvedSearchParams = await searchParams;
   const error = getValue(resolvedSearchParams, "error");
   const notice = getValue(resolvedSearchParams, "notice");
-  const [benefitsData, subscriptionData, constructorData] = await Promise.all([
+  const [benefitsData, subscriptionData, constructorData, serviceCapacityState] = await Promise.all([
     getAppBenefitsData(session.username),
     getAppSubscriptionData(session.username),
     getAppSubscriptionConstructorData(),
+    getServiceCapacityState(),
   ]);
 
   if (!benefitsData || !subscriptionData) {
@@ -69,6 +71,9 @@ export default async function AppPage({
   const canExtendSubscription =
     !subscriptionData.activeSubscription ||
     subscriptionData.activeSubscription.paymentRequest?.status === "APPROVED";
+  const isNewUserWithoutActiveSubscription = !subscriptionData.activeSubscription;
+  const isCapacityBlockedForNewSubscriptions =
+    isNewUserWithoutActiveSubscription && serviceCapacityState.isLimitReached;
 
   return (
     <main className="min-h-screen bg-background text-foreground">
@@ -87,7 +92,10 @@ export default async function AppPage({
           credits={benefitsData.user.credits}
           durationRules={constructorData.durationRules}
           firstPurchaseDiscountPct={benefitsData.firstPurchaseDiscountPct}
+          isCapacityBlockedForNewSubscriptions={isCapacityBlockedForNewSubscriptions}
+          maxActiveSubscriptions={serviceCapacityState.maxActiveSubscriptions}
           pricingSettings={constructorData.pricingSettings}
+          currentActiveSubscriptionsCount={serviceCapacityState.activeSubscriptionsCount}
         />
         <AppOverviewSection
           activeSubscription={subscriptionData.activeSubscription}
