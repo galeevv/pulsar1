@@ -12,7 +12,7 @@ export const createTicketSchema = z.object({
 })
 
 export const createTicketMessageSchema = z.object({
-  message: z.string().trim().min(10).max(5000),
+  message: z.string().trim().min(1).max(2000),
 })
 
 export const updateTicketStatusSchema = z.object({

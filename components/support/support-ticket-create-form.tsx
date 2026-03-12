@@ -24,11 +24,9 @@ type FieldErrors = {
 
 export function SupportTicketCreateForm({
   isSubmitting,
-  onCancel,
   onSubmit,
 }: {
   isSubmitting: boolean;
-  onCancel: () => void;
   onSubmit: (payload: { category: string; message: string; subject: string }) => Promise<void>;
 }) {
   const [category, setCategory] = useState<(typeof SUPPORT_TICKET_CATEGORIES)[number]>("payment");
@@ -120,11 +118,8 @@ export function SupportTicketCreateForm({
         {errors.message ? <p className="text-xs text-destructive">{errors.message}</p> : null}
       </div>
 
-      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-        <Button disabled={isSubmitting} onClick={onCancel} radius="card" type="button" variant="outline">
-          Отмена
-        </Button>
-        <Button disabled={isSubmitting} radius="card" type="submit">
+      <div>
+        <Button className="h-button w-full px-button-x" disabled={isSubmitting} radius="card" type="submit">
           {isSubmitting ? "Отправка..." : "Отправить"}
         </Button>
       </div>

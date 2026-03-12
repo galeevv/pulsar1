@@ -1,11 +1,13 @@
 "use client";
 
-import { Filter, RefreshCcw } from "lucide-react";
+import { ArrowUpRight, Filter, MessageCircleDashed, MessageSquare, RefreshCcw, Reply, UserRound } from "lucide-react";
 
+import { SupportStatusBadge } from "@/components/support/support-status-badge";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { AdminSupportTicketListItemSerialized } from "@/lib/support/client-types";
 import {
   SUPPORT_TICKET_CATEGORIES,
@@ -14,8 +16,6 @@ import {
   type SupportTicketStatus,
 } from "@/lib/support/constants";
 import { getSupportCategoryLabel, getSupportStatusLabel } from "@/lib/support/helpers";
-
-import { SupportStatusBadge } from "@/components/support/support-status-badge";
 
 export type AdminTicketListFiltersState = {
   category: SupportTicketCategory | "all";
@@ -39,6 +39,7 @@ function formatDateTime(value: string | null) {
     hour: "2-digit",
     minute: "2-digit",
     month: "2-digit",
+    year: "numeric",
   });
 }
 
@@ -59,14 +60,70 @@ export function AdminTicketList({
   selectedTicketId: number | null;
   tickets: AdminSupportTicketListItemSerialized[];
 }) {
+  const shouldConstrainHeight = tickets.length > 4;
+
+  const ticketCards = (
+    <div className="space-y-3 pr-1">
+      {tickets.map((ticket) => {
+        const selected = selectedTicketId === ticket.id;
+
+        return (
+          <button
+            className="group block w-full cursor-pointer text-left"
+            key={ticket.id}
+            onClick={() => onSelectTicket(ticket.id)}
+            type="button"
+          >
+            <div
+              className={`rounded-card border p-card-compact transition-colors md:p-card-compact-md ${
+                selected
+                  ? "border-primary/40 bg-primary/10"
+                  : "border-border/70 bg-card/40 group-hover:border-border group-hover:bg-card/70"
+              }`}
+            >
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0 space-y-1">
+                  <p className="text-xs text-muted-foreground">Тикет #{ticket.id}</p>
+                  <p className="line-clamp-2 text-sm font-semibold text-foreground">{ticket.subject}</p>
+                </div>
+                <ArrowUpRight className="size-4 text-muted-foreground transition-colors group-hover:text-foreground" />
+              </div>
+
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <SupportStatusBadge className="h-6 px-2.5 text-[11px]" status={ticket.status} />
+                <Badge className="h-6 gap-1.5 px-2.5 text-[11px]" variant="secondary">
+                  <MessageSquare className="size-3.5" />
+                  {getSupportCategoryLabel(ticket.category)}
+                </Badge>
+                <Badge className="h-6 gap-1.5 px-2.5 text-[11px]" variant="secondary">
+                  <UserRound className="size-3.5" />
+                  {ticket.user.username}
+                </Badge>
+                {ticket.unreadForAdmin ? (
+                  <Badge className="h-6 gap-1.5 px-2.5 text-[11px]" variant="warning">
+                    <Reply className="size-3.5" />
+                    Новый ответ
+                  </Badge>
+                ) : null}
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Обновлен: {formatDateTime(ticket.lastMessageAt ?? ticket.updatedAt)}
+              </p>
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  );
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
           <Filter className="size-4" />
-          Фильтры
+          Управление тикетами
         </div>
-        <Button onClick={onRefresh} radius="card" type="button" variant="outline">
+        <Button className="h-button px-button-x" onClick={onRefresh} radius="card" type="button" variant="outline">
           <RefreshCcw className="size-4" />
           Обновить
         </Button>
@@ -149,61 +206,24 @@ export function AdminTicketList({
       </div>
 
       {isLoading ? (
-        <div className="space-y-2">
-          <Skeleton className="h-12 w-full rounded-card" />
-          <Skeleton className="h-12 w-full rounded-card" />
-          <Skeleton className="h-12 w-full rounded-card" />
+        <div className="space-y-3">
+          <Skeleton className="h-24 w-full rounded-card" />
+          <Skeleton className="h-24 w-full rounded-card" />
+          <Skeleton className="h-24 w-full rounded-card" />
         </div>
+      ) : tickets.length ? (
+        shouldConstrainHeight ? (
+          <ScrollArea className="h-[54svh] rounded-card border border-border/70 bg-background/20 p-2 md:h-[600px]">
+            {ticketCards}
+          </ScrollArea>
+        ) : (
+          ticketCards
+        )
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Пользователь</TableHead>
-              <TableHead>Тема</TableHead>
-              <TableHead>Категория</TableHead>
-              <TableHead>Статус</TableHead>
-              <TableHead>Последнее сообщение</TableHead>
-              <TableHead>Создан</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {tickets.length ? (
-              tickets.map((ticket) => (
-                <TableRow
-                  className={`cursor-pointer ${
-                    selectedTicketId === ticket.id ? "bg-muted/40 hover:bg-muted/50" : ""
-                  }`}
-                  key={ticket.id}
-                  onClick={() => onSelectTicket(ticket.id)}
-                >
-                  <TableCell>#{ticket.id}</TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <p className="font-medium text-foreground">{ticket.user.username}</p>
-                      {ticket.unreadForAdmin ? (
-                        <p className="text-xs text-amber-300">Есть новый ответ пользователя</p>
-                      ) : null}
-                    </div>
-                  </TableCell>
-                  <TableCell className="max-w-[220px] truncate">{ticket.subject}</TableCell>
-                  <TableCell>{getSupportCategoryLabel(ticket.category)}</TableCell>
-                  <TableCell>
-                    <SupportStatusBadge status={ticket.status} />
-                  </TableCell>
-                  <TableCell>{formatDateTime(ticket.lastMessageAt ?? ticket.updatedAt)}</TableCell>
-                  <TableCell>{formatDateTime(ticket.createdAt)}</TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell className="py-10 text-center text-muted-foreground" colSpan={7}>
-                  Тикеты не найдены по текущим фильтрам.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+        <div className="rounded-card border border-dashed border-border bg-background/30 px-4 py-10 text-center">
+          <MessageCircleDashed className="mx-auto mb-3 size-5 text-muted-foreground" />
+          <p className="text-sm text-muted-foreground">Тикеты не найдены по текущим фильтрам.</p>
+        </div>
       )}
     </div>
   );

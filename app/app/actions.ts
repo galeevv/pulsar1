@@ -6,10 +6,8 @@ import { redirect } from "next/navigation";
 import { generateReferralCodeValue } from "@/lib/admin-code-management";
 import { getAppBenefitsData, validatePromoCodeForUser } from "@/lib/app-benefits";
 import { getCurrentSession, normalizeCode } from "@/lib/auth";
+import { createSubscriptionFromPaidRequest } from "@/lib/payment-subscription-issuance";
 import { prisma } from "@/lib/prisma";
-import {
-  isActiveSubscriptionsLimitReached,
-} from "@/lib/service-capacity";
 import {
   calculateSubscriptionPrice,
   getAppSubscriptionConstructorData,
@@ -37,12 +35,6 @@ function buildRedirectUrl(params: {
 
   const query = searchParams.toString();
   return `/app${query ? `?${query}` : ""}${params.anchor ?? "#benefits"}`;
-}
-
-function addMonths(date: Date, months: number) {
-  const result = new Date(date);
-  result.setMonth(result.getMonth() + months);
-  return result;
 }
 
 function normalizeDiscountPct(discountPct: number) {
@@ -137,7 +129,7 @@ async function parseAndValidateConstructorSelection(
       prisma.paymentRequest.findFirst({
         where: {
           status: {
-            in: ["CREATED", "MARKED_PAID"],
+            in: ["CREATED"],
           },
           userId,
         },
@@ -163,7 +155,7 @@ async function parseAndValidateConstructorSelection(
     redirect(
       buildRedirectUrl({
         anchor: "#tariffs",
-        error: "У вас уже есть открытая заявка на оплату. Дождитесь проверки администратором.",
+        error: "У вас уже есть незавершенный платеж. Дождитесь его завершения.",
       })
     );
   }
@@ -217,132 +209,6 @@ async function parseAndValidateConstructorSelection(
     months,
     pricingSettings,
     price,
-  };
-}
-
-async function createSubscriptionFromPaidRequest(input: {
-  now: Date;
-  paymentRequest: {
-    amountRub: number;
-    baseDeviceMonthlyPriceSnapshot: number;
-    currency: string;
-    deviceLimit: number;
-    devices: number;
-    durationDiscountPercentSnapshot: number;
-    extraDeviceMonthlyPriceSnapshot: number;
-    id: string;
-    monthlyPriceSnapshot: number;
-    months: number;
-    referralDiscountPercentSnapshot: number;
-    tariffName: string;
-  };
-  tx: Omit<
-    typeof prisma,
-    "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends"
-  >;
-  userId: string;
-}) {
-  const activeSubscription = await input.tx.subscription.findFirst({
-    orderBy: [{ startsAt: "desc" }, { startedAt: "desc" }],
-    where: {
-      status: "ACTIVE",
-      userId: input.userId,
-    },
-  });
-  const serviceCapacitySettings = await input.tx.serviceCapacitySettings.upsert({
-    create: {
-      id: 1,
-      maxActiveSubscriptions: 0,
-    },
-    update: {},
-    where: { id: 1 },
-  });
-
-  if (!activeSubscription && serviceCapacitySettings.maxActiveSubscriptions > 0) {
-    const activeSubscriptionsCount = await input.tx.subscription.count({
-      where: {
-        status: "ACTIVE",
-      },
-    });
-
-    if (
-      isActiveSubscriptionsLimitReached({
-        activeSubscriptionsCount,
-        maxActiveSubscriptions: serviceCapacitySettings.maxActiveSubscriptions,
-      })
-    ) {
-      throw new Error("ACTIVE_SUBSCRIPTIONS_LIMIT_REACHED");
-    }
-  }
-
-  const now = input.now;
-  const previousStartAt = activeSubscription?.startsAt ?? activeSubscription?.startedAt ?? now;
-  const extensionBaseDate = activeSubscription?.expiresAt ?? activeSubscription?.endsAt ?? now;
-  const nextExpiresAt = addMonths(extensionBaseDate, input.paymentRequest.months);
-  const nextMonthsPurchased =
-    (activeSubscription?.monthsPurchased ?? activeSubscription?.periodMonths ?? 0) +
-    input.paymentRequest.months;
-  const nextTotalPaid = (activeSubscription?.totalPaid ?? 0) + input.paymentRequest.amountRub;
-
-  if (activeSubscription) {
-    await input.tx.subscription.update({
-      data: {
-        marzbanUsername: null,
-        revokedAt: now,
-        status: "REVOKED",
-      },
-      where: {
-        id: activeSubscription.id,
-      },
-    });
-
-    await input.tx.deviceSlot.updateMany({
-      data: {
-        status: "BLOCKED",
-      },
-      where: {
-        subscriptionId: activeSubscription.id,
-      },
-    });
-  }
-
-  const createdSubscription = await input.tx.subscription.create({
-    data: {
-      baseDeviceMonthlyPriceSnapshot: input.paymentRequest.baseDeviceMonthlyPriceSnapshot,
-      currency: input.paymentRequest.currency,
-      deviceLimit: input.paymentRequest.deviceLimit,
-      devices: input.paymentRequest.devices,
-      durationDiscountPercentSnapshot: input.paymentRequest.durationDiscountPercentSnapshot,
-      endsAt: nextExpiresAt,
-      expiresAt: nextExpiresAt,
-      extraDeviceMonthlyPriceSnapshot: input.paymentRequest.extraDeviceMonthlyPriceSnapshot,
-      monthlyPriceSnapshot: input.paymentRequest.monthlyPriceSnapshot,
-      monthsPurchased: nextMonthsPurchased,
-      paymentRequestId: input.paymentRequest.id,
-      pendingDevices: null,
-      periodMonths: input.paymentRequest.months,
-      referralDiscountPercentSnapshot: input.paymentRequest.referralDiscountPercentSnapshot,
-      startsAt: previousStartAt,
-      startedAt: previousStartAt,
-      status: "ACTIVE",
-      tariffName: input.paymentRequest.tariffName,
-      totalPaid: nextTotalPaid,
-      userId: input.userId,
-    },
-  });
-
-  await input.tx.deviceSlot.createMany({
-    data: Array.from({ length: input.paymentRequest.devices }, (_, index) => ({
-      label: `Device ${index + 1}`,
-      slotIndex: index + 1,
-      status: "FREE",
-      subscriptionId: createdSubscription.id,
-    })),
-  });
-
-  return {
-    createdSubscriptionId: createdSubscription.id,
-    revokedSubscriptionId: activeSubscription?.id ?? null,
   };
 }
 
@@ -429,87 +295,11 @@ export async function applyPromoCodeAction(formData: FormData) {
 }
 
 export async function confirmTariffPaymentAction(formData: FormData) {
-  const user = await getUserActor();
-  const validated = await parseAndValidateConstructorSelection(user.id, formData);
-  const now = new Date();
-  let createdSubscriptionId: string | null = null;
-  let revokedSubscriptionId: string | null = null;
-
-  try {
-    await prisma.$transaction(async (tx) => {
-      const paymentRequest = await tx.paymentRequest.create({
-        data: {
-          amountRub: validated.price.finalTotalRub,
-          baseDeviceMonthlyPriceSnapshot: validated.price.baseDeviceMonthlyPrice,
-          currency: "RUB",
-          deviceLimit: validated.price.devices,
-          devices: validated.price.devices,
-          durationDiscountPercentSnapshot: validated.price.durationDiscountPercent,
-          extraDeviceMonthlyPriceSnapshot: validated.price.extraDeviceMonthlyPrice,
-          markedPaidAt: now,
-          method: "BANK_TRANSFER",
-          monthlyPriceSnapshot: validated.price.monthlyPrice,
-          months: validated.price.months,
-          periodMonths: validated.price.months,
-          referralDiscountPercentSnapshot: validated.price.referralDiscountPercent,
-          status: "MARKED_PAID",
-          tariffName: buildConstructorTariffName(validated.price.months, validated.price.devices),
-          totalPriceBeforeDiscountRubSnapshot: validated.price.totalBeforeDiscountRub,
-          userId: user.id,
-        },
-      });
-
-      const creationResult = await createSubscriptionFromPaidRequest({
-        now,
-        paymentRequest: paymentRequest,
-        tx,
-        userId: user.id,
-      });
-
-      createdSubscriptionId = creationResult.createdSubscriptionId;
-      revokedSubscriptionId = creationResult.revokedSubscriptionId;
-    });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "";
-
-    if (message === "ACTIVE_SUBSCRIPTIONS_LIMIT_REACHED") {
-      redirect(
-        buildRedirectUrl({
-          anchor: "#tariffs",
-          error: "Свободных мест сейчас нет.",
-        })
-      );
-    }
-
-    throw error;
-  }
-
-  let integrationNotice = "";
-
-  if (revokedSubscriptionId) {
-    const revokeResult = await revokeSubscriptionInXui(revokedSubscriptionId);
-
-    if (!revokeResult.ok) {
-      integrationNotice +=
-        " Предыдущие конфиги отозваны локально, но удаление клиентов в 3x-ui завершилось ошибкой.";
-    }
-  }
-
-  if (createdSubscriptionId) {
-    const integrationResult = await issueSubscriptionInXui(createdSubscriptionId);
-
-    if (!integrationResult.ok) {
-      integrationNotice +=
-        " Подписка активирована локально, но выдача в 3x-ui не удалась. Проверьте интеграции в админке.";
-    }
-  }
-
-  revalidatePath("/app");
-  revalidatePath("/admin");
+  void formData;
   redirect(
     buildRedirectUrl({
-      anchor: "#dashboard",
-      notice: `Оплата отмечена как выполненная. Подписка активирована сразу и ожидает проверки администратором.${integrationNotice}`,
+      anchor: "#tariffs",
+      error: "Оплата переводом отключена. Используйте Platega или кредиты.",
     })
   );
 }

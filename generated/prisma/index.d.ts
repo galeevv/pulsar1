@@ -84,6 +84,11 @@ export type SubscriptionPricingSettings = $Result.DefaultSelection<Prisma.$Subsc
  */
 export type PaymentRequest = $Result.DefaultSelection<Prisma.$PaymentRequestPayload>
 /**
+ * Model PlategaWebhookLog
+ * 
+ */
+export type PlategaWebhookLog = $Result.DefaultSelection<Prisma.$PlategaWebhookLogPayload>
+/**
  * Model Subscription
  * 
  */
@@ -118,7 +123,6 @@ export type Role = (typeof Role)[keyof typeof Role]
 
 export const PaymentRequestStatus: {
   CREATED: 'CREATED',
-  MARKED_PAID: 'MARKED_PAID',
   APPROVED: 'APPROVED',
   REJECTED: 'REJECTED'
 };
@@ -170,11 +174,21 @@ export type IntegrationSyncStatus = (typeof IntegrationSyncStatus)[keyof typeof 
 
 
 export const PaymentMethod: {
-  BANK_TRANSFER: 'BANK_TRANSFER',
+  PLATEGA: 'PLATEGA',
   CREDITS: 'CREDITS'
 };
 
 export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]
+
+
+export const PlategaWebhookLogStatus: {
+  RECEIVED: 'RECEIVED',
+  PROCESSED: 'PROCESSED',
+  IGNORED: 'IGNORED',
+  ERROR: 'ERROR'
+};
+
+export type PlategaWebhookLogStatus = (typeof PlategaWebhookLogStatus)[keyof typeof PlategaWebhookLogStatus]
 
 }
 
@@ -209,6 +223,10 @@ export const IntegrationSyncStatus: typeof $Enums.IntegrationSyncStatus
 export type PaymentMethod = $Enums.PaymentMethod
 
 export const PaymentMethod: typeof $Enums.PaymentMethod
+
+export type PlategaWebhookLogStatus = $Enums.PlategaWebhookLogStatus
+
+export const PlategaWebhookLogStatus: typeof $Enums.PlategaWebhookLogStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -470,6 +488,16 @@ export class PrismaClient<
     * ```
     */
   get paymentRequest(): Prisma.PaymentRequestDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.plategaWebhookLog`: Exposes CRUD operations for the **PlategaWebhookLog** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PlategaWebhookLogs
+    * const plategaWebhookLogs = await prisma.plategaWebhookLog.findMany()
+    * ```
+    */
+  get plategaWebhookLog(): Prisma.PlategaWebhookLogDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.subscription`: Exposes CRUD operations for the **Subscription** model.
@@ -958,6 +986,7 @@ export namespace Prisma {
     SubscriptionDurationRule: 'SubscriptionDurationRule',
     SubscriptionPricingSettings: 'SubscriptionPricingSettings',
     PaymentRequest: 'PaymentRequest',
+    PlategaWebhookLog: 'PlategaWebhookLog',
     Subscription: 'Subscription',
     DeviceSlot: 'DeviceSlot',
     IntegrationSyncLog: 'IntegrationSyncLog',
@@ -977,7 +1006,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "inviteCode" | "referralCode" | "referralCodeUse" | "promoCode" | "promoCodeRedemption" | "referralProgramSettings" | "legalDocumentSettings" | "serviceCapacitySettings" | "supportTicket" | "supportMessage" | "subscriptionDurationRule" | "subscriptionPricingSettings" | "paymentRequest" | "subscription" | "deviceSlot" | "integrationSyncLog" | "session"
+      modelProps: "user" | "inviteCode" | "referralCode" | "referralCodeUse" | "promoCode" | "promoCodeRedemption" | "referralProgramSettings" | "legalDocumentSettings" | "serviceCapacitySettings" | "supportTicket" | "supportMessage" | "subscriptionDurationRule" | "subscriptionPricingSettings" | "paymentRequest" | "plategaWebhookLog" | "subscription" | "deviceSlot" | "integrationSyncLog" | "session"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2017,6 +2046,80 @@ export namespace Prisma {
           }
         }
       }
+      PlategaWebhookLog: {
+        payload: Prisma.$PlategaWebhookLogPayload<ExtArgs>
+        fields: Prisma.PlategaWebhookLogFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PlategaWebhookLogFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlategaWebhookLogPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PlategaWebhookLogFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlategaWebhookLogPayload>
+          }
+          findFirst: {
+            args: Prisma.PlategaWebhookLogFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlategaWebhookLogPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PlategaWebhookLogFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlategaWebhookLogPayload>
+          }
+          findMany: {
+            args: Prisma.PlategaWebhookLogFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlategaWebhookLogPayload>[]
+          }
+          create: {
+            args: Prisma.PlategaWebhookLogCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlategaWebhookLogPayload>
+          }
+          createMany: {
+            args: Prisma.PlategaWebhookLogCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PlategaWebhookLogCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlategaWebhookLogPayload>[]
+          }
+          delete: {
+            args: Prisma.PlategaWebhookLogDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlategaWebhookLogPayload>
+          }
+          update: {
+            args: Prisma.PlategaWebhookLogUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlategaWebhookLogPayload>
+          }
+          deleteMany: {
+            args: Prisma.PlategaWebhookLogDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PlategaWebhookLogUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.PlategaWebhookLogUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlategaWebhookLogPayload>[]
+          }
+          upsert: {
+            args: Prisma.PlategaWebhookLogUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlategaWebhookLogPayload>
+          }
+          aggregate: {
+            args: Prisma.PlategaWebhookLogAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePlategaWebhookLog>
+          }
+          groupBy: {
+            args: Prisma.PlategaWebhookLogGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PlategaWebhookLogGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PlategaWebhookLogCountArgs<ExtArgs>
+            result: $Utils.Optional<PlategaWebhookLogCountAggregateOutputType> | number
+          }
+        }
+      }
       Subscription: {
         payload: Prisma.$SubscriptionPayload<ExtArgs>
         fields: Prisma.SubscriptionFieldRefs
@@ -2435,6 +2538,7 @@ export namespace Prisma {
     subscriptionDurationRule?: SubscriptionDurationRuleOmit
     subscriptionPricingSettings?: SubscriptionPricingSettingsOmit
     paymentRequest?: PaymentRequestOmit
+    plategaWebhookLog?: PlategaWebhookLogOmit
     subscription?: SubscriptionOmit
     deviceSlot?: DeviceSlotOmit
     integrationSyncLog?: IntegrationSyncLogOmit
@@ -2698,6 +2802,37 @@ export namespace Prisma {
    */
   export type SupportTicketCountOutputTypeCountMessagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SupportMessageWhereInput
+  }
+
+
+  /**
+   * Count Type PaymentRequestCountOutputType
+   */
+
+  export type PaymentRequestCountOutputType = {
+    plategaWebhookLogs: number
+  }
+
+  export type PaymentRequestCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    plategaWebhookLogs?: boolean | PaymentRequestCountOutputTypeCountPlategaWebhookLogsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * PaymentRequestCountOutputType without action
+   */
+  export type PaymentRequestCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PaymentRequestCountOutputType
+     */
+    select?: PaymentRequestCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * PaymentRequestCountOutputType without action
+   */
+  export type PaymentRequestCountOutputTypeCountPlategaWebhookLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PlategaWebhookLogWhereInput
   }
 
 
@@ -17321,6 +17456,11 @@ export namespace Prisma {
     markedPaidAt: Date | null
     approvedAt: Date | null
     rejectedAt: Date | null
+    plategaTransactionId: string | null
+    plategaRedirectUrl: string | null
+    plategaStatus: string | null
+    plategaPayloadJson: string | null
+    plategaConfirmedAt: Date | null
   }
 
   export type PaymentRequestMaxAggregateOutputType = {
@@ -17346,6 +17486,11 @@ export namespace Prisma {
     markedPaidAt: Date | null
     approvedAt: Date | null
     rejectedAt: Date | null
+    plategaTransactionId: string | null
+    plategaRedirectUrl: string | null
+    plategaStatus: string | null
+    plategaPayloadJson: string | null
+    plategaConfirmedAt: Date | null
   }
 
   export type PaymentRequestCountAggregateOutputType = {
@@ -17371,6 +17516,11 @@ export namespace Prisma {
     markedPaidAt: number
     approvedAt: number
     rejectedAt: number
+    plategaTransactionId: number
+    plategaRedirectUrl: number
+    plategaStatus: number
+    plategaPayloadJson: number
+    plategaConfirmedAt: number
     _all: number
   }
 
@@ -17426,6 +17576,11 @@ export namespace Prisma {
     markedPaidAt?: true
     approvedAt?: true
     rejectedAt?: true
+    plategaTransactionId?: true
+    plategaRedirectUrl?: true
+    plategaStatus?: true
+    plategaPayloadJson?: true
+    plategaConfirmedAt?: true
   }
 
   export type PaymentRequestMaxAggregateInputType = {
@@ -17451,6 +17606,11 @@ export namespace Prisma {
     markedPaidAt?: true
     approvedAt?: true
     rejectedAt?: true
+    plategaTransactionId?: true
+    plategaRedirectUrl?: true
+    plategaStatus?: true
+    plategaPayloadJson?: true
+    plategaConfirmedAt?: true
   }
 
   export type PaymentRequestCountAggregateInputType = {
@@ -17476,6 +17636,11 @@ export namespace Prisma {
     markedPaidAt?: true
     approvedAt?: true
     rejectedAt?: true
+    plategaTransactionId?: true
+    plategaRedirectUrl?: true
+    plategaStatus?: true
+    plategaPayloadJson?: true
+    plategaConfirmedAt?: true
     _all?: true
   }
 
@@ -17588,6 +17753,11 @@ export namespace Prisma {
     markedPaidAt: Date | null
     approvedAt: Date | null
     rejectedAt: Date | null
+    plategaTransactionId: string | null
+    plategaRedirectUrl: string | null
+    plategaStatus: string | null
+    plategaPayloadJson: string | null
+    plategaConfirmedAt: Date | null
     _count: PaymentRequestCountAggregateOutputType | null
     _avg: PaymentRequestAvgAggregateOutputType | null
     _sum: PaymentRequestSumAggregateOutputType | null
@@ -17632,8 +17802,15 @@ export namespace Prisma {
     markedPaidAt?: boolean
     approvedAt?: boolean
     rejectedAt?: boolean
+    plategaTransactionId?: boolean
+    plategaRedirectUrl?: boolean
+    plategaStatus?: boolean
+    plategaPayloadJson?: boolean
+    plategaConfirmedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     subscription?: boolean | PaymentRequest$subscriptionArgs<ExtArgs>
+    plategaWebhookLogs?: boolean | PaymentRequest$plategaWebhookLogsArgs<ExtArgs>
+    _count?: boolean | PaymentRequestCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["paymentRequest"]>
 
   export type PaymentRequestSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -17659,6 +17836,11 @@ export namespace Prisma {
     markedPaidAt?: boolean
     approvedAt?: boolean
     rejectedAt?: boolean
+    plategaTransactionId?: boolean
+    plategaRedirectUrl?: boolean
+    plategaStatus?: boolean
+    plategaPayloadJson?: boolean
+    plategaConfirmedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["paymentRequest"]>
 
@@ -17685,6 +17867,11 @@ export namespace Prisma {
     markedPaidAt?: boolean
     approvedAt?: boolean
     rejectedAt?: boolean
+    plategaTransactionId?: boolean
+    plategaRedirectUrl?: boolean
+    plategaStatus?: boolean
+    plategaPayloadJson?: boolean
+    plategaConfirmedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["paymentRequest"]>
 
@@ -17711,12 +17898,19 @@ export namespace Prisma {
     markedPaidAt?: boolean
     approvedAt?: boolean
     rejectedAt?: boolean
+    plategaTransactionId?: boolean
+    plategaRedirectUrl?: boolean
+    plategaStatus?: boolean
+    plategaPayloadJson?: boolean
+    plategaConfirmedAt?: boolean
   }
 
-  export type PaymentRequestOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "tariffName" | "periodMonths" | "deviceLimit" | "amountRub" | "status" | "method" | "months" | "devices" | "currency" | "baseDeviceMonthlyPriceSnapshot" | "extraDeviceMonthlyPriceSnapshot" | "monthlyPriceSnapshot" | "durationDiscountPercentSnapshot" | "referralDiscountPercentSnapshot" | "totalPriceBeforeDiscountRubSnapshot" | "createdAt" | "updatedAt" | "markedPaidAt" | "approvedAt" | "rejectedAt", ExtArgs["result"]["paymentRequest"]>
+  export type PaymentRequestOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "tariffName" | "periodMonths" | "deviceLimit" | "amountRub" | "status" | "method" | "months" | "devices" | "currency" | "baseDeviceMonthlyPriceSnapshot" | "extraDeviceMonthlyPriceSnapshot" | "monthlyPriceSnapshot" | "durationDiscountPercentSnapshot" | "referralDiscountPercentSnapshot" | "totalPriceBeforeDiscountRubSnapshot" | "createdAt" | "updatedAt" | "markedPaidAt" | "approvedAt" | "rejectedAt" | "plategaTransactionId" | "plategaRedirectUrl" | "plategaStatus" | "plategaPayloadJson" | "plategaConfirmedAt", ExtArgs["result"]["paymentRequest"]>
   export type PaymentRequestInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     subscription?: boolean | PaymentRequest$subscriptionArgs<ExtArgs>
+    plategaWebhookLogs?: boolean | PaymentRequest$plategaWebhookLogsArgs<ExtArgs>
+    _count?: boolean | PaymentRequestCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type PaymentRequestIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -17730,6 +17924,7 @@ export namespace Prisma {
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
       subscription: Prisma.$SubscriptionPayload<ExtArgs> | null
+      plategaWebhookLogs: Prisma.$PlategaWebhookLogPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -17754,6 +17949,11 @@ export namespace Prisma {
       markedPaidAt: Date | null
       approvedAt: Date | null
       rejectedAt: Date | null
+      plategaTransactionId: string | null
+      plategaRedirectUrl: string | null
+      plategaStatus: string | null
+      plategaPayloadJson: string | null
+      plategaConfirmedAt: Date | null
     }, ExtArgs["result"]["paymentRequest"]>
     composites: {}
   }
@@ -18150,6 +18350,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     subscription<T extends PaymentRequest$subscriptionArgs<ExtArgs> = {}>(args?: Subset<T, PaymentRequest$subscriptionArgs<ExtArgs>>): Prisma__SubscriptionClient<$Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    plategaWebhookLogs<T extends PaymentRequest$plategaWebhookLogsArgs<ExtArgs> = {}>(args?: Subset<T, PaymentRequest$plategaWebhookLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlategaWebhookLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -18201,6 +18402,11 @@ export namespace Prisma {
     readonly markedPaidAt: FieldRef<"PaymentRequest", 'DateTime'>
     readonly approvedAt: FieldRef<"PaymentRequest", 'DateTime'>
     readonly rejectedAt: FieldRef<"PaymentRequest", 'DateTime'>
+    readonly plategaTransactionId: FieldRef<"PaymentRequest", 'String'>
+    readonly plategaRedirectUrl: FieldRef<"PaymentRequest", 'String'>
+    readonly plategaStatus: FieldRef<"PaymentRequest", 'String'>
+    readonly plategaPayloadJson: FieldRef<"PaymentRequest", 'String'>
+    readonly plategaConfirmedAt: FieldRef<"PaymentRequest", 'DateTime'>
   }
     
 
@@ -18614,6 +18820,30 @@ export namespace Prisma {
   }
 
   /**
+   * PaymentRequest.plategaWebhookLogs
+   */
+  export type PaymentRequest$plategaWebhookLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlategaWebhookLog
+     */
+    select?: PlategaWebhookLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlategaWebhookLog
+     */
+    omit?: PlategaWebhookLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlategaWebhookLogInclude<ExtArgs> | null
+    where?: PlategaWebhookLogWhereInput
+    orderBy?: PlategaWebhookLogOrderByWithRelationInput | PlategaWebhookLogOrderByWithRelationInput[]
+    cursor?: PlategaWebhookLogWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PlategaWebhookLogScalarFieldEnum | PlategaWebhookLogScalarFieldEnum[]
+  }
+
+  /**
    * PaymentRequest without action
    */
   export type PaymentRequestDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -18629,6 +18859,1172 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: PaymentRequestInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model PlategaWebhookLog
+   */
+
+  export type AggregatePlategaWebhookLog = {
+    _count: PlategaWebhookLogCountAggregateOutputType | null
+    _min: PlategaWebhookLogMinAggregateOutputType | null
+    _max: PlategaWebhookLogMaxAggregateOutputType | null
+  }
+
+  export type PlategaWebhookLogMinAggregateOutputType = {
+    id: string | null
+    dedupKey: string | null
+    transactionId: string | null
+    paymentRequestId: string | null
+    statusRaw: string | null
+    payloadJson: string | null
+    headersJson: string | null
+    processingStatus: $Enums.PlategaWebhookLogStatus | null
+    errorMessage: string | null
+    processedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PlategaWebhookLogMaxAggregateOutputType = {
+    id: string | null
+    dedupKey: string | null
+    transactionId: string | null
+    paymentRequestId: string | null
+    statusRaw: string | null
+    payloadJson: string | null
+    headersJson: string | null
+    processingStatus: $Enums.PlategaWebhookLogStatus | null
+    errorMessage: string | null
+    processedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PlategaWebhookLogCountAggregateOutputType = {
+    id: number
+    dedupKey: number
+    transactionId: number
+    paymentRequestId: number
+    statusRaw: number
+    payloadJson: number
+    headersJson: number
+    processingStatus: number
+    errorMessage: number
+    processedAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type PlategaWebhookLogMinAggregateInputType = {
+    id?: true
+    dedupKey?: true
+    transactionId?: true
+    paymentRequestId?: true
+    statusRaw?: true
+    payloadJson?: true
+    headersJson?: true
+    processingStatus?: true
+    errorMessage?: true
+    processedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PlategaWebhookLogMaxAggregateInputType = {
+    id?: true
+    dedupKey?: true
+    transactionId?: true
+    paymentRequestId?: true
+    statusRaw?: true
+    payloadJson?: true
+    headersJson?: true
+    processingStatus?: true
+    errorMessage?: true
+    processedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PlategaWebhookLogCountAggregateInputType = {
+    id?: true
+    dedupKey?: true
+    transactionId?: true
+    paymentRequestId?: true
+    statusRaw?: true
+    payloadJson?: true
+    headersJson?: true
+    processingStatus?: true
+    errorMessage?: true
+    processedAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type PlategaWebhookLogAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PlategaWebhookLog to aggregate.
+     */
+    where?: PlategaWebhookLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlategaWebhookLogs to fetch.
+     */
+    orderBy?: PlategaWebhookLogOrderByWithRelationInput | PlategaWebhookLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PlategaWebhookLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlategaWebhookLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlategaWebhookLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PlategaWebhookLogs
+    **/
+    _count?: true | PlategaWebhookLogCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PlategaWebhookLogMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PlategaWebhookLogMaxAggregateInputType
+  }
+
+  export type GetPlategaWebhookLogAggregateType<T extends PlategaWebhookLogAggregateArgs> = {
+        [P in keyof T & keyof AggregatePlategaWebhookLog]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePlategaWebhookLog[P]>
+      : GetScalarType<T[P], AggregatePlategaWebhookLog[P]>
+  }
+
+
+
+
+  export type PlategaWebhookLogGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PlategaWebhookLogWhereInput
+    orderBy?: PlategaWebhookLogOrderByWithAggregationInput | PlategaWebhookLogOrderByWithAggregationInput[]
+    by: PlategaWebhookLogScalarFieldEnum[] | PlategaWebhookLogScalarFieldEnum
+    having?: PlategaWebhookLogScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PlategaWebhookLogCountAggregateInputType | true
+    _min?: PlategaWebhookLogMinAggregateInputType
+    _max?: PlategaWebhookLogMaxAggregateInputType
+  }
+
+  export type PlategaWebhookLogGroupByOutputType = {
+    id: string
+    dedupKey: string
+    transactionId: string
+    paymentRequestId: string | null
+    statusRaw: string
+    payloadJson: string
+    headersJson: string | null
+    processingStatus: $Enums.PlategaWebhookLogStatus
+    errorMessage: string | null
+    processedAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: PlategaWebhookLogCountAggregateOutputType | null
+    _min: PlategaWebhookLogMinAggregateOutputType | null
+    _max: PlategaWebhookLogMaxAggregateOutputType | null
+  }
+
+  type GetPlategaWebhookLogGroupByPayload<T extends PlategaWebhookLogGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PlategaWebhookLogGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PlategaWebhookLogGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PlategaWebhookLogGroupByOutputType[P]>
+            : GetScalarType<T[P], PlategaWebhookLogGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PlategaWebhookLogSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    dedupKey?: boolean
+    transactionId?: boolean
+    paymentRequestId?: boolean
+    statusRaw?: boolean
+    payloadJson?: boolean
+    headersJson?: boolean
+    processingStatus?: boolean
+    errorMessage?: boolean
+    processedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    paymentRequest?: boolean | PlategaWebhookLog$paymentRequestArgs<ExtArgs>
+  }, ExtArgs["result"]["plategaWebhookLog"]>
+
+  export type PlategaWebhookLogSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    dedupKey?: boolean
+    transactionId?: boolean
+    paymentRequestId?: boolean
+    statusRaw?: boolean
+    payloadJson?: boolean
+    headersJson?: boolean
+    processingStatus?: boolean
+    errorMessage?: boolean
+    processedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    paymentRequest?: boolean | PlategaWebhookLog$paymentRequestArgs<ExtArgs>
+  }, ExtArgs["result"]["plategaWebhookLog"]>
+
+  export type PlategaWebhookLogSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    dedupKey?: boolean
+    transactionId?: boolean
+    paymentRequestId?: boolean
+    statusRaw?: boolean
+    payloadJson?: boolean
+    headersJson?: boolean
+    processingStatus?: boolean
+    errorMessage?: boolean
+    processedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    paymentRequest?: boolean | PlategaWebhookLog$paymentRequestArgs<ExtArgs>
+  }, ExtArgs["result"]["plategaWebhookLog"]>
+
+  export type PlategaWebhookLogSelectScalar = {
+    id?: boolean
+    dedupKey?: boolean
+    transactionId?: boolean
+    paymentRequestId?: boolean
+    statusRaw?: boolean
+    payloadJson?: boolean
+    headersJson?: boolean
+    processingStatus?: boolean
+    errorMessage?: boolean
+    processedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type PlategaWebhookLogOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "dedupKey" | "transactionId" | "paymentRequestId" | "statusRaw" | "payloadJson" | "headersJson" | "processingStatus" | "errorMessage" | "processedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["plategaWebhookLog"]>
+  export type PlategaWebhookLogInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    paymentRequest?: boolean | PlategaWebhookLog$paymentRequestArgs<ExtArgs>
+  }
+  export type PlategaWebhookLogIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    paymentRequest?: boolean | PlategaWebhookLog$paymentRequestArgs<ExtArgs>
+  }
+  export type PlategaWebhookLogIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    paymentRequest?: boolean | PlategaWebhookLog$paymentRequestArgs<ExtArgs>
+  }
+
+  export type $PlategaWebhookLogPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PlategaWebhookLog"
+    objects: {
+      paymentRequest: Prisma.$PaymentRequestPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      dedupKey: string
+      transactionId: string
+      paymentRequestId: string | null
+      statusRaw: string
+      payloadJson: string
+      headersJson: string | null
+      processingStatus: $Enums.PlategaWebhookLogStatus
+      errorMessage: string | null
+      processedAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["plategaWebhookLog"]>
+    composites: {}
+  }
+
+  type PlategaWebhookLogGetPayload<S extends boolean | null | undefined | PlategaWebhookLogDefaultArgs> = $Result.GetResult<Prisma.$PlategaWebhookLogPayload, S>
+
+  type PlategaWebhookLogCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PlategaWebhookLogFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PlategaWebhookLogCountAggregateInputType | true
+    }
+
+  export interface PlategaWebhookLogDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PlategaWebhookLog'], meta: { name: 'PlategaWebhookLog' } }
+    /**
+     * Find zero or one PlategaWebhookLog that matches the filter.
+     * @param {PlategaWebhookLogFindUniqueArgs} args - Arguments to find a PlategaWebhookLog
+     * @example
+     * // Get one PlategaWebhookLog
+     * const plategaWebhookLog = await prisma.plategaWebhookLog.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PlategaWebhookLogFindUniqueArgs>(args: SelectSubset<T, PlategaWebhookLogFindUniqueArgs<ExtArgs>>): Prisma__PlategaWebhookLogClient<$Result.GetResult<Prisma.$PlategaWebhookLogPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PlategaWebhookLog that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PlategaWebhookLogFindUniqueOrThrowArgs} args - Arguments to find a PlategaWebhookLog
+     * @example
+     * // Get one PlategaWebhookLog
+     * const plategaWebhookLog = await prisma.plategaWebhookLog.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PlategaWebhookLogFindUniqueOrThrowArgs>(args: SelectSubset<T, PlategaWebhookLogFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PlategaWebhookLogClient<$Result.GetResult<Prisma.$PlategaWebhookLogPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PlategaWebhookLog that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlategaWebhookLogFindFirstArgs} args - Arguments to find a PlategaWebhookLog
+     * @example
+     * // Get one PlategaWebhookLog
+     * const plategaWebhookLog = await prisma.plategaWebhookLog.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PlategaWebhookLogFindFirstArgs>(args?: SelectSubset<T, PlategaWebhookLogFindFirstArgs<ExtArgs>>): Prisma__PlategaWebhookLogClient<$Result.GetResult<Prisma.$PlategaWebhookLogPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PlategaWebhookLog that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlategaWebhookLogFindFirstOrThrowArgs} args - Arguments to find a PlategaWebhookLog
+     * @example
+     * // Get one PlategaWebhookLog
+     * const plategaWebhookLog = await prisma.plategaWebhookLog.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PlategaWebhookLogFindFirstOrThrowArgs>(args?: SelectSubset<T, PlategaWebhookLogFindFirstOrThrowArgs<ExtArgs>>): Prisma__PlategaWebhookLogClient<$Result.GetResult<Prisma.$PlategaWebhookLogPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PlategaWebhookLogs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlategaWebhookLogFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PlategaWebhookLogs
+     * const plategaWebhookLogs = await prisma.plategaWebhookLog.findMany()
+     * 
+     * // Get first 10 PlategaWebhookLogs
+     * const plategaWebhookLogs = await prisma.plategaWebhookLog.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const plategaWebhookLogWithIdOnly = await prisma.plategaWebhookLog.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PlategaWebhookLogFindManyArgs>(args?: SelectSubset<T, PlategaWebhookLogFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlategaWebhookLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PlategaWebhookLog.
+     * @param {PlategaWebhookLogCreateArgs} args - Arguments to create a PlategaWebhookLog.
+     * @example
+     * // Create one PlategaWebhookLog
+     * const PlategaWebhookLog = await prisma.plategaWebhookLog.create({
+     *   data: {
+     *     // ... data to create a PlategaWebhookLog
+     *   }
+     * })
+     * 
+     */
+    create<T extends PlategaWebhookLogCreateArgs>(args: SelectSubset<T, PlategaWebhookLogCreateArgs<ExtArgs>>): Prisma__PlategaWebhookLogClient<$Result.GetResult<Prisma.$PlategaWebhookLogPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PlategaWebhookLogs.
+     * @param {PlategaWebhookLogCreateManyArgs} args - Arguments to create many PlategaWebhookLogs.
+     * @example
+     * // Create many PlategaWebhookLogs
+     * const plategaWebhookLog = await prisma.plategaWebhookLog.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PlategaWebhookLogCreateManyArgs>(args?: SelectSubset<T, PlategaWebhookLogCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many PlategaWebhookLogs and returns the data saved in the database.
+     * @param {PlategaWebhookLogCreateManyAndReturnArgs} args - Arguments to create many PlategaWebhookLogs.
+     * @example
+     * // Create many PlategaWebhookLogs
+     * const plategaWebhookLog = await prisma.plategaWebhookLog.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many PlategaWebhookLogs and only return the `id`
+     * const plategaWebhookLogWithIdOnly = await prisma.plategaWebhookLog.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PlategaWebhookLogCreateManyAndReturnArgs>(args?: SelectSubset<T, PlategaWebhookLogCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlategaWebhookLogPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a PlategaWebhookLog.
+     * @param {PlategaWebhookLogDeleteArgs} args - Arguments to delete one PlategaWebhookLog.
+     * @example
+     * // Delete one PlategaWebhookLog
+     * const PlategaWebhookLog = await prisma.plategaWebhookLog.delete({
+     *   where: {
+     *     // ... filter to delete one PlategaWebhookLog
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PlategaWebhookLogDeleteArgs>(args: SelectSubset<T, PlategaWebhookLogDeleteArgs<ExtArgs>>): Prisma__PlategaWebhookLogClient<$Result.GetResult<Prisma.$PlategaWebhookLogPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PlategaWebhookLog.
+     * @param {PlategaWebhookLogUpdateArgs} args - Arguments to update one PlategaWebhookLog.
+     * @example
+     * // Update one PlategaWebhookLog
+     * const plategaWebhookLog = await prisma.plategaWebhookLog.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PlategaWebhookLogUpdateArgs>(args: SelectSubset<T, PlategaWebhookLogUpdateArgs<ExtArgs>>): Prisma__PlategaWebhookLogClient<$Result.GetResult<Prisma.$PlategaWebhookLogPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PlategaWebhookLogs.
+     * @param {PlategaWebhookLogDeleteManyArgs} args - Arguments to filter PlategaWebhookLogs to delete.
+     * @example
+     * // Delete a few PlategaWebhookLogs
+     * const { count } = await prisma.plategaWebhookLog.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PlategaWebhookLogDeleteManyArgs>(args?: SelectSubset<T, PlategaWebhookLogDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PlategaWebhookLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlategaWebhookLogUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PlategaWebhookLogs
+     * const plategaWebhookLog = await prisma.plategaWebhookLog.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PlategaWebhookLogUpdateManyArgs>(args: SelectSubset<T, PlategaWebhookLogUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PlategaWebhookLogs and returns the data updated in the database.
+     * @param {PlategaWebhookLogUpdateManyAndReturnArgs} args - Arguments to update many PlategaWebhookLogs.
+     * @example
+     * // Update many PlategaWebhookLogs
+     * const plategaWebhookLog = await prisma.plategaWebhookLog.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more PlategaWebhookLogs and only return the `id`
+     * const plategaWebhookLogWithIdOnly = await prisma.plategaWebhookLog.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends PlategaWebhookLogUpdateManyAndReturnArgs>(args: SelectSubset<T, PlategaWebhookLogUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlategaWebhookLogPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one PlategaWebhookLog.
+     * @param {PlategaWebhookLogUpsertArgs} args - Arguments to update or create a PlategaWebhookLog.
+     * @example
+     * // Update or create a PlategaWebhookLog
+     * const plategaWebhookLog = await prisma.plategaWebhookLog.upsert({
+     *   create: {
+     *     // ... data to create a PlategaWebhookLog
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PlategaWebhookLog we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PlategaWebhookLogUpsertArgs>(args: SelectSubset<T, PlategaWebhookLogUpsertArgs<ExtArgs>>): Prisma__PlategaWebhookLogClient<$Result.GetResult<Prisma.$PlategaWebhookLogPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PlategaWebhookLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlategaWebhookLogCountArgs} args - Arguments to filter PlategaWebhookLogs to count.
+     * @example
+     * // Count the number of PlategaWebhookLogs
+     * const count = await prisma.plategaWebhookLog.count({
+     *   where: {
+     *     // ... the filter for the PlategaWebhookLogs we want to count
+     *   }
+     * })
+    **/
+    count<T extends PlategaWebhookLogCountArgs>(
+      args?: Subset<T, PlategaWebhookLogCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PlategaWebhookLogCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PlategaWebhookLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlategaWebhookLogAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PlategaWebhookLogAggregateArgs>(args: Subset<T, PlategaWebhookLogAggregateArgs>): Prisma.PrismaPromise<GetPlategaWebhookLogAggregateType<T>>
+
+    /**
+     * Group by PlategaWebhookLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlategaWebhookLogGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PlategaWebhookLogGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PlategaWebhookLogGroupByArgs['orderBy'] }
+        : { orderBy?: PlategaWebhookLogGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PlategaWebhookLogGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPlategaWebhookLogGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PlategaWebhookLog model
+   */
+  readonly fields: PlategaWebhookLogFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PlategaWebhookLog.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PlategaWebhookLogClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    paymentRequest<T extends PlategaWebhookLog$paymentRequestArgs<ExtArgs> = {}>(args?: Subset<T, PlategaWebhookLog$paymentRequestArgs<ExtArgs>>): Prisma__PaymentRequestClient<$Result.GetResult<Prisma.$PaymentRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PlategaWebhookLog model
+   */
+  interface PlategaWebhookLogFieldRefs {
+    readonly id: FieldRef<"PlategaWebhookLog", 'String'>
+    readonly dedupKey: FieldRef<"PlategaWebhookLog", 'String'>
+    readonly transactionId: FieldRef<"PlategaWebhookLog", 'String'>
+    readonly paymentRequestId: FieldRef<"PlategaWebhookLog", 'String'>
+    readonly statusRaw: FieldRef<"PlategaWebhookLog", 'String'>
+    readonly payloadJson: FieldRef<"PlategaWebhookLog", 'String'>
+    readonly headersJson: FieldRef<"PlategaWebhookLog", 'String'>
+    readonly processingStatus: FieldRef<"PlategaWebhookLog", 'PlategaWebhookLogStatus'>
+    readonly errorMessage: FieldRef<"PlategaWebhookLog", 'String'>
+    readonly processedAt: FieldRef<"PlategaWebhookLog", 'DateTime'>
+    readonly createdAt: FieldRef<"PlategaWebhookLog", 'DateTime'>
+    readonly updatedAt: FieldRef<"PlategaWebhookLog", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PlategaWebhookLog findUnique
+   */
+  export type PlategaWebhookLogFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlategaWebhookLog
+     */
+    select?: PlategaWebhookLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlategaWebhookLog
+     */
+    omit?: PlategaWebhookLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlategaWebhookLogInclude<ExtArgs> | null
+    /**
+     * Filter, which PlategaWebhookLog to fetch.
+     */
+    where: PlategaWebhookLogWhereUniqueInput
+  }
+
+  /**
+   * PlategaWebhookLog findUniqueOrThrow
+   */
+  export type PlategaWebhookLogFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlategaWebhookLog
+     */
+    select?: PlategaWebhookLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlategaWebhookLog
+     */
+    omit?: PlategaWebhookLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlategaWebhookLogInclude<ExtArgs> | null
+    /**
+     * Filter, which PlategaWebhookLog to fetch.
+     */
+    where: PlategaWebhookLogWhereUniqueInput
+  }
+
+  /**
+   * PlategaWebhookLog findFirst
+   */
+  export type PlategaWebhookLogFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlategaWebhookLog
+     */
+    select?: PlategaWebhookLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlategaWebhookLog
+     */
+    omit?: PlategaWebhookLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlategaWebhookLogInclude<ExtArgs> | null
+    /**
+     * Filter, which PlategaWebhookLog to fetch.
+     */
+    where?: PlategaWebhookLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlategaWebhookLogs to fetch.
+     */
+    orderBy?: PlategaWebhookLogOrderByWithRelationInput | PlategaWebhookLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PlategaWebhookLogs.
+     */
+    cursor?: PlategaWebhookLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlategaWebhookLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlategaWebhookLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PlategaWebhookLogs.
+     */
+    distinct?: PlategaWebhookLogScalarFieldEnum | PlategaWebhookLogScalarFieldEnum[]
+  }
+
+  /**
+   * PlategaWebhookLog findFirstOrThrow
+   */
+  export type PlategaWebhookLogFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlategaWebhookLog
+     */
+    select?: PlategaWebhookLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlategaWebhookLog
+     */
+    omit?: PlategaWebhookLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlategaWebhookLogInclude<ExtArgs> | null
+    /**
+     * Filter, which PlategaWebhookLog to fetch.
+     */
+    where?: PlategaWebhookLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlategaWebhookLogs to fetch.
+     */
+    orderBy?: PlategaWebhookLogOrderByWithRelationInput | PlategaWebhookLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PlategaWebhookLogs.
+     */
+    cursor?: PlategaWebhookLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlategaWebhookLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlategaWebhookLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PlategaWebhookLogs.
+     */
+    distinct?: PlategaWebhookLogScalarFieldEnum | PlategaWebhookLogScalarFieldEnum[]
+  }
+
+  /**
+   * PlategaWebhookLog findMany
+   */
+  export type PlategaWebhookLogFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlategaWebhookLog
+     */
+    select?: PlategaWebhookLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlategaWebhookLog
+     */
+    omit?: PlategaWebhookLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlategaWebhookLogInclude<ExtArgs> | null
+    /**
+     * Filter, which PlategaWebhookLogs to fetch.
+     */
+    where?: PlategaWebhookLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlategaWebhookLogs to fetch.
+     */
+    orderBy?: PlategaWebhookLogOrderByWithRelationInput | PlategaWebhookLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PlategaWebhookLogs.
+     */
+    cursor?: PlategaWebhookLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlategaWebhookLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlategaWebhookLogs.
+     */
+    skip?: number
+    distinct?: PlategaWebhookLogScalarFieldEnum | PlategaWebhookLogScalarFieldEnum[]
+  }
+
+  /**
+   * PlategaWebhookLog create
+   */
+  export type PlategaWebhookLogCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlategaWebhookLog
+     */
+    select?: PlategaWebhookLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlategaWebhookLog
+     */
+    omit?: PlategaWebhookLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlategaWebhookLogInclude<ExtArgs> | null
+    /**
+     * The data needed to create a PlategaWebhookLog.
+     */
+    data: XOR<PlategaWebhookLogCreateInput, PlategaWebhookLogUncheckedCreateInput>
+  }
+
+  /**
+   * PlategaWebhookLog createMany
+   */
+  export type PlategaWebhookLogCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PlategaWebhookLogs.
+     */
+    data: PlategaWebhookLogCreateManyInput | PlategaWebhookLogCreateManyInput[]
+  }
+
+  /**
+   * PlategaWebhookLog createManyAndReturn
+   */
+  export type PlategaWebhookLogCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlategaWebhookLog
+     */
+    select?: PlategaWebhookLogSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlategaWebhookLog
+     */
+    omit?: PlategaWebhookLogOmit<ExtArgs> | null
+    /**
+     * The data used to create many PlategaWebhookLogs.
+     */
+    data: PlategaWebhookLogCreateManyInput | PlategaWebhookLogCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlategaWebhookLogIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PlategaWebhookLog update
+   */
+  export type PlategaWebhookLogUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlategaWebhookLog
+     */
+    select?: PlategaWebhookLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlategaWebhookLog
+     */
+    omit?: PlategaWebhookLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlategaWebhookLogInclude<ExtArgs> | null
+    /**
+     * The data needed to update a PlategaWebhookLog.
+     */
+    data: XOR<PlategaWebhookLogUpdateInput, PlategaWebhookLogUncheckedUpdateInput>
+    /**
+     * Choose, which PlategaWebhookLog to update.
+     */
+    where: PlategaWebhookLogWhereUniqueInput
+  }
+
+  /**
+   * PlategaWebhookLog updateMany
+   */
+  export type PlategaWebhookLogUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PlategaWebhookLogs.
+     */
+    data: XOR<PlategaWebhookLogUpdateManyMutationInput, PlategaWebhookLogUncheckedUpdateManyInput>
+    /**
+     * Filter which PlategaWebhookLogs to update
+     */
+    where?: PlategaWebhookLogWhereInput
+    /**
+     * Limit how many PlategaWebhookLogs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PlategaWebhookLog updateManyAndReturn
+   */
+  export type PlategaWebhookLogUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlategaWebhookLog
+     */
+    select?: PlategaWebhookLogSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlategaWebhookLog
+     */
+    omit?: PlategaWebhookLogOmit<ExtArgs> | null
+    /**
+     * The data used to update PlategaWebhookLogs.
+     */
+    data: XOR<PlategaWebhookLogUpdateManyMutationInput, PlategaWebhookLogUncheckedUpdateManyInput>
+    /**
+     * Filter which PlategaWebhookLogs to update
+     */
+    where?: PlategaWebhookLogWhereInput
+    /**
+     * Limit how many PlategaWebhookLogs to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlategaWebhookLogIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PlategaWebhookLog upsert
+   */
+  export type PlategaWebhookLogUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlategaWebhookLog
+     */
+    select?: PlategaWebhookLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlategaWebhookLog
+     */
+    omit?: PlategaWebhookLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlategaWebhookLogInclude<ExtArgs> | null
+    /**
+     * The filter to search for the PlategaWebhookLog to update in case it exists.
+     */
+    where: PlategaWebhookLogWhereUniqueInput
+    /**
+     * In case the PlategaWebhookLog found by the `where` argument doesn't exist, create a new PlategaWebhookLog with this data.
+     */
+    create: XOR<PlategaWebhookLogCreateInput, PlategaWebhookLogUncheckedCreateInput>
+    /**
+     * In case the PlategaWebhookLog was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PlategaWebhookLogUpdateInput, PlategaWebhookLogUncheckedUpdateInput>
+  }
+
+  /**
+   * PlategaWebhookLog delete
+   */
+  export type PlategaWebhookLogDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlategaWebhookLog
+     */
+    select?: PlategaWebhookLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlategaWebhookLog
+     */
+    omit?: PlategaWebhookLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlategaWebhookLogInclude<ExtArgs> | null
+    /**
+     * Filter which PlategaWebhookLog to delete.
+     */
+    where: PlategaWebhookLogWhereUniqueInput
+  }
+
+  /**
+   * PlategaWebhookLog deleteMany
+   */
+  export type PlategaWebhookLogDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PlategaWebhookLogs to delete
+     */
+    where?: PlategaWebhookLogWhereInput
+    /**
+     * Limit how many PlategaWebhookLogs to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * PlategaWebhookLog.paymentRequest
+   */
+  export type PlategaWebhookLog$paymentRequestArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PaymentRequest
+     */
+    select?: PaymentRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PaymentRequest
+     */
+    omit?: PaymentRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PaymentRequestInclude<ExtArgs> | null
+    where?: PaymentRequestWhereInput
+  }
+
+  /**
+   * PlategaWebhookLog without action
+   */
+  export type PlategaWebhookLogDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlategaWebhookLog
+     */
+    select?: PlategaWebhookLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlategaWebhookLog
+     */
+    omit?: PlategaWebhookLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlategaWebhookLogInclude<ExtArgs> | null
   }
 
 
@@ -23638,10 +25034,33 @@ export namespace Prisma {
     updatedAt: 'updatedAt',
     markedPaidAt: 'markedPaidAt',
     approvedAt: 'approvedAt',
-    rejectedAt: 'rejectedAt'
+    rejectedAt: 'rejectedAt',
+    plategaTransactionId: 'plategaTransactionId',
+    plategaRedirectUrl: 'plategaRedirectUrl',
+    plategaStatus: 'plategaStatus',
+    plategaPayloadJson: 'plategaPayloadJson',
+    plategaConfirmedAt: 'plategaConfirmedAt'
   };
 
   export type PaymentRequestScalarFieldEnum = (typeof PaymentRequestScalarFieldEnum)[keyof typeof PaymentRequestScalarFieldEnum]
+
+
+  export const PlategaWebhookLogScalarFieldEnum: {
+    id: 'id',
+    dedupKey: 'dedupKey',
+    transactionId: 'transactionId',
+    paymentRequestId: 'paymentRequestId',
+    statusRaw: 'statusRaw',
+    payloadJson: 'payloadJson',
+    headersJson: 'headersJson',
+    processingStatus: 'processingStatus',
+    errorMessage: 'errorMessage',
+    processedAt: 'processedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type PlategaWebhookLogScalarFieldEnum = (typeof PlategaWebhookLogScalarFieldEnum)[keyof typeof PlategaWebhookLogScalarFieldEnum]
 
 
   export const SubscriptionScalarFieldEnum: {
@@ -23792,6 +25211,13 @@ export namespace Prisma {
    * Reference to a field of type 'PaymentMethod'
    */
   export type EnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod'>
+    
+
+
+  /**
+   * Reference to a field of type 'PlategaWebhookLogStatus'
+   */
+  export type EnumPlategaWebhookLogStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlategaWebhookLogStatus'>
     
 
 
@@ -24743,8 +26169,14 @@ export namespace Prisma {
     markedPaidAt?: DateTimeNullableFilter<"PaymentRequest"> | Date | string | null
     approvedAt?: DateTimeNullableFilter<"PaymentRequest"> | Date | string | null
     rejectedAt?: DateTimeNullableFilter<"PaymentRequest"> | Date | string | null
+    plategaTransactionId?: StringNullableFilter<"PaymentRequest"> | string | null
+    plategaRedirectUrl?: StringNullableFilter<"PaymentRequest"> | string | null
+    plategaStatus?: StringNullableFilter<"PaymentRequest"> | string | null
+    plategaPayloadJson?: StringNullableFilter<"PaymentRequest"> | string | null
+    plategaConfirmedAt?: DateTimeNullableFilter<"PaymentRequest"> | Date | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     subscription?: XOR<SubscriptionNullableScalarRelationFilter, SubscriptionWhereInput> | null
+    plategaWebhookLogs?: PlategaWebhookLogListRelationFilter
   }
 
   export type PaymentRequestOrderByWithRelationInput = {
@@ -24770,12 +26202,19 @@ export namespace Prisma {
     markedPaidAt?: SortOrderInput | SortOrder
     approvedAt?: SortOrderInput | SortOrder
     rejectedAt?: SortOrderInput | SortOrder
+    plategaTransactionId?: SortOrderInput | SortOrder
+    plategaRedirectUrl?: SortOrderInput | SortOrder
+    plategaStatus?: SortOrderInput | SortOrder
+    plategaPayloadJson?: SortOrderInput | SortOrder
+    plategaConfirmedAt?: SortOrderInput | SortOrder
     user?: UserOrderByWithRelationInput
     subscription?: SubscriptionOrderByWithRelationInput
+    plategaWebhookLogs?: PlategaWebhookLogOrderByRelationAggregateInput
   }
 
   export type PaymentRequestWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    plategaTransactionId?: string
     AND?: PaymentRequestWhereInput | PaymentRequestWhereInput[]
     OR?: PaymentRequestWhereInput[]
     NOT?: PaymentRequestWhereInput | PaymentRequestWhereInput[]
@@ -24800,9 +26239,14 @@ export namespace Prisma {
     markedPaidAt?: DateTimeNullableFilter<"PaymentRequest"> | Date | string | null
     approvedAt?: DateTimeNullableFilter<"PaymentRequest"> | Date | string | null
     rejectedAt?: DateTimeNullableFilter<"PaymentRequest"> | Date | string | null
+    plategaRedirectUrl?: StringNullableFilter<"PaymentRequest"> | string | null
+    plategaStatus?: StringNullableFilter<"PaymentRequest"> | string | null
+    plategaPayloadJson?: StringNullableFilter<"PaymentRequest"> | string | null
+    plategaConfirmedAt?: DateTimeNullableFilter<"PaymentRequest"> | Date | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     subscription?: XOR<SubscriptionNullableScalarRelationFilter, SubscriptionWhereInput> | null
-  }, "id">
+    plategaWebhookLogs?: PlategaWebhookLogListRelationFilter
+  }, "id" | "plategaTransactionId">
 
   export type PaymentRequestOrderByWithAggregationInput = {
     id?: SortOrder
@@ -24827,6 +26271,11 @@ export namespace Prisma {
     markedPaidAt?: SortOrderInput | SortOrder
     approvedAt?: SortOrderInput | SortOrder
     rejectedAt?: SortOrderInput | SortOrder
+    plategaTransactionId?: SortOrderInput | SortOrder
+    plategaRedirectUrl?: SortOrderInput | SortOrder
+    plategaStatus?: SortOrderInput | SortOrder
+    plategaPayloadJson?: SortOrderInput | SortOrder
+    plategaConfirmedAt?: SortOrderInput | SortOrder
     _count?: PaymentRequestCountOrderByAggregateInput
     _avg?: PaymentRequestAvgOrderByAggregateInput
     _max?: PaymentRequestMaxOrderByAggregateInput
@@ -24860,6 +26309,101 @@ export namespace Prisma {
     markedPaidAt?: DateTimeNullableWithAggregatesFilter<"PaymentRequest"> | Date | string | null
     approvedAt?: DateTimeNullableWithAggregatesFilter<"PaymentRequest"> | Date | string | null
     rejectedAt?: DateTimeNullableWithAggregatesFilter<"PaymentRequest"> | Date | string | null
+    plategaTransactionId?: StringNullableWithAggregatesFilter<"PaymentRequest"> | string | null
+    plategaRedirectUrl?: StringNullableWithAggregatesFilter<"PaymentRequest"> | string | null
+    plategaStatus?: StringNullableWithAggregatesFilter<"PaymentRequest"> | string | null
+    plategaPayloadJson?: StringNullableWithAggregatesFilter<"PaymentRequest"> | string | null
+    plategaConfirmedAt?: DateTimeNullableWithAggregatesFilter<"PaymentRequest"> | Date | string | null
+  }
+
+  export type PlategaWebhookLogWhereInput = {
+    AND?: PlategaWebhookLogWhereInput | PlategaWebhookLogWhereInput[]
+    OR?: PlategaWebhookLogWhereInput[]
+    NOT?: PlategaWebhookLogWhereInput | PlategaWebhookLogWhereInput[]
+    id?: StringFilter<"PlategaWebhookLog"> | string
+    dedupKey?: StringFilter<"PlategaWebhookLog"> | string
+    transactionId?: StringFilter<"PlategaWebhookLog"> | string
+    paymentRequestId?: StringNullableFilter<"PlategaWebhookLog"> | string | null
+    statusRaw?: StringFilter<"PlategaWebhookLog"> | string
+    payloadJson?: StringFilter<"PlategaWebhookLog"> | string
+    headersJson?: StringNullableFilter<"PlategaWebhookLog"> | string | null
+    processingStatus?: EnumPlategaWebhookLogStatusFilter<"PlategaWebhookLog"> | $Enums.PlategaWebhookLogStatus
+    errorMessage?: StringNullableFilter<"PlategaWebhookLog"> | string | null
+    processedAt?: DateTimeNullableFilter<"PlategaWebhookLog"> | Date | string | null
+    createdAt?: DateTimeFilter<"PlategaWebhookLog"> | Date | string
+    updatedAt?: DateTimeFilter<"PlategaWebhookLog"> | Date | string
+    paymentRequest?: XOR<PaymentRequestNullableScalarRelationFilter, PaymentRequestWhereInput> | null
+  }
+
+  export type PlategaWebhookLogOrderByWithRelationInput = {
+    id?: SortOrder
+    dedupKey?: SortOrder
+    transactionId?: SortOrder
+    paymentRequestId?: SortOrderInput | SortOrder
+    statusRaw?: SortOrder
+    payloadJson?: SortOrder
+    headersJson?: SortOrderInput | SortOrder
+    processingStatus?: SortOrder
+    errorMessage?: SortOrderInput | SortOrder
+    processedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    paymentRequest?: PaymentRequestOrderByWithRelationInput
+  }
+
+  export type PlategaWebhookLogWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    dedupKey?: string
+    AND?: PlategaWebhookLogWhereInput | PlategaWebhookLogWhereInput[]
+    OR?: PlategaWebhookLogWhereInput[]
+    NOT?: PlategaWebhookLogWhereInput | PlategaWebhookLogWhereInput[]
+    transactionId?: StringFilter<"PlategaWebhookLog"> | string
+    paymentRequestId?: StringNullableFilter<"PlategaWebhookLog"> | string | null
+    statusRaw?: StringFilter<"PlategaWebhookLog"> | string
+    payloadJson?: StringFilter<"PlategaWebhookLog"> | string
+    headersJson?: StringNullableFilter<"PlategaWebhookLog"> | string | null
+    processingStatus?: EnumPlategaWebhookLogStatusFilter<"PlategaWebhookLog"> | $Enums.PlategaWebhookLogStatus
+    errorMessage?: StringNullableFilter<"PlategaWebhookLog"> | string | null
+    processedAt?: DateTimeNullableFilter<"PlategaWebhookLog"> | Date | string | null
+    createdAt?: DateTimeFilter<"PlategaWebhookLog"> | Date | string
+    updatedAt?: DateTimeFilter<"PlategaWebhookLog"> | Date | string
+    paymentRequest?: XOR<PaymentRequestNullableScalarRelationFilter, PaymentRequestWhereInput> | null
+  }, "id" | "dedupKey">
+
+  export type PlategaWebhookLogOrderByWithAggregationInput = {
+    id?: SortOrder
+    dedupKey?: SortOrder
+    transactionId?: SortOrder
+    paymentRequestId?: SortOrderInput | SortOrder
+    statusRaw?: SortOrder
+    payloadJson?: SortOrder
+    headersJson?: SortOrderInput | SortOrder
+    processingStatus?: SortOrder
+    errorMessage?: SortOrderInput | SortOrder
+    processedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: PlategaWebhookLogCountOrderByAggregateInput
+    _max?: PlategaWebhookLogMaxOrderByAggregateInput
+    _min?: PlategaWebhookLogMinOrderByAggregateInput
+  }
+
+  export type PlategaWebhookLogScalarWhereWithAggregatesInput = {
+    AND?: PlategaWebhookLogScalarWhereWithAggregatesInput | PlategaWebhookLogScalarWhereWithAggregatesInput[]
+    OR?: PlategaWebhookLogScalarWhereWithAggregatesInput[]
+    NOT?: PlategaWebhookLogScalarWhereWithAggregatesInput | PlategaWebhookLogScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"PlategaWebhookLog"> | string
+    dedupKey?: StringWithAggregatesFilter<"PlategaWebhookLog"> | string
+    transactionId?: StringWithAggregatesFilter<"PlategaWebhookLog"> | string
+    paymentRequestId?: StringNullableWithAggregatesFilter<"PlategaWebhookLog"> | string | null
+    statusRaw?: StringWithAggregatesFilter<"PlategaWebhookLog"> | string
+    payloadJson?: StringWithAggregatesFilter<"PlategaWebhookLog"> | string
+    headersJson?: StringNullableWithAggregatesFilter<"PlategaWebhookLog"> | string | null
+    processingStatus?: EnumPlategaWebhookLogStatusWithAggregatesFilter<"PlategaWebhookLog"> | $Enums.PlategaWebhookLogStatus
+    errorMessage?: StringNullableWithAggregatesFilter<"PlategaWebhookLog"> | string | null
+    processedAt?: DateTimeNullableWithAggregatesFilter<"PlategaWebhookLog"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"PlategaWebhookLog"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"PlategaWebhookLog"> | Date | string
   }
 
   export type SubscriptionWhereInput = {
@@ -26219,8 +27763,14 @@ export namespace Prisma {
     markedPaidAt?: Date | string | null
     approvedAt?: Date | string | null
     rejectedAt?: Date | string | null
+    plategaTransactionId?: string | null
+    plategaRedirectUrl?: string | null
+    plategaStatus?: string | null
+    plategaPayloadJson?: string | null
+    plategaConfirmedAt?: Date | string | null
     user: UserCreateNestedOneWithoutPaymentRequestsInput
     subscription?: SubscriptionCreateNestedOneWithoutPaymentRequestInput
+    plategaWebhookLogs?: PlategaWebhookLogCreateNestedManyWithoutPaymentRequestInput
   }
 
   export type PaymentRequestUncheckedCreateInput = {
@@ -26246,7 +27796,13 @@ export namespace Prisma {
     markedPaidAt?: Date | string | null
     approvedAt?: Date | string | null
     rejectedAt?: Date | string | null
+    plategaTransactionId?: string | null
+    plategaRedirectUrl?: string | null
+    plategaStatus?: string | null
+    plategaPayloadJson?: string | null
+    plategaConfirmedAt?: Date | string | null
     subscription?: SubscriptionUncheckedCreateNestedOneWithoutPaymentRequestInput
+    plategaWebhookLogs?: PlategaWebhookLogUncheckedCreateNestedManyWithoutPaymentRequestInput
   }
 
   export type PaymentRequestUpdateInput = {
@@ -26271,8 +27827,14 @@ export namespace Prisma {
     markedPaidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    plategaTransactionId?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaRedirectUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaPayloadJson?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaConfirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     user?: UserUpdateOneRequiredWithoutPaymentRequestsNestedInput
     subscription?: SubscriptionUpdateOneWithoutPaymentRequestNestedInput
+    plategaWebhookLogs?: PlategaWebhookLogUpdateManyWithoutPaymentRequestNestedInput
   }
 
   export type PaymentRequestUncheckedUpdateInput = {
@@ -26298,7 +27860,13 @@ export namespace Prisma {
     markedPaidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    plategaTransactionId?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaRedirectUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaPayloadJson?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaConfirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     subscription?: SubscriptionUncheckedUpdateOneWithoutPaymentRequestNestedInput
+    plategaWebhookLogs?: PlategaWebhookLogUncheckedUpdateManyWithoutPaymentRequestNestedInput
   }
 
   export type PaymentRequestCreateManyInput = {
@@ -26324,6 +27892,11 @@ export namespace Prisma {
     markedPaidAt?: Date | string | null
     approvedAt?: Date | string | null
     rejectedAt?: Date | string | null
+    plategaTransactionId?: string | null
+    plategaRedirectUrl?: string | null
+    plategaStatus?: string | null
+    plategaPayloadJson?: string | null
+    plategaConfirmedAt?: Date | string | null
   }
 
   export type PaymentRequestUpdateManyMutationInput = {
@@ -26348,6 +27921,11 @@ export namespace Prisma {
     markedPaidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    plategaTransactionId?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaRedirectUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaPayloadJson?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaConfirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type PaymentRequestUncheckedUpdateManyInput = {
@@ -26373,6 +27951,115 @@ export namespace Prisma {
     markedPaidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    plategaTransactionId?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaRedirectUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaPayloadJson?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaConfirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type PlategaWebhookLogCreateInput = {
+    id?: string
+    dedupKey: string
+    transactionId: string
+    statusRaw: string
+    payloadJson: string
+    headersJson?: string | null
+    processingStatus?: $Enums.PlategaWebhookLogStatus
+    errorMessage?: string | null
+    processedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    paymentRequest?: PaymentRequestCreateNestedOneWithoutPlategaWebhookLogsInput
+  }
+
+  export type PlategaWebhookLogUncheckedCreateInput = {
+    id?: string
+    dedupKey: string
+    transactionId: string
+    paymentRequestId?: string | null
+    statusRaw: string
+    payloadJson: string
+    headersJson?: string | null
+    processingStatus?: $Enums.PlategaWebhookLogStatus
+    errorMessage?: string | null
+    processedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PlategaWebhookLogUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dedupKey?: StringFieldUpdateOperationsInput | string
+    transactionId?: StringFieldUpdateOperationsInput | string
+    statusRaw?: StringFieldUpdateOperationsInput | string
+    payloadJson?: StringFieldUpdateOperationsInput | string
+    headersJson?: NullableStringFieldUpdateOperationsInput | string | null
+    processingStatus?: EnumPlategaWebhookLogStatusFieldUpdateOperationsInput | $Enums.PlategaWebhookLogStatus
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    paymentRequest?: PaymentRequestUpdateOneWithoutPlategaWebhookLogsNestedInput
+  }
+
+  export type PlategaWebhookLogUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dedupKey?: StringFieldUpdateOperationsInput | string
+    transactionId?: StringFieldUpdateOperationsInput | string
+    paymentRequestId?: NullableStringFieldUpdateOperationsInput | string | null
+    statusRaw?: StringFieldUpdateOperationsInput | string
+    payloadJson?: StringFieldUpdateOperationsInput | string
+    headersJson?: NullableStringFieldUpdateOperationsInput | string | null
+    processingStatus?: EnumPlategaWebhookLogStatusFieldUpdateOperationsInput | $Enums.PlategaWebhookLogStatus
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlategaWebhookLogCreateManyInput = {
+    id?: string
+    dedupKey: string
+    transactionId: string
+    paymentRequestId?: string | null
+    statusRaw: string
+    payloadJson: string
+    headersJson?: string | null
+    processingStatus?: $Enums.PlategaWebhookLogStatus
+    errorMessage?: string | null
+    processedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PlategaWebhookLogUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dedupKey?: StringFieldUpdateOperationsInput | string
+    transactionId?: StringFieldUpdateOperationsInput | string
+    statusRaw?: StringFieldUpdateOperationsInput | string
+    payloadJson?: StringFieldUpdateOperationsInput | string
+    headersJson?: NullableStringFieldUpdateOperationsInput | string | null
+    processingStatus?: EnumPlategaWebhookLogStatusFieldUpdateOperationsInput | $Enums.PlategaWebhookLogStatus
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlategaWebhookLogUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dedupKey?: StringFieldUpdateOperationsInput | string
+    transactionId?: StringFieldUpdateOperationsInput | string
+    paymentRequestId?: NullableStringFieldUpdateOperationsInput | string | null
+    statusRaw?: StringFieldUpdateOperationsInput | string
+    payloadJson?: StringFieldUpdateOperationsInput | string
+    headersJson?: NullableStringFieldUpdateOperationsInput | string | null
+    processingStatus?: EnumPlategaWebhookLogStatusFieldUpdateOperationsInput | $Enums.PlategaWebhookLogStatus
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SubscriptionCreateInput = {
@@ -27671,6 +29358,16 @@ export namespace Prisma {
     isNot?: SubscriptionWhereInput | null
   }
 
+  export type PlategaWebhookLogListRelationFilter = {
+    every?: PlategaWebhookLogWhereInput
+    some?: PlategaWebhookLogWhereInput
+    none?: PlategaWebhookLogWhereInput
+  }
+
+  export type PlategaWebhookLogOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type PaymentRequestCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
@@ -27694,6 +29391,11 @@ export namespace Prisma {
     markedPaidAt?: SortOrder
     approvedAt?: SortOrder
     rejectedAt?: SortOrder
+    plategaTransactionId?: SortOrder
+    plategaRedirectUrl?: SortOrder
+    plategaStatus?: SortOrder
+    plategaPayloadJson?: SortOrder
+    plategaConfirmedAt?: SortOrder
   }
 
   export type PaymentRequestAvgOrderByAggregateInput = {
@@ -27733,6 +29435,11 @@ export namespace Prisma {
     markedPaidAt?: SortOrder
     approvedAt?: SortOrder
     rejectedAt?: SortOrder
+    plategaTransactionId?: SortOrder
+    plategaRedirectUrl?: SortOrder
+    plategaStatus?: SortOrder
+    plategaPayloadJson?: SortOrder
+    plategaConfirmedAt?: SortOrder
   }
 
   export type PaymentRequestMinOrderByAggregateInput = {
@@ -27758,6 +29465,11 @@ export namespace Prisma {
     markedPaidAt?: SortOrder
     approvedAt?: SortOrder
     rejectedAt?: SortOrder
+    plategaTransactionId?: SortOrder
+    plategaRedirectUrl?: SortOrder
+    plategaStatus?: SortOrder
+    plategaPayloadJson?: SortOrder
+    plategaConfirmedAt?: SortOrder
   }
 
   export type PaymentRequestSumOrderByAggregateInput = {
@@ -27794,6 +29506,73 @@ export namespace Prisma {
     _max?: NestedEnumPaymentMethodFilter<$PrismaModel>
   }
 
+  export type EnumPlategaWebhookLogStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.PlategaWebhookLogStatus | EnumPlategaWebhookLogStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PlategaWebhookLogStatus[]
+    notIn?: $Enums.PlategaWebhookLogStatus[]
+    not?: NestedEnumPlategaWebhookLogStatusFilter<$PrismaModel> | $Enums.PlategaWebhookLogStatus
+  }
+
+  export type PaymentRequestNullableScalarRelationFilter = {
+    is?: PaymentRequestWhereInput | null
+    isNot?: PaymentRequestWhereInput | null
+  }
+
+  export type PlategaWebhookLogCountOrderByAggregateInput = {
+    id?: SortOrder
+    dedupKey?: SortOrder
+    transactionId?: SortOrder
+    paymentRequestId?: SortOrder
+    statusRaw?: SortOrder
+    payloadJson?: SortOrder
+    headersJson?: SortOrder
+    processingStatus?: SortOrder
+    errorMessage?: SortOrder
+    processedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PlategaWebhookLogMaxOrderByAggregateInput = {
+    id?: SortOrder
+    dedupKey?: SortOrder
+    transactionId?: SortOrder
+    paymentRequestId?: SortOrder
+    statusRaw?: SortOrder
+    payloadJson?: SortOrder
+    headersJson?: SortOrder
+    processingStatus?: SortOrder
+    errorMessage?: SortOrder
+    processedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PlategaWebhookLogMinOrderByAggregateInput = {
+    id?: SortOrder
+    dedupKey?: SortOrder
+    transactionId?: SortOrder
+    paymentRequestId?: SortOrder
+    statusRaw?: SortOrder
+    payloadJson?: SortOrder
+    headersJson?: SortOrder
+    processingStatus?: SortOrder
+    errorMessage?: SortOrder
+    processedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumPlategaWebhookLogStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PlategaWebhookLogStatus | EnumPlategaWebhookLogStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PlategaWebhookLogStatus[]
+    notIn?: $Enums.PlategaWebhookLogStatus[]
+    not?: NestedEnumPlategaWebhookLogStatusWithAggregatesFilter<$PrismaModel> | $Enums.PlategaWebhookLogStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPlategaWebhookLogStatusFilter<$PrismaModel>
+    _max?: NestedEnumPlategaWebhookLogStatusFilter<$PrismaModel>
+  }
+
   export type IntNullableFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: number[] | null
@@ -27810,11 +29589,6 @@ export namespace Prisma {
     in?: $Enums.SubscriptionStatus[]
     notIn?: $Enums.SubscriptionStatus[]
     not?: NestedEnumSubscriptionStatusFilter<$PrismaModel> | $Enums.SubscriptionStatus
-  }
-
-  export type PaymentRequestNullableScalarRelationFilter = {
-    is?: PaymentRequestWhereInput | null
-    isNot?: PaymentRequestWhereInput | null
   }
 
   export type DeviceSlotListRelationFilter = {
@@ -28844,10 +30618,24 @@ export namespace Prisma {
     connect?: SubscriptionWhereUniqueInput
   }
 
+  export type PlategaWebhookLogCreateNestedManyWithoutPaymentRequestInput = {
+    create?: XOR<PlategaWebhookLogCreateWithoutPaymentRequestInput, PlategaWebhookLogUncheckedCreateWithoutPaymentRequestInput> | PlategaWebhookLogCreateWithoutPaymentRequestInput[] | PlategaWebhookLogUncheckedCreateWithoutPaymentRequestInput[]
+    connectOrCreate?: PlategaWebhookLogCreateOrConnectWithoutPaymentRequestInput | PlategaWebhookLogCreateOrConnectWithoutPaymentRequestInput[]
+    createMany?: PlategaWebhookLogCreateManyPaymentRequestInputEnvelope
+    connect?: PlategaWebhookLogWhereUniqueInput | PlategaWebhookLogWhereUniqueInput[]
+  }
+
   export type SubscriptionUncheckedCreateNestedOneWithoutPaymentRequestInput = {
     create?: XOR<SubscriptionCreateWithoutPaymentRequestInput, SubscriptionUncheckedCreateWithoutPaymentRequestInput>
     connectOrCreate?: SubscriptionCreateOrConnectWithoutPaymentRequestInput
     connect?: SubscriptionWhereUniqueInput
+  }
+
+  export type PlategaWebhookLogUncheckedCreateNestedManyWithoutPaymentRequestInput = {
+    create?: XOR<PlategaWebhookLogCreateWithoutPaymentRequestInput, PlategaWebhookLogUncheckedCreateWithoutPaymentRequestInput> | PlategaWebhookLogCreateWithoutPaymentRequestInput[] | PlategaWebhookLogUncheckedCreateWithoutPaymentRequestInput[]
+    connectOrCreate?: PlategaWebhookLogCreateOrConnectWithoutPaymentRequestInput | PlategaWebhookLogCreateOrConnectWithoutPaymentRequestInput[]
+    createMany?: PlategaWebhookLogCreateManyPaymentRequestInputEnvelope
+    connect?: PlategaWebhookLogWhereUniqueInput | PlategaWebhookLogWhereUniqueInput[]
   }
 
   export type EnumPaymentRequestStatusFieldUpdateOperationsInput = {
@@ -28876,6 +30664,20 @@ export namespace Prisma {
     update?: XOR<XOR<SubscriptionUpdateToOneWithWhereWithoutPaymentRequestInput, SubscriptionUpdateWithoutPaymentRequestInput>, SubscriptionUncheckedUpdateWithoutPaymentRequestInput>
   }
 
+  export type PlategaWebhookLogUpdateManyWithoutPaymentRequestNestedInput = {
+    create?: XOR<PlategaWebhookLogCreateWithoutPaymentRequestInput, PlategaWebhookLogUncheckedCreateWithoutPaymentRequestInput> | PlategaWebhookLogCreateWithoutPaymentRequestInput[] | PlategaWebhookLogUncheckedCreateWithoutPaymentRequestInput[]
+    connectOrCreate?: PlategaWebhookLogCreateOrConnectWithoutPaymentRequestInput | PlategaWebhookLogCreateOrConnectWithoutPaymentRequestInput[]
+    upsert?: PlategaWebhookLogUpsertWithWhereUniqueWithoutPaymentRequestInput | PlategaWebhookLogUpsertWithWhereUniqueWithoutPaymentRequestInput[]
+    createMany?: PlategaWebhookLogCreateManyPaymentRequestInputEnvelope
+    set?: PlategaWebhookLogWhereUniqueInput | PlategaWebhookLogWhereUniqueInput[]
+    disconnect?: PlategaWebhookLogWhereUniqueInput | PlategaWebhookLogWhereUniqueInput[]
+    delete?: PlategaWebhookLogWhereUniqueInput | PlategaWebhookLogWhereUniqueInput[]
+    connect?: PlategaWebhookLogWhereUniqueInput | PlategaWebhookLogWhereUniqueInput[]
+    update?: PlategaWebhookLogUpdateWithWhereUniqueWithoutPaymentRequestInput | PlategaWebhookLogUpdateWithWhereUniqueWithoutPaymentRequestInput[]
+    updateMany?: PlategaWebhookLogUpdateManyWithWhereWithoutPaymentRequestInput | PlategaWebhookLogUpdateManyWithWhereWithoutPaymentRequestInput[]
+    deleteMany?: PlategaWebhookLogScalarWhereInput | PlategaWebhookLogScalarWhereInput[]
+  }
+
   export type SubscriptionUncheckedUpdateOneWithoutPaymentRequestNestedInput = {
     create?: XOR<SubscriptionCreateWithoutPaymentRequestInput, SubscriptionUncheckedCreateWithoutPaymentRequestInput>
     connectOrCreate?: SubscriptionCreateOrConnectWithoutPaymentRequestInput
@@ -28884,6 +30686,40 @@ export namespace Prisma {
     delete?: SubscriptionWhereInput | boolean
     connect?: SubscriptionWhereUniqueInput
     update?: XOR<XOR<SubscriptionUpdateToOneWithWhereWithoutPaymentRequestInput, SubscriptionUpdateWithoutPaymentRequestInput>, SubscriptionUncheckedUpdateWithoutPaymentRequestInput>
+  }
+
+  export type PlategaWebhookLogUncheckedUpdateManyWithoutPaymentRequestNestedInput = {
+    create?: XOR<PlategaWebhookLogCreateWithoutPaymentRequestInput, PlategaWebhookLogUncheckedCreateWithoutPaymentRequestInput> | PlategaWebhookLogCreateWithoutPaymentRequestInput[] | PlategaWebhookLogUncheckedCreateWithoutPaymentRequestInput[]
+    connectOrCreate?: PlategaWebhookLogCreateOrConnectWithoutPaymentRequestInput | PlategaWebhookLogCreateOrConnectWithoutPaymentRequestInput[]
+    upsert?: PlategaWebhookLogUpsertWithWhereUniqueWithoutPaymentRequestInput | PlategaWebhookLogUpsertWithWhereUniqueWithoutPaymentRequestInput[]
+    createMany?: PlategaWebhookLogCreateManyPaymentRequestInputEnvelope
+    set?: PlategaWebhookLogWhereUniqueInput | PlategaWebhookLogWhereUniqueInput[]
+    disconnect?: PlategaWebhookLogWhereUniqueInput | PlategaWebhookLogWhereUniqueInput[]
+    delete?: PlategaWebhookLogWhereUniqueInput | PlategaWebhookLogWhereUniqueInput[]
+    connect?: PlategaWebhookLogWhereUniqueInput | PlategaWebhookLogWhereUniqueInput[]
+    update?: PlategaWebhookLogUpdateWithWhereUniqueWithoutPaymentRequestInput | PlategaWebhookLogUpdateWithWhereUniqueWithoutPaymentRequestInput[]
+    updateMany?: PlategaWebhookLogUpdateManyWithWhereWithoutPaymentRequestInput | PlategaWebhookLogUpdateManyWithWhereWithoutPaymentRequestInput[]
+    deleteMany?: PlategaWebhookLogScalarWhereInput | PlategaWebhookLogScalarWhereInput[]
+  }
+
+  export type PaymentRequestCreateNestedOneWithoutPlategaWebhookLogsInput = {
+    create?: XOR<PaymentRequestCreateWithoutPlategaWebhookLogsInput, PaymentRequestUncheckedCreateWithoutPlategaWebhookLogsInput>
+    connectOrCreate?: PaymentRequestCreateOrConnectWithoutPlategaWebhookLogsInput
+    connect?: PaymentRequestWhereUniqueInput
+  }
+
+  export type EnumPlategaWebhookLogStatusFieldUpdateOperationsInput = {
+    set?: $Enums.PlategaWebhookLogStatus
+  }
+
+  export type PaymentRequestUpdateOneWithoutPlategaWebhookLogsNestedInput = {
+    create?: XOR<PaymentRequestCreateWithoutPlategaWebhookLogsInput, PaymentRequestUncheckedCreateWithoutPlategaWebhookLogsInput>
+    connectOrCreate?: PaymentRequestCreateOrConnectWithoutPlategaWebhookLogsInput
+    upsert?: PaymentRequestUpsertWithoutPlategaWebhookLogsInput
+    disconnect?: PaymentRequestWhereInput | boolean
+    delete?: PaymentRequestWhereInput | boolean
+    connect?: PaymentRequestWhereUniqueInput
+    update?: XOR<XOR<PaymentRequestUpdateToOneWithWhereWithoutPlategaWebhookLogsInput, PaymentRequestUpdateWithoutPlategaWebhookLogsInput>, PaymentRequestUncheckedUpdateWithoutPlategaWebhookLogsInput>
   }
 
   export type UserCreateNestedOneWithoutSubscriptionsInput = {
@@ -29239,6 +31075,23 @@ export namespace Prisma {
     _max?: NestedEnumPaymentMethodFilter<$PrismaModel>
   }
 
+  export type NestedEnumPlategaWebhookLogStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.PlategaWebhookLogStatus | EnumPlategaWebhookLogStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PlategaWebhookLogStatus[]
+    notIn?: $Enums.PlategaWebhookLogStatus[]
+    not?: NestedEnumPlategaWebhookLogStatusFilter<$PrismaModel> | $Enums.PlategaWebhookLogStatus
+  }
+
+  export type NestedEnumPlategaWebhookLogStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PlategaWebhookLogStatus | EnumPlategaWebhookLogStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PlategaWebhookLogStatus[]
+    notIn?: $Enums.PlategaWebhookLogStatus[]
+    not?: NestedEnumPlategaWebhookLogStatusWithAggregatesFilter<$PrismaModel> | $Enums.PlategaWebhookLogStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPlategaWebhookLogStatusFilter<$PrismaModel>
+    _max?: NestedEnumPlategaWebhookLogStatusFilter<$PrismaModel>
+  }
+
   export type NestedEnumSubscriptionStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.SubscriptionStatus | EnumSubscriptionStatusFieldRefInput<$PrismaModel>
     in?: $Enums.SubscriptionStatus[]
@@ -29456,7 +31309,13 @@ export namespace Prisma {
     markedPaidAt?: Date | string | null
     approvedAt?: Date | string | null
     rejectedAt?: Date | string | null
+    plategaTransactionId?: string | null
+    plategaRedirectUrl?: string | null
+    plategaStatus?: string | null
+    plategaPayloadJson?: string | null
+    plategaConfirmedAt?: Date | string | null
     subscription?: SubscriptionCreateNestedOneWithoutPaymentRequestInput
+    plategaWebhookLogs?: PlategaWebhookLogCreateNestedManyWithoutPaymentRequestInput
   }
 
   export type PaymentRequestUncheckedCreateWithoutUserInput = {
@@ -29481,7 +31340,13 @@ export namespace Prisma {
     markedPaidAt?: Date | string | null
     approvedAt?: Date | string | null
     rejectedAt?: Date | string | null
+    plategaTransactionId?: string | null
+    plategaRedirectUrl?: string | null
+    plategaStatus?: string | null
+    plategaPayloadJson?: string | null
+    plategaConfirmedAt?: Date | string | null
     subscription?: SubscriptionUncheckedCreateNestedOneWithoutPaymentRequestInput
+    plategaWebhookLogs?: PlategaWebhookLogUncheckedCreateNestedManyWithoutPaymentRequestInput
   }
 
   export type PaymentRequestCreateOrConnectWithoutUserInput = {
@@ -29807,6 +31672,11 @@ export namespace Prisma {
     markedPaidAt?: DateTimeNullableFilter<"PaymentRequest"> | Date | string | null
     approvedAt?: DateTimeNullableFilter<"PaymentRequest"> | Date | string | null
     rejectedAt?: DateTimeNullableFilter<"PaymentRequest"> | Date | string | null
+    plategaTransactionId?: StringNullableFilter<"PaymentRequest"> | string | null
+    plategaRedirectUrl?: StringNullableFilter<"PaymentRequest"> | string | null
+    plategaStatus?: StringNullableFilter<"PaymentRequest"> | string | null
+    plategaPayloadJson?: StringNullableFilter<"PaymentRequest"> | string | null
+    plategaConfirmedAt?: DateTimeNullableFilter<"PaymentRequest"> | Date | string | null
   }
 
   export type SubscriptionUpsertWithWhereUniqueWithoutUserInput = {
@@ -30950,6 +32820,43 @@ export namespace Prisma {
     create: XOR<SubscriptionCreateWithoutPaymentRequestInput, SubscriptionUncheckedCreateWithoutPaymentRequestInput>
   }
 
+  export type PlategaWebhookLogCreateWithoutPaymentRequestInput = {
+    id?: string
+    dedupKey: string
+    transactionId: string
+    statusRaw: string
+    payloadJson: string
+    headersJson?: string | null
+    processingStatus?: $Enums.PlategaWebhookLogStatus
+    errorMessage?: string | null
+    processedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PlategaWebhookLogUncheckedCreateWithoutPaymentRequestInput = {
+    id?: string
+    dedupKey: string
+    transactionId: string
+    statusRaw: string
+    payloadJson: string
+    headersJson?: string | null
+    processingStatus?: $Enums.PlategaWebhookLogStatus
+    errorMessage?: string | null
+    processedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PlategaWebhookLogCreateOrConnectWithoutPaymentRequestInput = {
+    where: PlategaWebhookLogWhereUniqueInput
+    create: XOR<PlategaWebhookLogCreateWithoutPaymentRequestInput, PlategaWebhookLogUncheckedCreateWithoutPaymentRequestInput>
+  }
+
+  export type PlategaWebhookLogCreateManyPaymentRequestInputEnvelope = {
+    data: PlategaWebhookLogCreateManyPaymentRequestInput | PlategaWebhookLogCreateManyPaymentRequestInput[]
+  }
+
   export type UserUpsertWithoutPaymentRequestsInput = {
     update: XOR<UserUpdateWithoutPaymentRequestsInput, UserUncheckedUpdateWithoutPaymentRequestsInput>
     create: XOR<UserCreateWithoutPaymentRequestsInput, UserUncheckedCreateWithoutPaymentRequestsInput>
@@ -31076,6 +32983,180 @@ export namespace Prisma {
     deviceSlots?: DeviceSlotUncheckedUpdateManyWithoutSubscriptionNestedInput
   }
 
+  export type PlategaWebhookLogUpsertWithWhereUniqueWithoutPaymentRequestInput = {
+    where: PlategaWebhookLogWhereUniqueInput
+    update: XOR<PlategaWebhookLogUpdateWithoutPaymentRequestInput, PlategaWebhookLogUncheckedUpdateWithoutPaymentRequestInput>
+    create: XOR<PlategaWebhookLogCreateWithoutPaymentRequestInput, PlategaWebhookLogUncheckedCreateWithoutPaymentRequestInput>
+  }
+
+  export type PlategaWebhookLogUpdateWithWhereUniqueWithoutPaymentRequestInput = {
+    where: PlategaWebhookLogWhereUniqueInput
+    data: XOR<PlategaWebhookLogUpdateWithoutPaymentRequestInput, PlategaWebhookLogUncheckedUpdateWithoutPaymentRequestInput>
+  }
+
+  export type PlategaWebhookLogUpdateManyWithWhereWithoutPaymentRequestInput = {
+    where: PlategaWebhookLogScalarWhereInput
+    data: XOR<PlategaWebhookLogUpdateManyMutationInput, PlategaWebhookLogUncheckedUpdateManyWithoutPaymentRequestInput>
+  }
+
+  export type PlategaWebhookLogScalarWhereInput = {
+    AND?: PlategaWebhookLogScalarWhereInput | PlategaWebhookLogScalarWhereInput[]
+    OR?: PlategaWebhookLogScalarWhereInput[]
+    NOT?: PlategaWebhookLogScalarWhereInput | PlategaWebhookLogScalarWhereInput[]
+    id?: StringFilter<"PlategaWebhookLog"> | string
+    dedupKey?: StringFilter<"PlategaWebhookLog"> | string
+    transactionId?: StringFilter<"PlategaWebhookLog"> | string
+    paymentRequestId?: StringNullableFilter<"PlategaWebhookLog"> | string | null
+    statusRaw?: StringFilter<"PlategaWebhookLog"> | string
+    payloadJson?: StringFilter<"PlategaWebhookLog"> | string
+    headersJson?: StringNullableFilter<"PlategaWebhookLog"> | string | null
+    processingStatus?: EnumPlategaWebhookLogStatusFilter<"PlategaWebhookLog"> | $Enums.PlategaWebhookLogStatus
+    errorMessage?: StringNullableFilter<"PlategaWebhookLog"> | string | null
+    processedAt?: DateTimeNullableFilter<"PlategaWebhookLog"> | Date | string | null
+    createdAt?: DateTimeFilter<"PlategaWebhookLog"> | Date | string
+    updatedAt?: DateTimeFilter<"PlategaWebhookLog"> | Date | string
+  }
+
+  export type PaymentRequestCreateWithoutPlategaWebhookLogsInput = {
+    id?: string
+    tariffName: string
+    periodMonths: number
+    deviceLimit: number
+    amountRub: number
+    status?: $Enums.PaymentRequestStatus
+    method?: $Enums.PaymentMethod
+    months?: number
+    devices?: number
+    currency?: string
+    baseDeviceMonthlyPriceSnapshot?: number
+    extraDeviceMonthlyPriceSnapshot?: number
+    monthlyPriceSnapshot?: number
+    durationDiscountPercentSnapshot?: number
+    referralDiscountPercentSnapshot?: number
+    totalPriceBeforeDiscountRubSnapshot?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    markedPaidAt?: Date | string | null
+    approvedAt?: Date | string | null
+    rejectedAt?: Date | string | null
+    plategaTransactionId?: string | null
+    plategaRedirectUrl?: string | null
+    plategaStatus?: string | null
+    plategaPayloadJson?: string | null
+    plategaConfirmedAt?: Date | string | null
+    user: UserCreateNestedOneWithoutPaymentRequestsInput
+    subscription?: SubscriptionCreateNestedOneWithoutPaymentRequestInput
+  }
+
+  export type PaymentRequestUncheckedCreateWithoutPlategaWebhookLogsInput = {
+    id?: string
+    userId: string
+    tariffName: string
+    periodMonths: number
+    deviceLimit: number
+    amountRub: number
+    status?: $Enums.PaymentRequestStatus
+    method?: $Enums.PaymentMethod
+    months?: number
+    devices?: number
+    currency?: string
+    baseDeviceMonthlyPriceSnapshot?: number
+    extraDeviceMonthlyPriceSnapshot?: number
+    monthlyPriceSnapshot?: number
+    durationDiscountPercentSnapshot?: number
+    referralDiscountPercentSnapshot?: number
+    totalPriceBeforeDiscountRubSnapshot?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    markedPaidAt?: Date | string | null
+    approvedAt?: Date | string | null
+    rejectedAt?: Date | string | null
+    plategaTransactionId?: string | null
+    plategaRedirectUrl?: string | null
+    plategaStatus?: string | null
+    plategaPayloadJson?: string | null
+    plategaConfirmedAt?: Date | string | null
+    subscription?: SubscriptionUncheckedCreateNestedOneWithoutPaymentRequestInput
+  }
+
+  export type PaymentRequestCreateOrConnectWithoutPlategaWebhookLogsInput = {
+    where: PaymentRequestWhereUniqueInput
+    create: XOR<PaymentRequestCreateWithoutPlategaWebhookLogsInput, PaymentRequestUncheckedCreateWithoutPlategaWebhookLogsInput>
+  }
+
+  export type PaymentRequestUpsertWithoutPlategaWebhookLogsInput = {
+    update: XOR<PaymentRequestUpdateWithoutPlategaWebhookLogsInput, PaymentRequestUncheckedUpdateWithoutPlategaWebhookLogsInput>
+    create: XOR<PaymentRequestCreateWithoutPlategaWebhookLogsInput, PaymentRequestUncheckedCreateWithoutPlategaWebhookLogsInput>
+    where?: PaymentRequestWhereInput
+  }
+
+  export type PaymentRequestUpdateToOneWithWhereWithoutPlategaWebhookLogsInput = {
+    where?: PaymentRequestWhereInput
+    data: XOR<PaymentRequestUpdateWithoutPlategaWebhookLogsInput, PaymentRequestUncheckedUpdateWithoutPlategaWebhookLogsInput>
+  }
+
+  export type PaymentRequestUpdateWithoutPlategaWebhookLogsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tariffName?: StringFieldUpdateOperationsInput | string
+    periodMonths?: IntFieldUpdateOperationsInput | number
+    deviceLimit?: IntFieldUpdateOperationsInput | number
+    amountRub?: IntFieldUpdateOperationsInput | number
+    status?: EnumPaymentRequestStatusFieldUpdateOperationsInput | $Enums.PaymentRequestStatus
+    method?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    months?: IntFieldUpdateOperationsInput | number
+    devices?: IntFieldUpdateOperationsInput | number
+    currency?: StringFieldUpdateOperationsInput | string
+    baseDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    extraDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    monthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    durationDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    referralDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    totalPriceBeforeDiscountRubSnapshot?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    markedPaidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    plategaTransactionId?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaRedirectUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaPayloadJson?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaConfirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    user?: UserUpdateOneRequiredWithoutPaymentRequestsNestedInput
+    subscription?: SubscriptionUpdateOneWithoutPaymentRequestNestedInput
+  }
+
+  export type PaymentRequestUncheckedUpdateWithoutPlategaWebhookLogsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    tariffName?: StringFieldUpdateOperationsInput | string
+    periodMonths?: IntFieldUpdateOperationsInput | number
+    deviceLimit?: IntFieldUpdateOperationsInput | number
+    amountRub?: IntFieldUpdateOperationsInput | number
+    status?: EnumPaymentRequestStatusFieldUpdateOperationsInput | $Enums.PaymentRequestStatus
+    method?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    months?: IntFieldUpdateOperationsInput | number
+    devices?: IntFieldUpdateOperationsInput | number
+    currency?: StringFieldUpdateOperationsInput | string
+    baseDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    extraDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    monthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    durationDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    referralDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    totalPriceBeforeDiscountRubSnapshot?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    markedPaidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    plategaTransactionId?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaRedirectUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaPayloadJson?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaConfirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscription?: SubscriptionUncheckedUpdateOneWithoutPaymentRequestNestedInput
+  }
+
   export type UserCreateWithoutSubscriptionsInput = {
     id?: string
     username: string
@@ -31139,7 +33220,13 @@ export namespace Prisma {
     markedPaidAt?: Date | string | null
     approvedAt?: Date | string | null
     rejectedAt?: Date | string | null
+    plategaTransactionId?: string | null
+    plategaRedirectUrl?: string | null
+    plategaStatus?: string | null
+    plategaPayloadJson?: string | null
+    plategaConfirmedAt?: Date | string | null
     user: UserCreateNestedOneWithoutPaymentRequestsInput
+    plategaWebhookLogs?: PlategaWebhookLogCreateNestedManyWithoutPaymentRequestInput
   }
 
   export type PaymentRequestUncheckedCreateWithoutSubscriptionInput = {
@@ -31165,6 +33252,12 @@ export namespace Prisma {
     markedPaidAt?: Date | string | null
     approvedAt?: Date | string | null
     rejectedAt?: Date | string | null
+    plategaTransactionId?: string | null
+    plategaRedirectUrl?: string | null
+    plategaStatus?: string | null
+    plategaPayloadJson?: string | null
+    plategaConfirmedAt?: Date | string | null
+    plategaWebhookLogs?: PlategaWebhookLogUncheckedCreateNestedManyWithoutPaymentRequestInput
   }
 
   export type PaymentRequestCreateOrConnectWithoutSubscriptionInput = {
@@ -31287,7 +33380,13 @@ export namespace Prisma {
     markedPaidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    plategaTransactionId?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaRedirectUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaPayloadJson?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaConfirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     user?: UserUpdateOneRequiredWithoutPaymentRequestsNestedInput
+    plategaWebhookLogs?: PlategaWebhookLogUpdateManyWithoutPaymentRequestNestedInput
   }
 
   export type PaymentRequestUncheckedUpdateWithoutSubscriptionInput = {
@@ -31313,6 +33412,12 @@ export namespace Prisma {
     markedPaidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    plategaTransactionId?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaRedirectUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaPayloadJson?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaConfirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    plategaWebhookLogs?: PlategaWebhookLogUncheckedUpdateManyWithoutPaymentRequestNestedInput
   }
 
   export type DeviceSlotUpsertWithWhereUniqueWithoutSubscriptionInput = {
@@ -31630,6 +33735,11 @@ export namespace Prisma {
     markedPaidAt?: Date | string | null
     approvedAt?: Date | string | null
     rejectedAt?: Date | string | null
+    plategaTransactionId?: string | null
+    plategaRedirectUrl?: string | null
+    plategaStatus?: string | null
+    plategaPayloadJson?: string | null
+    plategaConfirmedAt?: Date | string | null
   }
 
   export type SubscriptionCreateManyUserInput = {
@@ -31784,7 +33894,13 @@ export namespace Prisma {
     markedPaidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    plategaTransactionId?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaRedirectUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaPayloadJson?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaConfirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     subscription?: SubscriptionUpdateOneWithoutPaymentRequestNestedInput
+    plategaWebhookLogs?: PlategaWebhookLogUpdateManyWithoutPaymentRequestNestedInput
   }
 
   export type PaymentRequestUncheckedUpdateWithoutUserInput = {
@@ -31809,7 +33925,13 @@ export namespace Prisma {
     markedPaidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    plategaTransactionId?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaRedirectUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaPayloadJson?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaConfirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     subscription?: SubscriptionUncheckedUpdateOneWithoutPaymentRequestNestedInput
+    plategaWebhookLogs?: PlategaWebhookLogUncheckedUpdateManyWithoutPaymentRequestNestedInput
   }
 
   export type PaymentRequestUncheckedUpdateManyWithoutUserInput = {
@@ -31834,6 +33956,11 @@ export namespace Prisma {
     markedPaidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    plategaTransactionId?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaRedirectUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaPayloadJson?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaConfirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type SubscriptionUpdateWithoutUserInput = {
@@ -32131,6 +34258,62 @@ export namespace Prisma {
     senderId?: NullableStringFieldUpdateOperationsInput | string | null
     message?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlategaWebhookLogCreateManyPaymentRequestInput = {
+    id?: string
+    dedupKey: string
+    transactionId: string
+    statusRaw: string
+    payloadJson: string
+    headersJson?: string | null
+    processingStatus?: $Enums.PlategaWebhookLogStatus
+    errorMessage?: string | null
+    processedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PlategaWebhookLogUpdateWithoutPaymentRequestInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dedupKey?: StringFieldUpdateOperationsInput | string
+    transactionId?: StringFieldUpdateOperationsInput | string
+    statusRaw?: StringFieldUpdateOperationsInput | string
+    payloadJson?: StringFieldUpdateOperationsInput | string
+    headersJson?: NullableStringFieldUpdateOperationsInput | string | null
+    processingStatus?: EnumPlategaWebhookLogStatusFieldUpdateOperationsInput | $Enums.PlategaWebhookLogStatus
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlategaWebhookLogUncheckedUpdateWithoutPaymentRequestInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dedupKey?: StringFieldUpdateOperationsInput | string
+    transactionId?: StringFieldUpdateOperationsInput | string
+    statusRaw?: StringFieldUpdateOperationsInput | string
+    payloadJson?: StringFieldUpdateOperationsInput | string
+    headersJson?: NullableStringFieldUpdateOperationsInput | string | null
+    processingStatus?: EnumPlategaWebhookLogStatusFieldUpdateOperationsInput | $Enums.PlategaWebhookLogStatus
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlategaWebhookLogUncheckedUpdateManyWithoutPaymentRequestInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dedupKey?: StringFieldUpdateOperationsInput | string
+    transactionId?: StringFieldUpdateOperationsInput | string
+    statusRaw?: StringFieldUpdateOperationsInput | string
+    payloadJson?: StringFieldUpdateOperationsInput | string
+    headersJson?: NullableStringFieldUpdateOperationsInput | string | null
+    processingStatus?: EnumPlategaWebhookLogStatusFieldUpdateOperationsInput | $Enums.PlategaWebhookLogStatus
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type DeviceSlotCreateManySubscriptionInput = {

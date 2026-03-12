@@ -191,7 +191,7 @@ export async function updateSupportTicketStatusByAdmin(input: {
   })
 
   if (updated.count !== 1) {
-    throw new SupportMutationError("NOT_FOUND", "РўРёРєРµС‚ РЅРµ РЅР°Р№РґРµРЅ.")
+    throw new SupportMutationError("NOT_FOUND", "Тикет не найден.")
   }
 }
 
@@ -206,6 +206,6 @@ export async function markSupportTicketReadByAdmin(ticketId: number) {
   })
 
   if (updated.count !== 1) {
-    throw new SupportMutationError("NOT_FOUND", "РўРёРєРµС‚ РЅРµ РЅР°Р№РґРµРЅ.")
+    throw new SupportMutationError("NOT_FOUND", "Тикет не найден.")
   }
 }

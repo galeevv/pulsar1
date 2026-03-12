@@ -1,11 +1,13 @@
 ﻿"use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-import { CalendarClock, CreditCard, Landmark, Settings2, Smartphone } from "lucide-react";
+import { CalendarClock, CreditCard, Loader2, Settings2, Smartphone, Wallet } from "lucide-react";
+import { toast } from "sonner";
 
-import { confirmTariffPaymentAction, payTariffWithCreditsAction } from "@/app/app/actions";
+import { payTariffWithCreditsAction } from "@/app/app/actions";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
 import { calculateAppSubscriptionPreviewPrice } from "@/lib/subscription-preview";
 
@@ -32,12 +35,6 @@ type PricingSettings = {
   extraDeviceMonthlyPrice: number;
   maxDevices: number;
   minDevices: number;
-};
-
-const PAYMENT_DETAILS = {
-  bankName: "Т-Банк",
-  cardNumber: "2200 7001 2345 6789",
-  cardOwner: "PULSAR SERVICE",
 };
 
 function getMonthsLabel(months: number) {
@@ -81,6 +78,7 @@ export function AppTariffsSection({
   firstPurchaseDiscountPct,
   isCapacityBlockedForNewSubscriptions,
   maxActiveSubscriptions,
+  plategaPaymentRequestId,
   pricingSettings,
 }: {
   activeSubscriptionEndAtIso: string | null;
@@ -92,6 +90,7 @@ export function AppTariffsSection({
   firstPurchaseDiscountPct: number;
   isCapacityBlockedForNewSubscriptions: boolean;
   maxActiveSubscriptions: number;
+  plategaPaymentRequestId: string | null;
   pricingSettings: PricingSettings;
 }) {
   const sortedRules = useMemo(
@@ -105,6 +104,14 @@ export function AppTariffsSection({
 
   const [selectedMonths, setSelectedMonths] = useState(sortedRules[0]?.months ?? 1);
   const [selectedDevices, setSelectedDevices] = useState(defaultDevices);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<"PLATEGA" | "CREDITS">(
+    "PLATEGA"
+  );
+  const [isCreatingPlategaPayment, setIsCreatingPlategaPayment] = useState(false);
+  const [isCheckingPlategaPayment, setIsCheckingPlategaPayment] = useState(
+    Boolean(plategaPaymentRequestId)
+  );
+  const creditsFormRef = useRef<HTMLFormElement | null>(null);
 
   const selectedRule = sortedRules.find((item) => item.months === selectedMonths) ?? sortedRules[0];
   const effectiveSelectedMonths = selectedRule?.months ?? sortedRules[0]?.months ?? 1;
@@ -138,6 +145,8 @@ export function AppTariffsSection({
     !isDeviceRangeValid ||
     !selectedRule ||
     !calculatedPrice;
+  const paymentActionDisabled =
+    checkoutDisabled || isCreatingPlategaPayment || isCheckingPlategaPayment;
   const hasEnoughCredits = calculatedPrice ? credits >= calculatedPrice.finalTotalRub : false;
   const hasReferralDiscount =
     firstPurchaseDiscountPct > 0 &&
@@ -145,6 +154,126 @@ export function AppTariffsSection({
   const totalSavings = calculatedPrice
     ? calculatedPrice.totalBeforeDiscountRub - calculatedPrice.finalTotalRub
     : 0;
+
+  useEffect(() => {
+    if (!plategaPaymentRequestId) {
+      setIsCheckingPlategaPayment(false);
+      return;
+    }
+
+    setIsCheckingPlategaPayment(true);
+    let isCancelled = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    const pollStatus = async () => {
+      try {
+        const response = await fetch(
+          `/api/payments/platega/status?paymentRequestId=${encodeURIComponent(plategaPaymentRequestId)}`,
+          { cache: "no-store" }
+        );
+        const payload = (await response.json().catch(() => ({}))) as {
+          error?: string;
+          isFinal?: boolean;
+          status?: "APPROVED" | "CREATED" | "REJECTED";
+        };
+
+        if (!response.ok) {
+          if (!isCancelled) {
+            setIsCheckingPlategaPayment(false);
+            const errorMessage = payload.error ?? "Не удалось проверить статус платежа.";
+            window.location.replace(`/app?error=${encodeURIComponent(errorMessage)}#tariffs`);
+          }
+          return;
+        }
+
+        if (payload.status === "APPROVED") {
+          if (!isCancelled) {
+            setIsCheckingPlategaPayment(false);
+            window.location.replace(
+              `/app?notice=${encodeURIComponent(
+                "Оплата через Platega подтверждена. Подписка активирована."
+              )}#dashboard`
+            );
+          }
+          return;
+        }
+
+        if (payload.status === "REJECTED") {
+          if (!isCancelled) {
+            setIsCheckingPlategaPayment(false);
+            window.location.replace(
+              `/app?error=${encodeURIComponent(
+                "Платеж через Platega не подтвержден. Попробуйте снова."
+              )}#tariffs`
+            );
+          }
+          return;
+        }
+
+        if (!isCancelled) {
+          timer = setTimeout(pollStatus, 2500);
+        }
+      } catch {
+        if (!isCancelled) {
+          setIsCheckingPlategaPayment(false);
+          window.location.replace(
+            `/app?error=${encodeURIComponent(
+              "Не удалось проверить статус платежа через Platega."
+            )}#tariffs`
+          );
+        }
+      }
+    };
+
+    void pollStatus();
+
+    return () => {
+      isCancelled = true;
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
+  }, [plategaPaymentRequestId]);
+
+  async function startPlategaPayment() {
+    if (!calculatedPrice || checkoutDisabled) {
+      return;
+    }
+
+    setIsCreatingPlategaPayment(true);
+
+    try {
+      const response = await fetch("/api/payments/platega/create", {
+        body: JSON.stringify({
+          amount: calculatedPrice.finalTotalRub,
+          description: `PulsarVPN ${effectiveSelectedMonths} мес. / ${effectiveSelectedDevices} устройств`,
+          devices: effectiveSelectedDevices,
+          months: effectiveSelectedMonths,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+      });
+
+      const payload = (await response.json().catch(() => ({}))) as {
+        error?: string;
+        paymentRequestId?: string;
+        redirectUrl?: string;
+      };
+
+      if (!response.ok || !payload.redirectUrl) {
+        throw new Error(payload.error || "Не удалось создать платеж в Platega.");
+      }
+
+      window.location.href = payload.redirectUrl;
+    } catch (error) {
+      setIsCreatingPlategaPayment(false);
+      toast.error(error instanceof Error ? error.message : "Не удалось создать платеж в Platega.", {
+        position: "bottom-right",
+      });
+    }
+  }
 
   return (
     <AppSectionShell
@@ -164,6 +293,15 @@ export function AppTariffsSection({
           </p>
         ) : (
           <div className="space-y-6">
+            {isCheckingPlategaPayment ? (
+              <div className="rounded-card border border-border bg-background/50 p-card-compact text-sm text-muted-foreground md:p-card-compact-md">
+                <p className="inline-flex items-center gap-2">
+                  <Loader2 className="size-4 animate-spin" />
+                  Платеж через банковскую карту обрабатывается. Обновляем статус подписки...
+                </p>
+              </div>
+            ) : null}
+
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <Settings2 className="size-4 text-muted-foreground" />
@@ -291,7 +429,7 @@ export function AppTariffsSection({
               <DialogTrigger asChild>
                 <Button
                   className="h-button w-full px-button-x"
-                  disabled={checkoutDisabled}
+                  disabled={paymentActionDisabled}
                   radius="card"
                   type="button"
                 >
@@ -319,54 +457,121 @@ export function AppTariffsSection({
                     {getMonthsLabel(effectiveSelectedMonths)} и {effectiveSelectedDevices} устройств.
                   </DialogDescription>
                 </DialogHeader>
-
                 <div className="space-y-3 rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md">
-                  <div className="flex items-start gap-2">
-                    <Landmark className="mt-0.5 size-4 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm font-medium">Банк</p>
-                      <p className="text-sm text-muted-foreground">{PAYMENT_DETAILS.bankName}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CreditCard className="mt-0.5 size-4 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm font-medium">Карта</p>
-                      <p className="text-sm text-muted-foreground">{PAYMENT_DETAILS.cardNumber}</p>
-                      <p className="text-sm text-muted-foreground">{PAYMENT_DETAILS.cardOwner}</p>
-                    </div>
+                  <div className="space-y-1 text-sm text-muted-foreground">
+                    <p>
+                      Срок:{" "}
+                      <span className="font-medium text-foreground">
+                        {getMonthsLabel(effectiveSelectedMonths)}
+                      </span>
+                    </p>
+                    <p>
+                      Устройства:{" "}
+                      <span className="font-medium text-foreground">{effectiveSelectedDevices}</span>
+                    </p>
+                    <p>
+                      К оплате:{" "}
+                      <span className="font-medium text-foreground">
+                        {calculatedPrice?.finalTotalRub ?? 0} ₽
+                      </span>
+                    </p>
                   </div>
                 </div>
 
-                <p className="text-sm text-muted-foreground">
-                  После перевода нажмите «Оплачено». Подписка активируется сразу, админ подтверждает
-                  платеж позже.
-                </p>
-                <p className="text-sm text-muted-foreground">Баланс: {credits} кредитов.</p>
-
-                <div className="space-y-2">
-                  <form action={confirmTariffPaymentAction}>
-                    <input name="devices" type="hidden" value={effectiveSelectedDevices} />
-                    <input name="months" type="hidden" value={effectiveSelectedMonths} />
-                    <Button className="h-button w-full px-button-x" radius="card" type="submit">
-                      Оплачено
-                    </Button>
-                  </form>
-
-                  <form action={payTariffWithCreditsAction}>
-                    <input name="devices" type="hidden" value={effectiveSelectedDevices} />
-                    <input name="months" type="hidden" value={effectiveSelectedMonths} />
-                    <Button
-                      className="h-button w-full px-button-x"
-                      disabled={!hasEnoughCredits}
-                      radius="card"
-                      type="submit"
-                      variant="outline"
+                <RadioGroup
+                  className="space-y-1"
+                  onValueChange={(value) => setSelectedPaymentMethod(value as "PLATEGA" | "CREDITS")}
+                  value={selectedPaymentMethod}
+                >
+                  <label className="block cursor-pointer" htmlFor="payment-method-platega">
+                    <Card
+                      className={`transition-colors ${
+                        selectedPaymentMethod === "PLATEGA"
+                          ? "border-primary bg-primary/10"
+                          : "border-border bg-background/40 hover:bg-background/60"
+                      }`}
                     >
-                      Оплатить кредитами
-                    </Button>
-                  </form>
-                </div>
+                      <div className="flex w-full items-start justify-between gap-3 p-3">
+                        <div className="min-w-0 flex-1 space-y-1 leading-snug">
+                          <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+                            <CreditCard className="size-4" />
+                            Банковская карта
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Visa, MasterCard, Мир
+                          </p>
+                        </div>
+                        <RadioGroupItem className="mt-0.5 shrink-0" id="payment-method-platega" value="PLATEGA" />
+                      </div>
+                    </Card>
+                  </label>
+
+                  <label className="block cursor-pointer" htmlFor="payment-method-credits">
+                    <Card
+                      className={`transition-colors ${
+                        selectedPaymentMethod === "CREDITS"
+                          ? "border-primary bg-primary/10"
+                          : "border-border bg-background/40 hover:bg-background/60"
+                      }`}
+                    >
+                      <div className="flex w-full items-start justify-between gap-3 p-3">
+                        <div className="min-w-0 flex-1 space-y-1 leading-snug">
+                          <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+                            <Wallet className="size-4" />
+                            Кредитами
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Баланс: {credits} кредитов
+                          </p>
+                        </div>
+                        <RadioGroupItem className="mt-0.5 shrink-0" id="payment-method-credits" value="CREDITS" />
+                      </div>
+                    </Card>
+                  </label>
+                </RadioGroup>
+
+                <form action={payTariffWithCreditsAction} ref={creditsFormRef}>
+                  <input name="devices" type="hidden" value={effectiveSelectedDevices} />
+                  <input name="months" type="hidden" value={effectiveSelectedMonths} />
+                </form>
+
+                <Button
+                  className="h-button w-full px-button-x"
+                  disabled={
+                    selectedPaymentMethod === "CREDITS"
+                      ? paymentActionDisabled || !hasEnoughCredits
+                      : paymentActionDisabled
+                  }
+                  onClick={() => {
+                    if (selectedPaymentMethod === "CREDITS") {
+                      creditsFormRef.current?.requestSubmit();
+                      return;
+                    }
+
+                    void startPlategaPayment();
+                  }}
+                  radius="card"
+                  type="button"
+                >
+                  {selectedPaymentMethod === "PLATEGA" ? (
+                    isCreatingPlategaPayment ? (
+                      <span className="inline-flex items-center gap-2">
+                        <Loader2 className="size-4 animate-spin" />
+                        Создаем платеж...
+                      </span>
+                    ) : (
+                      "Оплатить банковской картой"
+                    )
+                  ) : (
+                    "Оплатить кредитами"
+                  )}
+                </Button>
+
+                {selectedPaymentMethod === "CREDITS" && !hasEnoughCredits ? (
+                  <p className="text-sm text-muted-foreground">
+                    Недостаточно кредитов. Пополните баланс или выберите банковскую карту.
+                  </p>
+                ) : null}
               </DialogContent>
             </Dialog>
           </div>

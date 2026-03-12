@@ -27,9 +27,9 @@ export function SupportMessageItem({
   const isAdmin = senderType === "admin";
 
   return (
-    <div className={`flex ${isAdmin ? "justify-start" : "justify-end"}`}>
+    <div className={`min-w-0 overflow-x-hidden flex ${isAdmin ? "justify-start" : "justify-end"}`}>
       <div
-        className={`max-w-[88%] rounded-card border px-3 py-2 md:max-w-[80%] ${
+        className={`min-w-0 w-fit overflow-hidden max-w-[72%] rounded-card border px-3 py-2 md:max-w-[58%] lg:max-w-[34rem] ${
           isAdmin
             ? "border-border bg-background/60 text-foreground"
             : "border-primary/20 bg-primary/10 text-foreground"
@@ -41,7 +41,9 @@ export function SupportMessageItem({
           </p>
           <p className="text-xs text-muted-foreground">{formatMessageDateTime(createdAt)}</p>
         </div>
-        <p className="whitespace-pre-wrap break-words text-sm leading-6">{message}</p>
+        <p className="max-w-full whitespace-pre-wrap break-all [overflow-wrap:anywhere] text-sm leading-6">
+          {message}
+        </p>
       </div>
     </div>
   );

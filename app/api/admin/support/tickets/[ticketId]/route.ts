@@ -60,7 +60,7 @@ export async function GET(
     })
   } catch (error) {
     if (error instanceof SupportMutationError && error.code === "NOT_FOUND") {
-      return supportNotFoundResponse("РўРёРєРµС‚ РЅРµ РЅР°Р№РґРµРЅ.")
+      return supportNotFoundResponse("Тикет не найден.")
     }
 
     return supportServerErrorResponse()

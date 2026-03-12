@@ -2,7 +2,7 @@ import { calculateSubscriptionPrice } from "@/lib/subscription-pricing";
 import { describe, expect, it } from "vitest";
 
 describe("calculateSubscriptionPrice", () => {
-  it("calculates full constructor price with duration and referral discounts", () => {
+  it("calculates full constructor price and disables referral for multi-month period", () => {
     const result = calculateSubscriptionPrice({
       baseDeviceMonthlyPrice: 299,
       devices: 3,
@@ -17,7 +17,8 @@ describe("calculateSubscriptionPrice", () => {
     expect(result.monthlyPrice).toBe(899);
     expect(result.totalBeforeDiscountRub).toBe(5394);
     expect(result.totalAfterDurationDiscountRub).toBe(5154);
-    expect(result.finalTotalRub).toBe(5082);
+    expect(result.referralDiscountPercent).toBe(0);
+    expect(result.finalTotalRub).toBe(5154);
   });
 
   it("normalizes boundary values: floors numbers and clamps invalid ranges", () => {
@@ -55,7 +56,8 @@ describe("calculateSubscriptionPrice", () => {
 
     expect(result.totalBeforeDiscountRub).toBe(999);
     expect(result.totalAfterDurationDiscountRub).toBe(669);
-    expect(result.finalTotalRub).toBe(647);
+    expect(result.referralDiscountPercent).toBe(0);
+    expect(result.finalTotalRub).toBe(669);
   });
 
   it("does not apply duration discount to device component", () => {
@@ -96,7 +98,7 @@ describe("calculateSubscriptionPrice", () => {
     expect(result.finalTotalRub).toBe(783);
   });
 
-  it("applies referral discount only to first month VPN amount", () => {
+  it("does not apply referral discount for periods longer than one month", () => {
     const result = calculateSubscriptionPrice({
       baseDeviceMonthlyPrice: 100,
       devices: 2,
@@ -107,12 +109,28 @@ describe("calculateSubscriptionPrice", () => {
       vpnMonthlyPrice: 300,
     });
 
-    // devicesMonthlyPrice = 150, devicesTotal = 450
-    // vpnTotalAfterDuration = 900
-    // totalAfterDuration = 1350
-    // referral applies only to first month vpn (300), discount amount = 150
-    // final = 1350 - 150 = 1200
     expect(result.totalAfterDurationDiscountRub).toBe(1350);
-    expect(result.finalTotalRub).toBe(1200);
+    expect(result.referralDiscountPercent).toBe(0);
+    expect(result.finalTotalRub).toBe(1350);
+  });
+
+  it("applies referral discount to the full total for 1-month plans", () => {
+    const result = calculateSubscriptionPrice({
+      baseDeviceMonthlyPrice: 70,
+      devices: 2,
+      durationDiscountPercent: 10,
+      extraDeviceMonthlyPrice: 30,
+      months: 1,
+      referralDiscountPercent: 50,
+      vpnMonthlyPrice: 100,
+    });
+
+    // devicesMonthlyPrice = 70 + 30 = 100
+    // vpn after duration discount = 100 - 10% = 90
+    // totalAfterDuration = 90 + 100 = 190
+    // final with referral 50% = 95
+    expect(result.totalAfterDurationDiscountRub).toBe(190);
+    expect(result.referralDiscountPercent).toBe(50);
+    expect(result.finalTotalRub).toBe(95);
   });
 });

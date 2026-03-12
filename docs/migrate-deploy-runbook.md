@@ -1,6 +1,6 @@
 ﻿# Migrate Deploy Runbook (Production)
 
-Last updated: 2026-03-07
+Last updated: 2026-03-12
 
 ## Goal
 
@@ -95,9 +95,10 @@ sudo systemctl status pulsar --no-pager
 - `/login` works
 - `/app` constructor section works (duration/devices/price)
 - `/admin` тарифные правила section works (durations/settings)
-- create payment request flow:
-  - `Оплачено` -> `MARKED_PAID`
-  - admin `APPROVED/REJECTED` path works
+- payment flow:
+  - Platega checkout creates `PaymentRequest(status=CREATED, method=PLATEGA)`
+  - webhook `CONFIRMED` moves payment to `APPROVED` and activates subscription
+  - credits checkout creates `PaymentRequest(status=APPROVED, method=CREDITS)` and activates subscription immediately
 
 Quick DB sanity checks (optional):
 

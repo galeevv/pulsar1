@@ -1,17 +1,13 @@
-import { BadgeCheck, CalendarClock, Link2, Send, Smartphone, Wallet } from "lucide-react";
+import { BadgeCheck, CalendarClock, Send, Smartphone, UserPlus, UserRound, Users, Wallet } from "lucide-react";
 
-import {
-  activateDeviceSlotAction,
-  deactivateDeviceSlotAction,
-} from "@/app/app/actions";
-import { Button } from "@/components/ui/button";
 import { SupportDialog } from "@/components/support/support-dialog";
 
-import { AppCopySubscriptionButton } from "./app-copy-subscription-button";
+import { AppDevicesManagementDialog } from "./app-devices-management-dialog";
 import { AppSectionShell } from "./app-section-shell";
 import { AppSetupDialog } from "./app-setup-dialog";
 import { AppStatusPill } from "./app-status-pill";
 import { AppSurface } from "./app-surface";
+import { AppUserAgreementDialog } from "./app-user-agreement-dialog";
 
 type ActiveSubscriptionItem = {
   deviceLimit: number;
@@ -27,7 +23,7 @@ type ActiveSubscriptionItem = {
   endsAt: Date;
   expiresAt: Date | null;
   paymentRequest: {
-    status: "APPROVED" | "CREATED" | "MARKED_PAID" | "REJECTED";
+    status: "APPROVED" | "CREATED" | "REJECTED";
   } | null;
   startsAt: Date | null;
   startedAt: Date;
@@ -54,22 +50,11 @@ function mapSubscriptionStatus(status: SubscriptionStatus) {
   return { label: "Отозвана", tone: "default" as const };
 }
 
-function mapSlotStatus(status: "ACTIVE" | "BLOCKED" | "FREE") {
-  if (status === "ACTIVE") {
-    return "Подключено";
-  }
-
-  if (status === "BLOCKED") {
-    return "Заблокировано";
-  }
-
-  return "Свободно";
-}
-
 export function AppOverviewSection({
   activeSubscription,
   credits,
   referralStats,
+  userAgreementText,
   username,
 }: {
   activeSubscription: ActiveSubscriptionItem;
@@ -78,6 +63,7 @@ export function AppOverviewSection({
     activeInvitedCount: number;
     totalInvitedCount: number;
   };
+  userAgreementText: string;
   username: string;
 }) {
   const subscriptionStatus = activeSubscription
@@ -92,13 +78,9 @@ export function AppOverviewSection({
   const devicesCount = activeSubscription
     ? Math.max(activeSubscription.devices, activeSubscription.deviceLimit)
     : 0;
-  const firstFreeSlot = activeSubscription
-    ? activeSubscription.deviceSlots.find((slot) => slot.status === "FREE") ?? null
-    : null;
-
   return (
     <AppSectionShell
-      description="Основная сводка аккаунта: баланс, состояние подписки и быстрые действия для подключения."
+      description="Основная сводка аккаунта: баланс, статус подписки и быстрые действия для подключения и управления."
       eyebrow="ACCOUNT OVERVIEW"
       id="dashboard"
       title="Dashboard"
@@ -111,30 +93,56 @@ export function AppOverviewSection({
                 <Wallet className="size-4 text-muted-foreground" />
                 <p className="text-sm font-semibold">Аккаунт и баланс</p>
               </div>
-              <div className="space-y-2 break-words text-sm text-muted-foreground">
-                <p>
-                  Username: <span className="break-all font-medium text-foreground">{username}</span>
-                </p>
-                <p>
-                  Баланс: <span className="font-medium text-foreground">{credits} кредитов</span>
-                </p>
-                <p>
-                  Всего приглашено: <span className="font-medium text-foreground">{referralStats.totalInvitedCount}</span>
-                </p>
-                <p>
-                  Активные пользователи: <span className="font-medium text-foreground">{referralStats.activeInvitedCount}</span>
-                </p>
+              <div className="rounded-card border border-border/70 bg-background/40 p-card-compact md:p-card-compact-md">
+                <div className="flex items-start gap-2">
+                  <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-card border border-border bg-background/60">
+                    <UserRound className="size-4 text-foreground" />
+                  </span>
+                  <div className="min-w-0 space-y-1">
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground">Профиль</p>
+                    <p className="break-all text-sm font-semibold text-foreground">{username}</p>
+                  </div>
+                </div>
+
+                <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                  <div className="rounded-card border border-border/70 bg-background/30 px-3 py-2">
+                    <p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Wallet className="size-3.5" />
+                      Баланс
+                    </p>
+                    <p className="text-sm font-semibold text-foreground">{credits} кредитов</p>
+                  </div>
+                  <div className="rounded-card border border-border/70 bg-background/30 px-3 py-2">
+                    <p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <UserPlus className="size-3.5" />
+                      Приглашено
+                    </p>
+                    <p className="text-sm font-semibold text-foreground">{referralStats.totalInvitedCount}</p>
+                  </div>
+                  <div className="rounded-card border border-border/70 bg-background/30 px-3 py-2">
+                    <p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Users className="size-3.5" />
+                      Активные
+                    </p>
+                    <p className="text-sm font-semibold text-foreground">{referralStats.activeInvitedCount}</p>
+                  </div>
+                </div>
               </div>
+
               <a
-                className="inline-flex items-center gap-2 break-all text-sm text-foreground underline-offset-4 hover:underline"
+                className="inline-flex h-button w-full items-center justify-center gap-2 rounded-card border border-border bg-background/40 px-button-x text-sm text-foreground transition-colors hover:bg-background/60"
                 href="https://t.me/pulsar_space"
                 rel="noreferrer"
                 target="_blank"
               >
                 <Send className="size-4" />
-                Мы в телеграме
+                Мы в Telegram
               </a>
-              <SupportDialog />
+
+              <div className="space-y-2">
+                <AppUserAgreementDialog userAgreementText={userAgreementText} />
+                <SupportDialog />
+              </div>
             </div>
           </AppSurface>
 
@@ -170,95 +178,16 @@ export function AppOverviewSection({
 
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Link2 className="size-4 text-muted-foreground" />
-                  <p className="text-sm font-medium">Ссылка подписки (первый активный слот)</p>
+                  <Smartphone className="size-4 text-muted-foreground" />
+                  <p className="text-sm font-medium">Устройства</p>
                 </div>
-                <AppCopySubscriptionButton subscriptionUrl={activeSubscription?.subscriptionUrl ?? null} />
+                <AppDevicesManagementDialog activeSubscription={activeSubscription} />
               </div>
 
               <AppSetupDialog subscriptionUrl={activeSubscription?.subscriptionUrl ?? null} />
             </div>
           </AppSurface>
         </div>
-
-        <AppSurface className="min-w-0">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Smartphone className="size-4 text-muted-foreground" />
-              <p className="text-sm font-semibold">Устройства</p>
-            </div>
-
-            {activeSubscription ? (
-              <>
-                <div className="space-y-2">
-                  {activeSubscription.deviceSlots.map((slot) => (
-                    <div
-                      className="flex flex-col gap-3 rounded-card border border-border bg-background/50 p-card-compact md:flex-row md:items-center md:justify-between md:p-card-compact-md"
-                      key={slot.id}
-                    >
-                      <div className="space-y-1 text-sm">
-                        <p className="font-medium text-foreground">
-                          {slot.label ?? `Устройство ${slot.slotIndex}`}
-                        </p>
-                        <p className="text-muted-foreground">Статус: {mapSlotStatus(slot.status)}</p>
-                        {slot.lastSyncError ? (
-                          <p className="break-words text-xs text-destructive">
-                            Ошибка синхронизации: {slot.lastSyncError}
-                          </p>
-                        ) : null}
-                      </div>
-
-                      {slot.status === "ACTIVE" ? (
-                        <div className="flex w-full flex-col gap-2 md:w-[380px]">
-                          <AppCopySubscriptionButton subscriptionUrl={slot.configUrl} />
-                          <form action={deactivateDeviceSlotAction}>
-                            <input name="slotId" type="hidden" value={slot.id} />
-                            <Button
-                              className="h-button w-full px-button-x"
-                              radius="card"
-                              type="submit"
-                              variant="outline"
-                            >
-                              Отключить слот
-                            </Button>
-                          </form>
-                        </div>
-                      ) : slot.status === "FREE" ? (
-                        <form action={activateDeviceSlotAction}>
-                          <input name="slotId" type="hidden" value={slot.id} />
-                          <Button className="h-button px-button-x" radius="card" type="submit">
-                            Активировать слот
-                          </Button>
-                        </form>
-                      ) : (
-                        <Button className="h-button px-button-x" disabled radius="card" type="button" variant="outline">
-                          Слот заблокирован
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                {firstFreeSlot ? (
-                  <form action={activateDeviceSlotAction}>
-                    <input name="slotId" type="hidden" value={firstFreeSlot.id} />
-                    <Button className="h-button w-full px-button-x" radius="card" type="submit" variant="outline">
-                      Активировать следующий свободный слот
-                    </Button>
-                  </form>
-                ) : (
-                  <Button className="h-button w-full px-button-x" disabled radius="card" type="button" variant="outline">
-                    Свободных слотов больше нет
-                  </Button>
-                )}
-              </>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Блок устройств станет доступен после активации первой подписки.
-              </p>
-            )}
-          </div>
-        </AppSurface>
       </div>
     </AppSectionShell>
   );

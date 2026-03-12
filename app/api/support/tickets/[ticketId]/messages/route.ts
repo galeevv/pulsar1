@@ -39,7 +39,7 @@ export async function POST(
 
   const parsedBody = createTicketMessageSchema.safeParse(payload)
   if (!parsedBody.success) {
-    return supportBadRequestResponse("Сообщение должно содержать от 10 до 5000 символов.")
+    return supportBadRequestResponse("Сообщение должно содержать от 1 до 2000 символов.")
   }
 
   try {

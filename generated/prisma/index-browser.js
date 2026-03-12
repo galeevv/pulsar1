@@ -266,7 +266,27 @@ exports.Prisma.PaymentRequestScalarFieldEnum = {
   updatedAt: 'updatedAt',
   markedPaidAt: 'markedPaidAt',
   approvedAt: 'approvedAt',
-  rejectedAt: 'rejectedAt'
+  rejectedAt: 'rejectedAt',
+  plategaTransactionId: 'plategaTransactionId',
+  plategaRedirectUrl: 'plategaRedirectUrl',
+  plategaStatus: 'plategaStatus',
+  plategaPayloadJson: 'plategaPayloadJson',
+  plategaConfirmedAt: 'plategaConfirmedAt'
+};
+
+exports.Prisma.PlategaWebhookLogScalarFieldEnum = {
+  id: 'id',
+  dedupKey: 'dedupKey',
+  transactionId: 'transactionId',
+  paymentRequestId: 'paymentRequestId',
+  statusRaw: 'statusRaw',
+  payloadJson: 'payloadJson',
+  headersJson: 'headersJson',
+  processingStatus: 'processingStatus',
+  errorMessage: 'errorMessage',
+  processedAt: 'processedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SubscriptionScalarFieldEnum = {
@@ -354,14 +374,20 @@ exports.Role = exports.$Enums.Role = {
 
 exports.PaymentRequestStatus = exports.$Enums.PaymentRequestStatus = {
   CREATED: 'CREATED',
-  MARKED_PAID: 'MARKED_PAID',
   APPROVED: 'APPROVED',
   REJECTED: 'REJECTED'
 };
 
 exports.PaymentMethod = exports.$Enums.PaymentMethod = {
-  BANK_TRANSFER: 'BANK_TRANSFER',
+  PLATEGA: 'PLATEGA',
   CREDITS: 'CREDITS'
+};
+
+exports.PlategaWebhookLogStatus = exports.$Enums.PlategaWebhookLogStatus = {
+  RECEIVED: 'RECEIVED',
+  PROCESSED: 'PROCESSED',
+  IGNORED: 'IGNORED',
+  ERROR: 'ERROR'
 };
 
 exports.SubscriptionStatus = exports.$Enums.SubscriptionStatus = {
@@ -407,6 +433,7 @@ exports.Prisma.ModelName = {
   SubscriptionDurationRule: 'SubscriptionDurationRule',
   SubscriptionPricingSettings: 'SubscriptionPricingSettings',
   PaymentRequest: 'PaymentRequest',
+  PlategaWebhookLog: 'PlategaWebhookLog',
   Subscription: 'Subscription',
   DeviceSlot: 'DeviceSlot',
   IntegrationSyncLog: 'IntegrationSyncLog',

@@ -1,6 +1,6 @@
 ﻿# Pulsar System Handbook
 
-Last updated: 2026-03-11
+Last updated: 2026-03-12
 
 ## 1) Product Scope (MVP)
 
@@ -62,18 +62,21 @@ Price model (server-side authoritative):
 
 Payment methods:
 
-- bank transfer (`MARKED_PAID` then admin review)
+- Platega (external payment gateway + webhook confirmation)
 - internal credits (immediate `APPROVED`)
 
-Bank transfer flow:
+Platega flow:
 
 1. User configures constructor and clicks final-price CTA.
-2. User sends transfer and clicks `Оплачено`.
-3. System creates `PaymentRequest` in `MARKED_PAID` and immediately issues local subscription.
-4. System attempts 3x-ui provisioning (strict slots: all free slots become active and each slot gets its own x-ui client with `limitIp=2`).
-5. Admin later verifies transfer:
-   - `APPROVED`: confirmation + 3x-ui sync
-   - `REJECTED`: local revoke + 3x-ui revoke attempt
+2. User selects `Platega`, backend creates `PaymentRequest` in `CREATED` and requests payment link from Platega API.
+3. User is redirected to hosted payment page.
+4. Platega webhook calls `/api/payments/platega/webhook`.
+5. On `CONFIRMED`, backend atomically moves request to `APPROVED`, issues local subscription, then syncs 3x-ui side effects.
+6. Repeated webhook notifications are idempotent and do not re-activate the same order.
+7. Required endpoints:
+   - `POST /api/payments/platega/create`
+   - `POST /api/payments/platega/webhook`
+   - `GET /api/payments/platega/status`
 
 Credits flow:
 
@@ -169,9 +172,8 @@ Schema source: `prisma/schema.prisma`.
 
 - Never call 3x-ui from browser/client. Server-side only.
 - Trigger points:
-  - issue/update on user payment action (`MARKED_PAID` and credits `APPROVED`)
-  - sync on admin `APPROVED`
-  - revoke on admin `REJECTED`
+  - issue/update on Platega webhook `CONFIRMED` and credits `APPROVED`
+  - revoke on explicit failed/rejected payment statuses from payment provider
 - Strict model: one x-ui client per `DeviceSlot`, each with `limitIp=2`.
   Device limit is enforced by number of active slots, not by one shared client with `limitIp>1`.
 - Practical note: in x-ui, `limitIp` is enforced per client entry in each inbound. If backup inbound is enabled, one slot is represented in both inbounds, so effective concurrent IP count may increase if user actively uses both nodes at the same time.
@@ -208,6 +210,12 @@ Base:
 - `XUI_TIMEOUT_MS`
 - `XUI_VERIFY_TLS`
 - `XUI_ENABLE_MOCK_FALLBACK`
+
+Platega:
+
+- `PLATEGA_BASE_URL` (default `https://app.platega.io`)
+- `PLATEGA_MERCHANT_ID`
+- `PLATEGA_API_KEY`
 
 Admin bootstrap:
 
@@ -317,6 +325,8 @@ When updating, do both:
 | 2026-03-10 | Added public `/rules` page and admin-managed legal text editor | Keep user agreement centrally managed in control-plane UI without code deploys |
 | 2026-03-10 | Referral discount now applies only when selected duration is exactly 1 month, and is calculated from full post-duration total | Match updated commercial rule for referral scope |
 | 2026-03-11 | Added admin-configurable `MAX_ACTIVE_SUBSCRIPTIONS` limit with checkout blocking for new users and extension exception for active users | Protect service capacity from overload while preserving renewals for current subscribers |
+| 2026-03-12 | Added `PlategaWebhookLog` with dedup key + raw payload/header snapshot and idempotent webhook processing | Provide auditable payment event trail and guarantee one payment activation even on webhook retries |
+| 2026-03-12 | Removed manual admin payment review flow from runtime (`MARKED_PAID`/`BANK_TRANSFER` removed from active model) | Finalize migration to two payment methods only: Platega and credits |
 | 2026-03-09 | Added `docs/dev-ai-agent-context.md` with practical architecture/device-control/API onboarding for AI agents | Reduce onboarding time and prevent regressions in VPN/device-limit logic during autonomous development |
 | 2026-03-06 | Added multi-step Happ setup dialog in Dashboard subscription block | Replace single connect button with clearer onboarding path across platforms |
 | 2026-03-05 | Production admin bootstrap moved to explicit command `npm run admin:bootstrap` | Avoid insecure runtime default credentials |

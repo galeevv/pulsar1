@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 
-import { LifeBuoy } from "lucide-react";
+import { Headset, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -59,7 +59,6 @@ export function SupportDialog() {
 
   const [createSubmitting, setCreateSubmitting] = useState(false);
   const [messageSubmitting, setMessageSubmitting] = useState(false);
-  const [closeSubmitting, setCloseSubmitting] = useState(false);
 
   const dialogDescription = useMemo(() => {
     if (view === "create") {
@@ -70,7 +69,7 @@ export function SupportDialog() {
       return "История обращения и сообщения с поддержкой.";
     }
 
-    return "Ваши тикеты и ответы поддержки.";
+    return "Ваши тикеты.";
   }, [view]);
 
   const loadTickets = useCallback(async () => {
@@ -171,33 +170,11 @@ export function SupportDialog() {
     }
   }
 
-  async function handleCloseTicket() {
-    if (!activeTicketId) {
-      return;
-    }
-
-    setCloseSubmitting(true);
-    try {
-      await requestJson<{ ok: true }>(`/api/support/tickets/${activeTicketId}/close`, {
-        method: "POST",
-      });
-      toast.success("Тикет закрыт.", { position: "bottom-right" });
-      await Promise.all([loadTicketDetail(activeTicketId), loadTickets()]);
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Не удалось закрыть тикет.", {
-        position: "bottom-right",
-      });
-    } finally {
-      setCloseSubmitting(false);
-    }
-  }
-
   function renderContent() {
     if (view === "create") {
       return (
         <SupportTicketCreateForm
           isSubmitting={createSubmitting}
-          onCancel={() => setView("list")}
           onSubmit={handleCreateTicket}
         />
       );
@@ -207,14 +184,12 @@ export function SupportDialog() {
       return (
         <SupportTicketDetail
           key={`${activeTicketId ?? "none"}-${activeTicket?.updatedAt ?? "initial"}`}
-          isClosing={closeSubmitting}
           isLoading={detailLoading}
           isSendingMessage={messageSubmitting}
           onBack={() => {
             setView("list");
             setActiveTicket(null);
           }}
-          onCloseTicket={handleCloseTicket}
           onSendMessage={handleSendMessage}
           ticket={activeTicket}
         />
@@ -224,7 +199,6 @@ export function SupportDialog() {
     return (
       <SupportTicketList
         isLoading={listLoading}
-        onCreateClick={() => setView("create")}
         onOpenTicket={(ticketId) => void handleOpenTicket(ticketId)}
         tickets={tickets}
       />
@@ -235,15 +209,32 @@ export function SupportDialog() {
     <Dialog onOpenChange={handleOpenChange} open={open}>
       <DialogTrigger asChild>
         <Button className="h-button w-full px-button-x" radius="card" type="button" variant="outline">
-          <LifeBuoy className="size-4" />
-          Поддержка
+          <Headset className="size-4" />
+          Свзяться с поддержкой
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-h-[calc(100svh-1.5rem)] overflow-y-auto p-4 sm:max-w-3xl sm:p-6">
+      <DialogContent className="max-h-[calc(100svh-1.5rem)] overflow-x-hidden overflow-y-auto p-4 sm:max-w-3xl sm:p-6">
         <DialogHeader className="text-left">
-          <DialogTitle>Поддержка</DialogTitle>
-          <DialogDescription>{dialogDescription}</DialogDescription>
+          <div className="flex items-start justify-between gap-3">
+            <div className="space-y-1">
+              <DialogTitle>Поддержка</DialogTitle>
+              <DialogDescription>{dialogDescription}</DialogDescription>
+            </div>
+
+            {view === "list" ? (
+              <Button
+                className="h-button shrink-0 px-button-x"
+                onClick={() => setView("create")}
+                radius="card"
+                type="button"
+                variant="outline"
+              >
+                <Plus className="size-4" />
+                Создать тикет
+              </Button>
+            ) : null}
+          </div>
         </DialogHeader>
         {renderContent()}
       </DialogContent>

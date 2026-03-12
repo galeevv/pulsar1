@@ -1,7 +1,4 @@
-﻿import { approvePaymentRequestAction, rejectPaymentRequestAction } from "@/app/admin/payment-actions";
-import { Button } from "@/components/ui/button";
-
-import { AdminSectionShell } from "./admin-section-shell";
+﻿import { AdminSectionShell } from "./admin-section-shell";
 import { AdminStatusPill } from "./admin-status-pill";
 import { AdminSurface } from "./admin-surface";
 
@@ -10,9 +7,9 @@ type PaymentRequestItem = {
   createdAt: Date;
   devices: number;
   id: string;
-  method: "BANK_TRANSFER" | "CREDITS";
+  method: "CREDITS" | "PLATEGA";
   months: number;
-  status: "APPROVED" | "CREATED" | "MARKED_PAID" | "REJECTED";
+  status: "APPROVED" | "CREATED" | "REJECTED";
   tariffName: string;
   user: {
     username: string;
@@ -20,33 +17,25 @@ type PaymentRequestItem = {
 };
 
 function getStatusMeta(status: PaymentRequestItem["status"]) {
-  if (status === "MARKED_PAID") {
+  if (status === "CREATED") {
     return {
-      label: "Оплачено",
-      note: "Подписка уже выдана автоматически. Проверьте перевод и подтвердите или отклоните.",
-      tone: "warning" as const,
+      label: "Ожидает оплаты",
+      note: "Платеж создан, ожидается подтверждение от провайдера оплаты.",
+      tone: "default" as const,
     };
   }
 
   if (status === "APPROVED") {
     return {
       label: "Подтвержден",
-      note: "Платеж подтвержден администратором.",
+      note: "Платеж подтвержден системой.",
       tone: "success" as const,
     };
   }
 
-  if (status === "REJECTED") {
-    return {
-      label: "Отклонен",
-      note: "Оплата не подтверждена. Подписка отозвана.",
-      tone: "default" as const,
-    };
-  }
-
   return {
-    label: "Создан",
-    note: "Заявка создана и ждет кнопку «Оплачено» от пользователя.",
+    label: "Отклонен",
+    note: "Оплата не подтверждена. Подписка не активирована или отозвана.",
     tone: "default" as const,
   };
 }
@@ -58,7 +47,7 @@ export function AdminPaymentsSection({
 }) {
   return (
     <AdminSectionShell
-      description="Очередь ручной проверки переводов. После «Оплачено» у пользователя доступ активируется сразу, а админ подтверждает факт оплаты или отзывает доступ."
+      description="История платежей по методам Platega и кредиты."
       eyebrow="PAYMENTS"
       id="payments"
       title="Платежи"
@@ -67,8 +56,6 @@ export function AdminPaymentsSection({
         <div className="space-y-4">
           {paymentRequests.map((item) => {
             const meta = getStatusMeta(item.status);
-            const isFinal = item.status === "APPROVED" || item.status === "REJECTED";
-            const canReview = item.status === "MARKED_PAID";
 
             return (
               <AdminSurface key={item.id}>
@@ -78,7 +65,7 @@ export function AdminPaymentsSection({
                       <p className="text-sm font-semibold">{item.user.username}</p>
                       <p className="text-sm text-muted-foreground">
                         {item.tariffName} • {item.months} мес. • {item.devices} устройств •{" "}
-                        {item.method === "CREDITS" ? "credits" : "bank transfer"}
+                        {item.method === "CREDITS" ? "credits" : "platega"}
                       </p>
                     </div>
                     <div className="flex flex-col items-start gap-2 md:items-end">
@@ -88,33 +75,6 @@ export function AdminPaymentsSection({
                   </div>
 
                   <p className="text-sm text-muted-foreground">{meta.note}</p>
-
-                  <div className="flex flex-col gap-3 sm:flex-row">
-                    <form action={approvePaymentRequestAction}>
-                      <input name="id" type="hidden" value={item.id} />
-                      <Button
-                        className="h-button px-button-x"
-                        disabled={isFinal || !canReview}
-                        radius="card"
-                        type="submit"
-                      >
-                        Подтвердить
-                      </Button>
-                    </form>
-
-                    <form action={rejectPaymentRequestAction}>
-                      <input name="id" type="hidden" value={item.id} />
-                      <Button
-                        className="h-button px-button-x"
-                        disabled={isFinal || !canReview}
-                        radius="card"
-                        type="submit"
-                        variant="outline"
-                      >
-                        Отклонить
-                      </Button>
-                    </form>
-                  </div>
                 </div>
               </AdminSurface>
             );

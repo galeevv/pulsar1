@@ -14,7 +14,6 @@ enum Role {
 
 enum PaymentRequestStatus {
   CREATED
-  MARKED_PAID
   APPROVED
   REJECTED
 }
@@ -48,8 +47,15 @@ enum IntegrationSyncStatus {
 }
 
 enum PaymentMethod {
-  BANK_TRANSFER
+  PLATEGA
   CREDITS
+}
+
+enum PlategaWebhookLogStatus {
+  RECEIVED
+  PROCESSED
+  IGNORED
+  ERROR
 }
 
 model User {
@@ -237,7 +243,7 @@ model PaymentRequest {
   deviceLimit                         Int
   amountRub                           Int
   status                              PaymentRequestStatus @default(CREATED)
-  method                              PaymentMethod        @default(BANK_TRANSFER)
+  method                              PaymentMethod        @default(PLATEGA)
   months                              Int                  @default(1)
   devices                             Int                  @default(1)
   currency                            String               @default("RUB")
@@ -252,13 +258,39 @@ model PaymentRequest {
   markedPaidAt                        DateTime?
   approvedAt                          DateTime?
   rejectedAt                          DateTime?
+  plategaTransactionId                String?              @unique
+  plategaRedirectUrl                  String?
+  plategaStatus                       String?
+  plategaPayloadJson                  String?
+  plategaConfirmedAt                  DateTime?
   user                                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   subscription                        Subscription?
+  plategaWebhookLogs                  PlategaWebhookLog[]
 
   @@index([userId])
   @@index([status])
   @@index([method])
   @@index([createdAt])
+}
+
+model PlategaWebhookLog {
+  id               String                  @id @default(cuid())
+  dedupKey         String                  @unique
+  transactionId    String
+  paymentRequestId String?
+  statusRaw        String
+  payloadJson      String
+  headersJson      String?
+  processingStatus PlategaWebhookLogStatus @default(RECEIVED)
+  errorMessage     String?
+  processedAt      DateTime?
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+  paymentRequest   PaymentRequest?         @relation(fields: [paymentRequestId], references: [id], onDelete: SetNull)
+
+  @@index([transactionId, createdAt])
+  @@index([paymentRequestId])
+  @@index([processingStatus, createdAt])
 }
 
 model Subscription {

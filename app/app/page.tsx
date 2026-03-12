@@ -7,6 +7,7 @@ import { AppOverviewSection } from "@/components/app/app-overview-section";
 import { AppTariffsSection } from "@/components/app/app-tariffs-section";
 import { getAppBenefitsData } from "@/lib/app-benefits";
 import { getCurrentSession } from "@/lib/auth";
+import { getUserAgreementText } from "@/lib/legal-documents";
 import { getServiceCapacityState } from "@/lib/service-capacity";
 import { getAppSubscriptionConstructorData } from "@/lib/subscription-constructor";
 import { getAppSubscriptionData } from "@/lib/subscription-management";
@@ -51,11 +52,22 @@ export default async function AppPage({
   const resolvedSearchParams = await searchParams;
   const error = getValue(resolvedSearchParams, "error");
   const notice = getValue(resolvedSearchParams, "notice");
-  const [benefitsData, subscriptionData, constructorData, serviceCapacityState] = await Promise.all([
+  const plategaPaymentRequestId = getValue(
+    resolvedSearchParams,
+    "plategaPaymentRequestId"
+  );
+  const [
+    benefitsData,
+    subscriptionData,
+    constructorData,
+    serviceCapacityState,
+    userAgreementText,
+  ] = await Promise.all([
     getAppBenefitsData(session.username),
     getAppSubscriptionData(session.username),
     getAppSubscriptionConstructorData(),
     getServiceCapacityState(),
+    getUserAgreementText(),
   ]);
 
   if (!benefitsData || !subscriptionData) {
@@ -95,12 +107,14 @@ export default async function AppPage({
           isCapacityBlockedForNewSubscriptions={isCapacityBlockedForNewSubscriptions}
           maxActiveSubscriptions={serviceCapacityState.maxActiveSubscriptions}
           pricingSettings={constructorData.pricingSettings}
+          plategaPaymentRequestId={plategaPaymentRequestId ?? null}
           currentActiveSubscriptionsCount={serviceCapacityState.activeSubscriptionsCount}
         />
         <AppOverviewSection
           activeSubscription={subscriptionData.activeSubscription}
           credits={benefitsData.user.credits}
           referralStats={benefitsData.referralStats}
+          userAgreementText={userAgreementText}
           username={benefitsData.user.username}
         />
         <AppBenefitsSection
