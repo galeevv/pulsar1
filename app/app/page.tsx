@@ -1,10 +1,8 @@
 import { redirect } from "next/navigation";
 
 import { AppFeedbackToast } from "@/app/app/app-feedback-toast";
-import { AppBenefitsSection } from "@/components/app/app-benefits-section";
 import { AppDashboardPrototypeSection } from "@/components/app/app-dashboard-prototype-section";
 import { AppHeader } from "@/components/app/app-header";
-import { AppOverviewSection } from "@/components/app/app-overview-section";
 import { AppTariffsSection } from "@/components/app/app-tariffs-section";
 import { getAppBenefitsData } from "@/lib/app-benefits";
 import { getCurrentSession } from "@/lib/auth";
@@ -111,13 +109,6 @@ export default async function AppPage({
           plategaPaymentRequestId={plategaPaymentRequestId ?? null}
           currentActiveSubscriptionsCount={serviceCapacityState.activeSubscriptionsCount}
         />
-        <AppOverviewSection
-          activeSubscription={subscriptionData.activeSubscription}
-          credits={benefitsData.user.credits}
-          referralStats={benefitsData.referralStats}
-          userAgreementText={userAgreementText}
-          username={benefitsData.user.username}
-        />
         <AppDashboardPrototypeSection
           activeSubscription={subscriptionData.activeSubscription}
           canGenerateReferralCode={benefitsData.canGenerateReferralCode}
@@ -128,13 +119,6 @@ export default async function AppPage({
           referralProgramSettings={benefitsData.referralProgramSettings}
           userAgreementText={userAgreementText}
           username={benefitsData.user.username}
-        />
-        <AppBenefitsSection
-          canGenerateReferralCode={benefitsData.canGenerateReferralCode}
-          hasApprovedPayment={benefitsData.hasApprovedPayment}
-          ownReferralCode={benefitsData.ownReferralCode}
-          promoCodeRedemptions={benefitsData.promoCodeRedemptions}
-          referralProgramSettings={benefitsData.referralProgramSettings}
         />
       </div>
     </main>

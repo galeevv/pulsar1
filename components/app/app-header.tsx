@@ -95,21 +95,9 @@ export function AppHeader() {
               </DropdownMenu>
             </div>
 
-            <nav className="hidden lg:block lg:justify-self-center">
-              <div className="flex items-center gap-2 px-1">
-                {headerLinks.map((item) => (
-                  <Link
-                    key={item.href}
-                    className="inline-flex h-10 items-center rounded-card border border-transparent px-4 text-sm text-muted-foreground transition-colors hover:border-border hover:text-foreground"
-                    href={item.href}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            </nav>
+            <div aria-hidden className="hidden lg:block lg:justify-self-center" />
 
-            <form action={logoutAction} className="hidden lg:block lg:justify-self-end">
+            <form action={logoutAction} className="hidden lg:block lg:col-start-3 lg:justify-self-end">
               <Button className="h-10 px-button-x" radius="card" type="submit" variant="outline">
                 Выйти
               </Button>

@@ -85,6 +85,36 @@ function formatDate(date: Date) {
   return date.toLocaleDateString("ru-RU");
 }
 
+function getMonthsLabel(months: number) {
+  if (months === 1) {
+    return "1 месяц";
+  }
+
+  if (months >= 2 && months <= 4) {
+    return `${months} месяца`;
+  }
+
+  return `${months} месяцев`;
+}
+
+function formatTariffLabel(value: string) {
+  if (!/constructor/i.test(value)) {
+    return value;
+  }
+
+  const monthsMatch = value.match(/(\d+)\s*(?:m|ме(?:с|сяц(?:а|ев)?)?)\b/i);
+  if (!monthsMatch) {
+    return value;
+  }
+
+  const months = Number.parseInt(monthsMatch[1] ?? "", 10);
+  if (!Number.isFinite(months) || months <= 0) {
+    return value;
+  }
+
+  return getMonthsLabel(months);
+}
+
 function mapSubscriptionStatus(status: SubscriptionStatus) {
   if (status === "ACTIVE") {
     return { label: "Активна", tone: "success" as const };
@@ -111,6 +141,7 @@ function PromoCodesDialog({
           type="button"
           variant="outline"
         >
+          <Gift className="size-4" />
           Открыть промокоды
         </Button>
       </DialogTrigger>
@@ -191,6 +222,7 @@ function ReferralSystemDialog({
           type="button"
           variant="outline"
         >
+          <UsersRound className="size-4" />
           Открыть рефералку
         </Button>
       </DialogTrigger>
@@ -299,7 +331,9 @@ export function AppDashboardPrototypeSection({
   const devicesCount = activeSubscription
     ? Math.max(activeSubscription.devices, activeSubscription.deviceLimit)
     : 0;
-  const tariffLabel = activeSubscription ? activeSubscription.tariffName : "Нет подписки";
+  const tariffLabel = activeSubscription
+    ? formatTariffLabel(activeSubscription.tariffName)
+    : "Нет подписки";
   const subscriptionStatusLabel =
     activeSubscription && subscriptionStatus.tone === "success" && subscriptionEnd
       ? `Активна до ${formatDate(subscriptionEnd)}`
@@ -307,12 +341,13 @@ export function AppDashboardPrototypeSection({
 
   return (
     <AppSectionShell
-      description="Единая секция управления аккаунтом: статус подписки, устройства, настройка, поддержка, соглашение и бонусная механика."
+      description="Подписка, устройства, поддержка и бонусы."
       eyebrow="DASHBOARD"
-      id="dashboard-prototype"
-      title="Центр управления аккаунтом"
+      id="dashboard"
+      title="Управление"
     >
       <div className="space-y-4">
+        <div className="scroll-mt-24" id="benefits" />
         <AppSurface className="min-w-0">
           <div className="space-y-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -354,7 +389,7 @@ export function AppDashboardPrototypeSection({
               </div>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-2 md:grid-cols-2">
               
               <AppSetupDialog subscriptionUrl={activeSubscription?.subscriptionUrl ?? null} />
               <AppDevicesManagementDialog activeSubscription={activeSubscription} />
