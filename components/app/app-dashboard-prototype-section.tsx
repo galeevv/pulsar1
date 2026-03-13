@@ -1,6 +1,6 @@
-import {
+﻿import {
   BadgeCheck,
-  FileText,
+  File,
   Gift,
   Handshake,
   Headset,
@@ -26,6 +26,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import type { LegalDocuments } from "@/lib/legal-documents";
 import { cn } from "@/lib/utils";
 
 import { AppDevicesManagementDialog } from "./app-devices-management-dialog";
@@ -128,12 +129,14 @@ function mapSubscriptionStatus(status: SubscriptionStatus) {
 }
 
 function PromoCodesDialog({
+  defaultOpen,
   promoCodeRedemptions,
 }: {
+  defaultOpen: boolean;
   promoCodeRedemptions: PromoRedemption[];
 }) {
   return (
-    <Dialog>
+    <Dialog defaultOpen={defaultOpen}>
       <DialogTrigger asChild>
         <Button
           className="h-button w-full px-button-x"
@@ -198,11 +201,13 @@ function PromoCodesDialog({
 
 function ReferralSystemDialog({
   canGenerateReferralCode,
+  defaultOpen,
   hasApprovedPayment,
   ownReferralCode,
   referralProgramSettings,
 }: {
   canGenerateReferralCode: boolean;
+  defaultOpen: boolean;
   hasApprovedPayment: boolean;
   ownReferralCode: OwnReferralCode;
   referralProgramSettings: ReferralProgramSettings;
@@ -214,7 +219,7 @@ function ReferralSystemDialog({
     !ownReferralCode;
 
   return (
-    <Dialog>
+    <Dialog defaultOpen={defaultOpen}>
       <DialogTrigger asChild>
         <Button
           className="h-button w-full px-button-x"
@@ -305,21 +310,23 @@ export function AppDashboardPrototypeSection({
   activeSubscription,
   canGenerateReferralCode,
   credits,
+  defaultDialog,
   hasApprovedPayment,
+  legalDocuments,
   ownReferralCode,
   promoCodeRedemptions,
   referralProgramSettings,
-  userAgreementText,
   username,
 }: {
   activeSubscription: ActiveSubscriptionItem;
   canGenerateReferralCode: boolean;
   credits: number;
+  defaultDialog: "promo" | "referral" | null;
   hasApprovedPayment: boolean;
+  legalDocuments: LegalDocuments;
   ownReferralCode: OwnReferralCode;
   promoCodeRedemptions: PromoRedemption[];
   referralProgramSettings: ReferralProgramSettings;
-  userAgreementText: string;
   username: string;
 }) {
   const subscriptionStatus = activeSubscription
@@ -338,6 +345,8 @@ export function AppDashboardPrototypeSection({
     activeSubscription && subscriptionStatus.tone === "success" && subscriptionEnd
       ? `Активна до ${formatDate(subscriptionEnd)}`
       : subscriptionStatus.label;
+  const isPromoDialogOpenByDefault = defaultDialog === "promo";
+  const isReferralDialogOpenByDefault = defaultDialog === "referral";
 
   return (
     <AppSectionShell
@@ -360,32 +369,32 @@ export function AppDashboardPrototypeSection({
 
             <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-4">
               <div className="rounded-card border border-border/70 bg-background/40 px-3 py-2">
-                <p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                <p className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
                   <TicketPercent className="size-3.5" />
                   Тариф
                 </p>
-                <p className="mt-1 text-sm font-semibold text-foreground">{tariffLabel}</p>
+                <p className="mt-0 text-base font-semibold text-foreground">{tariffLabel}</p>
               </div>
               <div className="rounded-card border border-border/70 bg-background/40 px-3 py-2">
-                <p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                <p className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
                   <Smartphone className="size-3.5" />
                   Устройства
                 </p>
-                <p className="mt-1 text-sm font-semibold text-foreground">{devicesCount || "—"}</p>
+                <p className="mt-0 text-base font-semibold text-foreground">{devicesCount || "—"}</p>
               </div>
               <div className="rounded-card border border-border/70 bg-background/40 px-3 py-2">
-                <p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                <p className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
                   <UserRound className="size-3.5" />
                   Username
                 </p>
-                <p className="mt-1 text-sm font-semibold text-foreground">{username}</p>
+                <p className="mt-0 text-base font-semibold text-foreground">{username}</p>
               </div>
               <div className="rounded-card border border-border/70 bg-background/40 px-3 py-2">
-                <p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                <p className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
                   <Wallet className="size-3.5" />
                   Баланс
                 </p>
-                <p className="mt-1 text-sm font-semibold text-foreground">{credits} кредитов</p>
+                <p className="mt-0 text-base font-semibold text-foreground">{credits} кредитов</p>
               </div>
             </div>
 
@@ -398,22 +407,25 @@ export function AppDashboardPrototypeSection({
         </AppSurface>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <AppSurface className="min-w-0">
+          <div className="scroll-mt-24 md:scroll-mt-28" id="legal">
+            <AppSurface className="min-w-0">
             <div className="space-y-4">
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-card border border-border bg-background/60">
-                <FileText className="size-5 text-foreground" />
+                <File className="size-5 text-foreground" />
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-semibold text-foreground">Пользовательское соглашение</p>
+                <p className="text-sm font-semibold text-foreground">Юридическая информация</p>
                 <p className="text-sm text-muted-foreground">
-                  Ключевые условия использования сервиса и зона ответственности сторон.
+                  Ключевые документы, условия использования и базовые ограничения сервиса.
                 </p>
               </div>
-              <AppUserAgreementDialog userAgreementText={userAgreementText} />
+              <AppUserAgreementDialog legalDocuments={legalDocuments} />
             </div>
-          </AppSurface>
+            </AppSurface>
+          </div>
 
-          <AppSurface className="min-w-0">
+          <div className="scroll-mt-24 md:scroll-mt-28" id="support">
+            <AppSurface className="min-w-0">
             <div className="space-y-4">
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-card border border-border bg-background/60">
                 <Headset className="size-5 text-foreground" />
@@ -426,7 +438,8 @@ export function AppDashboardPrototypeSection({
               </div>
               <SupportDialog />
             </div>
-          </AppSurface>
+            </AppSurface>
+          </div>
 
           <AppSurface className="min-w-0">
             <div className="space-y-4">
@@ -439,7 +452,10 @@ export function AppDashboardPrototypeSection({
                   Применение промокода и история последних начислений на баланс.
                 </p>
               </div>
-              <PromoCodesDialog promoCodeRedemptions={promoCodeRedemptions} />
+              <PromoCodesDialog
+                defaultOpen={isPromoDialogOpenByDefault}
+                promoCodeRedemptions={promoCodeRedemptions}
+              />
             </div>
           </AppSurface>
 
@@ -456,6 +472,7 @@ export function AppDashboardPrototypeSection({
               </div>
               <ReferralSystemDialog
                 canGenerateReferralCode={canGenerateReferralCode}
+                defaultOpen={isReferralDialogOpenByDefault}
                 hasApprovedPayment={hasApprovedPayment}
                 ownReferralCode={ownReferralCode}
                 referralProgramSettings={referralProgramSettings}

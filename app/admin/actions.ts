@@ -10,7 +10,7 @@ import {
   isCodeTakenAcrossSystem,
 } from "@/lib/admin-code-management";
 import { getCurrentSession, normalizeCode } from "@/lib/auth";
-import { saveUserAgreementText } from "@/lib/legal-documents";
+import { saveLegalDocuments } from "@/lib/legal-documents";
 import { prisma } from "@/lib/prisma";
 
 function buildRedirectUrl(params: {
@@ -721,33 +721,65 @@ export async function updateServiceCapacitySettingsAction(formData: FormData) {
   );
 }
 
-export async function updateUserAgreementAction(formData: FormData) {
+export async function updateLegalDocumentsAction(formData: FormData) {
   await getAdminActor();
 
-  const rawText = String(formData.get("userAgreementText") ?? "");
-  const normalizedText = rawText.trim();
+  const userAgreementText = String(formData.get("userAgreementText") ?? "").trim();
+  const publicOfferText = String(formData.get("publicOfferText") ?? "").trim();
+  const privacyPolicyText = String(formData.get("privacyPolicyText") ?? "").trim();
 
-  if (!normalizedText) {
+  if (!userAgreementText) {
     redirect(
       buildRedirectUrl({
         anchor: "#rules",
-        error: "Текст пользовательского соглашения не может быть пустым.",
+        error: "Текст «Пользовательское соглашение» не может быть пустым.",
       })
     );
   }
 
-  if (normalizedText.length > 40000) {
+  if (!publicOfferText) {
     redirect(
       buildRedirectUrl({
         anchor: "#rules",
-        error: "Текст пользовательского соглашения слишком длинный.",
+        error: "Текст «Публичная оферта» не может быть пустым.",
       })
     );
   }
 
-  await saveUserAgreementText(normalizedText);
+  if (!privacyPolicyText) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#rules",
+        error: "Текст «Политика конфиденциальности» не может быть пустым.",
+      })
+    );
+  }
+
+  if (
+    userAgreementText.length > 40000 ||
+    publicOfferText.length > 40000 ||
+    privacyPolicyText.length > 40000
+  ) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "#rules",
+        error: "Один из юридических документов слишком длинный.",
+      })
+    );
+  }
+
+  await saveLegalDocuments({
+    privacyPolicyText,
+    publicOfferText,
+    userAgreementText,
+  });
 
   revalidatePath("/admin");
   revalidatePath("/rules");
-  redirect(buildRedirectUrl({ anchor: "#rules", notice: "Пользовательское соглашение обновлено." }));
+  revalidatePath("/app");
+  redirect(buildRedirectUrl({ anchor: "#rules", notice: "Юридическая информация обновлена." }));
+}
+
+export async function updateUserAgreementAction(formData: FormData) {
+  return updateLegalDocumentsAction(formData);
 }

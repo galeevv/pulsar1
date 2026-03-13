@@ -189,6 +189,8 @@ exports.Prisma.ReferralProgramSettingsScalarFieldEnum = {
 exports.Prisma.LegalDocumentSettingsScalarFieldEnum = {
   id: 'id',
   userAgreementText: 'userAgreementText',
+  publicOfferText: 'publicOfferText',
+  privacyPolicyText: 'privacyPolicyText',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

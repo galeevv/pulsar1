@@ -10909,6 +10909,8 @@ export namespace Prisma {
   export type LegalDocumentSettingsMinAggregateOutputType = {
     id: number | null
     userAgreementText: string | null
+    publicOfferText: string | null
+    privacyPolicyText: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -10916,6 +10918,8 @@ export namespace Prisma {
   export type LegalDocumentSettingsMaxAggregateOutputType = {
     id: number | null
     userAgreementText: string | null
+    publicOfferText: string | null
+    privacyPolicyText: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -10923,6 +10927,8 @@ export namespace Prisma {
   export type LegalDocumentSettingsCountAggregateOutputType = {
     id: number
     userAgreementText: number
+    publicOfferText: number
+    privacyPolicyText: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -10940,6 +10946,8 @@ export namespace Prisma {
   export type LegalDocumentSettingsMinAggregateInputType = {
     id?: true
     userAgreementText?: true
+    publicOfferText?: true
+    privacyPolicyText?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -10947,6 +10955,8 @@ export namespace Prisma {
   export type LegalDocumentSettingsMaxAggregateInputType = {
     id?: true
     userAgreementText?: true
+    publicOfferText?: true
+    privacyPolicyText?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -10954,6 +10964,8 @@ export namespace Prisma {
   export type LegalDocumentSettingsCountAggregateInputType = {
     id?: true
     userAgreementText?: true
+    publicOfferText?: true
+    privacyPolicyText?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -11048,6 +11060,8 @@ export namespace Prisma {
   export type LegalDocumentSettingsGroupByOutputType = {
     id: number
     userAgreementText: string
+    publicOfferText: string
+    privacyPolicyText: string
     createdAt: Date
     updatedAt: Date
     _count: LegalDocumentSettingsCountAggregateOutputType | null
@@ -11074,6 +11088,8 @@ export namespace Prisma {
   export type LegalDocumentSettingsSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userAgreementText?: boolean
+    publicOfferText?: boolean
+    privacyPolicyText?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["legalDocumentSettings"]>
@@ -11081,6 +11097,8 @@ export namespace Prisma {
   export type LegalDocumentSettingsSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userAgreementText?: boolean
+    publicOfferText?: boolean
+    privacyPolicyText?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["legalDocumentSettings"]>
@@ -11088,6 +11106,8 @@ export namespace Prisma {
   export type LegalDocumentSettingsSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userAgreementText?: boolean
+    publicOfferText?: boolean
+    privacyPolicyText?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["legalDocumentSettings"]>
@@ -11095,11 +11115,13 @@ export namespace Prisma {
   export type LegalDocumentSettingsSelectScalar = {
     id?: boolean
     userAgreementText?: boolean
+    publicOfferText?: boolean
+    privacyPolicyText?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type LegalDocumentSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userAgreementText" | "createdAt" | "updatedAt", ExtArgs["result"]["legalDocumentSettings"]>
+  export type LegalDocumentSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userAgreementText" | "publicOfferText" | "privacyPolicyText" | "createdAt" | "updatedAt", ExtArgs["result"]["legalDocumentSettings"]>
 
   export type $LegalDocumentSettingsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "LegalDocumentSettings"
@@ -11107,6 +11129,8 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: number
       userAgreementText: string
+      publicOfferText: string
+      privacyPolicyText: string
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["legalDocumentSettings"]>
@@ -11534,6 +11558,8 @@ export namespace Prisma {
   interface LegalDocumentSettingsFieldRefs {
     readonly id: FieldRef<"LegalDocumentSettings", 'Int'>
     readonly userAgreementText: FieldRef<"LegalDocumentSettings", 'String'>
+    readonly publicOfferText: FieldRef<"LegalDocumentSettings", 'String'>
+    readonly privacyPolicyText: FieldRef<"LegalDocumentSettings", 'String'>
     readonly createdAt: FieldRef<"LegalDocumentSettings", 'DateTime'>
     readonly updatedAt: FieldRef<"LegalDocumentSettings", 'DateTime'>
   }
@@ -24939,6 +24965,8 @@ export namespace Prisma {
   export const LegalDocumentSettingsScalarFieldEnum: {
     id: 'id',
     userAgreementText: 'userAgreementText',
+    publicOfferText: 'publicOfferText',
+    privacyPolicyText: 'privacyPolicyText',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -25763,6 +25791,8 @@ export namespace Prisma {
     NOT?: LegalDocumentSettingsWhereInput | LegalDocumentSettingsWhereInput[]
     id?: IntFilter<"LegalDocumentSettings"> | number
     userAgreementText?: StringFilter<"LegalDocumentSettings"> | string
+    publicOfferText?: StringFilter<"LegalDocumentSettings"> | string
+    privacyPolicyText?: StringFilter<"LegalDocumentSettings"> | string
     createdAt?: DateTimeFilter<"LegalDocumentSettings"> | Date | string
     updatedAt?: DateTimeFilter<"LegalDocumentSettings"> | Date | string
   }
@@ -25770,6 +25800,8 @@ export namespace Prisma {
   export type LegalDocumentSettingsOrderByWithRelationInput = {
     id?: SortOrder
     userAgreementText?: SortOrder
+    publicOfferText?: SortOrder
+    privacyPolicyText?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -25780,6 +25812,8 @@ export namespace Prisma {
     OR?: LegalDocumentSettingsWhereInput[]
     NOT?: LegalDocumentSettingsWhereInput | LegalDocumentSettingsWhereInput[]
     userAgreementText?: StringFilter<"LegalDocumentSettings"> | string
+    publicOfferText?: StringFilter<"LegalDocumentSettings"> | string
+    privacyPolicyText?: StringFilter<"LegalDocumentSettings"> | string
     createdAt?: DateTimeFilter<"LegalDocumentSettings"> | Date | string
     updatedAt?: DateTimeFilter<"LegalDocumentSettings"> | Date | string
   }, "id">
@@ -25787,6 +25821,8 @@ export namespace Prisma {
   export type LegalDocumentSettingsOrderByWithAggregationInput = {
     id?: SortOrder
     userAgreementText?: SortOrder
+    publicOfferText?: SortOrder
+    privacyPolicyText?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: LegalDocumentSettingsCountOrderByAggregateInput
@@ -25802,6 +25838,8 @@ export namespace Prisma {
     NOT?: LegalDocumentSettingsScalarWhereWithAggregatesInput | LegalDocumentSettingsScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"LegalDocumentSettings"> | number
     userAgreementText?: StringWithAggregatesFilter<"LegalDocumentSettings"> | string
+    publicOfferText?: StringWithAggregatesFilter<"LegalDocumentSettings"> | string
+    privacyPolicyText?: StringWithAggregatesFilter<"LegalDocumentSettings"> | string
     createdAt?: DateTimeWithAggregatesFilter<"LegalDocumentSettings"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"LegalDocumentSettings"> | Date | string
   }
@@ -27343,6 +27381,8 @@ export namespace Prisma {
   export type LegalDocumentSettingsCreateInput = {
     id?: number
     userAgreementText?: string
+    publicOfferText?: string
+    privacyPolicyText?: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -27350,6 +27390,8 @@ export namespace Prisma {
   export type LegalDocumentSettingsUncheckedCreateInput = {
     id?: number
     userAgreementText?: string
+    publicOfferText?: string
+    privacyPolicyText?: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -27357,6 +27399,8 @@ export namespace Prisma {
   export type LegalDocumentSettingsUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     userAgreementText?: StringFieldUpdateOperationsInput | string
+    publicOfferText?: StringFieldUpdateOperationsInput | string
+    privacyPolicyText?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -27364,6 +27408,8 @@ export namespace Prisma {
   export type LegalDocumentSettingsUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     userAgreementText?: StringFieldUpdateOperationsInput | string
+    publicOfferText?: StringFieldUpdateOperationsInput | string
+    privacyPolicyText?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -27371,6 +27417,8 @@ export namespace Prisma {
   export type LegalDocumentSettingsCreateManyInput = {
     id?: number
     userAgreementText?: string
+    publicOfferText?: string
+    privacyPolicyText?: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -27378,6 +27426,8 @@ export namespace Prisma {
   export type LegalDocumentSettingsUpdateManyMutationInput = {
     id?: IntFieldUpdateOperationsInput | number
     userAgreementText?: StringFieldUpdateOperationsInput | string
+    publicOfferText?: StringFieldUpdateOperationsInput | string
+    privacyPolicyText?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -27385,6 +27435,8 @@ export namespace Prisma {
   export type LegalDocumentSettingsUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
     userAgreementText?: StringFieldUpdateOperationsInput | string
+    publicOfferText?: StringFieldUpdateOperationsInput | string
+    privacyPolicyText?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -29099,6 +29151,8 @@ export namespace Prisma {
   export type LegalDocumentSettingsCountOrderByAggregateInput = {
     id?: SortOrder
     userAgreementText?: SortOrder
+    publicOfferText?: SortOrder
+    privacyPolicyText?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -29110,6 +29164,8 @@ export namespace Prisma {
   export type LegalDocumentSettingsMaxOrderByAggregateInput = {
     id?: SortOrder
     userAgreementText?: SortOrder
+    publicOfferText?: SortOrder
+    privacyPolicyText?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -29117,6 +29173,8 @@ export namespace Prisma {
   export type LegalDocumentSettingsMinOrderByAggregateInput = {
     id?: SortOrder
     userAgreementText?: SortOrder
+    publicOfferText?: SortOrder
+    privacyPolicyText?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }

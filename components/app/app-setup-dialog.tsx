@@ -101,12 +101,16 @@ function StepIcon({ children }: { children: React.ReactNode }) {
 }
 
 export function AppSetupDialog({
+  defaultOpen = false,
+  showTrigger = true,
   subscriptionUrl,
 }: {
+  defaultOpen?: boolean;
+  showTrigger?: boolean;
   subscriptionUrl: string | null;
 }) {
   const currentPlatform = useMemo(() => detectCurrentPlatform(), []);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   const [step, setStep] = useState<SetupStep>("start");
   const [selectedPlatform, setSelectedPlatform] = useState<DevicePlatform>(currentPlatform);
   const [installReturnStep, setInstallReturnStep] = useState<InstallReturnStep>("start");
@@ -162,29 +166,25 @@ export function AppSetupDialog({
 
   return (
     <Dialog onOpenChange={handleOpenChange} open={open}>
-      <DialogTrigger asChild>
-        <Button 
-          className="h-button w-full px-button-x"
-          disabled={!subscriptionUrl}
-          radius="card"
-          type="button"
-        >
-          <Settings2 className="size-4" />
-          Установка и настройка
-        </Button>
-      </DialogTrigger>
+      {showTrigger ? (
+        <DialogTrigger asChild>
+          <Button
+            className="h-button w-full px-button-x"
+            disabled={!subscriptionUrl}
+            radius="card"
+            type="button"
+          >
+            <Settings2 className="size-4" />
+            Установка и настройка
+          </Button>
+        </DialogTrigger>
+      ) : null}
 
       <DialogContent className="max-h-[calc(100svh-1rem)] overflow-y-auto p-4 sm:max-w-lg sm:p-6">
         <div className="space-y-4 text-center sm:space-y-5">
           {showBackButton ? (
             <div className="flex justify-start">
-              <Button
-                onClick={handleBack}
-                radius="card"
-                size="icon-sm"
-                type="button"
-                variant="ghost"
-              >
+              <Button onClick={handleBack} radius="card" size="icon-sm" type="button" variant="ghost">
                 <ArrowLeft className="size-4" />
                 <span className="sr-only">Вернуться на предыдущий этап</span>
               </Button>
@@ -204,7 +204,7 @@ export function AppSetupDialog({
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="flex w-full flex-col gap-3">           
+              <div className="flex w-full flex-col gap-3">
                 <Button
                   className="h-button w-full px-button-x"
                   onClick={() => {
@@ -217,7 +217,13 @@ export function AppSetupDialog({
                 >
                   Настроить на этом устройстве
                 </Button>
-                <Button className="h-button w-full px-button-x" onClick={() => setStep("choose-device")} radius="card" type="button" variant="outline">
+                <Button
+                  className="h-button w-full px-button-x"
+                  onClick={() => setStep("choose-device")}
+                  radius="card"
+                  type="button"
+                  variant="outline"
+                >
                   Настроить на другом устройстве
                 </Button>
               </div>
@@ -305,7 +311,7 @@ export function AppSetupDialog({
               <DialogHeader className="items-center text-center sm:text-center">
                 <DialogTitle>Подписка</DialogTitle>
                 <DialogDescription className="w-full max-w-none">
-                  Добавьте подписку в Happ с помощью кнопки ниже или вставьте ссылку вручную.
+                  Добавьте подписку в Happ через кнопку ниже или вставьте ссылку вручную.
                 </DialogDescription>
               </DialogHeader>
 
@@ -361,12 +367,17 @@ export function AppSetupDialog({
               <DialogHeader className="items-center text-center sm:text-center">
                 <DialogTitle>Готово</DialogTitle>
                 <DialogDescription className="w-full max-w-none sm:max-w-md">
-                  Нажмите на кнопку включения в приложении Happ.
+                  Нажмите кнопку включения в приложении Happ.
                 </DialogDescription>
               </DialogHeader>
 
               <div className="flex w-full flex-col gap-3">
-                <Button className="h-button w-full px-button-x" onClick={() => setOpen(false)} radius="card" type="button">
+                <Button
+                  className="h-button w-full px-button-x"
+                  onClick={() => setOpen(false)}
+                  radius="card"
+                  type="button"
+                >
                   Завершить настройку
                 </Button>
               </div>

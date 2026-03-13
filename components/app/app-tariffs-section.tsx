@@ -21,6 +21,7 @@ import { Slider } from "@/components/ui/slider";
 import { calculateAppSubscriptionPreviewPrice } from "@/lib/subscription-preview";
 
 import { AppSectionShell } from "./app-section-shell";
+import { AppSetupDialog } from "./app-setup-dialog";
 import { AppSurface } from "./app-surface";
 
 type DurationRuleItem = {
@@ -71,6 +72,7 @@ function parseDateOrNull(value: string | null) {
 export function AppTariffsSection({
   activeSubscriptionEndAtIso,
   activeSubscriptionStartAtIso,
+  autoOpenSetupDialog,
   canExtendSubscription,
   credits,
   currentActiveSubscriptionsCount,
@@ -80,9 +82,11 @@ export function AppTariffsSection({
   maxActiveSubscriptions,
   plategaPaymentRequestId,
   pricingSettings,
+  setupSubscriptionUrl,
 }: {
   activeSubscriptionEndAtIso: string | null;
   activeSubscriptionStartAtIso: string | null;
+  autoOpenSetupDialog: boolean;
   canExtendSubscription: boolean;
   credits: number;
   currentActiveSubscriptionsCount: number;
@@ -92,6 +96,7 @@ export function AppTariffsSection({
   maxActiveSubscriptions: number;
   plategaPaymentRequestId: string | null;
   pricingSettings: PricingSettings;
+  setupSubscriptionUrl: string | null;
 }) {
   const sortedRules = useMemo(
     () => [...durationRules].sort((a, b) => a.months - b.months),
@@ -111,6 +116,7 @@ export function AppTariffsSection({
   const [isCheckingPlategaPayment, setIsCheckingPlategaPayment] = useState(
     Boolean(plategaPaymentRequestId)
   );
+  const [isSubmittingCredits, setIsSubmittingCredits] = useState(false);
   const creditsFormRef = useRef<HTMLFormElement | null>(null);
 
   const selectedRule = sortedRules.find((item) => item.months === selectedMonths) ?? sortedRules[0];
@@ -146,7 +152,7 @@ export function AppTariffsSection({
     !selectedRule ||
     !calculatedPrice;
   const paymentActionDisabled =
-    checkoutDisabled || isCreatingPlategaPayment || isCheckingPlategaPayment;
+    checkoutDisabled || isCreatingPlategaPayment || isCheckingPlategaPayment || isSubmittingCredits;
   const hasEnoughCredits = calculatedPrice ? credits >= calculatedPrice.finalTotalRub : false;
   const hasReferralDiscount =
     firstPurchaseDiscountPct > 0 &&
@@ -192,7 +198,7 @@ export function AppTariffsSection({
             window.location.replace(
               `/app?notice=${encodeURIComponent(
                 "Оплата через Platega подтверждена. Подписка активирована."
-              )}#dashboard`
+              )}&openSetup=1#dashboard`
             );
           }
           return;
@@ -234,6 +240,12 @@ export function AppTariffsSection({
       }
     };
   }, [plategaPaymentRequestId]);
+
+  useEffect(() => {
+    if (selectedPaymentMethod !== "CREDITS" && isSubmittingCredits) {
+      setIsSubmittingCredits(false);
+    }
+  }, [isSubmittingCredits, selectedPaymentMethod]);
 
   async function startPlategaPayment() {
     if (!calculatedPrice || checkoutDisabled) {
@@ -298,6 +310,15 @@ export function AppTariffsSection({
                 <p className="inline-flex items-center gap-2">
                   <Loader2 className="size-4 animate-spin" />
                   Платеж через банковскую карту обрабатывается. Обновляем статус подписки...
+                </p>
+              </div>
+            ) : null}
+
+            {isSubmittingCredits ? (
+              <div className="rounded-card border border-border bg-background/50 p-card-compact text-sm text-muted-foreground md:p-card-compact-md">
+                <p className="inline-flex items-center gap-2">
+                  <Loader2 className="size-4 animate-spin" />
+                  Оплата получена. Выдаем подписку и синхронизируем доступ...
                 </p>
               </div>
             ) : null}
@@ -544,6 +565,7 @@ export function AppTariffsSection({
                   }
                   onClick={() => {
                     if (selectedPaymentMethod === "CREDITS") {
+                      setIsSubmittingCredits(true);
                       creditsFormRef.current?.requestSubmit();
                       return;
                     }
@@ -563,7 +585,14 @@ export function AppTariffsSection({
                       "Оплатить банковской картой"
                     )
                   ) : (
-                    "Оплатить кредитами"
+                    isSubmittingCredits ? (
+                      <span className="inline-flex items-center gap-2">
+                        <Loader2 className="size-4 animate-spin" />
+                        Выдаем подписку...
+                      </span>
+                    ) : (
+                      "Оплатить кредитами"
+                    )
                   )}
                 </Button>
 
@@ -577,6 +606,13 @@ export function AppTariffsSection({
           </div>
         )}
       </AppSurface>
+      {setupSubscriptionUrl ? (
+        <AppSetupDialog
+          defaultOpen={autoOpenSetupDialog}
+          showTrigger={false}
+          subscriptionUrl={setupSubscriptionUrl}
+        />
+      ) : null}
     </AppSectionShell>
   );
 }

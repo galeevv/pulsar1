@@ -163,6 +163,8 @@ model ReferralProgramSettings {
 model LegalDocumentSettings {
   id                Int      @id @default(1)
   userAgreementText String   @default("")
+  publicOfferText   String   @default("")
+  privacyPolicyText String   @default("")
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 }

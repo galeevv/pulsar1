@@ -77,7 +77,7 @@ export default async function AdminPage({
           referralProgramSettings={dashboardData.referralProgramSettings}
         />
         <AdminPromoCodesSection promoCodes={dashboardData.promoCodes} />
-        <AdminRulesSection userAgreementText={dashboardData.userAgreementText} />
+        <AdminRulesSection legalDocuments={dashboardData.legalDocuments} />
         <AdminTariffsSection
           durationRules={dashboardData.subscriptionDurationRules}
           pricingSettings={dashboardData.subscriptionPricingSettings}

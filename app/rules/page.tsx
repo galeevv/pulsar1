@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
 
 import { LandingHeader } from "@/components/landing/landing-header";
-import { getUserAgreementText } from "@/lib/legal-documents";
+import { RulesLegalTabs } from "@/components/rules/rules-legal-tabs";
+import { getLegalDocuments } from "@/lib/legal-documents";
 
 export const metadata: Metadata = {
-  description: "Условия использования сервиса Pulsar.",
-  title: "PULSAR • Пользовательское соглашение",
+  description: "Юридическая информация сервиса Pulsar.",
+  title: "PULSAR • Юридическая информация",
 };
 
 export const dynamic = "force-dynamic";
 
 export default async function RulesPage() {
-  const userAgreementText = await getUserAgreementText();
+  const legalDocuments = await getLegalDocuments();
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -22,16 +23,13 @@ export default async function RulesPage() {
           <p className="text-eyebrow font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             LEGAL
           </p>
-          <h1 className="text-h2 font-semibold tracking-tight md:text-h1">Пользовательское соглашение</h1>
+          <h1 className="text-h2 font-semibold tracking-tight md:text-h1">Юридическая информация</h1>
           <p className="max-w-[760px] text-sm leading-7 text-muted-foreground md:text-base">
-            Ниже размещена актуальная редакция пользовательского соглашения сервиса Pulsar.
+            На странице собраны пользовательское соглашение, публичная оферта и политика
+            конфиденциальности.
           </p>
 
-          <div className="rounded-card border border-border/70 bg-card/40 p-card md:p-card-md">
-            <article className="whitespace-pre-line text-sm leading-7 text-foreground md:text-base">
-              {userAgreementText}
-            </article>
-          </div>
+          <RulesLegalTabs legalDocuments={legalDocuments} />
         </section>
       </main>
     </div>

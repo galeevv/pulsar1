@@ -20,8 +20,10 @@ import {
 
 function buildRedirectUrl(params: {
   anchor?: string;
+  dialog?: "promo" | "referral";
   error?: string;
   notice?: string;
+  openSetup?: boolean;
 }) {
   const searchParams = new URLSearchParams();
 
@@ -33,8 +35,16 @@ function buildRedirectUrl(params: {
     searchParams.set("error", params.error);
   }
 
+  if (params.dialog) {
+    searchParams.set("dialog", params.dialog);
+  }
+
+  if (params.openSetup) {
+    searchParams.set("openSetup", "1");
+  }
+
   const query = searchParams.toString();
-  return `/app${query ? `?${query}` : ""}${params.anchor ?? "#benefits"}`;
+  return `/app${query ? `?${query}` : ""}${params.anchor ?? "#dashboard"}`;
 }
 
 function normalizeDiscountPct(discountPct: number) {
@@ -221,12 +231,13 @@ export async function generateOwnReferralCodeAction() {
   const appBenefitsData = await getAppBenefitsData(user.username);
 
   if (!appBenefitsData) {
-    redirect(buildRedirectUrl({ error: "Пользователь не найден." }));
+    redirect(buildRedirectUrl({ dialog: "referral", error: "Пользователь не найден." }));
   }
 
   if (!appBenefitsData.referralProgramSettings.isEnabled) {
     redirect(
       buildRedirectUrl({
+        dialog: "referral",
         error: "Реферальная программа сейчас отключена.",
       })
     );
@@ -235,13 +246,14 @@ export async function generateOwnReferralCodeAction() {
   if (!appBenefitsData.hasApprovedPayment) {
     redirect(
       buildRedirectUrl({
+        dialog: "referral",
         error: "Реферальный код доступен после первой подтвержденной оплаты.",
       })
     );
   }
 
   if (appBenefitsData.ownReferralCode) {
-    redirect(buildRedirectUrl({ error: "У вас уже есть реферальный код." }));
+    redirect(buildRedirectUrl({ dialog: "referral", error: "У вас уже есть реферальный код." }));
   }
 
   const code = normalizeCode(generateReferralCodeValue());
@@ -257,7 +269,7 @@ export async function generateOwnReferralCodeAction() {
   });
 
   revalidatePath("/app");
-  redirect(buildRedirectUrl({ notice: "Ваш реферальный код создан." }));
+  redirect(buildRedirectUrl({ dialog: "referral", notice: "Ваш реферальный код создан." }));
 }
 
 export async function applyPromoCodeAction(formData: FormData) {
@@ -266,7 +278,7 @@ export async function applyPromoCodeAction(formData: FormData) {
   const validation = await validatePromoCodeForUser(user.id, rawCode);
 
   if (!validation.ok) {
-    redirect(buildRedirectUrl({ error: validation.message }));
+    redirect(buildRedirectUrl({ dialog: "promo", error: validation.message }));
   }
 
   await prisma.$transaction([
@@ -289,6 +301,7 @@ export async function applyPromoCodeAction(formData: FormData) {
   revalidatePath("/app");
   redirect(
     buildRedirectUrl({
+      dialog: "promo",
       notice: `Промокод применен. Баланс увеличен на ${validation.promoCode.creditAmount} кредитов.`,
     })
   );
@@ -491,6 +504,7 @@ export async function payTariffWithCreditsAction(formData: FormData) {
     buildRedirectUrl({
       anchor: "#dashboard",
       notice: `Оплата кредитами завершена: списано эквивалент ${chargedRub} ₽.${discountNotice}${rewardNotice}${integrationNotice}`,
+      openSetup: true,
     })
   );
 }

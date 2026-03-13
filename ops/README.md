@@ -24,3 +24,19 @@ systemctl status pulsar-sqlite-backup.timer
 sudo systemctl start pulsar-sqlite-backup.service
 ls -lah /opt/pulsar/backups
 ```
+
+## 4) Destructive cleanup (backups + DB)
+
+```bash
+cd /var/www/1pulsar/app
+chmod +x ops/cleanup-backups-and-db.sh
+
+# Full cleanup: remove backup files + reset DB schema
+ops/cleanup-backups-and-db.sh --yes
+
+# Only backup files
+ops/cleanup-backups-and-db.sh --yes --backups-only
+
+# Only DB (drop and recreate schema)
+ops/cleanup-backups-and-db.sh --yes --db-only
+```

@@ -16,14 +16,34 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const headerLinks = [
-  { href: "#tariffs", label: "Тарифы" },
-  { href: "#dashboard", label: "Dashboard" },
-  { href: "#benefits", label: "Бонусы" },
+  { href: "#tariffs", label: "Покупка" },
+  { href: "#dashboard", label: "Управление" },
+  { href: "#support", label: "Поддержка" },
+  { href: "#legal", label: "Юридическая информация" },
 ];
 
 export function AppHeader() {
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollYRef = useRef(0);
+
+  function scrollToAnchor(href: string) {
+    const targetId = href.replace(/^#/, "");
+    const target = document.getElementById(targetId);
+
+    if (!target) {
+      window.location.replace(href);
+      return;
+    }
+
+    const stickyOffset = 112;
+    const targetTop = target.getBoundingClientRect().top + window.scrollY - stickyOffset;
+
+    window.scrollTo({
+      behavior: "smooth",
+      top: Math.max(0, targetTop),
+    });
+    window.history.replaceState(null, "", `#${targetId}`);
+  }
 
   useEffect(() => {
     lastScrollYRef.current = window.scrollY;
@@ -77,10 +97,15 @@ export function AppHeader() {
                     <span className="sr-only">Открыть меню</span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuContent align="end" className="w-56">
                   {headerLinks.map((item) => (
-                    <DropdownMenuItem asChild key={item.href}>
-                      <Link href={item.href}>{item.label}</Link>
+                    <DropdownMenuItem
+                      key={item.href}
+                      onSelect={() => {
+                        scrollToAnchor(item.href);
+                      }}
+                    >
+                      {item.label}
                     </DropdownMenuItem>
                   ))}
                   <DropdownMenuSeparator />

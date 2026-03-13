@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto";
 
 import { prisma } from "@/lib/prisma";
-import { getUserAgreementText } from "@/lib/legal-documents";
+import { getLegalDocuments } from "@/lib/legal-documents";
 import { getAdminSubscriptionConstructorData } from "@/lib/subscription-constructor";
 import { getServiceCapacitySettings } from "@/lib/service-capacity";
 
@@ -39,7 +39,7 @@ export async function getAdminDashboardData() {
   await ensureBootstrapData();
 
   const constructorData = await getAdminSubscriptionConstructorData();
-  const userAgreementTextPromise = getUserAgreementText();
+  const legalDocumentsPromise = getLegalDocuments();
   const serviceCapacitySettingsPromise = getServiceCapacitySettings();
 
   const [
@@ -56,7 +56,7 @@ export async function getAdminDashboardData() {
     activeDeviceSlots,
     blockedDeviceSlots,
     recentSubscriptions,
-    userAgreementText,
+    legalDocuments,
     serviceCapacitySettings,
   ] =
     await Promise.all([
@@ -146,7 +146,7 @@ export async function getAdminDashboardData() {
         orderBy: { createdAt: "desc" },
         take: 6,
       }),
-      userAgreementTextPromise,
+      legalDocumentsPromise,
       serviceCapacitySettingsPromise,
     ]);
 
@@ -162,7 +162,8 @@ export async function getAdminDashboardData() {
     recentSubscriptions,
     referralProgramSettings,
     serviceCapacitySettings,
-    userAgreementText,
+    legalDocuments,
+    userAgreementText: legalDocuments.userAgreementText,
     referralCodes,
     subscriptionDurationRules: constructorData.durationRules,
     subscriptionPricingSettings: constructorData.pricingSettings,
