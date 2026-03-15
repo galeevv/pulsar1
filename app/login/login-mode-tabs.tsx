@@ -21,7 +21,7 @@ export function LoginModeTabs({
       value={mode}
     >
       <TabsList
-        className="grid h-11 w-full grid-cols-2 rounded-card border border-border bg-background/40 p-1"
+        className="grid h-11 w-full grid-cols-2 rounded-card border border-border bg-background/40 p-0"
         variant="default"
       >
         <TabsTrigger value="login">Авторизация</TabsTrigger>

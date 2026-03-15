@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PulsarVPN | Admin Dashboard</title>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            border: "hsl(240 3.7% 15.9%)",
+            input: "hsl(240 3.7% 15.9%)",
+            ring: "hsl(240 4.9% 83.9%)",
+            background: "hsl(240 10% 3.9%)",
+            foreground: "hsl(0 0% 98%)",
+            primary: {
+              DEFAULT: "hsl(0 0% 98%)",
+              foreground: "hsl(240 5.9% 10%)",
+            },
+            secondary: {
+              DEFAULT: "hsl(240 3.7% 15.9%)",
+              foreground: "hsl(0 0% 98%)",
+            },
+            muted: {
+              DEFAULT: "hsl(240 3.7% 15.9%)",
+              foreground: "hsl(240 5% 64.9%)",
+            },
+            accent: {
+              DEFAULT: "hsl(240 3.7% 15.9%)",
+              foreground: "hsl(0 0% 98%)",
+            },
+            card: {
+              DEFAULT: "hsl(240 10% 3.9%)",
+              foreground: "hsl(0 0% 98%)",
+            },
+          },
+        },
+      },
+    }
+  </script>
+<style data-purpose="custom-scrollbar">
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+    
+    body { background-color: #09090b; color: #fafafa; }
+    .glass-card { 
+      background: rgba(9, 9, 11, 0.5); 
+      backdrop-filter: blur(8px); 
+      border: 1px solid rgba(39, 39, 42, 1);
+    }
+  </style>
+</head>
+<body class="font-sans antialiased overflow-x-hidden">
+<div class="flex min-h-screen bg-background text-foreground">
+<!-- BEGIN: Sidebar Navigation -->
+<aside class="w-64 border-r border-border hidden md:flex flex-col sticky top-0 h-screen" data-purpose="sidebar">
+<div class="p-6">
+<div class="flex items-center gap-2 font-bold text-xl tracking-tight">
+<div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+<div class="w-4 h-4 bg-black rounded-full"></div>
+</div>
+          PULSAR
+        </div>
+</div>
+<nav class="flex-1 px-4 space-y-1 overflow-y-auto">
+<div class="py-4">
+<p class="px-2 mb-2 text-xs font-semibold text-muted uppercase tracking-wider">Overview</p>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md bg-secondary text-primary" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+            Dashboard
+          </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md text-muted hover:text-primary hover:bg-accent transition-colors" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+            Users
+          </a>
+</div>
+<div class="py-4 border-t border-border">
+<p class="px-2 mb-2 text-xs font-semibold text-muted uppercase tracking-wider">Growth</p>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md text-muted hover:text-primary transition-colors" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+            Marketing
+          </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md text-muted hover:text-primary transition-colors" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+            Billing
+          </a>
+</div>
+<div class="py-4 border-t border-border">
+<p class="px-2 mb-2 text-xs font-semibold text-muted uppercase tracking-wider">Management</p>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md text-muted hover:text-primary transition-colors" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+            Support
+          </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md text-muted hover:text-primary transition-colors" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+            Operations
+          </a>
+</div>
+</nav>
+<div class="p-4 border-t border-border mt-auto">
+<div class="flex items-center gap-3 p-2 rounded-lg hover:bg-accent cursor-pointer group transition-all">
+<div class="w-8 h-8 rounded-full bg-gradient-to-tr from-zinc-700 to-zinc-900 border border-border"></div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-medium truncate">Admin_Pulsar</p>
+<p class="text-xs text-muted truncate">admin@pulsar.vpn</p>
+</div>
+<svg class="w-4 h-4 text-muted group-hover:text-primary" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+</aside>
+<!-- END: Sidebar Navigation -->
+<!-- BEGIN: Main Content Container -->
+<main class="flex-1 flex flex-col min-w-0 max-w-[1200px] mx-auto p-4 md:p-8 space-y-8">
+<!-- BEGIN: Header Section -->
+<header class="flex flex-col md:flex-row md:items-end justify-between gap-4" data-purpose="page-header">
+<div>
+<nav class="flex items-center gap-2 text-xs text-muted mb-1">
+<span>Control Panel</span>
+<span class="opacity-30">/</span>
+<span class="text-primary/60">Overview</span>
+</nav>
+<h1 class="text-3xl font-bold tracking-tight">System Control</h1>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 border border-green-500/20 rounded-full">
+<div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+<span class="text-xs font-semibold text-green-500">System Healthy</span>
+</div>
+<button class="bg-primary text-primary-foreground px-4 py-1.5 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors">
+            Generate Report
+          </button>
+</div>
+</header>
+<!-- END: Header Section -->
+<!-- BEGIN: Stat Cards Grid -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-purpose="overview-stats">
+<!-- Users Stat -->
+<div class="glass-card p-6 rounded-xl flex flex-col justify-between h-32">
+<div class="flex justify-between items-start">
+<span class="text-sm font-medium text-muted">Total Users</span>
+<svg class="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex items-baseline gap-2">
+<h2 class="text-2xl font-bold">128</h2>
+<span class="text-xs text-green-500 font-medium">+8 this week</span>
+</div>
+</div>
+<!-- Active Codes Stat -->
+<div class="glass-card p-6 rounded-xl flex flex-col justify-between h-32">
+<div class="flex justify-between items-start">
+<span class="text-sm font-medium text-muted">Active Codes</span>
+<svg class="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex items-baseline gap-2">
+<h2 class="text-2xl font-bold">23</h2>
+<span class="text-xs text-muted font-medium">Invites &amp; Promos</span>
+</div>
+</div>
+<!-- Pending Payments Stat -->
+<div class="glass-card p-6 rounded-xl flex flex-col justify-between h-32">
+<div class="flex justify-between items-start">
+<span class="text-sm font-medium text-muted">Pending Payouts</span>
+<svg class="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex items-baseline gap-2">
+<h2 class="text-2xl font-bold">7</h2>
+<span class="text-xs text-yellow-500 font-medium">Require review</span>
+</div>
+</div>
+<!-- Active Subs Stat -->
+<div class="glass-card p-6 rounded-xl flex flex-col justify-between h-32">
+<div class="flex justify-between items-start">
+<span class="text-sm font-medium text-muted">Active Subs</span>
+<svg class="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex items-baseline gap-2">
+<h2 class="text-2xl font-bold">91</h2>
+<span class="text-xs text-red-500 font-medium">4 expire today</span>
+</div>
+</div>
+</section>
+<!-- END: Stat Cards Grid -->
+<!-- BEGIN: Content Area Tabs Style -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- BEGIN: Left Column (Table & Marketing) -->
+<div class="lg:col-span-2 space-y-8">
+<!-- BEGIN: User Management Table -->
+<div class="glass-card rounded-xl overflow-hidden" data-purpose="user-management">
+<div class="p-6 border-b border-border flex items-center justify-between">
+<div>
+<h3 class="font-semibold text-lg">Recent Users</h3>
+<p class="text-sm text-muted">Manage system access and balances</p>
+</div>
+<div class="flex gap-2">
+<input class="bg-background border-border text-sm px-3 py-1.5 rounded-md focus:ring-1 focus:ring-primary w-48" placeholder="Search..." type="text"/>
+<button class="bg-secondary p-1.5 rounded-md text-muted hover:text-primary transition-colors">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left text-sm">
+<thead>
+<tr class="bg-secondary/30 text-muted">
+<th class="px-6 py-3 font-medium">User ID</th>
+<th class="px-6 py-3 font-medium">Status</th>
+<th class="px-6 py-3 font-medium">Balance</th>
+<th class="px-6 py-3 font-medium text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border">
+<tr class="hover:bg-accent/20 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="font-medium">USER_4909</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 bg-blue-500/10 text-blue-500 text-[10px] font-bold uppercase tracking-wider rounded">Standard</span>
+</td>
+<td class="px-6 py-4 text-muted">0 Credits</td>
+<td class="px-6 py-4 text-right">
+<button class="text-muted hover:text-primary text-xs font-semibold px-2 py-1 border border-border rounded">Details</button>
+</td>
+</tr>
+<tr class="hover:bg-accent/20 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-zinc-600"></span>
+<span class="font-medium">ADMIN_ROOT</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 bg-purple-500/10 text-purple-500 text-[10px] font-bold uppercase tracking-wider rounded">Administrator</span>
+</td>
+<td class="px-6 py-4 text-muted">999 Credits</td>
+<td class="px-6 py-4 text-right">
+<button class="text-muted hover:text-primary text-xs font-semibold px-2 py-1 border border-border rounded">Details</button>
+</td>
+</tr>
+<!-- More rows hidden for brevity -->
+</tbody>
+</table>
+</div>
+<div class="p-4 border-t border-border flex justify-center">
+<button class="text-xs text-muted hover:text-primary font-medium">View All Users</button>
+</div>
+</div>
+<!-- END: User Management Table -->
+<!-- BEGIN: Marketing Tools (Invites/Promos) -->
+<div class="glass-card rounded-xl overflow-hidden" data-purpose="marketing-section">
+<div class="flex border-b border-border">
+<button class="flex-1 py-4 text-sm font-semibold border-b-2 border-primary text-primary">InviteCodes</button>
+<button class="flex-1 py-4 text-sm font-medium text-muted hover:text-primary transition-colors">PromoCodes</button>
+<button class="flex-1 py-4 text-sm font-medium text-muted hover:text-primary transition-colors">Referrals</button>
+</div>
+<div class="p-8 grid md:grid-cols-2 gap-12">
+<div class="space-y-6">
+<div>
+<h4 class="text-lg font-semibold mb-1">Create Invite</h4>
+<p class="text-sm text-muted">Single-use access tokens for priority users.</p>
+</div>
+<div class="space-y-4">
+<div class="space-y-2">
+<label class="text-xs font-medium text-muted uppercase">Custom Code (Optional)</label>
+<input class="w-full bg-secondary border-border rounded-lg text-sm px-4 py-2.5" placeholder="LEAVE_BLANK_FOR_AUTO" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-medium text-muted uppercase">Expiration Date</label>
+<input class="w-full bg-secondary border-border rounded-lg text-sm px-4 py-2.5" type="date"/>
+</div>
+<button class="w-full bg-primary text-primary-foreground py-2.5 rounded-lg text-sm font-semibold shadow-lg shadow-white/5">Generate Invite</button>
+</div>
+</div>
+<div class="bg-secondary/30 rounded-xl p-6 border border-border flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-4">
+<span class="text-xs font-bold text-muted uppercase tracking-widest">Active Preview</span>
+<span class="w-2 h-2 rounded-full bg-blue-500"></span>
+</div>
+<p class="text-2xl font-mono font-bold tracking-tighter">INV-840350</p>
+<p class="text-xs text-muted mt-2">Expires: 19.03.2024, 23:59:59</p>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 bg-background text-xs py-2 rounded border border-border hover:bg-zinc-800 transition-colors">Disable</button>
+<button class="flex-1 bg-background text-xs py-2 rounded border border-border hover:bg-zinc-800 transition-colors">Copy</button>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Marketing Tools -->
+</div>
+<!-- END: Left Column -->
+<!-- BEGIN: Right Column (Operations & Quick Stats) -->
+<div class="space-y-8">
+<!-- BEGIN: Operations Summary -->
+<div class="glass-card rounded-xl p-6 space-y-6" data-purpose="operations-summary">
+<div>
+<h3 class="font-semibold text-lg">Infrastructure</h3>
+<p class="text-sm text-muted">Live hardware &amp; slots utilization</p>
+</div>
+<div class="space-y-4">
+<div class="p-4 bg-secondary/50 rounded-lg border border-border">
+<div class="flex justify-between items-center mb-2">
+<span class="text-sm font-medium">Device Slots</span>
+<span class="text-xs font-bold px-2 py-0.5 bg-green-500/10 text-green-500 rounded">Optimal</span>
+</div>
+<div class="w-full bg-background rounded-full h-1.5 mb-1">
+<div class="bg-primary h-1.5 rounded-full" style="width: 65%"></div>
+</div>
+<div class="flex justify-between text-[10px] text-muted font-bold uppercase">
+<span>Used: 42</span>
+<span>Total: 120</span>
+</div>
+</div>
+<div class="p-4 bg-secondary/50 rounded-lg border border-border">
+<div class="flex justify-between items-center mb-2">
+<span class="text-sm font-medium">Active Pipelines</span>
+<span class="text-xs font-bold px-2 py-0.5 bg-zinc-500/10 text-muted rounded">Idling</span>
+</div>
+<p class="text-2xl font-bold">12</p>
+</div>
+<div class="p-4 bg-secondary/50 rounded-lg border border-border">
+<div class="flex justify-between items-center mb-2">
+<span class="text-sm font-medium">System Journal</span>
+<span class="text-[10px] text-muted">LAST 24H</span>
+</div>
+<div class="space-y-2">
+<div class="flex items-center gap-2 text-[11px]">
+<span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+<span class="text-muted">12:04</span>
+<span>New referral code generated by UID_9</span>
+</div>
+<div class="flex items-center gap-2 text-[11px]">
+<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+<span class="text-muted">11:58</span>
+<span>Payment failed for Order #9302</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Operations Summary -->
+<!-- BEGIN: Tariff Config Mini -->
+<div class="glass-card rounded-xl p-6 space-y-4" data-purpose="tariff-preview">
+<div class="flex justify-between items-center">
+<h3 class="font-semibold">Tariff Rules</h3>
+<button class="text-xs text-muted hover:text-primary">Settings</button>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-center p-3 rounded-lg border border-border hover:border-primary/50 cursor-pointer transition-all">
+<div class="text-sm">
+<p class="font-medium">1 Month</p>
+<p class="text-xs text-muted">Standard Plan</p>
+</div>
+<p class="font-bold text-sm">650 ₽</p>
+</div>
+<div class="flex justify-between items-center p-3 rounded-lg border border-border hover:border-primary/50 cursor-pointer transition-all">
+<div class="text-sm">
+<p class="font-medium">3 Months</p>
+<p class="text-xs text-muted">Value Plan</p>
+</div>
+<div class="text-right">
+<p class="font-bold text-sm">2049 ₽</p>
+<p class="text-[10px] text-green-500 font-bold">-5% OFF</p>
+</div>
+</div>
+<div class="flex justify-between items-center p-3 rounded-lg border border-border hover:border-primary/50 cursor-pointer transition-all">
+<div class="text-sm">
+<p class="font-medium">12 Months</p>
+<p class="text-xs text-muted">Pro Plan</p>
+</div>
+<div class="text-right">
+<p class="font-bold text-sm">7658 ₽</p>
+<p class="text-[10px] text-green-500 font-bold">-20% OFF</p>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Tariff Config Mini -->
+</div>
+<!-- END: Right Column -->
+</section>
+<!-- END: Content Area -->
+<!-- BEGIN: Admin Profile Settings Section (from reference image) -->
+<section class="glass-card rounded-xl p-8 mt-4" data-purpose="admin-account">
+<div class="max-w-3xl">
+<h2 class="text-xl font-bold mb-2">Administrative Credentials</h2>
+<p class="text-sm text-muted mb-8">Update your login security and system identification. Requirements: MinBank 3-32 chars, a-z, 0-9, and underscores.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-4">
+<div class="space-y-2">
+<label class="text-xs font-medium text-muted uppercase">Current Login</label>
+<input class="w-full bg-secondary/50 border-border text-muted rounded-lg text-sm px-4 py-2.5 cursor-not-allowed" readonly="" type="text" value="admin_pulsar_123"/>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-medium text-muted uppercase">Current Password</label>
+<input class="w-full bg-secondary border-border rounded-lg text-sm px-4 py-2.5" placeholder="••••••••" type="password"/>
+</div>
+</div>
+<div class="space-y-4">
+<div class="space-y-2">
+<label class="text-xs font-medium text-muted uppercase">New Login</label>
+<input class="w-full bg-secondary border-border rounded-lg text-sm px-4 py-2.5" placeholder="Leave empty to keep current" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-medium text-muted uppercase">New Password</label>
+<input class="w-full bg-secondary border-border rounded-lg text-sm px-4 py-2.5" placeholder="Min 8 characters" type="password"/>
+</div>
+</div>
+</div>
+<button class="mt-8 bg-primary text-primary-foreground px-6 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity">
+            Save Changes
+          </button>
+</div>
+</section>
+<!-- END: Admin Profile Settings Section -->
+<!-- BEGIN: Footer Branding -->
+<footer class="py-12 border-t border-border mt-12 text-center">
+<p class="text-sm text-muted">© 2024 PulsarVPN Infrastructure. All systems operational.</p>
+</footer>
+<!-- END: Footer Branding -->
+</main>
+<!-- END: Main Content Container -->
+</div>
+</body></html>

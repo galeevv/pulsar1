@@ -42,7 +42,7 @@ export function RulesLegalTabs({
       </div>
 
       <TabsList
-        className="hidden h-11 w-full grid-cols-3 rounded-card border border-border bg-background/40 p-1 md:grid"
+        className="hidden h-11 w-full grid-cols-3 rounded-card border border-border bg-background/40 p-0 md:grid"
         variant="default"
       >
         <TabsTrigger value="agreement">Пользовательское соглашение</TabsTrigger>

@@ -407,58 +407,6 @@ export function AppDashboardPrototypeSection({
         </AppSurface>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <div className="scroll-mt-24 md:scroll-mt-28" id="legal">
-            <AppSurface className="min-w-0">
-            <div className="space-y-4">
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-card border border-border bg-background/60">
-                <File className="size-5 text-foreground" />
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm font-semibold text-foreground">Юридическая информация</p>
-                <p className="text-sm text-muted-foreground">
-                  Ключевые документы, условия использования и базовые ограничения сервиса.
-                </p>
-              </div>
-              <AppUserAgreementDialog legalDocuments={legalDocuments} />
-            </div>
-            </AppSurface>
-          </div>
-
-          <div className="scroll-mt-24 md:scroll-mt-28" id="support">
-            <AppSurface className="min-w-0">
-            <div className="space-y-4">
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-card border border-border bg-background/60">
-                <Headset className="size-5 text-foreground" />
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm font-semibold text-foreground">Связаться с поддержкой</p>
-                <p className="text-sm text-muted-foreground">
-                  Быстрый переход к тикетам и диалогу с командой поддержки.
-                </p>
-              </div>
-              <SupportDialog />
-            </div>
-            </AppSurface>
-          </div>
-
-          <AppSurface className="min-w-0">
-            <div className="space-y-4">
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-card border border-border bg-background/60">
-                <Gift className="size-5 text-foreground" />
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm font-semibold text-foreground">Промокоды</p>
-                <p className="text-sm text-muted-foreground">
-                  Применение промокода и история последних начислений на баланс.
-                </p>
-              </div>
-              <PromoCodesDialog
-                defaultOpen={isPromoDialogOpenByDefault}
-                promoCodeRedemptions={promoCodeRedemptions}
-              />
-            </div>
-          </AppSurface>
-
           <AppSurface className="min-w-0">
             <div className="space-y-4">
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-card border border-border bg-background/60">
@@ -479,6 +427,58 @@ export function AppDashboardPrototypeSection({
               />
             </div>
           </AppSurface>
+
+          <AppSurface className="min-w-0">
+            <div className="space-y-4">
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-card border border-border bg-background/60">
+                <Gift className="size-5 text-foreground" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-semibold text-foreground">Промокоды</p>
+                <p className="text-sm text-muted-foreground">
+                  Применение промокода и история последних начислений на баланс.
+                </p>
+              </div>
+              <PromoCodesDialog
+                defaultOpen={isPromoDialogOpenByDefault}
+                promoCodeRedemptions={promoCodeRedemptions}
+              />
+            </div>
+          </AppSurface>
+
+          <div className="scroll-mt-24 md:scroll-mt-28" id="support">
+            <AppSurface className="min-w-0">
+            <div className="space-y-4">
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-card border border-border bg-background/60">
+                <Headset className="size-5 text-foreground" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-semibold text-foreground">Связаться с поддержкой</p>
+                <p className="text-sm text-muted-foreground">
+                  Быстрый переход к тикетам и диалогу с командой поддержки.
+                </p>
+              </div>
+              <SupportDialog />
+            </div>
+            </AppSurface>
+          </div>
+
+          <div className="scroll-mt-24 md:scroll-mt-28" id="legal">
+            <AppSurface className="min-w-0">
+            <div className="space-y-4">
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-card border border-border bg-background/60">
+                <File className="size-5 text-foreground" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-semibold text-foreground">Юридическая информация</p>
+                <p className="text-sm text-muted-foreground">
+                  Ключевые документы, условия использования и базовые ограничения сервиса.
+                </p>
+              </div>
+              <AppUserAgreementDialog legalDocuments={legalDocuments} />
+            </div>
+            </AppSurface>
+          </div>
         </div>
       </div>
     </AppSectionShell>
