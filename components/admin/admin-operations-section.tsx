@@ -1,4 +1,4 @@
-import { Activity, Logs, Shield, Smartphone } from "lucide-react";
+import { Activity, Gauge, Logs, Shield, Smartphone } from "lucide-react";
 
 import { updateServiceCapacitySettingsAction } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,16 @@ type SubscriptionPreview = {
     username: string;
   };
 };
+
+function formatDate(value: Date) {
+  return value.toLocaleString("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
 
 function statusLabel(status: SubscriptionPreview["status"]) {
   if (status === "ACTIVE") {
@@ -51,20 +61,28 @@ export function AdminOperationsSection({
     revoked: number;
   };
 }) {
+  const activeUsersCount = subscriptionStats.active;
+  const maxActiveSubscriptions = serviceCapacitySettings.maxActiveSubscriptions;
+  const seatsLeft =
+    maxActiveSubscriptions > 0 ? Math.max(0, maxActiveSubscriptions - activeUsersCount) : null;
+
   const subscriptionPreview = [
     {
+      icon: Shield,
       label: "Активные",
       text: "Действующие подписки с доступом",
       value: `${subscriptionStats.active}`,
     },
     {
+      icon: Gauge,
       label: "Истекшие",
       text: "Подписки завершили срок",
       value: `${subscriptionStats.expired}`,
     },
     {
+      icon: Activity,
       label: "Отозвано",
-      text: "Подписки отключены вручную",
+      text: "Отключены вручную",
       value: `${subscriptionStats.revoked}`,
     },
   ];
@@ -75,84 +93,85 @@ export function AdminOperationsSection({
     { label: "Заблокировано", value: `${deviceSlotStats.blocked}` },
   ];
 
-  const activeUsersCount = subscriptionStats.active;
-  const maxActiveSubscriptions = serviceCapacitySettings.maxActiveSubscriptions;
-  const seatsLeft =
-    maxActiveSubscriptions > 0 ? Math.max(0, maxActiveSubscriptions - activeUsersCount) : null;
-
   return (
     <AdminSectionShell
-      description="Подписки и device slots считаются из реальных данных. Ниже метрики, последние события и глобальный лимит активных подписок."
+      description="Операционные метрики по подпискам и устройствам, журнал последних событий и глобальный лимит `MAX_ACTIVE_SUBSCRIPTIONS`."
       eyebrow="OPERATIONS"
       id="operations"
       title="Подписки, устройства и журнал"
     >
-      <div className="grid gap-6 xl:grid-cols-3">
-        <AdminSurface>
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Shield className="size-4 text-muted-foreground" />
-              <h3 className="text-sm font-semibold">Подписки</h3>
-            </div>
-            {subscriptionPreview.map((item) => (
-              <div
-                className="rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md"
-                key={item.label}
-              >
-                <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                  {item.label}
-                </p>
-                <p className="mt-2 text-2xl font-semibold tracking-tight">{item.value}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{item.text}</p>
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+        <div className="grid gap-6 md:grid-cols-2">
+          <AdminSurface>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Shield className="size-4 text-muted-foreground" />
+                <h3 className="text-sm font-semibold">Подписки</h3>
               </div>
-            ))}
-          </div>
-        </AdminSurface>
+              {subscriptionPreview.map((item) => {
+                const Icon = item.icon;
 
-        <AdminSurface>
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Smartphone className="size-4 text-muted-foreground" />
-              <h3 className="text-sm font-semibold">Устройства</h3>
+                return (
+                  <div
+                    className="rounded-card border border-border/70 bg-background/45 p-card-compact md:p-card-compact-md"
+                    key={item.label}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
+                        {item.label}
+                      </p>
+                      <Icon className="size-4 text-muted-foreground" />
+                    </div>
+                    <p className="mt-2 text-3xl font-semibold tracking-tight">{item.value}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">{item.text}</p>
+                  </div>
+                );
+              })}
             </div>
-            {devicePreview.map((item) => (
-              <div
-                className="rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md"
-                key={item.label}
-              >
-                <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                  {item.label}
-                </p>
-                <p className="mt-2 text-2xl font-semibold tracking-tight">{item.value}</p>
+          </AdminSurface>
+
+          <AdminSurface>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Smartphone className="size-4 text-muted-foreground" />
+                <h3 className="text-sm font-semibold">Device Slots</h3>
               </div>
-            ))}
-          </div>
-        </AdminSurface>
+              {devicePreview.map((item) => (
+                <div
+                  className="rounded-card border border-border/70 bg-background/45 p-card-compact md:p-card-compact-md"
+                  key={item.label}
+                >
+                  <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">{item.label}</p>
+                  <p className="mt-2 text-3xl font-semibold tracking-tight">{item.value}</p>
+                </div>
+              ))}
+            </div>
+          </AdminSurface>
+        </div>
 
         <AdminSurface>
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Logs className="size-4 text-muted-foreground" />
-              <h3 className="text-sm font-semibold">Журнал</h3>
+              <h3 className="text-sm font-semibold">Последние события</h3>
             </div>
+
             {recentSubscriptions.length ? (
               recentSubscriptions.map((item) => (
                 <div
-                  className="flex gap-3 rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md"
+                  className="rounded-card border border-border/70 bg-background/45 p-card-compact md:p-card-compact-md"
                   key={item.id}
                 >
-                  <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-card border border-border bg-background/70">
-                    <Activity className="size-4" />
-                  </div>
-                  <p className="text-sm leading-6 text-muted-foreground">
-                    {item.user.username}: {item.tariffName}, {item.periodMonths} мес., статус{" "}
-                    {statusLabel(item.status)}.
+                  <p className="text-sm font-medium">{item.user.username}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {item.tariffName}, {item.periodMonths} мес. • статус {statusLabel(item.status)}
                   </p>
+                  <p className="mt-1 text-xs text-muted-foreground">{formatDate(item.createdAt)}</p>
                 </div>
               ))
             ) : (
-              <div className="rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md">
-                <p className="text-sm text-muted-foreground">Событий по подпискам пока нет.</p>
+              <div className="rounded-card border border-dashed border-border/70 bg-background/30 px-4 py-12 text-center text-sm text-muted-foreground">
+                Событий по подпискам пока нет.
               </div>
             )}
           </div>
@@ -165,17 +184,17 @@ export function AdminOperationsSection({
             <div className="space-y-1">
               <h3 className="text-sm font-semibold">MAX_ACTIVE_SUBSCRIPTIONS</h3>
               <p className="text-sm text-muted-foreground">
-                Глобальный ceiling на число пользователей со статусом подписки `ACTIVE`.
-                Продления существующих клиентов разрешены даже при заполненном лимите.
+                Глобальный ceiling на число пользователей со статусом подписки `ACTIVE`. Продления
+                существующих клиентов разрешены даже при заполненном лимите.
               </p>
             </div>
 
-            <div className="grid gap-3 md:grid-cols-[minmax(0,220px)_minmax(0,1fr)] md:items-center">
+            <div className="grid gap-3 md:grid-cols-[minmax(0,240px)_minmax(0,1fr)] md:items-center">
               <Input
+                defaultValue={maxActiveSubscriptions}
                 min="0"
                 name="maxActiveSubscriptions"
                 type="number"
-                defaultValue={maxActiveSubscriptions}
               />
               <p className="text-sm text-muted-foreground">
                 {maxActiveSubscriptions === 0

@@ -13,11 +13,12 @@ import {
 import { prisma } from "@/lib/prisma";
 
 function buildRedirectUrl(params: {
-  anchor: string;
+  path: string;
   error?: string;
   notice?: string;
 }) {
-  const searchParams = new URLSearchParams();
+  const [pathname, rawQuery = ""] = params.path.split("?");
+  const searchParams = new URLSearchParams(rawQuery);
 
   if (params.notice) {
     searchParams.set("notice", params.notice);
@@ -28,14 +29,24 @@ function buildRedirectUrl(params: {
   }
 
   const query = searchParams.toString();
-  return `/admin${query ? `?${query}` : ""}${params.anchor}`;
+  return `${pathname}${query ? `?${query}` : ""}`;
+}
+
+function normalizeReturnPath(value: FormDataEntryValue | null) {
+  const path = typeof value === "string" ? value.trim() : "";
+
+  if (!path.startsWith("/admin")) {
+    return "/admin";
+  }
+
+  return path;
 }
 
 async function getAdminActor() {
   const session = await getCurrentSession();
 
   if (!session) {
-    redirect("/login?mode=login&error=Сначала войдите в аккаунт.");
+    redirect("/login?mode=login&error=Please log in first.");
   }
 
   if (session.role !== "ADMIN") {
@@ -52,7 +63,7 @@ async function getAdminActor() {
   });
 
   if (!user) {
-    redirect("/login?mode=login&error=Сначала войдите в аккаунт.");
+    redirect("/login?mode=login&error=Please log in first.");
   }
 
   return user;
@@ -60,6 +71,7 @@ async function getAdminActor() {
 
 export async function updateAdminCredentialsAction(formData: FormData) {
   const admin = await getAdminActor();
+  const returnPath = normalizeReturnPath(formData.get("returnPath"));
 
   const currentPassword = String(formData.get("currentPassword") ?? "");
   const nextUsernameRaw = String(formData.get("nextUsername") ?? "");
@@ -69,8 +81,8 @@ export async function updateAdminCredentialsAction(formData: FormData) {
   if (!currentPassword) {
     redirect(
       buildRedirectUrl({
-        anchor: "#account",
-        error: "Введите текущий пароль для подтверждения изменений.",
+        path: returnPath,
+        error: "Enter your current password to confirm changes.",
       })
     );
   }
@@ -80,8 +92,8 @@ export async function updateAdminCredentialsAction(formData: FormData) {
   if (!currentPasswordValid) {
     redirect(
       buildRedirectUrl({
-        anchor: "#account",
-        error: "Текущий пароль указан неверно.",
+        path: returnPath,
+        error: "Current password is incorrect.",
       })
     );
   }
@@ -96,9 +108,8 @@ export async function updateAdminCredentialsAction(formData: FormData) {
     if (!isValidMarzbanCompatibleUsername(nextUsername)) {
       redirect(
         buildRedirectUrl({
-          anchor: "#account",
-          error:
-            "Логин должен быть от 3 до 32 символов и содержать только a-z, 0-9 и _.",
+          path: returnPath,
+          error: "Username must be 3-32 chars and contain only a-z, 0-9 and _.",
         })
       );
     }
@@ -111,8 +122,8 @@ export async function updateAdminCredentialsAction(formData: FormData) {
     if (takenUser) {
       redirect(
         buildRedirectUrl({
-          anchor: "#account",
-          error: "Этот логин уже занят.",
+          path: returnPath,
+          error: "This username is already taken.",
         })
       );
     }
@@ -124,8 +135,8 @@ export async function updateAdminCredentialsAction(formData: FormData) {
     if (nextPassword.length < 8) {
       redirect(
         buildRedirectUrl({
-          anchor: "#account",
-          error: "Новый пароль должен быть не короче 8 символов.",
+          path: returnPath,
+          error: "New password must be at least 8 characters.",
         })
       );
     }
@@ -133,8 +144,8 @@ export async function updateAdminCredentialsAction(formData: FormData) {
     if (nextPassword !== nextPasswordConfirmation) {
       redirect(
         buildRedirectUrl({
-          anchor: "#account",
-          error: "Новый пароль и подтверждение не совпадают.",
+          path: returnPath,
+          error: "New password and confirmation do not match.",
         })
       );
     }
@@ -145,8 +156,8 @@ export async function updateAdminCredentialsAction(formData: FormData) {
   if (!updates.username && !updates.passwordHash) {
     redirect(
       buildRedirectUrl({
-        anchor: "#account",
-        error: "Нет изменений для сохранения.",
+        path: returnPath,
+        error: "No changes to save.",
       })
     );
   }
@@ -158,10 +169,11 @@ export async function updateAdminCredentialsAction(formData: FormData) {
 
   revalidatePath("/admin");
   revalidatePath("/login");
+  revalidatePath(returnPath);
   redirect(
     buildRedirectUrl({
-      anchor: "#account",
-      notice: "Данные администратора обновлены.",
+      path: returnPath,
+      notice: "Admin credentials were updated.",
     })
   );
 }

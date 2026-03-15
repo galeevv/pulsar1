@@ -19,7 +19,7 @@ type InviteCodeItem = {
 
 function formatDate(value: Date | null) {
   if (!value) {
-    return "Без срока";
+    return "No expiration";
   }
 
   return value.toLocaleString("ru-RU");
@@ -27,59 +27,59 @@ function formatDate(value: Date | null) {
 
 export function AdminInviteCodesSection({
   inviteCodes,
+  embedded = false,
 }: {
   inviteCodes: InviteCodeItem[];
+  embedded?: boolean;
 }) {
-  return (
-    <AdminSectionShell
-      description="InviteCode нужен для регистрации и работает только один раз. После успешной регистрации код теперь автоматически помечается как использованный и выключается."
-      eyebrow="INVITE"
-      id="invite-codes"
-      title="InviteCode"
-    >
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">
-        <AdminSurface>
-          <form action={createInviteCodeAction} className="space-y-4">
-            <div>
-              <label className="mb-2 block text-sm font-medium" htmlFor="invite-code-value">
-                Код
-              </label>
-              <Input
-                id="invite-code-value"
-                name="code"
-                placeholder="Оставьте пустым для автогенерации"
-              />
-            </div>
+  const content = (
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">
+      <AdminSurface>
+        <form action={createInviteCodeAction} className="space-y-4">
+          <div className="space-y-1">
+            <h3 className="text-sm font-semibold">Create invite code</h3>
+            <p className="text-sm text-muted-foreground">
+              Set a custom value or leave the field empty for automatic generation.
+            </p>
+          </div>
 
-            <AdminDatePickerField label="Срок действия" name="expiresAt" />
+          <div className="space-y-2">
+            <label className="block text-sm font-medium" htmlFor="invite-code-value">
+              Code
+            </label>
+            <Input id="invite-code-value" name="code" placeholder="Leave empty for auto generation" />
+          </div>
 
-            <Button className="h-button w-full px-button-x" radius="card" type="submit">
-              Создать invite-код
-            </Button>
-          </form>
-        </AdminSurface>
+          <AdminDatePickerField label="Expiration date" name="expiresAt" />
 
-        <AdminSurface>
+          <Button className="h-button w-full px-button-x" radius="card" type="submit">
+            Create invite code
+          </Button>
+        </form>
+      </AdminSurface>
+
+      <AdminSurface>
+        {inviteCodes.length ? (
           <div className="space-y-3">
             {inviteCodes.map((item) => (
               <div
+                className="rounded-card border border-border/70 bg-background/45 p-card-compact md:p-card-compact-md"
                 key={item.id}
-                className="rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md"
               >
-                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                   <div className="space-y-1">
-                    <p className="text-sm font-semibold">{item.code}</p>
+                    <p className="text-base font-semibold tracking-tight">{item.code}</p>
                     <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                      Истекает: {formatDate(item.expiresAt)}
+                      Expires: {formatDate(item.expiresAt)}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {item.usedBy ? `Использован: ${item.usedBy.username}` : "Еще не использован"}
+                      {item.usedBy ? `Used by: ${item.usedBy.username}` : "Not used yet"}
                     </p>
                   </div>
 
                   <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
                     <AdminStatusPill
-                      label={item.isEnabled ? "Включен" : "Выключен"}
+                      label={item.isEnabled ? "Enabled" : "Disabled"}
                       tone={item.isEnabled ? "success" : "default"}
                     />
                     <form action={toggleInviteCodeAction}>
@@ -90,7 +90,7 @@ export function AdminInviteCodesSection({
                         value={item.isEnabled ? "false" : "true"}
                       />
                       <Button radius="card" type="submit" variant="outline">
-                        {item.isEnabled ? "Выключить" : "Включить"}
+                        {item.isEnabled ? "Disable" : "Enable"}
                       </Button>
                     </form>
                   </div>
@@ -98,8 +98,27 @@ export function AdminInviteCodesSection({
               </div>
             ))}
           </div>
-        </AdminSurface>
-      </div>
+        ) : (
+          <div className="rounded-card border border-dashed border-border/70 bg-background/30 px-4 py-12 text-center text-sm text-muted-foreground">
+            No invite codes yet.
+          </div>
+        )}
+      </AdminSurface>
+    </div>
+  );
+
+  if (embedded) {
+    return content;
+  }
+
+  return (
+    <AdminSectionShell
+      description="Invite codes are used for closed registration and can only be applied once."
+      eyebrow="INVITE"
+      id="invite-codes"
+      title="Invite Codes"
+    >
+      {content}
     </AdminSectionShell>
   );
 }

@@ -1,8 +1,21 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 
 import { toast } from "sonner";
+
+function decodeSearchParam(value: string | null | undefined) {
+  if (!value) {
+    return undefined;
+  }
+
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
 
 export function AdminFeedbackToast({
   error,
@@ -11,20 +24,23 @@ export function AdminFeedbackToast({
   error?: string;
   notice?: string;
 }) {
+  const searchParams = useSearchParams();
   const shownRef = useRef<string | null>(null);
+  const resolvedNotice = notice ?? decodeSearchParam(searchParams.get("notice"));
+  const resolvedError = error ?? decodeSearchParam(searchParams.get("error"));
 
   useEffect(() => {
-    if (notice && shownRef.current !== `notice:${notice}`) {
-      shownRef.current = `notice:${notice}`;
-      toast.success(notice, { position: "bottom-right" });
+    if (resolvedNotice && shownRef.current !== `notice:${resolvedNotice}`) {
+      shownRef.current = `notice:${resolvedNotice}`;
+      toast.success(resolvedNotice, { position: "bottom-right" });
       return;
     }
 
-    if (error && shownRef.current !== `error:${error}`) {
-      shownRef.current = `error:${error}`;
-      toast.error(error, { position: "bottom-right" });
+    if (resolvedError && shownRef.current !== `error:${resolvedError}`) {
+      shownRef.current = `error:${resolvedError}`;
+      toast.error(resolvedError, { position: "bottom-right" });
     }
-  }, [error, notice]);
+  }, [resolvedError, resolvedNotice]);
 
   return null;
 }

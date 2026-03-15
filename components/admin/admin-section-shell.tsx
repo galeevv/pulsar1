@@ -1,28 +1,31 @@
+import { cn } from "@/lib/utils";
+
 export function AdminSectionShell({
   id,
-  eyebrow,
   title,
-  description,
+  actions,
   children,
+  className,
+  contentClassName,
 }: {
   id: string;
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
-  description: string;
+  description?: string;
+  actions?: React.ReactNode;
   children: React.ReactNode;
+  className?: string;
+  contentClassName?: string;
 }) {
   return (
-    <section className="scroll-mt-24 py-section md:scroll-mt-28 md:py-section-md" id={id}>
-      <div className="space-y-3">
-        <p className="text-eyebrow font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-          {eyebrow}
-        </p>
-        <h2 className="text-h2 font-semibold tracking-tight">{title}</h2>
-        <p className="max-w-[760px] text-sm leading-7 text-muted-foreground md:text-base">
-          {description}
-        </p>
+    <section className={cn("scroll-mt-20 py-12 md:scroll-mt-20 md:py-12", className)} id={id}>
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div className="w-full">
+          <h2 className="text-h2 font-semibold tracking-tight">{title}</h2>
+        </div>
+        {actions ? <div className="shrink-0">{actions}</div> : null}
       </div>
-      <div className="mt-6">{children}</div>
+      <div className={cn("mt-4", contentClassName)}>{children}</div>
     </section>
   );
 }

@@ -1,96 +1,175 @@
-import { redirect } from "next/navigation";
-
-import { AdminFeedbackToast } from "@/app/admin/admin-feedback-toast";
-import { AdminAccountSection } from "@/components/admin/admin-account-section";
-import { AdminHeader } from "@/components/admin/admin-header";
-import { AdminInviteCodesSection } from "@/components/admin/admin-invite-codes-section";
-import { AdminOperationsSection } from "@/components/admin/admin-operations-section";
 import { AdminOverviewSection } from "@/components/admin/admin-overview-section";
-import { AdminPaymentsSection } from "@/components/admin/admin-payments-section";
-import { AdminPromoCodesSection } from "@/components/admin/admin-promo-codes-section";
-import { AdminReferralCodesSection } from "@/components/admin/admin-referral-codes-section";
-import { AdminRulesSection } from "@/components/admin/admin-rules-section";
-import { AdminSupportSection } from "@/components/admin/admin-support-section";
-import { AdminTariffsSection } from "@/components/admin/admin-tariffs-section";
-import { AdminUsersSection } from "@/components/admin/admin-users-section";
-import { getCurrentSession } from "@/lib/auth";
 import { getAdminDashboardData } from "@/lib/admin-code-management";
+import { prisma } from "@/lib/prisma";
 
-type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+export default async function AdminOverviewPage() {
+  const now = new Date();
+  const startOfToday = new Date(now);
+  startOfToday.setHours(0, 0, 0, 0);
 
-function getValue(
-  searchParams: Record<string, string | string[] | undefined>,
-  key: string
-) {
-  const value = searchParams[key];
-  return Array.isArray(value) ? value[0] : value;
-}
+  const startOfYesterday = new Date(startOfToday);
+  startOfYesterday.setDate(startOfYesterday.getDate() - 1);
 
-function decodeSearchParam(value: string | undefined) {
-  if (!value) {
-    return undefined;
+  const startOfCurrentWeekWindow = new Date(now);
+  startOfCurrentWeekWindow.setDate(startOfCurrentWeekWindow.getDate() - 7);
+
+  const startOfPreviousWeekWindow = new Date(startOfCurrentWeekWindow);
+  startOfPreviousWeekWindow.setDate(startOfPreviousWeekWindow.getDate() - 7);
+
+  const [
+    dashboardData,
+    openTickets,
+    totalUsers,
+    usersThisWeek,
+    usersPreviousWeek,
+    activeSubsThisWeek,
+    activeSubsPreviousWeek,
+    openTicketsToday,
+    openTicketsYesterday,
+    totalRevenueAggregate,
+    revenueThisWeekAggregate,
+    revenuePreviousWeekAggregate,
+    referralUseRows,
+  ] = await Promise.all([
+    getAdminDashboardData(),
+    prisma.supportTicket.count({
+      where: {
+        status: {
+          not: "closed",
+        },
+      },
+    }),
+    prisma.user.count(),
+    prisma.user.count({
+      where: {
+        createdAt: {
+          gte: startOfCurrentWeekWindow,
+        },
+      },
+    }),
+    prisma.user.count({
+      where: {
+        createdAt: {
+          gte: startOfPreviousWeekWindow,
+          lt: startOfCurrentWeekWindow,
+        },
+      },
+    }),
+    prisma.subscription.count({
+      where: {
+        startedAt: {
+          gte: startOfCurrentWeekWindow,
+        },
+        status: "ACTIVE",
+      },
+    }),
+    prisma.subscription.count({
+      where: {
+        startedAt: {
+          gte: startOfPreviousWeekWindow,
+          lt: startOfCurrentWeekWindow,
+        },
+        status: "ACTIVE",
+      },
+    }),
+    prisma.supportTicket.count({
+      where: {
+        createdAt: {
+          gte: startOfToday,
+        },
+        status: {
+          not: "closed",
+        },
+      },
+    }),
+    prisma.supportTicket.count({
+      where: {
+        createdAt: {
+          gte: startOfYesterday,
+          lt: startOfToday,
+        },
+        status: {
+          not: "closed",
+        },
+      },
+    }),
+    prisma.paymentRequest.aggregate({
+      _sum: {
+        amountRub: true,
+      },
+      where: {
+        status: "APPROVED",
+      },
+    }),
+    prisma.paymentRequest.aggregate({
+      _sum: {
+        amountRub: true,
+      },
+      where: {
+        approvedAt: {
+          gte: startOfCurrentWeekWindow,
+        },
+        status: "APPROVED",
+      },
+    }),
+    prisma.paymentRequest.aggregate({
+      _sum: {
+        amountRub: true,
+      },
+      where: {
+        approvedAt: {
+          gte: startOfPreviousWeekWindow,
+          lt: startOfCurrentWeekWindow,
+        },
+        status: "APPROVED",
+      },
+    }),
+    prisma.referralCodeUse.findMany({
+      select: {
+        referralCode: {
+          select: {
+            ownerUser: {
+              select: { username: true },
+            },
+          },
+        },
+      },
+    }),
+  ]);
+
+  const totalRevenue = totalRevenueAggregate._sum.amountRub ?? 0;
+  const usersTrend = usersThisWeek - usersPreviousWeek;
+  const activeSubsTrend = activeSubsThisWeek - activeSubsPreviousWeek;
+  const openTicketsTrend = openTicketsToday - openTicketsYesterday;
+  const revenueTrend =
+    (revenueThisWeekAggregate._sum.amountRub ?? 0) -
+    (revenuePreviousWeekAggregate._sum.amountRub ?? 0);
+  const topReferrersMap = new Map<string, number>();
+  for (const row of referralUseRows) {
+    const username = row.referralCode.ownerUser?.username;
+    if (!username) {
+      continue;
+    }
+
+    topReferrersMap.set(username, (topReferrersMap.get(username) ?? 0) + 1);
   }
-
-  try {
-    return decodeURIComponent(value);
-  } catch {
-    return value;
-  }
-}
-
-export default async function AdminPage({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
-  const session = await getCurrentSession();
-
-  if (!session) {
-    redirect("/");
-  }
-
-  if (session.role !== "ADMIN") {
-    redirect("/app");
-  }
-
-  const resolvedSearchParams = await searchParams;
-  const error = getValue(resolvedSearchParams, "error");
-  const notice = getValue(resolvedSearchParams, "notice");
-  const dashboardData = await getAdminDashboardData();
+  const topReferrers = Array.from(topReferrersMap.entries())
+    .map(([username, invites]) => ({ invites, username }))
+    .sort((a, b) => b.invites - a.invites)
+    .slice(0, 3);
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
-      <AdminFeedbackToast
-        error={decodeSearchParam(error)}
-        notice={decodeSearchParam(notice)}
-      />
-
-      <AdminHeader />
-
-      <div className="mx-auto w-full max-w-[1200px] px-6 pb-24 pt-8">
-        <AdminOverviewSection />
-        <AdminAccountSection currentUsername={session.username} />
-        <AdminUsersSection users={dashboardData.users} />
-        <AdminInviteCodesSection inviteCodes={dashboardData.inviteCodes} />
-        <AdminReferralCodesSection
-          referralCodes={dashboardData.referralCodes}
-          referralProgramSettings={dashboardData.referralProgramSettings}
-        />
-        <AdminPromoCodesSection promoCodes={dashboardData.promoCodes} />
-        <AdminRulesSection legalDocuments={dashboardData.legalDocuments} />
-        <AdminTariffsSection
-          durationRules={dashboardData.subscriptionDurationRules}
-          pricingSettings={dashboardData.subscriptionPricingSettings}
-        />
-        <AdminPaymentsSection paymentRequests={dashboardData.paymentRequests} />
-        <AdminSupportSection />
-        <AdminOperationsSection
-          deviceSlotStats={dashboardData.deviceSlotStats}
-          recentSubscriptions={dashboardData.recentSubscriptions}
-          serviceCapacitySettings={dashboardData.serviceCapacitySettings}
-          subscriptionStats={dashboardData.subscriptionStats}
-        />
-      </div>
-    </main>
+    <AdminOverviewSection
+      activeSubscriptions={dashboardData.subscriptionStats.active}
+      activeSubscriptionsTrend={activeSubsTrend}
+      maxActiveSubscriptions={dashboardData.serviceCapacitySettings.maxActiveSubscriptions}
+      openTickets={openTickets}
+      openTicketsTrend={openTicketsTrend}
+      revenueTotal={totalRevenue}
+      revenueTrend={revenueTrend}
+      totalUsers={totalUsers}
+      totalUsersTrend={usersTrend}
+      topReferrers={topReferrers}
+    />
   );
 }

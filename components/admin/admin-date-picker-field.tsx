@@ -48,13 +48,13 @@ export function AdminDatePickerField({
   );
 
   return (
-    <div>
-      <label className="mb-2 block text-sm font-medium">{label}</label>
+    <div className="space-y-2">
+      <label className="block text-sm font-medium">{label}</label>
       <input name={name} type="hidden" value={serializedValue} />
       <Popover>
         <PopoverTrigger asChild>
           <Button
-            className="h-input w-full justify-between px-3"
+            className="h-input w-full justify-between border-border/70 bg-background/40 px-3 text-left"
             radius="card"
             type="button"
             variant="outline"
@@ -63,7 +63,7 @@ export function AdminDatePickerField({
             <CalendarDays className="size-4 text-muted-foreground" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent align="start" className="w-auto p-0">
+        <PopoverContent align="start" className="w-auto rounded-card border-border/70 p-0">
           <Calendar
             mode="single"
             onSelect={setSelected}

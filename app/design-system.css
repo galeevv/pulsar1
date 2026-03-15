@@ -6,11 +6,17 @@
   --spacing-card-md: 1.25rem;
   --spacing-card-compact: 0.75rem;
   --spacing-card-compact-md: 1rem;
+  --spacing-admin-shell-x: 1rem;
+  --spacing-admin-shell-x-md: 1.5rem;
+  --spacing-admin-shell-y: 1.5rem;
+  --spacing-admin-shell-y-md: 2rem;
+  --spacing-admin-grid-gap: 1.5rem;
   --spacing-button: 2.75rem;
   --spacing-button-x: 2rem;
   --spacing-input: 2.75rem;
 
   --text-eyebrow: 12px;
+  --text-admin-eyebrow: 11px;
   --text-logo: 20px;
   --text-h1: 36px;
   --text-h1--line-height: 1.05;
@@ -20,6 +26,7 @@
   --text-lead--line-height: 1.4;
 
   --radius-card: 16px;
+  --radius-panel: 20px;
   --radius-hero: 24px;
   --radius-pill: 999px;
 }
@@ -29,5 +36,6 @@
     --text-h1: 54px;
     --text-h2: 36px;
     --text-lead: 20px;
+    --spacing-admin-grid-gap: 2rem;
   }
 }
