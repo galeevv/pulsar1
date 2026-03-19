@@ -7,19 +7,16 @@ import { AdminDatePickerField } from "@/components/admin/admin-date-picker-field
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  generateInviteCodeValue,
-  generatePromoCodeValue,
-  generateReferralCodeValue,
-} from "@/lib/admin-code-management";
 
 import { AdminCopyCodeButton } from "./admin-copy-code-button";
 
 function PreviewCard({
   code,
+  placeholder,
   title,
 }: {
-  code: string;
+  code?: string;
+  placeholder: string;
   title: string;
 }) {
   return (
@@ -27,7 +24,7 @@ function PreviewCard({
       <div className="space-y-3">
         <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">{title}</p>
         <p className="rounded-card border border-border/70 bg-background/40 px-3 py-2 font-mono text-sm font-medium tracking-[0.08em]">
-          {code}
+          {code || placeholder}
         </p>
       </div>
       <AdminCopyCodeButton value={code} />
@@ -36,10 +33,6 @@ function PreviewCard({
 }
 
 export function AdminDashboardCodesBlock() {
-  const inviteCode = generateInviteCodeValue();
-  const referralCode = generateReferralCodeValue();
-  const promoCode = generatePromoCodeValue();
-
   return (
     <div className="space-y-4">
       <div className="space-y-1">
@@ -69,8 +62,7 @@ export function AdminDashboardCodesBlock() {
                 <Input
                   className="h-input border-border/70 bg-background/40"
                   name="code"
-                  readOnly
-                  value={inviteCode}
+                  placeholder="Leave empty for auto generation"
                 />
               </div>
 
@@ -81,7 +73,10 @@ export function AdminDashboardCodesBlock() {
               </Button>
             </form>
 
-            <PreviewCard code={inviteCode} title="Invite preview" />
+            <PreviewCard
+              placeholder="Code will be generated only after click on Generate Invite."
+              title="Invite preview"
+            />
           </div>
         </TabsContent>
 
@@ -100,8 +95,7 @@ export function AdminDashboardCodesBlock() {
                 <Input
                   className="h-input border-border/70 bg-background/40"
                   name="code"
-                  readOnly
-                  value={referralCode}
+                  placeholder="Leave empty for auto generation"
                 />
               </div>
 
@@ -135,7 +129,10 @@ export function AdminDashboardCodesBlock() {
               </Button>
             </form>
 
-            <PreviewCard code={referralCode} title="Referral preview" />
+            <PreviewCard
+              placeholder="Code will be generated only after click on Generate Referral."
+              title="Referral preview"
+            />
           </div>
         </TabsContent>
 
@@ -154,8 +151,7 @@ export function AdminDashboardCodesBlock() {
                 <Input
                   className="h-input border-border/70 bg-background/40"
                   name="code"
-                  readOnly
-                  value={promoCode}
+                  placeholder="Leave empty for auto generation"
                 />
               </div>
 
@@ -189,7 +185,10 @@ export function AdminDashboardCodesBlock() {
               </Button>
             </form>
 
-            <PreviewCard code={promoCode} title="Promo preview" />
+            <PreviewCard
+              placeholder="Code will be generated only after click on Generate Promo."
+              title="Promo preview"
+            />
           </div>
         </TabsContent>
       </Tabs>

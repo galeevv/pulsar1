@@ -10,12 +10,12 @@ import {
   ChevronRight,
   CircleUserRound,
   FileText,
-  LifeBuoy,
+  Headset,
+  LayoutDashboard,
   LogOut,
   Orbit,
   ReceiptText,
   Settings2,
-  ShieldCheck,
   Users,
 } from "lucide-react";
 
@@ -60,7 +60,7 @@ const navGroups: Array<{ id: string; links: SidebarLink[]; title: string }> = [
   {
     id: "overview",
     links: [
-      { href: "/admin", icon: ShieldCheck, label: "Dashboard" },
+      { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
       { href: "/admin/users", icon: Users, label: "Users" },
     ],
     title: "Core",
@@ -77,7 +77,7 @@ const navGroups: Array<{ id: string; links: SidebarLink[]; title: string }> = [
   {
     id: "operations",
     links: [
-      { href: "/admin/support", icon: LifeBuoy, label: "Support" },
+      { href: "/admin/support", icon: Headset, label: "Support" },
       { href: "/admin/rules", icon: FileText, label: "Documents" },
       { href: "/admin/operations", icon: Activity, label: "Operations" },
     ],

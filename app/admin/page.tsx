@@ -134,6 +134,11 @@ export default async function AdminOverviewPage() {
           },
         },
       },
+      where: {
+        rewardGrantedAt: {
+          not: null,
+        },
+      },
     }),
   ]);
 

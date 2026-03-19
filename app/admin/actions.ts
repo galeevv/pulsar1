@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -54,7 +54,7 @@ async function getAdminActor() {
   const session = await getCurrentSession();
 
   if (!session) {
-    redirect("/login?mode=login&error=РЎРЅР°С‡Р°Р»Р° РІРѕР№РґРёС‚Рµ РІ Р°РєРєР°СѓРЅС‚.");
+    redirect("/login?mode=login&error=Р РЋР Р…Р В°РЎвЂЎР В°Р В»Р В° Р Р†Р С•Р в„–Р Т‘Р С‘РЎвЂљР Вµ Р Р† Р В°Р С”Р С”Р В°РЎС“Р Р…РЎвЂљ.");
   }
 
   if (session.role !== "ADMIN") {
@@ -67,7 +67,7 @@ async function getAdminActor() {
   });
 
   if (!user) {
-    redirect("/login?mode=login&error=РЎРЅР°С‡Р°Р»Р° РІРѕР№РґРёС‚Рµ РІ Р°РєРєР°СѓРЅС‚.");
+    redirect("/login?mode=login&error=Р РЋР Р…Р В°РЎвЂЎР В°Р В»Р В° Р Р†Р С•Р в„–Р Т‘Р С‘РЎвЂљР Вµ Р Р† Р В°Р С”Р С”Р В°РЎС“Р Р…РЎвЂљ.");
   }
 
   return user;
@@ -87,7 +87,7 @@ export async function createInviteCodeAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: redirectPath,
-        error: "РЈРєР°Р¶РёС‚Рµ РєРѕСЂСЂРµРєС‚РЅС‹Р№ СЃСЂРѕРє РґРµР№СЃС‚РІРёСЏ invite-РєРѕРґР°.",
+        error: "Set an expiration date for the invite code.",
       })
     );
   }
@@ -96,7 +96,7 @@ export async function createInviteCodeAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: redirectPath,
-        error: "РЎСЂРѕРє РґРµР№СЃС‚РІРёСЏ invite-РєРѕРґР° РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РІ Р±СѓРґСѓС‰РµРј.",
+        error: "Invite code expiration must be in the future.",
       })
     );
   }
@@ -105,7 +105,7 @@ export async function createInviteCodeAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: redirectPath,
-        error: "РўР°РєРѕР№ РєРѕРґ СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚ РІ СЃРёСЃС‚РµРјРµ.",
+        error: "This code already exists in the system.",
       })
     );
   }
@@ -122,11 +122,10 @@ export async function createInviteCodeAction(formData: FormData) {
   redirect(
     buildRedirectUrl({
       path: redirectPath,
-      notice: "Invite-РєРѕРґ СЃРѕР·РґР°РЅ.",
+      notice: "Invite code created.",
     })
   );
 }
-
 export async function toggleInviteCodeAction(formData: FormData) {
   await getAdminActor();
 
@@ -134,7 +133,7 @@ export async function toggleInviteCodeAction(formData: FormData) {
   const nextEnabled = String(formData.get("nextEnabled") ?? "") === "true";
 
   if (!id) {
-    redirect(buildRedirectUrl({ path: "/admin/codes?tab=invite", error: "Invite-РєРѕРґ РЅРµ РЅР°Р№РґРµРЅ." }));
+    redirect(buildRedirectUrl({ path: "/admin/codes?tab=invite", error: "Invite-Р С”Р С•Р Т‘ Р Р…Р Вµ Р Р…Р В°Р в„–Р Т‘Р ВµР Р…." }));
   }
 
   await prisma.inviteCode.update({
@@ -146,7 +145,7 @@ export async function toggleInviteCodeAction(formData: FormData) {
   redirect(
     buildRedirectUrl({
       path: "/admin/codes?tab=invite",
-      notice: nextEnabled ? "Invite-РєРѕРґ РІРєР»СЋС‡РµРЅ." : "Invite-РєРѕРґ РІС‹РєР»СЋС‡РµРЅ.",
+      notice: nextEnabled ? "Invite-Р С”Р С•Р Т‘ Р Р†Р С”Р В»РЎР‹РЎвЂЎР ВµР Р…." : "Invite-Р С”Р С•Р Т‘ Р Р†РЎвЂ№Р С”Р В»РЎР‹РЎвЂЎР ВµР Р….",
     })
   );
 }
@@ -166,7 +165,7 @@ export async function updateReferralProgramSettingsAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/codes?tab=referral",
-        error: "Р“Р»РѕР±Р°Р»СЊРЅР°СЏ СЃРєРёРґРєР° РґРѕР»Р¶РЅР° Р±С‹С‚СЊ С‡РёСЃР»РѕРј РѕС‚ 1 РґРѕ 100.",
+        error: "Р вЂњР В»Р С•Р В±Р В°Р В»РЎРЉР Р…Р В°РЎРЏ РЎРѓР С”Р С‘Р Т‘Р С”Р В° Р Т‘Р С•Р В»Р В¶Р Р…Р В° Р В±РЎвЂ№РЎвЂљРЎРЉ РЎвЂЎР С‘РЎРѓР В»Р С•Р С Р С•РЎвЂљ 1 Р Т‘Р С• 100.",
       })
     );
   }
@@ -175,7 +174,7 @@ export async function updateReferralProgramSettingsAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/codes?tab=referral",
-        error: "Р“Р»РѕР±Р°Р»СЊРЅС‹Р№ Р±РѕРЅСѓСЃ РІ РєСЂРµРґРёС‚Р°С… РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ Р±РѕР»СЊС€Рµ 0.",
+        error: "Р вЂњР В»Р С•Р В±Р В°Р В»РЎРЉР Р…РЎвЂ№Р в„– Р В±Р С•Р Р…РЎС“РЎРѓ Р Р† Р С”РЎР‚Р ВµР Т‘Р С‘РЎвЂљР В°РЎвЂ¦ Р Т‘Р С•Р В»Р В¶Р ВµР Р… Р В±РЎвЂ№РЎвЂљРЎРЉ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ 0.",
       })
     );
   }
@@ -199,7 +198,7 @@ export async function updateReferralProgramSettingsAction(formData: FormData) {
   redirect(
     buildRedirectUrl({
       path: "/admin/codes?tab=referral",
-      notice: "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РЅР°СЃС‚СЂРѕР№РєРё СЂРµС„РµСЂР°Р»СЊРЅРѕР№ СЃРёСЃС‚РµРјС‹ СЃРѕС…СЂР°РЅРµРЅС‹.",
+      notice: "Р вЂњР В»Р С•Р В±Р В°Р В»РЎРЉР Р…РЎвЂ№Р Вµ Р Р…Р В°РЎРѓРЎвЂљРЎР‚Р С•Р в„–Р С”Р С‘ РЎР‚Р ВµРЎвЂћР ВµРЎР‚Р В°Р В»РЎРЉР Р…Р С•Р в„– РЎРѓР С‘РЎРѓРЎвЂљР ВµР СРЎвЂ№ РЎРѓР С•РЎвЂ¦РЎР‚Р В°Р Р…Р ВµР Р…РЎвЂ№.",
     })
   );
 }
@@ -223,7 +222,7 @@ export async function createReferralCodeAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: redirectPath,
-        error: "РЎРєРёРґРєР° РґРѕР»Р¶РЅР° Р±С‹С‚СЊ С‡РёСЃР»РѕРј РѕС‚ 1 РґРѕ 100.",
+        error: "Discount must be a number from 1 to 100.",
       })
     );
   }
@@ -232,7 +231,7 @@ export async function createReferralCodeAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: redirectPath,
-        error: "РљРѕР»РёС‡РµСЃС‚РІРѕ Р±РѕРЅСѓСЃРЅС‹С… РєСЂРµРґРёС‚РѕРІ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ Р±РѕР»СЊС€Рµ 0.",
+        error: "Reward credits must be greater than 0.",
       })
     );
   }
@@ -241,7 +240,7 @@ export async function createReferralCodeAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: redirectPath,
-        error: "РЈРєР°Р¶РёС‚Рµ РєРѕСЂСЂРµРєС‚РЅС‹Р№ СЃСЂРѕРє РґРµР№СЃС‚РІРёСЏ referral-РєРѕРґР°.",
+        error: "Set an expiration date for the referral code.",
       })
     );
   }
@@ -250,7 +249,7 @@ export async function createReferralCodeAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: redirectPath,
-        error: "РЎСЂРѕРє РґРµР№СЃС‚РІРёСЏ referral-РєРѕРґР° РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РІ Р±СѓРґСѓС‰РµРј.",
+        error: "Referral code expiration must be in the future.",
       })
     );
   }
@@ -259,7 +258,7 @@ export async function createReferralCodeAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: redirectPath,
-        error: "РўР°РєРѕР№ РєРѕРґ СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚ РІ СЃРёСЃС‚РµРјРµ.",
+        error: "This code already exists in the system.",
       })
     );
   }
@@ -279,11 +278,10 @@ export async function createReferralCodeAction(formData: FormData) {
   redirect(
     buildRedirectUrl({
       path: redirectPath,
-      notice: "РљР°СЃС‚РѕРјРЅС‹Р№ referral-РєРѕРґ СЃРѕР·РґР°РЅ.",
+      notice: "Referral code created.",
     })
   );
 }
-
 export async function toggleReferralCodeAction(formData: FormData) {
   await getAdminActor();
 
@@ -291,7 +289,7 @@ export async function toggleReferralCodeAction(formData: FormData) {
   const nextEnabled = String(formData.get("nextEnabled") ?? "") === "true";
 
   if (!id) {
-    redirect(buildRedirectUrl({ path: "/admin/codes?tab=referral", error: "Referral-РєРѕРґ РЅРµ РЅР°Р№РґРµРЅ." }));
+    redirect(buildRedirectUrl({ path: "/admin/codes?tab=referral", error: "Referral-Р С”Р С•Р Т‘ Р Р…Р Вµ Р Р…Р В°Р в„–Р Т‘Р ВµР Р…." }));
   }
 
   await prisma.referralCode.update({
@@ -303,7 +301,7 @@ export async function toggleReferralCodeAction(formData: FormData) {
   redirect(
     buildRedirectUrl({
       path: "/admin/codes?tab=referral",
-      notice: nextEnabled ? "Referral-РєРѕРґ РІРєР»СЋС‡РµРЅ." : "Referral-РєРѕРґ РІС‹РєР»СЋС‡РµРЅ.",
+      notice: nextEnabled ? "Referral-Р С”Р С•Р Т‘ Р Р†Р С”Р В»РЎР‹РЎвЂЎР ВµР Р…." : "Referral-Р С”Р С•Р Т‘ Р Р†РЎвЂ№Р С”Р В»РЎР‹РЎвЂЎР ВµР Р….",
     })
   );
 }
@@ -327,7 +325,7 @@ export async function createPromoCodeAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: redirectPath,
-        error: "РљРѕР»РёС‡РµСЃС‚РІРѕ РєСЂРµРґРёС‚РѕРІ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ Р±РѕР»СЊС€Рµ 0.",
+        error: "Credit amount must be greater than 0.",
       })
     );
   }
@@ -336,7 +334,7 @@ export async function createPromoCodeAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: redirectPath,
-        error: "Р›РёРјРёС‚ РїСЂРёРјРµРЅРµРЅРёР№ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ Р±РѕР»СЊС€Рµ 0.",
+        error: "Max redemptions must be greater than 0.",
       })
     );
   }
@@ -345,7 +343,7 @@ export async function createPromoCodeAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: redirectPath,
-        error: "РЈРєР°Р¶РёС‚Рµ РєРѕСЂСЂРµРєС‚РЅС‹Р№ СЃСЂРѕРє РґРµР№СЃС‚РІРёСЏ РїСЂРѕРјРѕРєРѕРґР°.",
+        error: "Set an expiration date for the promo code.",
       })
     );
   }
@@ -354,7 +352,7 @@ export async function createPromoCodeAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: redirectPath,
-        error: "РЎСЂРѕРє РґРµР№СЃС‚РІРёСЏ РїСЂРѕРјРѕРєРѕРґР° РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РІ Р±СѓРґСѓС‰РµРј.",
+        error: "Promo code expiration must be in the future.",
       })
     );
   }
@@ -363,7 +361,7 @@ export async function createPromoCodeAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: redirectPath,
-        error: "РўР°РєРѕР№ РєРѕРґ СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚ РІ СЃРёСЃС‚РµРјРµ.",
+        error: "This code already exists in the system.",
       })
     );
   }
@@ -382,11 +380,10 @@ export async function createPromoCodeAction(formData: FormData) {
   redirect(
     buildRedirectUrl({
       path: redirectPath,
-      notice: "РџСЂРѕРјРѕРєРѕРґ СЃРѕР·РґР°РЅ.",
+      notice: "Promo code created.",
     })
   );
 }
-
 export async function togglePromoCodeAction(formData: FormData) {
   await getAdminActor();
 
@@ -394,7 +391,7 @@ export async function togglePromoCodeAction(formData: FormData) {
   const nextEnabled = String(formData.get("nextEnabled") ?? "") === "true";
 
   if (!id) {
-    redirect(buildRedirectUrl({ path: "/admin/codes?tab=promo", error: "РџСЂРѕРјРѕРєРѕРґ РЅРµ РЅР°Р№РґРµРЅ." }));
+    redirect(buildRedirectUrl({ path: "/admin/codes?tab=promo", error: "Р СџРЎР‚Р С•Р СР С•Р С”Р С•Р Т‘ Р Р…Р Вµ Р Р…Р В°Р в„–Р Т‘Р ВµР Р…." }));
   }
 
   await prisma.promoCode.update({
@@ -406,7 +403,7 @@ export async function togglePromoCodeAction(formData: FormData) {
   redirect(
     buildRedirectUrl({
       path: "/admin/codes?tab=promo",
-      notice: nextEnabled ? "РџСЂРѕРјРѕРєРѕРґ РІРєР»СЋС‡РµРЅ." : "РџСЂРѕРјРѕРєРѕРґ РІС‹РєР»СЋС‡РµРЅ.",
+      notice: nextEnabled ? "Р СџРЎР‚Р С•Р СР С•Р С”Р С•Р Т‘ Р Р†Р С”Р В»РЎР‹РЎвЂЎР ВµР Р…." : "Р СџРЎР‚Р С•Р СР С•Р С”Р С•Р Т‘ Р Р†РЎвЂ№Р С”Р В»РЎР‹РЎвЂЎР ВµР Р….",
     })
   );
 }
@@ -442,18 +439,18 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
       discountPercent: number;
     }>;
   } catch {
-    redirect(buildRedirectUrl({ path: "/admin/tariffs", error: "РќРµРєРѕСЂСЂРµРєС‚РЅС‹Рµ РґР°РЅРЅС‹Рµ С‚Р°Р±Р»РёС†С‹ СЃСЂРѕРєРѕРІ." }));
+    redirect(buildRedirectUrl({ path: "/admin/tariffs", error: "Р СњР ВµР С”Р С•РЎР‚РЎР‚Р ВµР С”РЎвЂљР Р…РЎвЂ№Р Вµ Р Т‘Р В°Р Р…Р Р…РЎвЂ№Р Вµ РЎвЂљР В°Р В±Р В»Р С‘РЎвЂ РЎвЂ№ РЎРѓРЎР‚Р С•Р С”Р С•Р Р†." }));
   }
 
   if (!Array.isArray(parsedRows) || parsedRows.length === 0) {
-    redirect(buildRedirectUrl({ path: "/admin/tariffs", error: "Р”РѕР±Р°РІСЊС‚Рµ С…РѕС‚СЏ Р±С‹ РѕРґРёРЅ СЃСЂРѕРє РїРѕРґРїРёСЃРєРё." }));
+    redirect(buildRedirectUrl({ path: "/admin/tariffs", error: "Р вЂќР С•Р В±Р В°Р Р†РЎРЉРЎвЂљР Вµ РЎвЂ¦Р С•РЎвЂљРЎРЏ Р В±РЎвЂ№ Р С•Р Т‘Р С‘Р Р… РЎРѓРЎР‚Р С•Р С” Р С—Р С•Р Т‘Р С—Р С‘РЎРѓР С”Р С‘." }));
   }
 
   if (!Number.isFinite(baseDeviceMonthlyPrice) || baseDeviceMonthlyPrice < 0) {
     redirect(
       buildRedirectUrl({
         path: "/admin/tariffs",
-        error: "Р‘Р°Р·РѕРІР°СЏ С†РµРЅР° РІ РјРµСЃСЏС† (1 СѓСЃС‚СЂРѕР№СЃС‚РІРѕ) РґРѕР»Р¶РЅР° Р±С‹С‚СЊ 0 РёР»Рё Р±РѕР»СЊС€Рµ.",
+        error: "Р вЂР В°Р В·Р С•Р Р†Р В°РЎРЏ РЎвЂ Р ВµР Р…Р В° Р Р† Р СР ВµРЎРѓРЎРЏРЎвЂ  (1 РЎС“РЎРѓРЎвЂљРЎР‚Р С•Р в„–РЎРѓРЎвЂљР Р†Р С•) Р Т‘Р С•Р В»Р В¶Р Р…Р В° Р В±РЎвЂ№РЎвЂљРЎРЉ 0 Р С‘Р В»Р С‘ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ.",
       })
     );
   }
@@ -462,7 +459,7 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/tariffs",
-        error: "Р¦РµРЅР° РґРѕРї. СѓСЃС‚СЂРѕР№СЃС‚РІР° РІ РјРµСЃСЏС† РґРѕР»Р¶РЅР° Р±С‹С‚СЊ 0 РёР»Рё Р±РѕР»СЊС€Рµ.",
+        error: "Р В¦Р ВµР Р…Р В° Р Т‘Р С•Р С—. РЎС“РЎРѓРЎвЂљРЎР‚Р С•Р в„–РЎРѓРЎвЂљР Р†Р В° Р Р† Р СР ВµРЎРѓРЎРЏРЎвЂ  Р Т‘Р С•Р В»Р В¶Р Р…Р В° Р В±РЎвЂ№РЎвЂљРЎРЉ 0 Р С‘Р В»Р С‘ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ.",
       })
     );
   }
@@ -471,7 +468,7 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/tariffs",
-        error: "Р¦РµРЅР°/РјРµСЃ РґРѕР»Р¶РЅР° Р±С‹С‚СЊ 0 РёР»Рё Р±РѕР»СЊС€Рµ.",
+        error: "Р В¦Р ВµР Р…Р В°/Р СР ВµРЎРѓ Р Т‘Р С•Р В»Р В¶Р Р…Р В° Р В±РЎвЂ№РЎвЂљРЎРЉ 0 Р С‘Р В»Р С‘ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ.",
       })
     );
   }
@@ -480,7 +477,7 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/tariffs",
-        error: "РњРёРЅРёРјСѓРј СѓСЃС‚СЂРѕР№СЃС‚РІ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ Р±РѕР»СЊС€Рµ 0.",
+        error: "Р СљР С‘Р Р…Р С‘Р СРЎС“Р С РЎС“РЎРѓРЎвЂљРЎР‚Р С•Р в„–РЎРѓРЎвЂљР Р† Р Т‘Р С•Р В»Р В¶Р ВµР Р… Р В±РЎвЂ№РЎвЂљРЎРЉ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ 0.",
       })
     );
   }
@@ -489,7 +486,7 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/tariffs",
-        error: "РњР°РєСЃРёРјСѓРј СѓСЃС‚СЂРѕР№СЃС‚РІ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ Р±РѕР»СЊС€Рµ РёР»Рё СЂР°РІРµРЅ РјРёРЅРёРјСѓРјСѓ.",
+        error: "Р СљР В°Р С”РЎРѓР С‘Р СРЎС“Р С РЎС“РЎРѓРЎвЂљРЎР‚Р С•Р в„–РЎРѓРЎвЂљР Р† Р Т‘Р С•Р В»Р В¶Р ВµР Р… Р В±РЎвЂ№РЎвЂљРЎРЉ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ Р С‘Р В»Р С‘ РЎР‚Р В°Р Р†Р ВµР Р… Р СР С‘Р Р…Р С‘Р СРЎС“Р СРЎС“.",
       })
     );
   }
@@ -498,7 +495,7 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/tariffs",
-        error: "РњР°РєСЃРёРјСѓРј СѓСЃС‚СЂРѕР№СЃС‚РІ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ Р±РѕР»СЊС€Рµ 10.",
+        error: "Р СљР В°Р С”РЎРѓР С‘Р СРЎС“Р С РЎС“РЎРѓРЎвЂљРЎР‚Р С•Р в„–РЎРѓРЎвЂљР Р† Р Р…Р Вµ Р СР С•Р В¶Р ВµРЎвЂљ Р В±РЎвЂ№РЎвЂљРЎРЉ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ 10.",
       })
     );
   }
@@ -515,7 +512,7 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
       redirect(
         buildRedirectUrl({
           path: "/admin/tariffs",
-          error: "РЎСЂРѕРє РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РІ РґРёР°РїР°Р·РѕРЅРµ РѕС‚ 1 РґРѕ 120 РјРµСЃСЏС†РµРІ.",
+          error: "Р РЋРЎР‚Р С•Р С” Р Т‘Р С•Р В»Р В¶Р ВµР Р… Р В±РЎвЂ№РЎвЂљРЎРЉ Р Р† Р Т‘Р С‘Р В°Р С—Р В°Р В·Р С•Р Р…Р Вµ Р С•РЎвЂљ 1 Р Т‘Р С• 120 Р СР ВµРЎРѓРЎРЏРЎвЂ Р ВµР Р†.",
         })
       );
     }
@@ -524,7 +521,7 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
       redirect(
         buildRedirectUrl({
           path: "/admin/tariffs",
-          error: "РЎСЂРѕРєРё РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ СѓРЅРёРєР°Р»СЊРЅС‹РјРё.",
+          error: "Р РЋРЎР‚Р С•Р С”Р С‘ Р Т‘Р С•Р В»Р В¶Р Р…РЎвЂ№ Р В±РЎвЂ№РЎвЂљРЎРЉ РЎС“Р Р…Р С‘Р С”Р В°Р В»РЎРЉР Р…РЎвЂ№Р СР С‘.",
         })
       );
     }
@@ -533,7 +530,7 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
       redirect(
         buildRedirectUrl({
           path: "/admin/tariffs",
-          error: "РЎРєРёРґРєР° РґРѕР»Р¶РЅР° Р±С‹С‚СЊ С†РµР»С‹Рј С‡РёСЃР»РѕРј РѕС‚ 0 РґРѕ 100.",
+          error: "Р РЋР С”Р С‘Р Т‘Р С”Р В° Р Т‘Р С•Р В»Р В¶Р Р…Р В° Р В±РЎвЂ№РЎвЂљРЎРЉ РЎвЂ Р ВµР В»РЎвЂ№Р С РЎвЂЎР С‘РЎРѓР В»Р С•Р С Р С•РЎвЂљ 0 Р Т‘Р С• 100.",
         })
       );
     }
@@ -604,7 +601,7 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
 
   revalidatePath("/admin");
   revalidatePath("/app");
-  redirect(buildRedirectUrl({ path: "/admin/tariffs", notice: "РќР°СЃС‚СЂРѕР№РєРё С‚Р°СЂРёС„Р° СЃРѕС…СЂР°РЅРµРЅС‹." }));
+  redirect(buildRedirectUrl({ path: "/admin/tariffs", notice: "Р СњР В°РЎРѓРЎвЂљРЎР‚Р С•Р в„–Р С”Р С‘ РЎвЂљР В°РЎР‚Р С‘РЎвЂћР В° РЎРѓР С•РЎвЂ¦РЎР‚Р В°Р Р…Р ВµР Р…РЎвЂ№." }));
 }
 
 export async function updateSubscriptionPricingSettingsAction(formData: FormData) {
@@ -625,7 +622,7 @@ export async function updateSubscriptionPricingSettingsAction(formData: FormData
     redirect(
       buildRedirectUrl({
         path: "/admin/tariffs",
-        error: "РњРёРЅРёРјСѓРј СѓСЃС‚СЂРѕР№СЃС‚РІ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ Р±РѕР»СЊС€Рµ 0.",
+        error: "Р СљР С‘Р Р…Р С‘Р СРЎС“Р С РЎС“РЎРѓРЎвЂљРЎР‚Р С•Р в„–РЎРѓРЎвЂљР Р† Р Т‘Р С•Р В»Р В¶Р ВµР Р… Р В±РЎвЂ№РЎвЂљРЎРЉ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ 0.",
       })
     );
   }
@@ -634,7 +631,7 @@ export async function updateSubscriptionPricingSettingsAction(formData: FormData
     redirect(
       buildRedirectUrl({
         path: "/admin/tariffs",
-        error: "РњР°РєСЃРёРјСѓРј СѓСЃС‚СЂРѕР№СЃС‚РІ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ Р±РѕР»СЊС€Рµ РёР»Рё СЂР°РІРµРЅ РјРёРЅРёРјСѓРјСѓ.",
+        error: "Р СљР В°Р С”РЎРѓР С‘Р СРЎС“Р С РЎС“РЎРѓРЎвЂљРЎР‚Р С•Р в„–РЎРѓРЎвЂљР Р† Р Т‘Р С•Р В»Р В¶Р ВµР Р… Р В±РЎвЂ№РЎвЂљРЎРЉ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ Р С‘Р В»Р С‘ РЎР‚Р В°Р Р†Р ВµР Р… Р СР С‘Р Р…Р С‘Р СРЎС“Р СРЎС“.",
       })
     );
   }
@@ -643,7 +640,7 @@ export async function updateSubscriptionPricingSettingsAction(formData: FormData
     redirect(
       buildRedirectUrl({
         path: "/admin/tariffs",
-        error: "РњР°РєСЃРёРјСѓРј СѓСЃС‚СЂРѕР№СЃС‚РІ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ Р±РѕР»СЊС€Рµ 10.",
+        error: "Р СљР В°Р С”РЎРѓР С‘Р СРЎС“Р С РЎС“РЎРѓРЎвЂљРЎР‚Р С•Р в„–РЎРѓРЎвЂљР Р† Р Р…Р Вµ Р СР С•Р В¶Р ВµРЎвЂљ Р В±РЎвЂ№РЎвЂљРЎРЉ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ 10.",
       })
     );
   }
@@ -652,7 +649,7 @@ export async function updateSubscriptionPricingSettingsAction(formData: FormData
     redirect(
       buildRedirectUrl({
         path: "/admin/tariffs",
-        error: "Р‘Р°Р·РѕРІР°СЏ С†РµРЅР° Р·Р° РјРµСЃСЏС† РґРѕР»Р¶РЅР° Р±С‹С‚СЊ 0 РёР»Рё Р±РѕР»СЊС€Рµ.",
+        error: "Р вЂР В°Р В·Р С•Р Р†Р В°РЎРЏ РЎвЂ Р ВµР Р…Р В° Р В·Р В° Р СР ВµРЎРѓРЎРЏРЎвЂ  Р Т‘Р С•Р В»Р В¶Р Р…Р В° Р В±РЎвЂ№РЎвЂљРЎРЉ 0 Р С‘Р В»Р С‘ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ.",
       })
     );
   }
@@ -661,7 +658,7 @@ export async function updateSubscriptionPricingSettingsAction(formData: FormData
     redirect(
       buildRedirectUrl({
         path: "/admin/tariffs",
-        error: "Р¦РµРЅР° РґРѕРї. СѓСЃС‚СЂРѕР№СЃС‚РІР° РІ РјРµСЃСЏС† РґРѕР»Р¶РЅР° Р±С‹С‚СЊ 0 РёР»Рё Р±РѕР»СЊС€Рµ.",
+        error: "Р В¦Р ВµР Р…Р В° Р Т‘Р С•Р С—. РЎС“РЎРѓРЎвЂљРЎР‚Р С•Р в„–РЎРѓРЎвЂљР Р†Р В° Р Р† Р СР ВµРЎРѓРЎРЏРЎвЂ  Р Т‘Р С•Р В»Р В¶Р Р…Р В° Р В±РЎвЂ№РЎвЂљРЎРЉ 0 Р С‘Р В»Р С‘ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ.",
       })
     );
   }
@@ -687,7 +684,7 @@ export async function updateSubscriptionPricingSettingsAction(formData: FormData
 
   revalidatePath("/admin");
   revalidatePath("/app");
-  redirect(buildRedirectUrl({ path: "/admin/tariffs", notice: "РќР°СЃС‚СЂРѕР№РєРё СЃС‚РѕРёРјРѕСЃС‚Рё СЃРѕС…СЂР°РЅРµРЅС‹." }));
+  redirect(buildRedirectUrl({ path: "/admin/tariffs", notice: "Р СњР В°РЎРѓРЎвЂљРЎР‚Р С•Р в„–Р С”Р С‘ РЎРѓРЎвЂљР С•Р С‘Р СР С•РЎРѓРЎвЂљР С‘ РЎРѓР С•РЎвЂ¦РЎР‚Р В°Р Р…Р ВµР Р…РЎвЂ№." }));
 }
 
 export async function updateServiceCapacitySettingsAction(formData: FormData) {
@@ -702,7 +699,7 @@ export async function updateServiceCapacitySettingsAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/operations",
-        error: "MAX_ACTIVE_SUBSCRIPTIONS РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ С†РµР»С‹Рј С‡РёСЃР»РѕРј РѕС‚ 0 Рё РІС‹С€Рµ.",
+        error: "MAX_ACTIVE_SUBSCRIPTIONS Р Т‘Р С•Р В»Р В¶Р ВµР Р… Р В±РЎвЂ№РЎвЂљРЎРЉ РЎвЂ Р ВµР В»РЎвЂ№Р С РЎвЂЎР С‘РЎРѓР В»Р С•Р С Р С•РЎвЂљ 0 Р С‘ Р Р†РЎвЂ№РЎв‚¬Р Вµ.",
       })
     );
   }
@@ -711,7 +708,7 @@ export async function updateServiceCapacitySettingsAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/operations",
-        error: "MAX_ACTIVE_SUBSCRIPTIONS СЃР»РёС€РєРѕРј Р±РѕР»СЊС€РѕР№ (РјР°РєСЃРёРјСѓРј 100000).",
+        error: "MAX_ACTIVE_SUBSCRIPTIONS РЎРѓР В»Р С‘РЎв‚¬Р С”Р С•Р С Р В±Р С•Р В»РЎРЉРЎв‚¬Р С•Р в„– (Р СР В°Р С”РЎРѓР С‘Р СРЎС“Р С 100000).",
       })
     );
   }
@@ -734,8 +731,8 @@ export async function updateServiceCapacitySettingsAction(formData: FormData) {
       path: "/admin/operations",
       notice:
         maxActiveSubscriptions === 0
-          ? "Р›РёРјРёС‚ Р°РєС‚РёРІРЅС‹С… РїРѕРґРїРёСЃРѕРє РѕС‚РєР»СЋС‡РµРЅ."
-          : "Р›РёРјРёС‚ Р°РєС‚РёРІРЅС‹С… РїРѕРґРїРёСЃРѕРє СЃРѕС…СЂР°РЅРµРЅ.",
+          ? "Р вЂєР С‘Р СР С‘РЎвЂљ Р В°Р С”РЎвЂљР С‘Р Р†Р Р…РЎвЂ№РЎвЂ¦ Р С—Р С•Р Т‘Р С—Р С‘РЎРѓР С•Р С” Р С•РЎвЂљР С”Р В»РЎР‹РЎвЂЎР ВµР Р…."
+          : "Р вЂєР С‘Р СР С‘РЎвЂљ Р В°Р С”РЎвЂљР С‘Р Р†Р Р…РЎвЂ№РЎвЂ¦ Р С—Р С•Р Т‘Р С—Р С‘РЎРѓР С•Р С” РЎРѓР С•РЎвЂ¦РЎР‚Р В°Р Р…Р ВµР Р….",
     })
   );
 }
@@ -751,7 +748,7 @@ export async function updateLegalDocumentsAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/rules",
-        error: "РўРµРєСЃС‚ В«РџРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕРµ СЃРѕРіР»Р°С€РµРЅРёРµВ» РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РїСѓСЃС‚С‹Рј.",
+        error: "Р СћР ВµР С”РЎРѓРЎвЂљ Р’В«Р СџР С•Р В»РЎРЉР В·Р С•Р Р†Р В°РЎвЂљР ВµР В»РЎРЉРЎРѓР С”Р С•Р Вµ РЎРѓР С•Р С–Р В»Р В°РЎв‚¬Р ВµР Р…Р С‘Р ВµР’В» Р Р…Р Вµ Р СР С•Р В¶Р ВµРЎвЂљ Р В±РЎвЂ№РЎвЂљРЎРЉ Р С—РЎС“РЎРѓРЎвЂљРЎвЂ№Р С.",
       })
     );
   }
@@ -760,7 +757,7 @@ export async function updateLegalDocumentsAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/rules",
-        error: "РўРµРєСЃС‚ В«РџСѓР±Р»РёС‡РЅР°СЏ РѕС„РµСЂС‚Р°В» РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РїСѓСЃС‚С‹Рј.",
+        error: "Р СћР ВµР С”РЎРѓРЎвЂљ Р’В«Р СџРЎС“Р В±Р В»Р С‘РЎвЂЎР Р…Р В°РЎРЏ Р С•РЎвЂћР ВµРЎР‚РЎвЂљР В°Р’В» Р Р…Р Вµ Р СР С•Р В¶Р ВµРЎвЂљ Р В±РЎвЂ№РЎвЂљРЎРЉ Р С—РЎС“РЎРѓРЎвЂљРЎвЂ№Р С.",
       })
     );
   }
@@ -769,7 +766,7 @@ export async function updateLegalDocumentsAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/rules",
-        error: "РўРµРєСЃС‚ В«РџРѕР»РёС‚РёРєР° РєРѕРЅС„РёРґРµРЅС†РёР°Р»СЊРЅРѕСЃС‚РёВ» РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РїСѓСЃС‚С‹Рј.",
+        error: "Р СћР ВµР С”РЎРѓРЎвЂљ Р’В«Р СџР С•Р В»Р С‘РЎвЂљР С‘Р С”Р В° Р С”Р С•Р Р…РЎвЂћР С‘Р Т‘Р ВµР Р…РЎвЂ Р С‘Р В°Р В»РЎРЉР Р…Р С•РЎРѓРЎвЂљР С‘Р’В» Р Р…Р Вµ Р СР С•Р В¶Р ВµРЎвЂљ Р В±РЎвЂ№РЎвЂљРЎРЉ Р С—РЎС“РЎРѓРЎвЂљРЎвЂ№Р С.",
       })
     );
   }
@@ -782,7 +779,7 @@ export async function updateLegalDocumentsAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/rules",
-        error: "РћРґРёРЅ РёР· СЋСЂРёРґРёС‡РµСЃРєРёС… РґРѕРєСѓРјРµРЅС‚РѕРІ СЃР»РёС€РєРѕРј РґР»РёРЅРЅС‹Р№.",
+        error: "Р С›Р Т‘Р С‘Р Р… Р С‘Р В· РЎР‹РЎР‚Р С‘Р Т‘Р С‘РЎвЂЎР ВµРЎРѓР С”Р С‘РЎвЂ¦ Р Т‘Р С•Р С”РЎС“Р СР ВµР Р…РЎвЂљР С•Р Р† РЎРѓР В»Р С‘РЎв‚¬Р С”Р С•Р С Р Т‘Р В»Р С‘Р Р…Р Р…РЎвЂ№Р в„–.",
       })
     );
   }
@@ -796,9 +793,10 @@ export async function updateLegalDocumentsAction(formData: FormData) {
   revalidatePath("/admin");
   revalidatePath("/rules");
   revalidatePath("/app");
-  redirect(buildRedirectUrl({ path: "/admin/rules", notice: "Р®СЂРёРґРёС‡РµСЃРєР°СЏ РёРЅС„РѕСЂРјР°С†РёСЏ РѕР±РЅРѕРІР»РµРЅР°." }));
+  redirect(buildRedirectUrl({ path: "/admin/rules", notice: "Р В®РЎР‚Р С‘Р Т‘Р С‘РЎвЂЎР ВµРЎРѓР С”Р В°РЎРЏ Р С‘Р Р…РЎвЂћР С•РЎР‚Р СР В°РЎвЂ Р С‘РЎРЏ Р С•Р В±Р Р…Р С•Р Р†Р В»Р ВµР Р…Р В°." }));
 }
 
 export async function updateUserAgreementAction(formData: FormData) {
   return updateLegalDocumentsAction(formData);
 }
+

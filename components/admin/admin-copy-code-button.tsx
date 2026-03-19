@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 export function AdminCopyCodeButton({
   value,
 }: {
-  value: string;
+  value?: string;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -22,6 +22,10 @@ export function AdminCopyCodeButton({
   }, [copied]);
 
   async function handleCopy() {
+    if (!value) {
+      return;
+    }
+
     try {
       await navigator.clipboard.writeText(value);
       setCopied(true);
@@ -33,6 +37,7 @@ export function AdminCopyCodeButton({
   return (
     <Button
       className="w-full justify-center"
+      disabled={!value}
       onClick={handleCopy}
       radius="card"
       type="button"

@@ -1,10 +1,10 @@
 import {
+  BadgeDollarSign,
   BadgeCheck,
-  LifeBuoy,
+  Headset,
   TrendingDown,
   TrendingUp,
   Users,
-  WalletCards,
 } from "lucide-react";
 
 import { AdminDashboardCodesBlock } from "./admin-dashboard-codes-block";
@@ -80,10 +80,10 @@ export function AdminOverviewSection({
       trend: activeSubscriptionsTrend,
       trendPeriod: "this week",
       trendType: "count",
-      value: `${activeSubscriptions}/${maxActiveSubscriptions}`,
+      value: `${activeSubscriptions}/${maxActiveSubscriptions === 0 ? "∞" : maxActiveSubscriptions}`,
     },
     {
-      icon: LifeBuoy,
+      icon: Headset,
       title: "Open Tickets",
       trend: openTicketsTrend,
       trendPeriod: "today",
@@ -91,7 +91,7 @@ export function AdminOverviewSection({
       value: `${openTickets}`,
     },
     {
-      icon: WalletCards,
+      icon: BadgeDollarSign,
       title: "Revenue",
       trend: revenueTrend,
       trendPeriod: "this week",
