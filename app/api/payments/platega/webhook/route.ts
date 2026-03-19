@@ -1,8 +1,11 @@
-import { createHash } from "node:crypto";
+﻿import { createHash } from "node:crypto";
 
 import { NextResponse } from "next/server";
 
-import { createSubscriptionFromPaidRequest } from "@/lib/payment-subscription-issuance";
+import {
+  handleApprovedPaymentPostProcessing,
+  handleRejectedPaymentPostProcessing,
+} from "@/lib/payment-post-approval-handler";
 import { prisma } from "@/lib/prisma";
 import { issueSubscriptionInXui, revokeSubscriptionInXui } from "@/lib/xui-integration";
 import {
@@ -60,7 +63,7 @@ type TxOutcome =
       createdSubscriptionId: null;
       kind: "CAPACITY_LIMIT" | "REJECTED";
       paymentRequestId: string;
-      revokedSubscriptionId: null;
+      revokedSubscriptionId: string | null;
     }
   | {
       createdSubscriptionId: string | null;
@@ -82,7 +85,7 @@ export async function POST(request: Request) {
   try {
     isWebhookAuthorized = validatePlategaWebhookHeaders(request.headers);
   } catch {
-    return NextResponse.json({ error: "Platega не сконфигурирован." }, { status: 500 });
+    return NextResponse.json({ error: "Platega is not configured." }, { status: 500 });
   }
 
   if (!isWebhookAuthorized) {
@@ -175,6 +178,31 @@ export async function POST(request: Request) {
       });
 
       if (REJECTED_PAYMENT_STATUSES.has(normalizedStatus)) {
+        if (paymentRequest.status === "APPROVED") {
+          const rejectedPostProcessing = await handleRejectedPaymentPostProcessing({
+            now,
+            paymentRequestId: paymentRequest.id,
+            tx,
+          });
+
+          await tx.paymentRequest.update({
+            data: {
+              rejectedAt: now,
+              status: "REJECTED",
+            },
+            where: {
+              id: paymentRequest.id,
+            },
+          });
+
+          return {
+            createdSubscriptionId: null,
+            kind: "REJECTED",
+            paymentRequestId: paymentRequest.id,
+            revokedSubscriptionId: rejectedPostProcessing.revokedSubscriptionId,
+          };
+        }
+
         if (paymentRequest.status === "CREATED") {
           await tx.paymentRequest.update({
             data: {
@@ -185,11 +213,18 @@ export async function POST(request: Request) {
               id: paymentRequest.id,
             },
           });
+
+          return {
+            createdSubscriptionId: null,
+            kind: "REJECTED",
+            paymentRequestId: paymentRequest.id,
+            revokedSubscriptionId: null,
+          };
         }
 
         return {
           createdSubscriptionId: null,
-          kind: "REJECTED",
+          kind: "ALREADY_REJECTED",
           paymentRequestId: paymentRequest.id,
           revokedSubscriptionId: null,
         };
@@ -223,14 +258,7 @@ export async function POST(request: Request) {
       }
 
       try {
-        const creationResult = await createSubscriptionFromPaidRequest({
-          now,
-          paymentRequest,
-          tx,
-          userId: paymentRequest.userId,
-        });
-
-        await tx.paymentRequest.update({
+        const approvedPaymentRequest = await tx.paymentRequest.update({
           data: {
             approvedAt: now,
             markedPaidAt: now,
@@ -242,11 +270,17 @@ export async function POST(request: Request) {
           },
         });
 
+        const postApprovalResult = await handleApprovedPaymentPostProcessing({
+          now,
+          paymentRequest: approvedPaymentRequest,
+          tx,
+        });
+
         return {
-          createdSubscriptionId: creationResult.createdSubscriptionId,
+          createdSubscriptionId: postApprovalResult.createdSubscriptionId,
           kind: "APPROVED",
           paymentRequestId: paymentRequest.id,
-          revokedSubscriptionId: creationResult.revokedSubscriptionId,
+          revokedSubscriptionId: postApprovalResult.revokedSubscriptionId,
         };
       } catch (error) {
         const message = error instanceof Error ? error.message : "";
@@ -275,14 +309,12 @@ export async function POST(request: Request) {
       }
     });
 
-    if (txResult.kind === "APPROVED") {
-      if (txResult.revokedSubscriptionId) {
-        await revokeSubscriptionInXui(txResult.revokedSubscriptionId);
-      }
+    if (txResult.revokedSubscriptionId) {
+      await revokeSubscriptionInXui(txResult.revokedSubscriptionId);
+    }
 
-      if (txResult.createdSubscriptionId) {
-        await issueSubscriptionInXui(txResult.createdSubscriptionId);
-      }
+    if (txResult.createdSubscriptionId) {
+      await issueSubscriptionInXui(txResult.createdSubscriptionId);
     }
 
     await prisma.plategaWebhookLog.update({

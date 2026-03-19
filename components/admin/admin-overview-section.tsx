@@ -1,18 +1,22 @@
+import { type ComponentType } from "react";
 import {
-  BadgeDollarSign,
   BadgeCheck,
+  BadgeDollarSign,
   Headset,
   TrendingDown,
   TrendingUp,
+  User,
   Users,
 } from "lucide-react";
+
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 import { AdminDashboardCodesBlock } from "./admin-dashboard-codes-block";
 import { AdminSectionShell } from "./admin-section-shell";
 import { AdminSurface } from "./admin-surface";
 
 type DashboardKpi = {
-  icon: React.ComponentType<{ className?: string }>;
+  icon: ComponentType<{ className?: string }>;
   title: string;
   value: string;
   trend: number;
@@ -23,6 +27,10 @@ type DashboardKpi = {
 export function AdminOverviewSection({
   activeSubscriptions,
   activeSubscriptionsTrend,
+  codesActiveTab,
+  generatedInviteCode,
+  generatedPromoCode,
+  generatedReferralCode,
   maxActiveSubscriptions,
   openTickets,
   openTicketsTrend,
@@ -34,6 +42,10 @@ export function AdminOverviewSection({
 }: {
   activeSubscriptions: number;
   activeSubscriptionsTrend: number;
+  codesActiveTab?: string;
+  generatedInviteCode?: string;
+  generatedPromoCode?: string;
+  generatedReferralCode?: string;
   maxActiveSubscriptions: number;
   openTickets: number;
   openTicketsTrend: number;
@@ -41,7 +53,7 @@ export function AdminOverviewSection({
   revenueTrend: number;
   totalUsers: number;
   totalUsersTrend: number;
-  topReferrers: Array<{ invites: number; username: string }>;
+  topReferrers: Array<{ invites: number; referralCode: string; username: string }>;
 }) {
   const numberFormatter = new Intl.NumberFormat("ru-RU");
 
@@ -119,7 +131,7 @@ export function AdminOverviewSection({
             const trendColorClass = getTrendColorClass(card.trend);
 
             return (
-              <AdminSurface className="p-4 md:p-4" key={card.title}>
+              <AdminSurface className="p-5 md:p-5" key={card.title}>
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-sm font-medium text-muted-foreground">{card.title}</p>
                   <div className="flex size-8 items-center justify-center rounded-card bg-transparent">
@@ -140,11 +152,16 @@ export function AdminOverviewSection({
         </div>
 
         <div className="grid items-stretch gap-3 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-          <AdminSurface className="h-full p-4 md:p-4">
-            <AdminDashboardCodesBlock />
+          <AdminSurface className="h-full !p-4 md:!p-4">
+            <AdminDashboardCodesBlock
+              activeTab={codesActiveTab}
+              generatedInviteCode={generatedInviteCode}
+              generatedPromoCode={generatedPromoCode}
+              generatedReferralCode={generatedReferralCode}
+            />
           </AdminSurface>
 
-          <AdminSurface className="h-full p-4 md:p-4">
+          <AdminSurface className="h-full !p-4 md:!p-4">
             <div className="space-y-4">
               <div className="space-y-1">
                 <h3 className="text-lg font-semibold">Referral stats</h3>
@@ -152,14 +169,26 @@ export function AdminOverviewSection({
               </div>
 
               {topReferrers.length > 0 ? (
-                <ul className="space-y-2">
+                <ul className="max-h-[308px] space-y-2 overflow-y-auto pr-1">
                   {topReferrers.map((item) => (
                     <li
                       className="flex items-center justify-between rounded-card border border-border/70 bg-background/35 px-3 py-2 text-sm"
-                      key={item.username}
+                      key={`${item.username}:${item.referralCode}`}
                     >
-                      <span className="font-medium">{item.username}</span>
-                      <span className="text-muted-foreground">{item.invites} invites</span>
+                      <div className="flex min-w-0 items-center gap-3">
+                        <Avatar className="size-8 rounded-card bg-transparent">
+                          <AvatarFallback className="rounded-card bg-transparent text-muted-foreground">
+                            <User className="size-5" />
+                          </AvatarFallback>
+                        </Avatar>
+
+                        <div className="min-w-0">
+                          <p className="truncate font-medium">{item.username}</p>
+                          <p className="truncate text-xs text-muted-foreground">{item.referralCode}</p>
+                        </div>
+                      </div>
+
+                      <span className="shrink-0 text-muted-foreground">{item.invites} invites</span>
                     </li>
                   ))}
                 </ul>

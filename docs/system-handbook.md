@@ -32,6 +32,8 @@ Agent onboarding companion:
 ### 3.1 Auth
 
 - Login checks credentials and creates DB session + signed cookie.
+- Password hashing: Argon2id with per-user salt (PHC string in `User.passwordHash`).
+- Soft migration is enabled: legacy scrypt hashes are transparently rehashed to Argon2id on successful login.
 - Registration validates:
   - username: `a-z0-9_`, length `3..32`
   - passwords match
@@ -73,7 +75,8 @@ Platega flow:
 4. Platega webhook calls `/api/payments/platega/webhook`.
 5. On `CONFIRMED`, backend atomically moves request to `APPROVED`, issues local subscription, then syncs 3x-ui side effects.
 6. Repeated webhook notifications are idempotent and do not re-activate the same order.
-7. Required endpoints:
+7. On `CHARGEBACK/FAILED/CANCEL*`, backend moves request to `REJECTED`; if order was already approved, linked subscription is revoked.
+8. Required endpoints:
    - `POST /api/payments/platega/create`
    - `POST /api/payments/platega/webhook`
    - `GET /api/payments/platega/status`
@@ -327,6 +330,10 @@ When updating, do both:
 | 2026-03-11 | Added admin-configurable `MAX_ACTIVE_SUBSCRIPTIONS` limit with checkout blocking for new users and extension exception for active users | Protect service capacity from overload while preserving renewals for current subscribers |
 | 2026-03-12 | Added `PlategaWebhookLog` with dedup key + raw payload/header snapshot and idempotent webhook processing | Provide auditable payment event trail and guarantee one payment activation even on webhook retries |
 | 2026-03-12 | Removed manual admin payment review flow from runtime (`MARKED_PAID`/`BANK_TRANSFER` removed from active model) | Finalize migration to two payment methods only: Platega and credits |
+| 2026-03-19 | Introduced unified idempotent post-approval handler for payments (credits + Platega webhook) | Remove flow drift, ensure referral reward consistency, and centralize post-payment side effects |
+| 2026-03-19 | Added revoke-on-chargeback/reject for already approved Platega payments | Keep subscription state aligned with provider final status and reduce abuse window |
+| 2026-03-19 | Migrated password hashing to Argon2id with per-user salt and soft legacy rehash on login | Eliminate static-salt risk without forcing hard password reset |
+| 2026-03-19 | Added `_prisma_migrations` baseline utility and updated deploy runbook | Recover migration history safely for legacy `db push` databases |
 | 2026-03-09 | Added `docs/dev-ai-agent-context.md` with practical architecture/device-control/API onboarding for AI agents | Reduce onboarding time and prevent regressions in VPN/device-limit logic during autonomous development |
 | 2026-03-06 | Added multi-step Happ setup dialog in Dashboard subscription block | Replace single connect button with clearer onboarding path across platforms |
 | 2026-03-05 | Production admin bootstrap moved to explicit command `npm run admin:bootstrap` | Avoid insecure runtime default credentials |

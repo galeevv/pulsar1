@@ -1,5 +1,6 @@
-import { createHmac, randomUUID, scryptSync, timingSafeEqual } from "node:crypto";
+﻿import { createHmac, randomUUID, scryptSync, timingSafeEqual } from "node:crypto";
 
+import { hashSync as hashArgon2Sync, verifySync as verifyArgon2Sync } from "@node-rs/argon2";
 import { cookies } from "next/headers";
 
 import { Prisma, Role } from "@/generated/prisma";
@@ -23,6 +24,14 @@ const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 7;
 const SESSION_SECRET = process.env.SESSION_SECRET;
 const INVALID_REGISTRATION_CODE_ERROR = "INVALID_REGISTRATION_CODE";
 const INVITE_CODE_ALREADY_USED_ERROR = "INVITE_CODE_ALREADY_USED";
+const LEGACY_SCRYPT_SALT = "pulsar-dev-salt";
+const ARGON2_OPTIONS = {
+  algorithm: 2,
+  memoryCost: 19456,
+  outputLen: 32,
+  parallelism: 1,
+  timeCost: 2,
+};
 
 if (process.env.NODE_ENV === "production" && !SESSION_SECRET) {
   throw new Error("SESSION_SECRET is required in production.");
@@ -31,12 +40,19 @@ if (process.env.NODE_ENV === "production" && !SESSION_SECRET) {
 const SESSION_SECRET_VALUE = SESSION_SECRET ?? "pulsar-dev-session-secret";
 
 function hashPassword(password: string) {
-  const salt = "pulsar-dev-salt";
-  return scryptSync(password, salt, 64).toString("hex");
+  return hashArgon2Sync(password, ARGON2_OPTIONS);
 }
 
-function verifyPassword(password: string, passwordHash: string) {
-  const incoming = Buffer.from(hashPassword(password), "hex");
+function hashLegacyScryptPassword(password: string) {
+  return scryptSync(password, LEGACY_SCRYPT_SALT, 64).toString("hex");
+}
+
+function isArgon2Hash(passwordHash: string) {
+  return passwordHash.startsWith("$argon2");
+}
+
+function verifyLegacyScryptPassword(password: string, passwordHash: string) {
+  const incoming = Buffer.from(hashLegacyScryptPassword(password), "hex");
   const stored = Buffer.from(passwordHash, "hex");
 
   if (incoming.length !== stored.length) {
@@ -44,6 +60,18 @@ function verifyPassword(password: string, passwordHash: string) {
   }
 
   return timingSafeEqual(incoming, stored);
+}
+
+function verifyPassword(password: string, passwordHash: string) {
+  try {
+    if (isArgon2Hash(passwordHash)) {
+      return verifyArgon2Sync(passwordHash, password, ARGON2_OPTIONS);
+    }
+
+    return verifyLegacyScryptPassword(password, passwordHash);
+  } catch {
+    return false;
+  }
 }
 
 function signPayload(payload: string) {
@@ -228,6 +256,17 @@ export async function attemptLogin(rawUsername: string, password: string) {
 
   if (!user || !verifyPassword(password, user.passwordHash)) {
     return { message: "Неверный username или password.", ok: false as const };
+  }
+
+  if (!isArgon2Hash(user.passwordHash)) {
+    await prisma.user.update({
+      data: {
+        passwordHash: hashPassword(password),
+      },
+      where: {
+        id: user.id,
+      },
+    });
   }
 
   return {
@@ -436,3 +475,4 @@ export function decodeSessionSnapshot(value: string | undefined): SessionSnapsho
 }
 
 export { normalizeCode };
+

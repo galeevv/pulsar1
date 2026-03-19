@@ -1,129 +1,79 @@
 ﻿# Migrate Deploy Runbook (Production)
 
-Last updated: 2026-03-12
+Last updated: 2026-03-19
 
 ## Goal
 
-Deploy schema changes through Prisma migrations only (`migrate deploy`), without `db push`.
+Безопасно выкатывать схему только через Prisma migrations (`migrate deploy`) и не использовать `db push` в проде.
 
-This release introduces migrations:
+## Pre-check
 
-- `0008_subscription_constructor_cleanup`
-- `0009_duration_price_and_pricing_settings_cleanup`
-
-They do:
-
-- removes legacy `Tariff` table
-- removes `PaymentRequest.tariffId`
-- creates constructor tables:
-  - `SubscriptionDurationRule`
-  - `SubscriptionPricingSettings`
-- rebuilds `PaymentRequest` and `Subscription` with constructor snapshots
-- preserves existing user/payment/subscription data with safe backfill defaults
-- adds `SubscriptionDurationRule.monthlyPrice`
-- removes `SubscriptionPricingSettings.currency`
-
-## Before You Start
-
-- Stop background jobs that can write to DB during migration.
-- Ensure app is on maintenance/restart window.
-- Make a DB backup first.
-
-## 1) Backup (SQLite)
+1. Остановите запись в БД (maintenance/restart window).
+2. Сделайте backup SQLite.
+3. Проверьте статус миграций.
 
 ```bash
 cd /opt/pulsar/current
 cp prisma/dev.db prisma/dev.db.backup-$(date +%F-%H%M%S)
-```
-
-Optional checksum:
-
-```bash
-sha256sum prisma/dev.db prisma/dev.db.backup-*
-```
-
-## 2) Check Migration History Mode
-
-```bash
 npx prisma migrate status
 ```
 
-### Case A: DB already has `_prisma_migrations`
+## Case A: `_prisma_migrations` уже есть
 
-Continue to step 3.
+Если `migrate status` показывает валидную историю миграций, переходите к deploy.
 
-### Case B: DB was managed with `db push` and has no migration history
+## Case B: база создана через `db push` и `_prisma_migrations` отсутствует
 
-Run one-time baseline marking for old migrations, then continue to step 3:
-
-```bash
-npx prisma migrate resolve --applied 0001_init
-npx prisma migrate resolve --applied 0002_code_management
-npx prisma migrate resolve --applied 0003_referral_program_settings
-npx prisma migrate resolve --applied 0004_tariff
-npx prisma migrate resolve --applied 0005_payment_request
-npx prisma migrate resolve --applied 0006_subscription_device_slots
-npx prisma migrate resolve --applied 0007_marzban_integration_fields
-```
-
-Important:
-
-- Do not mark `0008_subscription_constructor_cleanup` as applied manually.
-- Do not mark `0009_duration_price_and_pricing_settings_cleanup` as applied manually.
-- Both `0008` and `0009` must be executed by `migrate deploy`.
-
-## 3) Apply Migration
+Выполните baseline (один раз на эту базу):
 
 ```bash
-npx prisma migrate deploy
-npx prisma generate
+npm run db:migrate:baseline
+npx prisma migrate status
 ```
 
-Expected result: migrations `0008` and `0009` are applied.
+Что делает baseline:
 
-## 4) Build and Restart
+- создает таблицу `_prisma_migrations` (если ее нет),
+- регистрирует все миграции из `prisma/migrations` как уже примененные,
+- проверяет checksum существующих записей,
+- не меняет бизнес-данные.
+
+Скрипт: `scripts/prisma-baseline-migrations.mjs`.
+
+## Deploy
 
 ```bash
 npm ci
+npx prisma migrate deploy
+npx prisma generate
 npm run build
 sudo systemctl restart pulsar
 sudo systemctl status pulsar --no-pager
 ```
 
-## 5) Post-Deploy Checks
+## Post-deploy checks
 
-- `/login` works
-- `/app` constructor section works (duration/devices/price)
-- `/admin` тарифные правила section works (durations/settings)
-- payment flow:
-  - Platega checkout creates `PaymentRequest(status=CREATED, method=PLATEGA)`
-  - webhook `CONFIRMED` moves payment to `APPROVED` and activates subscription
-  - credits checkout creates `PaymentRequest(status=APPROVED, method=CREDITS)` and activates subscription immediately
-
-Quick DB sanity checks (optional):
-
-```sql
-SELECT name FROM sqlite_master WHERE type='table' AND name='Tariff';
-SELECT COUNT(*) FROM SubscriptionDurationRule;
-SELECT * FROM SubscriptionPricingSettings WHERE id=1;
-```
-
-Expected:
-
-- `Tariff` table is absent.
-- `SubscriptionDurationRule` contains 1/3/6/12 rows.
-- `SubscriptionPricingSettings` has row `id=1`.
+1. `npx prisma migrate status` -> `Database schema is up to date`.
+2. `/login` работает.
+3. `/app`:
+   - Platega checkout создается,
+   - credits checkout проходит,
+   - тексты ошибок/уведомлений читаемы (без mojibake).
+4. `/admin`:
+   - блоки codes/tariffs/operations/rules работают,
+   - сообщения в server actions читаемы.
+5. Webhook Platega:
+   - `CONFIRMED` -> `PaymentRequest.APPROVED` + активация подписки,
+   - `CHARGEBACK/FAILED/CANCELED` после `APPROVED` -> `PaymentRequest.REJECTED` + revoke подписки.
 
 ## Rollback
 
-If app health checks fail right after migration:
+Если после релиза есть деградация:
 
-1. Stop app.
-2. Restore DB backup.
-3. Roll back app version.
-4. Start app.
-
-Example:
+1. Остановите приложение.
+2. Восстановите backup DB.
+3. Верните предыдущий релиз приложения.
+4. Запустите сервис.
 
 ```bash
 sudo systemctl stop pulsar
@@ -134,5 +84,6 @@ sudo systemctl start pulsar
 
 ## Policy
 
-- Production schema changes: `migrate deploy` only.
-- `db push` is allowed only in local development.
+- Прод: только `migrate deploy`.
+- `db push` допускается только локально.
+- При появлении drift сначала baseline, затем обычный deploy-пайплайн.

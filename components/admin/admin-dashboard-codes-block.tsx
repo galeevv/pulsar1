@@ -10,6 +10,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { AdminCopyCodeButton } from "./admin-copy-code-button";
 
+type CodesTab = "referral" | "invite" | "promo";
+
+function normalizeCodeTab(value: string | undefined): CodesTab {
+  if (value === "invite" || value === "promo" || value === "referral") {
+    return value;
+  }
+
+  return "referral";
+}
+
 function PreviewCard({
   code,
   placeholder,
@@ -32,7 +42,19 @@ function PreviewCard({
   );
 }
 
-export function AdminDashboardCodesBlock() {
+export function AdminDashboardCodesBlock({
+  activeTab,
+  generatedInviteCode,
+  generatedPromoCode,
+  generatedReferralCode,
+}: {
+  activeTab?: string;
+  generatedInviteCode?: string;
+  generatedPromoCode?: string;
+  generatedReferralCode?: string;
+}) {
+  const resolvedActiveTab = normalizeCodeTab(activeTab);
+
   return (
     <div className="space-y-4">
       <div className="space-y-1">
@@ -40,7 +62,7 @@ export function AdminDashboardCodesBlock() {
         <p className="text-sm text-muted-foreground">Create and preview registration and marketing codes.</p>
       </div>
 
-      <Tabs className="gap-4" defaultValue="referral">
+      <Tabs className="gap-4" defaultValue={resolvedActiveTab}>
         <TabsList className="grid h-10 w-full grid-cols-3 rounded-card border border-border bg-background/40 p-0" variant="default">
           <TabsTrigger value="referral">Referral Codes</TabsTrigger>
           <TabsTrigger value="invite">Invite Codes</TabsTrigger>
@@ -50,7 +72,7 @@ export function AdminDashboardCodesBlock() {
         <TabsContent className="mt-0" value="invite">
           <div className="grid gap-4 md:grid-cols-2">
             <form action={createInviteCodeAction} className="space-y-4">
-              <input name="redirectPath" type="hidden" value="/admin" />
+              <input name="redirectPath" type="hidden" value="/admin?codeTab=invite" />
 
               <div>
                 <h4 className="text-base font-semibold">Create Invite</h4>
@@ -61,6 +83,7 @@ export function AdminDashboardCodesBlock() {
                 <label className="block text-sm font-medium">Code</label>
                 <Input
                   className="h-input border-border/70 bg-background/40"
+                  defaultValue={generatedInviteCode}
                   name="code"
                   placeholder="Leave empty for auto generation"
                 />
@@ -74,6 +97,7 @@ export function AdminDashboardCodesBlock() {
             </form>
 
             <PreviewCard
+              code={generatedInviteCode}
               placeholder="Code will be generated only after click on Generate Invite."
               title="Invite preview"
             />
@@ -83,7 +107,7 @@ export function AdminDashboardCodesBlock() {
         <TabsContent className="mt-0" value="referral">
           <div className="grid gap-4 md:grid-cols-2">
             <form action={createReferralCodeAction} className="space-y-4">
-              <input name="redirectPath" type="hidden" value="/admin" />
+              <input name="redirectPath" type="hidden" value="/admin?codeTab=referral" />
 
               <div>
                 <h4 className="text-base font-semibold">Create Referral</h4>
@@ -94,6 +118,7 @@ export function AdminDashboardCodesBlock() {
                 <label className="block text-sm font-medium">Code</label>
                 <Input
                   className="h-input border-border/70 bg-background/40"
+                  defaultValue={generatedReferralCode}
                   name="code"
                   placeholder="Leave empty for auto generation"
                 />
@@ -130,6 +155,7 @@ export function AdminDashboardCodesBlock() {
             </form>
 
             <PreviewCard
+              code={generatedReferralCode}
               placeholder="Code will be generated only after click on Generate Referral."
               title="Referral preview"
             />
@@ -139,7 +165,7 @@ export function AdminDashboardCodesBlock() {
         <TabsContent className="mt-0" value="promo">
           <div className="grid gap-4 md:grid-cols-2">
             <form action={createPromoCodeAction} className="space-y-4">
-              <input name="redirectPath" type="hidden" value="/admin" />
+              <input name="redirectPath" type="hidden" value="/admin?codeTab=promo" />
 
               <div>
                 <h4 className="text-base font-semibold">Create Promo</h4>
@@ -150,6 +176,7 @@ export function AdminDashboardCodesBlock() {
                 <label className="block text-sm font-medium">Code</label>
                 <Input
                   className="h-input border-border/70 bg-background/40"
+                  defaultValue={generatedPromoCode}
                   name="code"
                   placeholder="Leave empty for auto generation"
                 />
@@ -186,6 +213,7 @@ export function AdminDashboardCodesBlock() {
             </form>
 
             <PreviewCard
+              code={generatedPromoCode}
               placeholder="Code will be generated only after click on Generate Promo."
               title="Promo preview"
             />

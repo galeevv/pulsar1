@@ -2,7 +2,35 @@ import { AdminOverviewSection } from "@/components/admin/admin-overview-section"
 import { getAdminDashboardData } from "@/lib/admin-code-management";
 import { prisma } from "@/lib/prisma";
 
-export default async function AdminOverviewPage() {
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+function getValue(
+  searchParams: Record<string, string | string[] | undefined>,
+  key: string
+) {
+  const value = searchParams[key];
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function normalizeCodeTab(value: string | undefined) {
+  if (value === "invite" || value === "promo" || value === "referral") {
+    return value;
+  }
+
+  return "referral";
+}
+
+export default async function AdminOverviewPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const resolvedSearchParams = await searchParams;
+  const generatedInviteCode = getValue(resolvedSearchParams, "generatedInviteCode");
+  const generatedReferralCode = getValue(resolvedSearchParams, "generatedReferralCode");
+  const generatedPromoCode = getValue(resolvedSearchParams, "generatedPromoCode");
+  const codeTab = normalizeCodeTab(getValue(resolvedSearchParams, "codeTab"));
+
   const now = new Date();
   const startOfToday = new Date(now);
   startOfToday.setHours(0, 0, 0, 0);
@@ -125,15 +153,20 @@ export default async function AdminOverviewPage() {
       },
     }),
     prisma.referralCodeUse.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
       select: {
         referralCode: {
           select: {
+            code: true,
             ownerUser: {
               select: { username: true },
             },
           },
         },
       },
+      take: 200,
       where: {
         rewardGrantedAt: {
           not: null,
@@ -150,6 +183,7 @@ export default async function AdminOverviewPage() {
     (revenueThisWeekAggregate._sum.amountRub ?? 0) -
     (revenuePreviousWeekAggregate._sum.amountRub ?? 0);
   const topReferrersMap = new Map<string, number>();
+  const topReferrersCodeMap = new Map<string, string>();
   for (const row of referralUseRows) {
     const username = row.referralCode.ownerUser?.username;
     if (!username) {
@@ -157,11 +191,18 @@ export default async function AdminOverviewPage() {
     }
 
     topReferrersMap.set(username, (topReferrersMap.get(username) ?? 0) + 1);
+    if (!topReferrersCodeMap.has(username)) {
+      topReferrersCodeMap.set(username, row.referralCode.code);
+    }
   }
   const topReferrers = Array.from(topReferrersMap.entries())
-    .map(([username, invites]) => ({ invites, username }))
+    .map(([username, invites]) => ({
+      invites,
+      referralCode: topReferrersCodeMap.get(username) ?? "-",
+      username,
+    }))
     .sort((a, b) => b.invites - a.invites)
-    .slice(0, 3);
+    .slice(0, 12);
 
   return (
     <AdminOverviewSection
@@ -175,6 +216,10 @@ export default async function AdminOverviewPage() {
       totalUsers={totalUsers}
       totalUsersTrend={usersTrend}
       topReferrers={topReferrers}
+      codesActiveTab={codeTab}
+      generatedInviteCode={generatedInviteCode}
+      generatedPromoCode={generatedPromoCode}
+      generatedReferralCode={generatedReferralCode}
     />
   );
 }

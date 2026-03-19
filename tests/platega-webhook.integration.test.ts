@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+﻿import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const hoisted = vi.hoisted(() => {
   const paymentRequests = new Map<
@@ -8,6 +8,7 @@ const hoisted = vi.hoisted(() => {
       createdAt: Date;
       id: string;
       markedPaidAt: Date | null;
+      plategaConfirmedAt: Date | null;
       plategaPayloadJson: string | null;
       plategaStatus: string | null;
       plategaTransactionId: string | null;
@@ -34,15 +35,26 @@ const hoisted = vi.hoisted(() => {
     }
   >();
 
-  const createSubscriptionFromPaidRequestMock = vi.fn<
+  const handleApprovedPaymentPostProcessingMock = vi.fn<
     (input: { paymentRequest: { id: string } }) => Promise<{
       createdSubscriptionId: string | null;
+      referralRewardGranted: boolean;
       revokedSubscriptionId: string | null;
     }>
   >(async (input) => ({
     createdSubscriptionId: `sub_${input.paymentRequest.id}`,
+    referralRewardGranted: false,
     revokedSubscriptionId: null,
   }));
+
+  const handleRejectedPaymentPostProcessingMock = vi.fn<
+    () => Promise<{
+      revokedSubscriptionId: string | null;
+    }>
+  >(async () => ({
+    revokedSubscriptionId: "revoked_sub_1",
+  }));
+
   const issueSubscriptionInXuiMock = vi.fn(async () => ({ ok: true as const }));
   const revokeSubscriptionInXuiMock = vi.fn(async () => ({ ok: true as const }));
 
@@ -120,15 +132,17 @@ const hoisted = vi.hoisted(() => {
   };
 
   const prismaMock = {
-    $transaction: vi.fn(async (callback: (tx: { paymentRequest: typeof paymentRequestApi }) => Promise<unknown>) =>
-      callback({ paymentRequest: paymentRequestApi })
+    $transaction: vi.fn(
+      async (callback: (tx: { paymentRequest: typeof paymentRequestApi }) => Promise<unknown>) =>
+        callback({ paymentRequest: paymentRequestApi })
     ),
     paymentRequest: paymentRequestApi,
     plategaWebhookLog: plategaWebhookLogApi,
   };
 
   return {
-    createSubscriptionFromPaidRequestMock,
+    handleApprovedPaymentPostProcessingMock,
+    handleRejectedPaymentPostProcessingMock,
     issueSubscriptionInXuiMock,
     parsePlategaWebhookPayloadMock,
     paymentRequests,
@@ -139,8 +153,9 @@ const hoisted = vi.hoisted(() => {
   };
 });
 
-vi.mock("@/lib/payment-subscription-issuance", () => ({
-  createSubscriptionFromPaidRequest: hoisted.createSubscriptionFromPaidRequestMock,
+vi.mock("@/lib/payment-post-approval-handler", () => ({
+  handleApprovedPaymentPostProcessing: hoisted.handleApprovedPaymentPostProcessingMock,
+  handleRejectedPaymentPostProcessing: hoisted.handleRejectedPaymentPostProcessingMock,
 }));
 
 vi.mock("@/lib/xui-integration", () => ({
@@ -173,14 +188,15 @@ function buildWebhookRequest(body: Record<string, unknown>) {
 
 function seedPaymentRequest(input: {
   id: string;
-  transactionId: string;
   status?: "APPROVED" | "CREATED" | "REJECTED";
+  transactionId: string;
 }) {
   hoisted.paymentRequests.set(input.id, {
     approvedAt: null,
     createdAt: new Date("2026-03-12T10:00:00.000Z"),
     id: input.id,
     markedPaidAt: null,
+    plategaConfirmedAt: null,
     plategaPayloadJson: null,
     plategaStatus: null,
     plategaTransactionId: input.transactionId,
@@ -195,7 +211,8 @@ describe("Platega webhook idempotency", () => {
     hoisted.paymentRequests.clear();
     hoisted.webhookLogs.clear();
 
-    hoisted.createSubscriptionFromPaidRequestMock.mockClear();
+    hoisted.handleApprovedPaymentPostProcessingMock.mockClear();
+    hoisted.handleRejectedPaymentPostProcessingMock.mockClear();
     hoisted.issueSubscriptionInXuiMock.mockClear();
     hoisted.revokeSubscriptionInXuiMock.mockClear();
     hoisted.validatePlategaWebhookHeadersMock.mockClear();
@@ -217,7 +234,7 @@ describe("Platega webhook idempotency", () => {
     );
 
     expect(firstResponse.status).toBe(200);
-    expect(hoisted.createSubscriptionFromPaidRequestMock).toHaveBeenCalledTimes(1);
+    expect(hoisted.handleApprovedPaymentPostProcessingMock).toHaveBeenCalledTimes(1);
     expect(hoisted.issueSubscriptionInXuiMock).toHaveBeenCalledTimes(1);
     expect(hoisted.webhookLogs.size).toBe(1);
 
@@ -232,7 +249,7 @@ describe("Platega webhook idempotency", () => {
 
     expect(secondResponse.status).toBe(200);
     expect(secondBody.dedup).toBe(true);
-    expect(hoisted.createSubscriptionFromPaidRequestMock).toHaveBeenCalledTimes(1);
+    expect(hoisted.handleApprovedPaymentPostProcessingMock).toHaveBeenCalledTimes(1);
     expect(hoisted.issueSubscriptionInXuiMock).toHaveBeenCalledTimes(1);
     expect(hoisted.webhookLogs.size).toBe(1);
   });
@@ -252,7 +269,7 @@ describe("Platega webhook idempotency", () => {
     );
 
     expect(firstResponse.status).toBe(200);
-    expect(hoisted.createSubscriptionFromPaidRequestMock).toHaveBeenCalledTimes(1);
+    expect(hoisted.handleApprovedPaymentPostProcessingMock).toHaveBeenCalledTimes(1);
     expect(hoisted.issueSubscriptionInXuiMock).toHaveBeenCalledTimes(1);
 
     const secondResponse = await POST(
@@ -264,11 +281,33 @@ describe("Platega webhook idempotency", () => {
     );
 
     expect(secondResponse.status).toBe(200);
-    expect(hoisted.createSubscriptionFromPaidRequestMock).toHaveBeenCalledTimes(1);
+    expect(hoisted.handleApprovedPaymentPostProcessingMock).toHaveBeenCalledTimes(1);
     expect(hoisted.issueSubscriptionInXuiMock).toHaveBeenCalledTimes(1);
     expect(hoisted.webhookLogs.size).toBe(2);
 
     const payment = hoisted.paymentRequests.get("payment_2");
     expect(payment?.status).toBe("APPROVED");
+  });
+
+  it("revokes approved payment subscription on chargeback", async () => {
+    seedPaymentRequest({
+      id: "payment_3",
+      status: "APPROVED",
+      transactionId: "txn_3",
+    });
+
+    const response = await POST(
+      buildWebhookRequest({
+        id: "txn_3",
+        status: "CHARGEBACK",
+      })
+    );
+
+    expect(response.status).toBe(200);
+    expect(hoisted.handleRejectedPaymentPostProcessingMock).toHaveBeenCalledTimes(1);
+    expect(hoisted.revokeSubscriptionInXuiMock).toHaveBeenCalledTimes(1);
+
+    const payment = hoisted.paymentRequests.get("payment_3");
+    expect(payment?.status).toBe("REJECTED");
   });
 });

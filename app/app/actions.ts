@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { generateReferralCodeValue } from "@/lib/admin-code-management";
 import { getAppBenefitsData, validatePromoCodeForUser } from "@/lib/app-benefits";
 import { getCurrentSession, normalizeCode } from "@/lib/auth";
-import { createSubscriptionFromPaidRequest } from "@/lib/payment-subscription-issuance";
+import { handleApprovedPaymentPostProcessing } from "@/lib/payment-post-approval-handler";
 import { prisma } from "@/lib/prisma";
 import {
   calculateSubscriptionPrice,
@@ -409,42 +409,14 @@ export async function payTariffWithCreditsAction(formData: FormData) {
         },
       });
 
-      const creationResult = await createSubscriptionFromPaidRequest({
+      const postApprovalResult = await handleApprovedPaymentPostProcessing({
         now,
-        paymentRequest: paymentRequest,
+        paymentRequest,
         tx,
-        userId: user.id,
       });
-      createdSubscriptionId = creationResult.createdSubscriptionId;
-      revokedSubscriptionId = creationResult.revokedSubscriptionId;
-
-      const canGrantReferralReward =
-        approvedBefore === 0 &&
-        Boolean(referredUse && !referredUse.rewardGrantedAt && referredUse.referralCode.ownerUserId);
-
-      if (canGrantReferralReward && referredUse?.referralCode.ownerUserId) {
-        await tx.user.update({
-          data: {
-            credits: {
-              increment: referredUse.rewardCreditsSnapshot,
-            },
-          },
-          where: {
-            id: referredUse.referralCode.ownerUserId,
-          },
-        });
-
-        await tx.referralCodeUse.update({
-          data: {
-            rewardGrantedAt: now,
-          },
-          where: {
-            id: referredUse.id,
-          },
-        });
-
-        referralRewardGranted = true;
-      }
+      createdSubscriptionId = postApprovalResult.createdSubscriptionId;
+      revokedSubscriptionId = postApprovalResult.revokedSubscriptionId;
+      referralRewardGranted = postApprovalResult.referralRewardGranted;
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "";

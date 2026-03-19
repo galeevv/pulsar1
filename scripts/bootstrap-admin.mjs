@@ -1,7 +1,7 @@
 import path from "node:path";
-import { scryptSync } from "node:crypto";
 
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { hashSync as hashArgon2Sync } from "@node-rs/argon2";
 
 import { PrismaClient, Role } from "../generated/prisma/index.js";
 
@@ -27,8 +27,13 @@ function isValidMarzbanCompatibleUsername(username) {
 }
 
 function hashPassword(password) {
-  const salt = "pulsar-dev-salt";
-  return scryptSync(password, salt, 64).toString("hex");
+  return hashArgon2Sync(password, {
+    algorithm: 2,
+    memoryCost: 19456,
+    outputLen: 32,
+    parallelism: 1,
+    timeCost: 2,
+  });
 }
 
 function readRequiredEnv(name) {

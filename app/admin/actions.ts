@@ -45,6 +45,18 @@ function resolveAdminRedirectPath(rawPath: string, fallbackPath: string) {
   return rawPath;
 }
 
+function withSearchParams(path: string, params: Record<string, string>) {
+  const [pathname, rawQuery = ""] = path.split("?");
+  const searchParams = new URLSearchParams(rawQuery);
+
+  for (const [key, value] of Object.entries(params)) {
+    searchParams.set(key, value);
+  }
+
+  const query = searchParams.toString();
+  return `${pathname}${query ? `?${query}` : ""}`;
+}
+
 function parseExpiryDate(value: string) {
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? null : parsed;
@@ -54,7 +66,7 @@ async function getAdminActor() {
   const session = await getCurrentSession();
 
   if (!session) {
-    redirect("/login?mode=login&error=Р РЋР Р…Р В°РЎвЂЎР В°Р В»Р В° Р Р†Р С•Р в„–Р Т‘Р С‘РЎвЂљР Вµ Р Р† Р В°Р С”Р С”Р В°РЎС“Р Р…РЎвЂљ.");
+    redirect("/login?mode=login&error=Сначала войдите в аккаунт.");
   }
 
   if (session.role !== "ADMIN") {
@@ -67,7 +79,7 @@ async function getAdminActor() {
   });
 
   if (!user) {
-    redirect("/login?mode=login&error=Р РЋР Р…Р В°РЎвЂЎР В°Р В»Р В° Р Р†Р С•Р в„–Р Т‘Р С‘РЎвЂљР Вµ Р Р† Р В°Р С”Р С”Р В°РЎС“Р Р…РЎвЂљ.");
+    redirect("/login?mode=login&error=Сначала войдите в аккаунт.");
   }
 
   return user;
@@ -119,9 +131,13 @@ export async function createInviteCodeAction(formData: FormData) {
   });
 
   revalidatePath("/admin");
+  const successPath = withSearchParams(redirectPath, {
+    codeTab: "invite",
+    generatedInviteCode: code,
+  });
   redirect(
     buildRedirectUrl({
-      path: redirectPath,
+      path: successPath,
       notice: "Invite code created.",
     })
   );
@@ -133,7 +149,7 @@ export async function toggleInviteCodeAction(formData: FormData) {
   const nextEnabled = String(formData.get("nextEnabled") ?? "") === "true";
 
   if (!id) {
-    redirect(buildRedirectUrl({ path: "/admin/codes?tab=invite", error: "Invite-Р С”Р С•Р Т‘ Р Р…Р Вµ Р Р…Р В°Р в„–Р Т‘Р ВµР Р…." }));
+    redirect(buildRedirectUrl({ path: "/admin/codes?tab=invite", error: "Invite-код не найден." }));
   }
 
   await prisma.inviteCode.update({
@@ -145,7 +161,7 @@ export async function toggleInviteCodeAction(formData: FormData) {
   redirect(
     buildRedirectUrl({
       path: "/admin/codes?tab=invite",
-      notice: nextEnabled ? "Invite-Р С”Р С•Р Т‘ Р Р†Р С”Р В»РЎР‹РЎвЂЎР ВµР Р…." : "Invite-Р С”Р С•Р Т‘ Р Р†РЎвЂ№Р С”Р В»РЎР‹РЎвЂЎР ВµР Р….",
+      notice: nextEnabled ? "Invite-код включен." : "Invite-код выключен.",
     })
   );
 }
@@ -165,7 +181,7 @@ export async function updateReferralProgramSettingsAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/codes?tab=referral",
-        error: "Р вЂњР В»Р С•Р В±Р В°Р В»РЎРЉР Р…Р В°РЎРЏ РЎРѓР С”Р С‘Р Т‘Р С”Р В° Р Т‘Р С•Р В»Р В¶Р Р…Р В° Р В±РЎвЂ№РЎвЂљРЎРЉ РЎвЂЎР С‘РЎРѓР В»Р С•Р С Р С•РЎвЂљ 1 Р Т‘Р С• 100.",
+        error: "Глобальная скидка должна быть числом от 1 до 100.",
       })
     );
   }
@@ -174,7 +190,7 @@ export async function updateReferralProgramSettingsAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/codes?tab=referral",
-        error: "Р вЂњР В»Р С•Р В±Р В°Р В»РЎРЉР Р…РЎвЂ№Р в„– Р В±Р С•Р Р…РЎС“РЎРѓ Р Р† Р С”РЎР‚Р ВµР Т‘Р С‘РЎвЂљР В°РЎвЂ¦ Р Т‘Р С•Р В»Р В¶Р ВµР Р… Р В±РЎвЂ№РЎвЂљРЎРЉ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ 0.",
+        error: "Глобальный бонус в кредитах должен быть больше 0.",
       })
     );
   }
@@ -198,7 +214,7 @@ export async function updateReferralProgramSettingsAction(formData: FormData) {
   redirect(
     buildRedirectUrl({
       path: "/admin/codes?tab=referral",
-      notice: "Р вЂњР В»Р С•Р В±Р В°Р В»РЎРЉР Р…РЎвЂ№Р Вµ Р Р…Р В°РЎРѓРЎвЂљРЎР‚Р С•Р в„–Р С”Р С‘ РЎР‚Р ВµРЎвЂћР ВµРЎР‚Р В°Р В»РЎРЉР Р…Р С•Р в„– РЎРѓР С‘РЎРѓРЎвЂљР ВµР СРЎвЂ№ РЎРѓР С•РЎвЂ¦РЎР‚Р В°Р Р…Р ВµР Р…РЎвЂ№.",
+      notice: "Глобальные настройки реферальной системы сохранены.",
     })
   );
 }
@@ -275,9 +291,13 @@ export async function createReferralCodeAction(formData: FormData) {
   });
 
   revalidatePath("/admin");
+  const successPath = withSearchParams(redirectPath, {
+    codeTab: "referral",
+    generatedReferralCode: code,
+  });
   redirect(
     buildRedirectUrl({
-      path: redirectPath,
+      path: successPath,
       notice: "Referral code created.",
     })
   );
@@ -289,7 +309,7 @@ export async function toggleReferralCodeAction(formData: FormData) {
   const nextEnabled = String(formData.get("nextEnabled") ?? "") === "true";
 
   if (!id) {
-    redirect(buildRedirectUrl({ path: "/admin/codes?tab=referral", error: "Referral-Р С”Р С•Р Т‘ Р Р…Р Вµ Р Р…Р В°Р в„–Р Т‘Р ВµР Р…." }));
+    redirect(buildRedirectUrl({ path: "/admin/codes?tab=referral", error: "Referral-код не найден." }));
   }
 
   await prisma.referralCode.update({
@@ -301,7 +321,7 @@ export async function toggleReferralCodeAction(formData: FormData) {
   redirect(
     buildRedirectUrl({
       path: "/admin/codes?tab=referral",
-      notice: nextEnabled ? "Referral-Р С”Р С•Р Т‘ Р Р†Р С”Р В»РЎР‹РЎвЂЎР ВµР Р…." : "Referral-Р С”Р С•Р Т‘ Р Р†РЎвЂ№Р С”Р В»РЎР‹РЎвЂЎР ВµР Р….",
+      notice: nextEnabled ? "Referral-код включен." : "Referral-код выключен.",
     })
   );
 }
@@ -377,9 +397,13 @@ export async function createPromoCodeAction(formData: FormData) {
   });
 
   revalidatePath("/admin");
+  const successPath = withSearchParams(redirectPath, {
+    codeTab: "promo",
+    generatedPromoCode: code,
+  });
   redirect(
     buildRedirectUrl({
-      path: redirectPath,
+      path: successPath,
       notice: "Promo code created.",
     })
   );
@@ -391,7 +415,7 @@ export async function togglePromoCodeAction(formData: FormData) {
   const nextEnabled = String(formData.get("nextEnabled") ?? "") === "true";
 
   if (!id) {
-    redirect(buildRedirectUrl({ path: "/admin/codes?tab=promo", error: "Р СџРЎР‚Р С•Р СР С•Р С”Р С•Р Т‘ Р Р…Р Вµ Р Р…Р В°Р в„–Р Т‘Р ВµР Р…." }));
+    redirect(buildRedirectUrl({ path: "/admin/codes?tab=promo", error: "Промокод не найден." }));
   }
 
   await prisma.promoCode.update({
@@ -403,7 +427,7 @@ export async function togglePromoCodeAction(formData: FormData) {
   redirect(
     buildRedirectUrl({
       path: "/admin/codes?tab=promo",
-      notice: nextEnabled ? "Р СџРЎР‚Р С•Р СР С•Р С”Р С•Р Т‘ Р Р†Р С”Р В»РЎР‹РЎвЂЎР ВµР Р…." : "Р СџРЎР‚Р С•Р СР С•Р С”Р С•Р Т‘ Р Р†РЎвЂ№Р С”Р В»РЎР‹РЎвЂЎР ВµР Р….",
+      notice: nextEnabled ? "Промокод включен." : "Промокод выключен.",
     })
   );
 }
@@ -439,18 +463,18 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
       discountPercent: number;
     }>;
   } catch {
-    redirect(buildRedirectUrl({ path: "/admin/tariffs", error: "Р СњР ВµР С”Р С•РЎР‚РЎР‚Р ВµР С”РЎвЂљР Р…РЎвЂ№Р Вµ Р Т‘Р В°Р Р…Р Р…РЎвЂ№Р Вµ РЎвЂљР В°Р В±Р В»Р С‘РЎвЂ РЎвЂ№ РЎРѓРЎР‚Р С•Р С”Р С•Р Р†." }));
+    redirect(buildRedirectUrl({ path: "/admin/tariffs", error: "Некорректные данные таблицы сроков." }));
   }
 
   if (!Array.isArray(parsedRows) || parsedRows.length === 0) {
-    redirect(buildRedirectUrl({ path: "/admin/tariffs", error: "Р вЂќР С•Р В±Р В°Р Р†РЎРЉРЎвЂљР Вµ РЎвЂ¦Р С•РЎвЂљРЎРЏ Р В±РЎвЂ№ Р С•Р Т‘Р С‘Р Р… РЎРѓРЎР‚Р С•Р С” Р С—Р С•Р Т‘Р С—Р С‘РЎРѓР С”Р С‘." }));
+    redirect(buildRedirectUrl({ path: "/admin/tariffs", error: "Добавьте хотя бы один срок подписки." }));
   }
 
   if (!Number.isFinite(baseDeviceMonthlyPrice) || baseDeviceMonthlyPrice < 0) {
     redirect(
       buildRedirectUrl({
         path: "/admin/tariffs",
-        error: "Р вЂР В°Р В·Р С•Р Р†Р В°РЎРЏ РЎвЂ Р ВµР Р…Р В° Р Р† Р СР ВµРЎРѓРЎРЏРЎвЂ  (1 РЎС“РЎРѓРЎвЂљРЎР‚Р С•Р в„–РЎРѓРЎвЂљР Р†Р С•) Р Т‘Р С•Р В»Р В¶Р Р…Р В° Р В±РЎвЂ№РЎвЂљРЎРЉ 0 Р С‘Р В»Р С‘ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ.",
+        error: "Базовая цена в месяц (1 устройство) должна быть 0 или больше.",
       })
     );
   }
@@ -459,7 +483,7 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/tariffs",
-        error: "Р В¦Р ВµР Р…Р В° Р Т‘Р С•Р С—. РЎС“РЎРѓРЎвЂљРЎР‚Р С•Р в„–РЎРѓРЎвЂљР Р†Р В° Р Р† Р СР ВµРЎРѓРЎРЏРЎвЂ  Р Т‘Р С•Р В»Р В¶Р Р…Р В° Р В±РЎвЂ№РЎвЂљРЎРЉ 0 Р С‘Р В»Р С‘ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ.",
+        error: "Цена доп. устройства в месяц должна быть 0 или больше.",
       })
     );
   }
@@ -468,7 +492,7 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/tariffs",
-        error: "Р В¦Р ВµР Р…Р В°/Р СР ВµРЎРѓ Р Т‘Р С•Р В»Р В¶Р Р…Р В° Р В±РЎвЂ№РЎвЂљРЎРЉ 0 Р С‘Р В»Р С‘ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ.",
+        error: "Цена VPN в месяц должна быть 0 или больше.",
       })
     );
   }
@@ -477,7 +501,7 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/tariffs",
-        error: "Р СљР С‘Р Р…Р С‘Р СРЎС“Р С РЎС“РЎРѓРЎвЂљРЎР‚Р С•Р в„–РЎРѓРЎвЂљР Р† Р Т‘Р С•Р В»Р В¶Р ВµР Р… Р В±РЎвЂ№РЎвЂљРЎРЉ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ 0.",
+        error: "Минимум устройств должен быть больше 0.",
       })
     );
   }
@@ -486,7 +510,7 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/tariffs",
-        error: "Р СљР В°Р С”РЎРѓР С‘Р СРЎС“Р С РЎС“РЎРѓРЎвЂљРЎР‚Р С•Р в„–РЎРѓРЎвЂљР Р† Р Т‘Р С•Р В»Р В¶Р ВµР Р… Р В±РЎвЂ№РЎвЂљРЎРЉ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ Р С‘Р В»Р С‘ РЎР‚Р В°Р Р†Р ВµР Р… Р СР С‘Р Р…Р С‘Р СРЎС“Р СРЎС“.",
+        error: "Максимум устройств должен быть не меньше минимума.",
       })
     );
   }
@@ -495,7 +519,7 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/tariffs",
-        error: "Р СљР В°Р С”РЎРѓР С‘Р СРЎС“Р С РЎС“РЎРѓРЎвЂљРЎР‚Р С•Р в„–РЎРѓРЎвЂљР Р† Р Р…Р Вµ Р СР С•Р В¶Р ВµРЎвЂљ Р В±РЎвЂ№РЎвЂљРЎРЉ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ 10.",
+        error: "Максимум устройств не может быть больше 10.",
       })
     );
   }
@@ -512,7 +536,7 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
       redirect(
         buildRedirectUrl({
           path: "/admin/tariffs",
-          error: "Р РЋРЎР‚Р С•Р С” Р Т‘Р С•Р В»Р В¶Р ВµР Р… Р В±РЎвЂ№РЎвЂљРЎРЉ Р Р† Р Т‘Р С‘Р В°Р С—Р В°Р В·Р С•Р Р…Р Вµ Р С•РЎвЂљ 1 Р Т‘Р С• 120 Р СР ВµРЎРѓРЎРЏРЎвЂ Р ВµР Р†.",
+          error: "Срок должен быть в диапазоне от 1 до 120 месяцев.",
         })
       );
     }
@@ -521,7 +545,7 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
       redirect(
         buildRedirectUrl({
           path: "/admin/tariffs",
-          error: "Р РЋРЎР‚Р С•Р С”Р С‘ Р Т‘Р С•Р В»Р В¶Р Р…РЎвЂ№ Р В±РЎвЂ№РЎвЂљРЎРЉ РЎС“Р Р…Р С‘Р С”Р В°Р В»РЎРЉР Р…РЎвЂ№Р СР С‘.",
+          error: "Сроки должны быть уникальными.",
         })
       );
     }
@@ -530,7 +554,7 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
       redirect(
         buildRedirectUrl({
           path: "/admin/tariffs",
-          error: "Р РЋР С”Р С‘Р Т‘Р С”Р В° Р Т‘Р С•Р В»Р В¶Р Р…Р В° Р В±РЎвЂ№РЎвЂљРЎРЉ РЎвЂ Р ВµР В»РЎвЂ№Р С РЎвЂЎР С‘РЎРѓР В»Р С•Р С Р С•РЎвЂљ 0 Р Т‘Р С• 100.",
+          error: "Скидка должна быть целым числом от 0 до 100.",
         })
       );
     }
@@ -601,7 +625,7 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
 
   revalidatePath("/admin");
   revalidatePath("/app");
-  redirect(buildRedirectUrl({ path: "/admin/tariffs", notice: "Р СњР В°РЎРѓРЎвЂљРЎР‚Р С•Р в„–Р С”Р С‘ РЎвЂљР В°РЎР‚Р С‘РЎвЂћР В° РЎРѓР С•РЎвЂ¦РЎР‚Р В°Р Р…Р ВµР Р…РЎвЂ№." }));
+  redirect(buildRedirectUrl({ path: "/admin/tariffs", notice: "Настройки тарифа сохранены." }));
 }
 
 export async function updateSubscriptionPricingSettingsAction(formData: FormData) {
@@ -622,7 +646,7 @@ export async function updateSubscriptionPricingSettingsAction(formData: FormData
     redirect(
       buildRedirectUrl({
         path: "/admin/tariffs",
-        error: "Р СљР С‘Р Р…Р С‘Р СРЎС“Р С РЎС“РЎРѓРЎвЂљРЎР‚Р С•Р в„–РЎРѓРЎвЂљР Р† Р Т‘Р С•Р В»Р В¶Р ВµР Р… Р В±РЎвЂ№РЎвЂљРЎРЉ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ 0.",
+        error: "Минимум устройств должен быть больше 0.",
       })
     );
   }
@@ -631,7 +655,7 @@ export async function updateSubscriptionPricingSettingsAction(formData: FormData
     redirect(
       buildRedirectUrl({
         path: "/admin/tariffs",
-        error: "Р СљР В°Р С”РЎРѓР С‘Р СРЎС“Р С РЎС“РЎРѓРЎвЂљРЎР‚Р С•Р в„–РЎРѓРЎвЂљР Р† Р Т‘Р С•Р В»Р В¶Р ВµР Р… Р В±РЎвЂ№РЎвЂљРЎРЉ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ Р С‘Р В»Р С‘ РЎР‚Р В°Р Р†Р ВµР Р… Р СР С‘Р Р…Р С‘Р СРЎС“Р СРЎС“.",
+        error: "Максимум устройств должен быть не меньше минимума.",
       })
     );
   }
@@ -640,7 +664,7 @@ export async function updateSubscriptionPricingSettingsAction(formData: FormData
     redirect(
       buildRedirectUrl({
         path: "/admin/tariffs",
-        error: "Р СљР В°Р С”РЎРѓР С‘Р СРЎС“Р С РЎС“РЎРѓРЎвЂљРЎР‚Р С•Р в„–РЎРѓРЎвЂљР Р† Р Р…Р Вµ Р СР С•Р В¶Р ВµРЎвЂљ Р В±РЎвЂ№РЎвЂљРЎРЉ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ 10.",
+        error: "Максимум устройств не может быть больше 10.",
       })
     );
   }
@@ -649,7 +673,7 @@ export async function updateSubscriptionPricingSettingsAction(formData: FormData
     redirect(
       buildRedirectUrl({
         path: "/admin/tariffs",
-        error: "Р вЂР В°Р В·Р С•Р Р†Р В°РЎРЏ РЎвЂ Р ВµР Р…Р В° Р В·Р В° Р СР ВµРЎРѓРЎРЏРЎвЂ  Р Т‘Р С•Р В»Р В¶Р Р…Р В° Р В±РЎвЂ№РЎвЂљРЎРЉ 0 Р С‘Р В»Р С‘ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ.",
+        error: "Базовая цена за месяц должна быть 0 или больше.",
       })
     );
   }
@@ -658,7 +682,7 @@ export async function updateSubscriptionPricingSettingsAction(formData: FormData
     redirect(
       buildRedirectUrl({
         path: "/admin/tariffs",
-        error: "Р В¦Р ВµР Р…Р В° Р Т‘Р С•Р С—. РЎС“РЎРѓРЎвЂљРЎР‚Р С•Р в„–РЎРѓРЎвЂљР Р†Р В° Р Р† Р СР ВµРЎРѓРЎРЏРЎвЂ  Р Т‘Р С•Р В»Р В¶Р Р…Р В° Р В±РЎвЂ№РЎвЂљРЎРЉ 0 Р С‘Р В»Р С‘ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ.",
+        error: "Цена доп. устройства в месяц должна быть 0 или больше.",
       })
     );
   }
@@ -684,7 +708,7 @@ export async function updateSubscriptionPricingSettingsAction(formData: FormData
 
   revalidatePath("/admin");
   revalidatePath("/app");
-  redirect(buildRedirectUrl({ path: "/admin/tariffs", notice: "Р СњР В°РЎРѓРЎвЂљРЎР‚Р С•Р в„–Р С”Р С‘ РЎРѓРЎвЂљР С•Р С‘Р СР С•РЎРѓРЎвЂљР С‘ РЎРѓР С•РЎвЂ¦РЎР‚Р В°Р Р…Р ВµР Р…РЎвЂ№." }));
+  redirect(buildRedirectUrl({ path: "/admin/tariffs", notice: "Настройки стоимости сохранены." }));
 }
 
 export async function updateServiceCapacitySettingsAction(formData: FormData) {
@@ -699,7 +723,7 @@ export async function updateServiceCapacitySettingsAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/operations",
-        error: "MAX_ACTIVE_SUBSCRIPTIONS Р Т‘Р С•Р В»Р В¶Р ВµР Р… Р В±РЎвЂ№РЎвЂљРЎРЉ РЎвЂ Р ВµР В»РЎвЂ№Р С РЎвЂЎР С‘РЎРѓР В»Р С•Р С Р С•РЎвЂљ 0 Р С‘ Р Р†РЎвЂ№РЎв‚¬Р Вµ.",
+        error: "MAX_ACTIVE_SUBSCRIPTIONS должен быть целым числом от 0 и выше.",
       })
     );
   }
@@ -708,7 +732,7 @@ export async function updateServiceCapacitySettingsAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/operations",
-        error: "MAX_ACTIVE_SUBSCRIPTIONS РЎРѓР В»Р С‘РЎв‚¬Р С”Р С•Р С Р В±Р С•Р В»РЎРЉРЎв‚¬Р С•Р в„– (Р СР В°Р С”РЎРѓР С‘Р СРЎС“Р С 100000).",
+        error: "MAX_ACTIVE_SUBSCRIPTIONS слишком большой (максимум 100000).",
       })
     );
   }
@@ -731,8 +755,8 @@ export async function updateServiceCapacitySettingsAction(formData: FormData) {
       path: "/admin/operations",
       notice:
         maxActiveSubscriptions === 0
-          ? "Р вЂєР С‘Р СР С‘РЎвЂљ Р В°Р С”РЎвЂљР С‘Р Р†Р Р…РЎвЂ№РЎвЂ¦ Р С—Р С•Р Т‘Р С—Р С‘РЎРѓР С•Р С” Р С•РЎвЂљР С”Р В»РЎР‹РЎвЂЎР ВµР Р…."
-          : "Р вЂєР С‘Р СР С‘РЎвЂљ Р В°Р С”РЎвЂљР С‘Р Р†Р Р…РЎвЂ№РЎвЂ¦ Р С—Р С•Р Т‘Р С—Р С‘РЎРѓР С•Р С” РЎРѓР С•РЎвЂ¦РЎР‚Р В°Р Р…Р ВµР Р….",
+          ? "Лимит активных подписок отключен."
+          : "Лимит активных подписок сохранен.",
     })
   );
 }
@@ -748,7 +772,7 @@ export async function updateLegalDocumentsAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/rules",
-        error: "Р СћР ВµР С”РЎРѓРЎвЂљ Р’В«Р СџР С•Р В»РЎРЉР В·Р С•Р Р†Р В°РЎвЂљР ВµР В»РЎРЉРЎРѓР С”Р С•Р Вµ РЎРѓР С•Р С–Р В»Р В°РЎв‚¬Р ВµР Р…Р С‘Р ВµР’В» Р Р…Р Вµ Р СР С•Р В¶Р ВµРЎвЂљ Р В±РЎвЂ№РЎвЂљРЎРЉ Р С—РЎС“РЎРѓРЎвЂљРЎвЂ№Р С.",
+        error: "Текст «Пользовательское соглашение» не может быть пустым.",
       })
     );
   }
@@ -757,7 +781,7 @@ export async function updateLegalDocumentsAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/rules",
-        error: "Р СћР ВµР С”РЎРѓРЎвЂљ Р’В«Р СџРЎС“Р В±Р В»Р С‘РЎвЂЎР Р…Р В°РЎРЏ Р С•РЎвЂћР ВµРЎР‚РЎвЂљР В°Р’В» Р Р…Р Вµ Р СР С•Р В¶Р ВµРЎвЂљ Р В±РЎвЂ№РЎвЂљРЎРЉ Р С—РЎС“РЎРѓРЎвЂљРЎвЂ№Р С.",
+        error: "Текст «Публичная оферта» не может быть пустым.",
       })
     );
   }
@@ -766,7 +790,7 @@ export async function updateLegalDocumentsAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/rules",
-        error: "Р СћР ВµР С”РЎРѓРЎвЂљ Р’В«Р СџР С•Р В»Р С‘РЎвЂљР С‘Р С”Р В° Р С”Р С•Р Р…РЎвЂћР С‘Р Т‘Р ВµР Р…РЎвЂ Р С‘Р В°Р В»РЎРЉР Р…Р С•РЎРѓРЎвЂљР С‘Р’В» Р Р…Р Вµ Р СР С•Р В¶Р ВµРЎвЂљ Р В±РЎвЂ№РЎвЂљРЎРЉ Р С—РЎС“РЎРѓРЎвЂљРЎвЂ№Р С.",
+        error: "Текст «Политика конфиденциальности» не может быть пустым.",
       })
     );
   }
@@ -779,7 +803,7 @@ export async function updateLegalDocumentsAction(formData: FormData) {
     redirect(
       buildRedirectUrl({
         path: "/admin/rules",
-        error: "Р С›Р Т‘Р С‘Р Р… Р С‘Р В· РЎР‹РЎР‚Р С‘Р Т‘Р С‘РЎвЂЎР ВµРЎРѓР С”Р С‘РЎвЂ¦ Р Т‘Р С•Р С”РЎС“Р СР ВµР Р…РЎвЂљР С•Р Р† РЎРѓР В»Р С‘РЎв‚¬Р С”Р С•Р С Р Т‘Р В»Р С‘Р Р…Р Р…РЎвЂ№Р в„–.",
+        error: "Один из юридических документов слишком длинный.",
       })
     );
   }
@@ -793,7 +817,7 @@ export async function updateLegalDocumentsAction(formData: FormData) {
   revalidatePath("/admin");
   revalidatePath("/rules");
   revalidatePath("/app");
-  redirect(buildRedirectUrl({ path: "/admin/rules", notice: "Р В®РЎР‚Р С‘Р Т‘Р С‘РЎвЂЎР ВµРЎРѓР С”Р В°РЎРЏ Р С‘Р Р…РЎвЂћР С•РЎР‚Р СР В°РЎвЂ Р С‘РЎРЏ Р С•Р В±Р Р…Р С•Р Р†Р В»Р ВµР Р…Р В°." }));
+  redirect(buildRedirectUrl({ path: "/admin/rules", notice: "Юридическая информация обновлена." }));
 }
 
 export async function updateUserAgreementAction(formData: FormData) {

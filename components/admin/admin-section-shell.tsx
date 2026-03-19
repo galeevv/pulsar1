@@ -18,7 +18,10 @@ export function AdminSectionShell({
   contentClassName?: string;
 }) {
   return (
-    <section className={cn("scroll-mt-20 py-12 md:scroll-mt-20 md:py-12", className)} id={id}>
+    <section
+      className={cn("mx-auto w-full max-w-[1120px] scroll-mt-20 py-12 md:scroll-mt-20 md:py-12", className)}
+      id={id}
+    >
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div className="w-full">
           <h2 className="text-h2 font-semibold tracking-tight">{title}</h2>
