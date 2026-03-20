@@ -52,6 +52,27 @@ function buildConstructorTariffName(months: number, devices: number) {
   return `Constructor: ${months}m / ${devices} devices`;
 }
 
+function buildPlategaRedirectTarget(params: {
+  fallbackRequestUrl: string;
+  paymentRequestId: string;
+  configuredUrl: string | undefined;
+}) {
+  const fallbackUrl = new URL("/app", params.fallbackRequestUrl);
+  fallbackUrl.searchParams.set("plategaPaymentRequestId", params.paymentRequestId);
+
+  if (!params.configuredUrl?.trim()) {
+    return fallbackUrl.toString();
+  }
+
+  try {
+    const configured = new URL(params.configuredUrl, params.fallbackRequestUrl);
+    configured.searchParams.set("plategaPaymentRequestId", params.paymentRequestId);
+    return configured.toString();
+  } catch {
+    return fallbackUrl.toString();
+  }
+}
+
 export async function POST(request: Request) {
   const session = await getCurrentSession();
   if (!session || session.role !== "USER") {
@@ -134,7 +155,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "Продление доступно только после подтверждения администратором текущей оплаты подписки.",
+          "Продление доступно только после завершения текущего платежа.",
       },
       { status: 400 }
     );
@@ -203,8 +224,16 @@ export async function POST(request: Request) {
     },
   });
 
-  const origin = new URL(request.url).origin;
-  const statusPageUrl = `${origin}/app?plategaPaymentRequestId=${paymentRequest.id}`;
+  const returnUrl = buildPlategaRedirectTarget({
+    configuredUrl: process.env.PLATEGA_RETURN_URL,
+    fallbackRequestUrl: request.url,
+    paymentRequestId: paymentRequest.id,
+  });
+  const failedUrl = buildPlategaRedirectTarget({
+    configuredUrl: process.env.PLATEGA_FAILED_URL,
+    fallbackRequestUrl: request.url,
+    paymentRequestId: paymentRequest.id,
+  });
   const payloadJson = JSON.stringify({
     amountRub: price.finalTotalRub,
     orderId: parsedPayload.data.orderId ?? paymentRequest.id,
@@ -219,10 +248,10 @@ export async function POST(request: Request) {
     const transaction = await createPlategaTransaction({
       amount: price.finalTotalRub,
       description,
-      failedUrl: statusPageUrl,
+      failedUrl,
       orderId: paymentRequest.id,
       payload: payloadJson,
-      returnUrl: statusPageUrl,
+      returnUrl,
     });
 
     await prisma.paymentRequest.update({

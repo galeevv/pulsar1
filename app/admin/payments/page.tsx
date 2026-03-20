@@ -1,8 +1,15 @@
 import { AdminPaymentsSection } from "@/components/admin/admin-payments-section";
-import { getAdminDashboardData } from "@/lib/admin-code-management";
+import { getAdminPaymentsPageData } from "@/lib/admin/get-admin-payments-page-data";
 
-export default async function AdminPaymentsPage() {
-  const dashboardData = await getAdminDashboardData();
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
-  return <AdminPaymentsSection paymentRequests={dashboardData.paymentRequests} />;
+export default async function AdminPaymentsPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const resolvedSearchParams = await searchParams;
+  const data = await getAdminPaymentsPageData(resolvedSearchParams);
+
+  return <AdminPaymentsSection data={data} />;
 }

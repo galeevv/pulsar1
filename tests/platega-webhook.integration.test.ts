@@ -186,6 +186,18 @@ function buildWebhookRequest(body: Record<string, unknown>) {
   });
 }
 
+function buildInvalidJsonWebhookRequest(rawBody: string) {
+  return new Request("https://example.com/api/payments/platega/webhook", {
+    body: rawBody,
+    headers: {
+      "Content-Type": "application/json",
+      "X-MerchantId": "merchant-test",
+      "X-Secret": "secret-test",
+    },
+    method: "POST",
+  });
+}
+
 function seedPaymentRequest(input: {
   id: string;
   status?: "APPROVED" | "CREATED" | "REJECTED";
@@ -254,6 +266,28 @@ describe("Platega webhook idempotency", () => {
     expect(hoisted.webhookLogs.size).toBe(1);
   });
 
+  it("does not activate subscription before CONFIRMED status", async () => {
+    seedPaymentRequest({
+      id: "payment_pending_1",
+      transactionId: "txn_pending_1",
+    });
+
+    const response = await POST(
+      buildWebhookRequest({
+        id: "txn_pending_1",
+        status: "PENDING",
+      })
+    );
+
+    expect(response.status).toBe(200);
+    expect(hoisted.handleApprovedPaymentPostProcessingMock).not.toHaveBeenCalled();
+    expect(hoisted.issueSubscriptionInXuiMock).not.toHaveBeenCalled();
+    expect(hoisted.revokeSubscriptionInXuiMock).not.toHaveBeenCalled();
+
+    const payment = hoisted.paymentRequests.get("payment_pending_1");
+    expect(payment?.status).toBe("CREATED");
+  });
+
   it("keeps one activation per payment even for non-identical repeated CONFIRMED webhook", async () => {
     seedPaymentRequest({
       id: "payment_2",
@@ -289,6 +323,88 @@ describe("Platega webhook idempotency", () => {
     expect(payment?.status).toBe("APPROVED");
   });
 
+  it("returns 401 for unauthorized webhook", async () => {
+    hoisted.validatePlategaWebhookHeadersMock.mockReturnValueOnce(false);
+
+    const response = await POST(
+      buildWebhookRequest({
+        id: "txn_unauthorized_1",
+        status: "CONFIRMED",
+      })
+    );
+
+    expect(response.status).toBe(401);
+    expect(hoisted.parsePlategaWebhookPayloadMock).not.toHaveBeenCalled();
+    expect(hoisted.handleApprovedPaymentPostProcessingMock).not.toHaveBeenCalled();
+    expect(hoisted.webhookLogs.size).toBe(0);
+  });
+
+  it("returns 400 for invalid webhook payload", async () => {
+    const response = await POST(
+      buildWebhookRequest({
+        foo: "bar",
+      })
+    );
+
+    expect(response.status).toBe(400);
+    expect(hoisted.handleApprovedPaymentPostProcessingMock).not.toHaveBeenCalled();
+    expect(hoisted.webhookLogs.size).toBe(0);
+  });
+
+  it("returns 400 for invalid json body", async () => {
+    const response = await POST(buildInvalidJsonWebhookRequest("{invalid_json"));
+
+    expect(response.status).toBe(400);
+    expect(hoisted.handleApprovedPaymentPostProcessingMock).not.toHaveBeenCalled();
+    expect(hoisted.webhookLogs.size).toBe(0);
+  });
+
+  it("handles payment-not-found webhook without side effects", async () => {
+    const response = await POST(
+      buildWebhookRequest({
+        id: "txn_missing_1",
+        status: "CONFIRMED",
+      })
+    );
+
+    expect(response.status).toBe(200);
+    expect(hoisted.handleApprovedPaymentPostProcessingMock).not.toHaveBeenCalled();
+    expect(hoisted.issueSubscriptionInXuiMock).not.toHaveBeenCalled();
+    expect(hoisted.revokeSubscriptionInXuiMock).not.toHaveBeenCalled();
+    expect(hoisted.webhookLogs.size).toBe(1);
+  });
+
+  it("ignores CONFIRMED after payment already rejected (out-of-order terminal transition)", async () => {
+    seedPaymentRequest({
+      id: "payment_out_of_order_1",
+      transactionId: "txn_out_of_order_1",
+    });
+
+    const rejectResponse = await POST(
+      buildWebhookRequest({
+        id: "txn_out_of_order_1",
+        status: "FAILED",
+      })
+    );
+    expect(rejectResponse.status).toBe(200);
+
+    const confirmedResponse = await POST(
+      buildWebhookRequest({
+        id: "txn_out_of_order_1",
+        payload: "late_confirm",
+        status: "CONFIRMED",
+      })
+    );
+    expect(confirmedResponse.status).toBe(200);
+
+    expect(hoisted.handleApprovedPaymentPostProcessingMock).not.toHaveBeenCalled();
+    expect(hoisted.issueSubscriptionInXuiMock).not.toHaveBeenCalled();
+    expect(hoisted.revokeSubscriptionInXuiMock).not.toHaveBeenCalled();
+
+    const payment = hoisted.paymentRequests.get("payment_out_of_order_1");
+    expect(payment?.status).toBe("REJECTED");
+  });
+
   it("revokes approved payment subscription on chargeback", async () => {
     seedPaymentRequest({
       id: "payment_3",
@@ -309,5 +425,70 @@ describe("Platega webhook idempotency", () => {
 
     const payment = hoisted.paymentRequests.get("payment_3");
     expect(payment?.status).toBe("REJECTED");
+  });
+
+  it("does not duplicate revoke side effects on repeated terminal reject status", async () => {
+    seedPaymentRequest({
+      id: "payment_4",
+      status: "APPROVED",
+      transactionId: "txn_4",
+    });
+
+    const firstResponse = await POST(
+      buildWebhookRequest({
+        id: "txn_4",
+        payload: "first",
+        status: "CHARGEBACK",
+      })
+    );
+    expect(firstResponse.status).toBe(200);
+
+    const secondResponse = await POST(
+      buildWebhookRequest({
+        id: "txn_4",
+        payload: "second",
+        status: "CHARGEBACK",
+      })
+    );
+    expect(secondResponse.status).toBe(200);
+
+    expect(hoisted.handleRejectedPaymentPostProcessingMock).toHaveBeenCalledTimes(1);
+    expect(hoisted.revokeSubscriptionInXuiMock).toHaveBeenCalledTimes(1);
+
+    const payment = hoisted.paymentRequests.get("payment_4");
+    expect(payment?.status).toBe("REJECTED");
+  });
+
+  it("does not duplicate local activation when x-ui issue fails and webhook is retried", async () => {
+    seedPaymentRequest({
+      id: "payment_partial_failure_1",
+      transactionId: "txn_partial_failure_1",
+    });
+
+    hoisted.issueSubscriptionInXuiMock.mockRejectedValueOnce(
+      new Error("xui temporary failure")
+    );
+
+    const firstResponse = await POST(
+      buildWebhookRequest({
+        id: "txn_partial_failure_1",
+        status: "CONFIRMED",
+      })
+    );
+    expect(firstResponse.status).toBe(500);
+
+    const secondResponse = await POST(
+      buildWebhookRequest({
+        id: "txn_partial_failure_1",
+        status: "CONFIRMED",
+      })
+    );
+    expect(secondResponse.status).toBe(200);
+
+    expect(hoisted.handleApprovedPaymentPostProcessingMock).toHaveBeenCalledTimes(1);
+    expect(hoisted.issueSubscriptionInXuiMock).toHaveBeenCalledTimes(1);
+
+    const payment = hoisted.paymentRequests.get("payment_partial_failure_1");
+    expect(payment?.status).toBe("APPROVED");
   });
 });

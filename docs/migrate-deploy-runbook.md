@@ -11,6 +11,10 @@ Last updated: 2026-03-19
 1. Остановите запись в БД (maintenance/restart window).
 2. Сделайте backup SQLite.
 3. Проверьте статус миграций.
+4. Проверьте платежные env:
+   - `PLATEGA_MERCHANT_ID`
+   - `PLATEGA_SECRET` (или `PLATEGA_API_KEY` для обратной совместимости)
+   - при необходимости `PLATEGA_RETURN_URL` и `PLATEGA_FAILED_URL`
 
 ```bash
 cd /opt/pulsar/current

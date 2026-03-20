@@ -55,6 +55,15 @@ Legacy ручной перевод удален из runtime-модели.
 - `POST /api/payments/platega/webhook`
 - `app/app/actions.ts` (`payTariffWithCreditsAction`)
 
+### Env для Platega
+
+- `PLATEGA_BASE_URL`
+- `PLATEGA_MERCHANT_ID`
+- `PLATEGA_SECRET` (основной)
+- `PLATEGA_API_KEY` (обратная совместимость)
+- `PLATEGA_RETURN_URL` (опционально)
+- `PLATEGA_FAILED_URL` (опционально)
+
 ### Unified post-approval handler
 
 Общий idempotent обработчик:

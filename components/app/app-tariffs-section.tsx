@@ -309,7 +309,7 @@ export function AppTariffsSection({
               <div className="rounded-card border border-border bg-background/50 p-card-compact text-sm text-muted-foreground md:p-card-compact-md">
                 <p className="inline-flex items-center gap-2">
                   <Loader2 className="size-4 animate-spin" />
-                  Платеж через банковскую карту обрабатывается. Обновляем статус подписки...
+                  Платеж через Platega обрабатывается. Обновляем статус подписки...
                 </p>
               </div>
             ) : null}
@@ -433,7 +433,7 @@ export function AppTariffsSection({
 
             {!canExtendSubscription ? (
               <p className="text-sm text-muted-foreground">
-                Продление станет доступно после подтверждения текущей оплаты администратором.
+                Продление станет доступно после завершения текущего платежа.
               </p>
             ) : null}
 
@@ -516,7 +516,7 @@ export function AppTariffsSection({
                         <div className="min-w-0 flex-1 space-y-1 leading-snug">
                           <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
                             <CreditCard className="size-4" />
-                            Банковская карта
+                            Platega
                           </p>
                           <p className="text-sm text-muted-foreground">
                             Visa, MasterCard, Мир
@@ -582,7 +582,7 @@ export function AppTariffsSection({
                         Создаем платеж...
                       </span>
                     ) : (
-                      "Оплатить банковской картой"
+                      "Оплатить через Platega"
                     )
                   ) : (
                     isSubmittingCredits ? (
@@ -598,7 +598,7 @@ export function AppTariffsSection({
 
                 {selectedPaymentMethod === "CREDITS" && !hasEnoughCredits ? (
                   <p className="text-sm text-muted-foreground">
-                    Недостаточно кредитов. Пополните баланс или выберите банковскую карту.
+                    Недостаточно кредитов. Пополните баланс или выберите Platega.
                   </p>
                 ) : null}
               </DialogContent>

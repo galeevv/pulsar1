@@ -8,7 +8,10 @@ export class PlategaApiError extends Error {
   statusCode: number | null;
   responseBody: string | null;
 
-  constructor(message: string, input?: { responseBody?: string | null; statusCode?: number | null }) {
+  constructor(
+    message: string,
+    input?: { responseBody?: string | null; statusCode?: number | null }
+  ) {
     super(message);
     this.name = "PlategaApiError";
     this.statusCode = input?.statusCode ?? null;
@@ -26,12 +29,17 @@ type PlategaCreateTransactionInput = {
 };
 
 type PlategaCreateTransactionResponse = {
-  data: {
+  data?: {
     id?: string;
     redirect?: string;
+    status?: string;
+    transactionId?: string;
   };
+  id?: string;
   message?: string;
+  redirect?: string;
   status?: string;
+  transactionId?: string;
 };
 
 type PlategaWebhookPayload = {
@@ -41,15 +49,19 @@ type PlategaWebhookPayload = {
   method?: string;
   payload?: string;
   status?: string;
+  transactionId?: string;
 };
 
 function getPlategaConfig() {
   const merchantId = process.env.PLATEGA_MERCHANT_ID?.trim();
-  const apiKey = process.env.PLATEGA_API_KEY?.trim();
+  const apiKey =
+    process.env.PLATEGA_SECRET?.trim() || process.env.PLATEGA_API_KEY?.trim();
   const baseUrl = process.env.PLATEGA_BASE_URL?.trim() || DEFAULT_PLATEGA_BASE_URL;
 
   if (!merchantId || !apiKey) {
-    throw new PlategaApiError("PLATEGA_MERCHANT_ID и PLATEGA_API_KEY должны быть заданы.");
+    throw new PlategaApiError(
+      "PLATEGA_MERCHANT_ID и PLATEGA_SECRET (или PLATEGA_API_KEY) должны быть заданы."
+    );
   }
 
   return {
@@ -73,6 +85,7 @@ function safeEqual(a: string, b: string) {
 async function callPlategaApi(input: { body: string; path: string }) {
   const config = getPlategaConfig();
   const url = `${config.baseUrl}${input.path}`;
+
   const response = await fetch(url, {
     body: input.body,
     headers: {
@@ -105,16 +118,19 @@ async function callPlategaApi(input: { body: string; path: string }) {
 }
 
 export async function createPlategaTransaction(input: PlategaCreateTransactionInput) {
+  // Docs contract:
+  // paymentDetails contains only amount/currency; description/return/failedUrl/payload are top-level.
   const payload = {
+    description: input.description,
+    failedUrl: input.failedUrl,
+    orderId: input.orderId,
+    payload: input.payload,
     paymentDetails: {
       amount: input.amount,
       currency: "RUB",
-      description: input.description,
-      failedUrl: input.failedUrl,
-      payload: input.payload,
-      returnUrl: input.returnUrl,
     },
     paymentMethod: 2,
+    return: input.returnUrl,
   };
 
   const parsed = (await callPlategaApi({
@@ -122,11 +138,13 @@ export async function createPlategaTransaction(input: PlategaCreateTransactionIn
     path: "/transaction/process",
   })) as PlategaCreateTransactionResponse;
 
-  const redirectUrl = parsed.data?.redirect;
-  const transactionId = parsed.data?.id;
+  const redirectUrl = parsed.redirect ?? parsed.data?.redirect;
+  const transactionId =
+    parsed.transactionId ?? parsed.id ?? parsed.data?.transactionId ?? parsed.data?.id;
+  const status = parsed.status ?? parsed.data?.status ?? null;
 
   if (!redirectUrl || !transactionId) {
-    throw new PlategaApiError("Platega API не вернул redirect или transaction id.", {
+    throw new PlategaApiError("Platega API не вернул redirect URL или transaction id.", {
       responseBody: JSON.stringify(parsed),
       statusCode: null,
     });
@@ -134,7 +152,7 @@ export async function createPlategaTransaction(input: PlategaCreateTransactionIn
 
   return {
     redirectUrl,
-    status: parsed.status ?? null,
+    status,
     transactionId,
   };
 }
@@ -153,7 +171,8 @@ export function parsePlategaWebhookPayload(payload: unknown) {
   }
 
   const cast = payload as PlategaWebhookPayload;
-  if (!cast.id || typeof cast.id !== "string") {
+  const transactionId = cast.id ?? cast.transactionId;
+  if (!transactionId || typeof transactionId !== "string") {
     return null;
   }
 
@@ -167,6 +186,6 @@ export function parsePlategaWebhookPayload(payload: unknown) {
     method: typeof cast.method === "string" ? cast.method : null,
     payload: typeof cast.payload === "string" ? cast.payload : null,
     status: cast.status,
-    transactionId: cast.id,
+    transactionId,
   };
 }

@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { Prisma, PaymentMethod, PaymentRequestStatus } from "@/generated/prisma";
+import { PaymentMethod, PaymentRequestStatus } from "@/generated/prisma";
+import type { Prisma } from "@/generated/prisma";
 
 import {
   type AdminPaymentMethod,
@@ -88,6 +89,14 @@ function normalizeSort(rawValue: string | undefined): AdminPaymentsSort {
   return "newest";
 }
 
+function buildFailedStatusConditions(): Prisma.PaymentRequestWhereInput[] {
+  return FAILED_PLATEGA_STATUSES.map((statusValue) => ({
+    plategaStatus: {
+      contains: statusValue,
+    },
+  }));
+}
+
 function mapMethod(method: PaymentMethod): AdminPaymentMethod {
   return method === PaymentMethod.CREDITS ? "credits" : "platega";
 }
@@ -120,6 +129,8 @@ function resolvePaymentStatus({
 }
 
 function resolveStatusWhere(status: AdminPaymentStatusFilter): Prisma.PaymentRequestWhereInput | null {
+  const failedConditions = buildFailedStatusConditions();
+
   if (status === "all") {
     return null;
   }
@@ -134,25 +145,26 @@ function resolveStatusWhere(status: AdminPaymentStatusFilter): Prisma.PaymentReq
 
   if (status === "failed") {
     return {
+      OR: failedConditions,
       status: PaymentRequestStatus.CREATED,
-      plategaStatus: {
-        in: [...FAILED_PLATEGA_STATUSES],
-      },
     };
   }
 
   return {
-    status: PaymentRequestStatus.CREATED,
     OR: [
       { plategaStatus: null },
       {
-        NOT: {
-          plategaStatus: {
-            in: [...FAILED_PLATEGA_STATUSES],
+        AND: [
+          {
+            NOT: {
+              OR: failedConditions,
+            },
           },
-        },
+          { plategaStatus: { not: null } },
+        ],
       },
     ],
+    status: PaymentRequestStatus.CREATED,
   };
 }
 
@@ -259,6 +271,7 @@ export async function getAdminPaymentsPageData(
     query,
     status,
   });
+  const summaryPendingWhere = resolveStatusWhere("pending") ?? {};
 
   const [filteredTotal, summaryTotal, summaryApproved, summaryPending, summaryRevenue] =
     await prisma.$transaction([
@@ -268,19 +281,7 @@ export async function getAdminPaymentsPageData(
         where: { status: PaymentRequestStatus.APPROVED },
       }),
       prisma.paymentRequest.count({
-        where: {
-          status: PaymentRequestStatus.CREATED,
-          OR: [
-            { plategaStatus: null },
-            {
-              NOT: {
-                plategaStatus: {
-                  in: [...FAILED_PLATEGA_STATUSES],
-                },
-              },
-            },
-          ],
-        },
+        where: summaryPendingWhere,
       }),
       prisma.paymentRequest.aggregate({
         _sum: {
@@ -362,9 +363,12 @@ export async function getAdminPaymentsPageData(
           updatedAt: item.updatedAt.toISOString(),
         },
         pricingSnapshot: {
-          appliedReferralDiscountPercent: null,
+          appliedReferralDiscountPercent:
+            item.referralDiscountPercentSnapshot > 0
+              ? item.referralDiscountPercentSnapshot
+              : null,
           devices: item.devices,
-          devicesMonthlyPrice: null,
+          devicesMonthlyPrice: item.extraDeviceMonthlyPriceSnapshot,
           durationDiscountPercent: item.durationDiscountPercentSnapshot,
           finalTotalRub: item.amountRub,
           months: item.months,
@@ -376,7 +380,7 @@ export async function getAdminPaymentsPageData(
         referral: referralUse
           ? {
               label: referralUse.referralCode.code,
-              rewardApplied: referralUse.rewardGrantedAt ? true : null,
+              rewardApplied: Boolean(referralUse.rewardGrantedAt),
             }
           : null,
         subscription: item.subscription

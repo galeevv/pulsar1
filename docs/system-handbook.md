@@ -81,6 +81,17 @@ Platega flow:
    - `POST /api/payments/platega/webhook`
    - `GET /api/payments/platega/status`
 
+Payment state transitions:
+
+- allowed:
+  - `CREATED -> APPROVED` (provider `CONFIRMED`)
+  - `CREATED -> REJECTED` (provider rejected/failed statuses)
+  - `APPROVED -> REJECTED` only for chargeback/failure statuses from provider
+- ignored (logged as processed/ignored webhook event):
+  - `REJECTED -> APPROVED`
+  - repeated terminal notifications (`APPROVED -> APPROVED`, `REJECTED -> REJECTED`)
+  - non-terminal/out-of-order provider statuses that do not require transition
+
 Credits flow:
 
 1. User configures constructor and clicks `Оплатить кредитами`.
@@ -218,7 +229,10 @@ Platega:
 
 - `PLATEGA_BASE_URL` (default `https://app.platega.io`)
 - `PLATEGA_MERCHANT_ID`
-- `PLATEGA_API_KEY`
+- `PLATEGA_SECRET` (primary secret for API/webhook auth)
+- `PLATEGA_API_KEY` (optional backward compatibility alias)
+- `PLATEGA_RETURN_URL` (optional; appends `plategaPaymentRequestId`)
+- `PLATEGA_FAILED_URL` (optional; appends `plategaPaymentRequestId`)
 
 Admin bootstrap:
 
@@ -308,6 +322,8 @@ When updating, do both:
 
 | Date       | Decision | Why |
 |------------|----------|-----|
+| 2026-03-20 | Hardened Platega runtime config (`PLATEGA_SECRET` primary, callback URLs configurable via `PLATEGA_RETURN_URL` / `PLATEGA_FAILED_URL`) and removed legacy payment server actions from `/app` | Align env model with production integration and reduce legacy runtime surface |
+| 2026-03-20 | Expanded webhook regression tests for unauthorized/invalid/not-found/out-of-order/partial-failure retry scenarios | Increase confidence in idempotency and terminal-state behavior under real webhook retry patterns |
 | 2026-03-07 | Removed legacy `Tariff` model and old tariff admin actions | Finalize transition to constructor-only pricing and eliminate dual-model maintenance risk |
 | 2026-03-07 | Added migration `0008_subscription_constructor_cleanup` and switched production policy to `migrate deploy` | Ensure deterministic schema rollout and avoid `db push` drift in production |
 | 2026-03-07 | Replaced fixed tariff UI/logic with server-side subscription constructor (duration + devices + snapshots) | Make pricing flexible, transparent, and admin-configurable without hardcoded plan catalog |

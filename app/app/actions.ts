@@ -198,7 +198,7 @@ async function parseAndValidateConstructorSelection(
         buildRedirectUrl({
           anchor: "#tariffs",
           error:
-            "Продление доступно только после подтверждения администратором текущей оплаты подписки.",
+            "Продление доступно только после завершения текущего платежа.",
         })
       );
     }
@@ -303,16 +303,6 @@ export async function applyPromoCodeAction(formData: FormData) {
     buildRedirectUrl({
       dialog: "promo",
       notice: `Промокод применен. Баланс увеличен на ${validation.promoCode.creditAmount} кредитов.`,
-    })
-  );
-}
-
-export async function confirmTariffPaymentAction(formData: FormData) {
-  void formData;
-  redirect(
-    buildRedirectUrl({
-      anchor: "#tariffs",
-      error: "Оплата переводом отключена. Используйте Platega или кредиты.",
     })
   );
 }
@@ -643,26 +633,6 @@ export async function deactivateDeviceSlotAction(formData: FormData) {
     buildRedirectUrl({
       anchor: "#dashboard",
       notice: `Слот ${slot.slotIndex} деактивирован.${syncNotice}`,
-    })
-  );
-}
-
-export async function createPaymentRequestAction(_formData: FormData) {
-  void _formData;
-  redirect(
-    buildRedirectUrl({
-      anchor: "#tariffs",
-      error: "Это действие устарело. Используйте оплату через конструктор подписки.",
-    })
-  );
-}
-
-export async function markPaymentRequestPaidAction(_formData: FormData) {
-  void _formData;
-  redirect(
-    buildRedirectUrl({
-      anchor: "#tariffs",
-      error: "Это действие устарело. Используйте оплату через конструктор подписки.",
     })
   );
 }
