@@ -92,7 +92,7 @@ export function AdminTariffsSection({
     clamp(Math.max(pricingSettings.maxDevices, pricingSettings.minDevices), 1, 10),
   ]);
   const [previewMonths, setPreviewMonths] = useState(sortedRules[0]?.months ?? 1);
-  const [previewDevices, setPreviewDevices] = useState(2);
+  const [previewDevices, setPreviewDevices] = useState(3);
 
   const minDevices = deviceRange[0];
   const maxDevices = deviceRange[1];

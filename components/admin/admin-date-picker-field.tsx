@@ -6,6 +6,7 @@ import { CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 function toEndOfDayIso(date: Date) {
   return new Date(
@@ -21,7 +22,7 @@ function toEndOfDayIso(date: Date) {
 
 function formatDisplayDate(date: Date | undefined) {
   if (!date) {
-    return "Выберите дату";
+    return "Pick a date";
   }
 
   return new Intl.DateTimeFormat("ru-RU", {
@@ -29,6 +30,11 @@ function formatDisplayDate(date: Date | undefined) {
     month: "2-digit",
     year: "numeric",
   }).format(date);
+}
+
+function getTodayStart() {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
 }
 
 export function AdminDatePickerField({
@@ -51,24 +57,37 @@ export function AdminDatePickerField({
     <div className="space-y-2">
       <label className="block text-sm font-medium">{label}</label>
       <input name={name} type="hidden" value={serializedValue} />
+
       <Popover>
         <PopoverTrigger asChild>
           <Button
-            className="h-input w-full justify-between border-border/70 bg-background/40 px-3 text-left"
+            className={cn(
+              "h-input w-full justify-start border-border/70 bg-background/40 px-3 text-left font-normal",
+              !selected && "text-muted-foreground"
+            )}
             radius="card"
             type="button"
             variant="outline"
           >
+            <CalendarDays className="mr-2 size-4 text-muted-foreground" />
             <span>{formatDisplayDate(selected)}</span>
-            <CalendarDays className="size-4 text-muted-foreground" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent align="start" className="w-auto rounded-card border-border/70 p-0">
+
+        <PopoverContent
+          align="start"
+          avoidCollisions
+          collisionPadding={12}
+          side="bottom"
+          sideOffset={8}
+          className="w-auto max-h-[min(360px,var(--radix-popover-content-available-height))] overflow-auto rounded-card border-border/70 p-0"
+        >
           <Calendar
+            disabled={(date) => date < getTodayStart()}
+            initialFocus
             mode="single"
             onSelect={setSelected}
             selected={selected}
-            disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
           />
         </PopoverContent>
       </Popover>

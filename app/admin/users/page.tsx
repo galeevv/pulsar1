@@ -90,8 +90,8 @@ export default async function AdminUsersPage({
   );
   const sort = normalizeSort(getValue(resolvedSearchParams, "sort"));
   const page = parsePositiveInt(getValue(resolvedSearchParams, "page"), 1);
-  const requestedPerPage = parsePositiveInt(getValue(resolvedSearchParams, "perPage"), 20);
-  const perPage = requestedPerPage === 50 ? 50 : 20;
+  const requestedPerPage = parsePositiveInt(getValue(resolvedSearchParams, "perPage"), 10);
+  const perPage = requestedPerPage === 50 ? 50 : requestedPerPage === 20 ? 20 : 10;
 
   const rawUsers = await prisma.user.findMany({
     orderBy: {

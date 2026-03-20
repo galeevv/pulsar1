@@ -46,6 +46,7 @@ export async function getAdminDashboardData() {
     users,
     inviteCodes,
     referralCodes,
+    referralCodeGrantedRewardCounts,
     promoCodes,
     referralProgramSettings,
     paymentRequests,
@@ -77,7 +78,6 @@ export async function getAdminDashboardData() {
           },
         },
         orderBy: { createdAt: "desc" },
-        take: 12,
       }),
       prisma.referralCode.findMany({
         include: {
@@ -89,7 +89,17 @@ export async function getAdminDashboardData() {
           },
         },
         orderBy: { createdAt: "desc" },
-        take: 12,
+      }),
+      prisma.referralCodeUse.groupBy({
+        _count: {
+          _all: true,
+        },
+        by: ["referralCodeId"],
+        where: {
+          rewardGrantedAt: {
+            not: null,
+          },
+        },
       }),
       prisma.promoCode.findMany({
         include: {
@@ -98,7 +108,6 @@ export async function getAdminDashboardData() {
           },
         },
         orderBy: { createdAt: "desc" },
-        take: 12,
       }),
       prisma.referralProgramSettings.upsert({
         create: {
@@ -150,6 +159,16 @@ export async function getAdminDashboardData() {
       serviceCapacitySettingsPromise,
     ]);
 
+  const grantedRewardsByReferralCodeId = new Map<string, number>();
+  for (const item of referralCodeGrantedRewardCounts) {
+    grantedRewardsByReferralCodeId.set(item.referralCodeId, item._count._all);
+  }
+
+  const referralCodesWithRewards = referralCodes.map((item) => ({
+    ...item,
+    grantedRewardsCount: grantedRewardsByReferralCodeId.get(item.id) ?? 0,
+  }));
+
   return {
     deviceSlotStats: {
       active: activeDeviceSlots,
@@ -164,7 +183,7 @@ export async function getAdminDashboardData() {
     serviceCapacitySettings,
     legalDocuments,
     userAgreementText: legalDocuments.userAgreementText,
-    referralCodes,
+    referralCodes: referralCodesWithRewards,
     subscriptionDurationRules: constructorData.durationRules,
     subscriptionPricingSettings: constructorData.pricingSettings,
     subscriptionStats: {

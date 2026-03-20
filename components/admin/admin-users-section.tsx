@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-import { Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 
 import { AdminStatusPill } from "@/components/admin/admin-status-pill";
 import { AdminSectionShell } from "@/components/admin/admin-section-shell";
@@ -23,8 +23,6 @@ import {
   PaginationEllipsis,
   PaginationItem,
   PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
 } from "@/components/ui/pagination";
 import {
   Select,
@@ -72,7 +70,7 @@ type PaginationData = {
 
 type FiltersData = {
   page: number;
-  perPage: 20 | 50;
+  perPage: 10 | 20 | 50;
   query: string;
   sort: UsersSort;
   subscription: SubscriptionFilter;
@@ -366,7 +364,7 @@ export function AdminUsersSection({
                     onValueChange={(value) =>
                       navigate({
                         page: "1",
-                        perPage: value === "20" ? undefined : value,
+                        perPage: value === "10" ? undefined : value,
                       })
                     }
                     value={String(filters.perPage)}
@@ -375,24 +373,28 @@ export function AdminUsersSection({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="10">10</SelectItem>
                       <SelectItem value="20">20</SelectItem>
                       <SelectItem value="50">50</SelectItem>
                     </SelectContent>
                   </Select>
                   <span>
-                    Showing {pagination.from}–{pagination.to} of {pagination.total} users
+                    Showing {pagination.from}-{pagination.to} of {pagination.total} users
                   </span>
                 </div>
 
                 <Pagination className="justify-center">
                   <PaginationContent>
                     <PaginationItem>
-                      <PaginationPrevious
+                      <PaginationLink
+                        aria-label="Previous page"
                         className={filters.page <= 1 ? "pointer-events-none opacity-50" : undefined}
                         href={buildHref({
                           page: String(Math.max(1, filters.page - 1)),
                         })}
-                      />
+                      >
+                        <ChevronLeft className="size-4" />
+                      </PaginationLink>
                     </PaginationItem>
 
                     {paginationItems.map((item, index) =>
@@ -415,7 +417,8 @@ export function AdminUsersSection({
                     )}
 
                     <PaginationItem>
-                      <PaginationNext
+                      <PaginationLink
+                        aria-label="Next page"
                         className={
                           filters.page >= pagination.totalPages
                             ? "pointer-events-none opacity-50"
@@ -424,7 +427,9 @@ export function AdminUsersSection({
                         href={buildHref({
                           page: String(Math.min(pagination.totalPages, filters.page + 1)),
                         })}
-                      />
+                      >
+                        <ChevronRight className="size-4" />
+                      </PaginationLink>
                     </PaginationItem>
                   </PaginationContent>
                 </Pagination>
