@@ -25,6 +25,7 @@ type PlategaCreateTransactionInput = {
   failedUrl: string;
   orderId: string;
   payload: string;
+  paymentMethod: "CARD" | "SBP";
   returnUrl: string;
 };
 
@@ -50,6 +51,11 @@ type PlategaWebhookPayload = {
   payload?: string;
   status?: string;
   transactionId?: string;
+};
+
+const PAYMENT_METHOD_TO_API_VALUE: Record<PlategaCreateTransactionInput["paymentMethod"], number> = {
+  CARD: 11,
+  SBP: 2,
 };
 
 function getPlategaConfig() {
@@ -129,7 +135,7 @@ export async function createPlategaTransaction(input: PlategaCreateTransactionIn
       amount: input.amount,
       currency: "RUB",
     },
-    paymentMethod: 2,
+    paymentMethod: PAYMENT_METHOD_TO_API_VALUE[input.paymentMethod],
     return: input.returnUrl,
   };
 

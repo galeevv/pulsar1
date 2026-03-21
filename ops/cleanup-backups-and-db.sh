@@ -6,6 +6,7 @@ ENV_FILE="${ENV_FILE:-/etc/pulsar/1pulsar.env}"
 DB_PATH="${DB_PATH:-${APP_DIR}/prisma/prod.db}"
 BACKUP_DIRS="${BACKUP_DIRS:-/var/backups/pulsar,/var/backups/pulsar-db}"
 PULSAR_SERVICE="${PULSAR_SERVICE:-pulsar}"
+APP_OWNER="${APP_OWNER:-www-data:www-data}"
 
 PURGE_BACKUPS=true
 PURGE_DB=true
@@ -81,6 +82,20 @@ start_service_if_needed() {
   fi
 }
 
+fix_db_permissions() {
+  local db_dir
+  db_dir="$(dirname "${DB_PATH}")"
+
+  if [[ -d "${db_dir}" ]]; then
+    chown "${APP_OWNER}" "${db_dir}" >/dev/null 2>&1 || true
+  fi
+
+  if [[ -f "${DB_PATH}" ]]; then
+    chown "${APP_OWNER}" "${DB_PATH}" >/dev/null 2>&1 || true
+    chmod 664 "${DB_PATH}" >/dev/null 2>&1 || true
+  fi
+}
+
 if command -v systemctl >/dev/null 2>&1; then
   if systemctl list-unit-files "${PULSAR_SERVICE}.service" >/dev/null 2>&1; then
     if systemctl is-active --quiet "${PULSAR_SERVICE}"; then
@@ -134,6 +149,8 @@ if [[ "${PURGE_DB}" == "true" ]]; then
     npx prisma migrate deploy
     npx prisma generate
   fi
+
+  fix_db_permissions
 fi
 
 trap - EXIT

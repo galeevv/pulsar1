@@ -16,6 +16,7 @@ const createPlategaPaymentSchema = z.object({
   devices: z.number().int().positive(),
   months: z.number().int().positive(),
   orderId: z.string().trim().min(1).max(120).optional(),
+  plategaPaymentMethod: z.enum(["CARD", "SBP"]).optional(),
   userId: z.string().trim().min(1).max(120).optional(),
 });
 
@@ -102,18 +103,10 @@ export async function POST(request: Request) {
 
   const { devices, months } = parsedPayload.data;
 
-  const [{ durationRules, pricingSettings }, referralDiscountPct, openPaymentRequest, activeSubscription] =
+  const [{ durationRules, pricingSettings }, referralDiscountPct, activeSubscription] =
     await Promise.all([
       getAppSubscriptionConstructorData(),
       getFirstPurchaseReferralDiscountPct(user.id),
-      prisma.paymentRequest.findFirst({
-        where: {
-          status: {
-            in: ["CREATED"],
-          },
-          userId: user.id,
-        },
-      }),
       prisma.subscription.findFirst({
         include: {
           paymentRequest: {
@@ -129,13 +122,6 @@ export async function POST(request: Request) {
         },
       }),
     ]);
-
-  if (openPaymentRequest) {
-    return NextResponse.json(
-      { error: "У вас уже есть незавершенный платеж. Дождитесь его завершения." },
-      { status: 409 }
-    );
-  }
 
   if (devices < pricingSettings.minDevices || devices > pricingSettings.maxDevices) {
     return NextResponse.json(
@@ -203,25 +189,41 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Сумма платежа устарела, обновите страницу." }, { status: 409 });
   }
 
-  const paymentRequest = await prisma.paymentRequest.create({
-    data: {
-      amountRub: price.finalTotalRub,
-      baseDeviceMonthlyPriceSnapshot: price.baseDeviceMonthlyPrice,
-      currency: "RUB",
-      deviceLimit: price.devices,
-      devices: price.devices,
-      durationDiscountPercentSnapshot: price.durationDiscountPercent,
-      extraDeviceMonthlyPriceSnapshot: price.extraDeviceMonthlyPrice,
-      method: "PLATEGA",
-      monthlyPriceSnapshot: price.monthlyPrice,
-      months: price.months,
-      periodMonths: price.months,
-      referralDiscountPercentSnapshot: price.referralDiscountPercent,
-      status: "CREATED",
-      tariffName: buildConstructorTariffName(price.months, price.devices),
-      totalPriceBeforeDiscountRubSnapshot: price.totalBeforeDiscountRub,
-      userId: user.id,
-    },
+  const selectedPlategaPaymentMethod = parsedPayload.data.plategaPaymentMethod ?? "SBP";
+  const replacementTimestamp = new Date();
+  const paymentRequest = await prisma.$transaction(async (tx) => {
+    await tx.paymentRequest.updateMany({
+      data: {
+        plategaStatus: "REPLACED_BY_NEW_REQUEST",
+        rejectedAt: replacementTimestamp,
+        status: "REJECTED",
+      },
+      where: {
+        status: "CREATED",
+        userId: user.id,
+      },
+    });
+
+    return tx.paymentRequest.create({
+      data: {
+        amountRub: price.finalTotalRub,
+        baseDeviceMonthlyPriceSnapshot: price.baseDeviceMonthlyPrice,
+        currency: "RUB",
+        deviceLimit: price.devices,
+        devices: price.devices,
+        durationDiscountPercentSnapshot: price.durationDiscountPercent,
+        extraDeviceMonthlyPriceSnapshot: price.extraDeviceMonthlyPrice,
+        method: "PLATEGA",
+        monthlyPriceSnapshot: price.monthlyPrice,
+        months: price.months,
+        periodMonths: price.months,
+        referralDiscountPercentSnapshot: price.referralDiscountPercent,
+        status: "CREATED",
+        tariffName: buildConstructorTariffName(price.months, price.devices),
+        totalPriceBeforeDiscountRubSnapshot: price.totalBeforeDiscountRub,
+        userId: user.id,
+      },
+    });
   });
 
   const returnUrl = buildPlategaRedirectTarget({
@@ -237,6 +239,7 @@ export async function POST(request: Request) {
   const payloadJson = JSON.stringify({
     amountRub: price.finalTotalRub,
     orderId: parsedPayload.data.orderId ?? paymentRequest.id,
+    paymentMethod: selectedPlategaPaymentMethod,
     paymentRequestId: paymentRequest.id,
     userId: parsedPayload.data.userId ?? user.id,
   });
@@ -251,6 +254,7 @@ export async function POST(request: Request) {
       failedUrl,
       orderId: paymentRequest.id,
       payload: payloadJson,
+      paymentMethod: selectedPlategaPaymentMethod,
       returnUrl,
     });
 

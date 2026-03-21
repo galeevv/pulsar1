@@ -109,9 +109,9 @@ export function AppTariffsSection({
 
   const [selectedMonths, setSelectedMonths] = useState(sortedRules[0]?.months ?? 1);
   const [selectedDevices, setSelectedDevices] = useState(defaultDevices);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<"PLATEGA" | "CREDITS">(
-    "PLATEGA"
-  );
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
+    "CREDITS" | "PLATEGA_CARD" | "PLATEGA_SBP"
+  >("PLATEGA_SBP");
   const [isCreatingPlategaPayment, setIsCreatingPlategaPayment] = useState(false);
   const [isCheckingPlategaPayment, setIsCheckingPlategaPayment] = useState(
     Boolean(plategaPaymentRequestId)
@@ -247,7 +247,7 @@ export function AppTariffsSection({
     }
   }, [isSubmittingCredits, selectedPaymentMethod]);
 
-  async function startPlategaPayment() {
+  async function startPlategaPayment(channel: "CARD" | "SBP") {
     if (!calculatedPrice || checkoutDisabled) {
       return;
     }
@@ -261,6 +261,7 @@ export function AppTariffsSection({
           description: `PulsarVPN ${effectiveSelectedMonths} мес. / ${effectiveSelectedDevices} устройств`,
           devices: effectiveSelectedDevices,
           months: effectiveSelectedMonths,
+          plategaPaymentMethod: channel,
         }),
         headers: {
           "Content-Type": "application/json",
@@ -501,13 +502,42 @@ export function AppTariffsSection({
 
                 <RadioGroup
                   className="space-y-1"
-                  onValueChange={(value) => setSelectedPaymentMethod(value as "PLATEGA" | "CREDITS")}
+                  onValueChange={(value) =>
+                    setSelectedPaymentMethod(value as "CREDITS" | "PLATEGA_CARD" | "PLATEGA_SBP")
+                  }
                   value={selectedPaymentMethod}
                 >
-                  <label className="block cursor-pointer" htmlFor="payment-method-platega">
+                  <label className="block cursor-pointer" htmlFor="payment-method-platega-sbp">
                     <Card
                       className={`transition-colors ${
-                        selectedPaymentMethod === "PLATEGA"
+                        selectedPaymentMethod === "PLATEGA_SBP"
+                          ? "border-primary bg-primary/10"
+                          : "border-border bg-background/40 hover:bg-background/60"
+                      }`}
+                    >
+                      <div className="flex w-full items-start justify-between gap-3 p-3">
+                        <div className="min-w-0 flex-1 space-y-1 leading-snug">
+                          <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+                            <Smartphone className="size-4" />
+                            СБП
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Оплата по QR-коду
+                          </p>
+                        </div>
+                        <RadioGroupItem
+                          className="mt-0.5 shrink-0"
+                          id="payment-method-platega-sbp"
+                          value="PLATEGA_SBP"
+                        />
+                      </div>
+                    </Card>
+                  </label>
+
+                  <label className="block cursor-pointer" htmlFor="payment-method-platega-card">
+                    <Card
+                      className={`transition-colors ${
+                        selectedPaymentMethod === "PLATEGA_CARD"
                           ? "border-primary bg-primary/10"
                           : "border-border bg-background/40 hover:bg-background/60"
                       }`}
@@ -516,13 +546,15 @@ export function AppTariffsSection({
                         <div className="min-w-0 flex-1 space-y-1 leading-snug">
                           <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
                             <CreditCard className="size-4" />
-                            Platega
+                            Банковская карта
                           </p>
-                          <p className="text-sm text-muted-foreground">
-                            Visa, MasterCard, Мир
-                          </p>
+                          <p className="text-sm text-muted-foreground">Visa, MasterCard, Мир</p>
                         </div>
-                        <RadioGroupItem className="mt-0.5 shrink-0" id="payment-method-platega" value="PLATEGA" />
+                        <RadioGroupItem
+                          className="mt-0.5 shrink-0"
+                          id="payment-method-platega-card"
+                          value="PLATEGA_CARD"
+                        />
                       </div>
                     </Card>
                   </label>
@@ -570,19 +602,23 @@ export function AppTariffsSection({
                       return;
                     }
 
-                    void startPlategaPayment();
+                    void startPlategaPayment(
+                      selectedPaymentMethod === "PLATEGA_CARD" ? "CARD" : "SBP"
+                    );
                   }}
                   radius="card"
                   type="button"
                 >
-                  {selectedPaymentMethod === "PLATEGA" ? (
+                  {selectedPaymentMethod !== "CREDITS" ? (
                     isCreatingPlategaPayment ? (
                       <span className="inline-flex items-center gap-2">
                         <Loader2 className="size-4 animate-spin" />
                         Создаем платеж...
                       </span>
                     ) : (
-                      "Оплатить через Platega"
+                      selectedPaymentMethod === "PLATEGA_CARD"
+                        ? "Оплатить банковской картой"
+                        : "Оплатить через СБП"
                     )
                   ) : (
                     isSubmittingCredits ? (
@@ -598,7 +634,7 @@ export function AppTariffsSection({
 
                 {selectedPaymentMethod === "CREDITS" && !hasEnoughCredits ? (
                   <p className="text-sm text-muted-foreground">
-                    Недостаточно кредитов. Пополните баланс или выберите Platega.
+                    Недостаточно кредитов. Пополните баланс или выберите СБП/банковскую карту.
                   </p>
                 ) : null}
               </DialogContent>

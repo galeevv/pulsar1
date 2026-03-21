@@ -133,17 +133,9 @@ async function parseAndValidateConstructorSelection(
     );
   }
 
-  const [{ durationRules, pricingSettings }, openPaymentRequest, activeSubscription, referralDiscountPct] =
+  const [{ durationRules, pricingSettings }, activeSubscription, referralDiscountPct] =
     await Promise.all([
       getAppSubscriptionConstructorData(),
-      prisma.paymentRequest.findFirst({
-        where: {
-          status: {
-            in: ["CREATED"],
-          },
-          userId,
-        },
-      }),
       prisma.subscription.findFirst({
         include: {
           paymentRequest: {
@@ -160,15 +152,6 @@ async function parseAndValidateConstructorSelection(
       }),
       getFirstPurchaseReferralDiscountPct(userId),
     ]);
-
-  if (openPaymentRequest) {
-    redirect(
-      buildRedirectUrl({
-        anchor: "#tariffs",
-        error: "У вас уже есть незавершенный платеж. Дождитесь его завершения.",
-      })
-    );
-  }
 
   if (devices < pricingSettings.minDevices || devices > pricingSettings.maxDevices) {
     redirect(
@@ -320,6 +303,18 @@ export async function payTariffWithCreditsAction(formData: FormData) {
 
   try {
     await prisma.$transaction(async (tx) => {
+      await tx.paymentRequest.updateMany({
+        data: {
+          plategaStatus: "REPLACED_BY_CREDITS_PAYMENT",
+          rejectedAt: now,
+          status: "REJECTED",
+        },
+        where: {
+          status: "CREATED",
+          userId: user.id,
+        },
+      });
+
       const [approvedBefore, referredUse] = await Promise.all([
         tx.paymentRequest.count({
           where: {
