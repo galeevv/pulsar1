@@ -64,6 +64,7 @@ type ReferralProgramSettings = {
   defaultDiscountPct: number;
   defaultRewardCredits: number;
   isEnabled: boolean;
+  minimumPayoutCredits: number;
 };
 
 function formatDate(value: Date | null) {
@@ -553,6 +554,20 @@ export function AdminReferralCodesSection({
                   type="number"
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium" htmlFor="referral-minimum-payout">
+                Minimum payout (credits)
+              </label>
+              <Input
+                defaultValue={referralProgramSettings.minimumPayoutCredits}
+                id="referral-minimum-payout"
+                min="1"
+                name="minimumPayoutCredits"
+                required
+                type="number"
+              />
             </div>
 
             <Button className="w-full" radius="card" type="submit">

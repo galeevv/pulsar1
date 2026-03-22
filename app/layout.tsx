@@ -29,7 +29,7 @@ export default function RootLayout({
     <html lang="ru">
       <body className={`${inter.variable} ${geistMono.variable} antialiased`}>
         {children}
-        <Toaster position="top-center" richColors />
+        <Toaster position="bottom-right" richColors />
       </body>
     </html>
   );

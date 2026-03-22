@@ -45,11 +45,17 @@ function DialogOverlay({
   )
 }
 
+type DialogContentProps = React.ComponentProps<typeof DialogPrimitive.Content> & {
+  preventAutoFocus?: boolean
+}
+
 function DialogContent({
   className,
   children,
+  onOpenAutoFocus,
+  preventAutoFocus = false,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Content>) {
+}: DialogContentProps) {
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />
@@ -60,6 +66,12 @@ function DialogContent({
           className
         )}
         {...props}
+        onOpenAutoFocus={(event) => {
+          if (preventAutoFocus) {
+            event.preventDefault()
+          }
+          onOpenAutoFocus?.(event)
+        }}
       >
         {children}
       </DialogPrimitive.Content>

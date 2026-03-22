@@ -1,5 +1,8 @@
 ﻿import {
+  BarChart3,
+  BanknoteArrowDown,
   BadgeCheck,
+  CircleDollarSign,
   File,
   Gift,
   Handshake,
@@ -11,11 +14,8 @@
   Wallet,
 } from "lucide-react";
 
-import {
-  applyPromoCodeAction,
-  generateOwnReferralCodeAction,
-} from "@/app/app/actions";
 import { SupportDialog } from "@/components/support/support-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,10 +25,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import type { LegalDocuments } from "@/lib/legal-documents";
 import { cn } from "@/lib/utils";
 
+import { AppCopyTextButton } from "./app-copy-text-button";
+import {
+  CancelPayoutRequestForm,
+  CreatePayoutRequestForm,
+  GenerateReferralCodeForm,
+  PromoCodeApplyForm,
+} from "./app-dashboard-dialog-actions";
 import { AppDevicesManagementDialog } from "./app-devices-management-dialog";
 import { AppSectionShell } from "./app-section-shell";
 import { AppSetupDialog } from "./app-setup-dialog";
@@ -40,6 +46,7 @@ type ReferralProgramSettings = {
   defaultDiscountPct: number;
   defaultRewardCredits: number;
   isEnabled: boolean;
+  minimumPayoutCredits: number;
 };
 
 type OwnReferralCode = {
@@ -55,6 +62,44 @@ type PromoRedemption = {
     code: string;
     creditAmount: number;
   };
+};
+
+type ReferralStats = {
+  confirmedInvitedCount: number;
+  conversionRatePct: number;
+  totalEarnedCredits: number;
+  totalInvitedCount: number;
+};
+
+type RecentReferralActivity = {
+  createdAt: Date;
+  discountPctSnapshot: number;
+  id: string;
+  referredUsername: string;
+  rewardCreditsSnapshot: number;
+  rewardGrantedAt: Date | null;
+};
+
+type PayoutSummary = {
+  activeRequest: {
+    amountCredits: number;
+    amountRub: number;
+    createdAt: Date;
+    id: string;
+    status: "APPROVED" | "CANCELED" | "PAID" | "PENDING" | "REJECTED";
+  } | null;
+  availableCredits: number;
+  minimumPayoutCredits: number;
+  recentRequests: Array<{
+    amountCredits: number;
+    amountRub: number;
+    createdAt: Date;
+    id: string;
+    rejectionReason: string | null;
+    status: "APPROVED" | "CANCELED" | "PAID" | "PENDING" | "REJECTED";
+  }>;
+  reservedCredits: number;
+  totalPaidOutCredits: number;
 };
 
 type ActiveSubscriptionItem = {
@@ -128,6 +173,58 @@ function mapSubscriptionStatus(status: SubscriptionStatus) {
   return { label: "Отозвана", tone: "default" as const };
 }
 
+function mapPayoutStatusLabel(status: PayoutSummary["recentRequests"][number]["status"]) {
+  if (status === "PENDING") {
+    return "На проверке";
+  }
+
+  if (status === "APPROVED") {
+    return "Одобрена";
+  }
+
+  if (status === "REJECTED") {
+    return "Отклонена";
+  }
+
+  if (status === "PAID") {
+    return "Выплачена";
+  }
+
+  return "Отменена";
+}
+
+function mapPayoutStatusVariant(status: PayoutSummary["recentRequests"][number]["status"]) {
+  if (status === "PENDING") {
+    return "warning" as const;
+  }
+
+  if (status === "APPROVED") {
+    return "success" as const;
+  }
+
+  if (status === "PAID") {
+    return "secondary" as const;
+  }
+
+  return "destructive" as const;
+}
+
+function formatPeopleMetric(value: number) {
+  const mod10 = value % 10;
+  const mod100 = value % 100;
+
+  const noun =
+    mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)
+      ? "человека"
+      : "человек";
+
+  return `${value} ${noun}`;
+}
+
+function formatRubMetric(value: number) {
+  return `${new Intl.NumberFormat("ru-RU").format(value)}₽`;
+}
+
 function PromoCodesDialog({
   defaultOpen,
   promoCodeRedemptions,
@@ -148,7 +245,10 @@ function PromoCodesDialog({
           Открыть промокоды
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[88svh] overflow-y-auto p-4 sm:max-w-lg sm:p-6">
+      <DialogContent
+        className="max-h-[88svh] overflow-y-auto p-4 sm:max-w-lg sm:p-6"
+        preventAutoFocus
+      >
         <DialogHeader className="text-left">
           <DialogTitle>Промокоды</DialogTitle>
           <DialogDescription>
@@ -156,23 +256,7 @@ function PromoCodesDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form action={applyPromoCodeAction} className="space-y-4">
-          <div>
-            <label className="mb-2 block text-sm font-medium" htmlFor="dashboard-promo-code-input">
-              PromoCode
-            </label>
-            <Input
-              id="dashboard-promo-code-input"
-              name="code"
-              placeholder="Введите промокод"
-              required
-            />
-          </div>
-
-          <Button className="h-button w-full px-button-x" radius="card" type="submit">
-            Применить промокод
-          </Button>
-        </form>
+        <PromoCodeApplyForm />
 
         <div className="space-y-2">
           <p className="text-sm font-semibold">Последние применения</p>
@@ -204,13 +288,19 @@ function ReferralSystemDialog({
   defaultOpen,
   hasApprovedPayment,
   ownReferralCode,
+  payout,
+  recentReferralActivity,
   referralProgramSettings,
+  referralStats,
 }: {
   canGenerateReferralCode: boolean;
   defaultOpen: boolean;
   hasApprovedPayment: boolean;
   ownReferralCode: OwnReferralCode;
+  payout: PayoutSummary;
+  recentReferralActivity: RecentReferralActivity[];
   referralProgramSettings: ReferralProgramSettings;
+  referralStats: ReferralStats;
 }) {
   const canGenerate =
     canGenerateReferralCode &&
@@ -231,12 +321,10 @@ function ReferralSystemDialog({
           Открыть рефералку
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[88svh] overflow-y-auto p-4 sm:max-w-lg sm:p-6">
+      <DialogContent className="max-h-[88svh] overflow-y-auto p-4 sm:max-w-3xl sm:p-6">
         <DialogHeader className="text-left">
           <DialogTitle>Реферальная система</DialogTitle>
-          <DialogDescription>
-            Управление личным referral-кодом и условиями бонусов.
-          </DialogDescription>
+          <DialogDescription>1 Сredit = 1 RUB</DialogDescription>
         </DialogHeader>
 
         <div className="rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md">
@@ -267,32 +355,37 @@ function ReferralSystemDialog({
 
         {ownReferralCode ? (
           <div className="rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md">
-            <p className="text-sm font-semibold">{ownReferralCode.code}</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Скидка {ownReferralCode.discountPct}% • бонус {ownReferralCode.rewardCredits} кредитов
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Использований: {ownReferralCode._count.uses}
-            </p>
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex min-w-0 items-start gap-3">
+                <div className="inline-flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-card border border-border bg-background/60">
+                  <TicketPercent className="size-5 text-foreground" />
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-foreground">{ownReferralCode.code}</p>
+                  <p className="text-sm text-muted-foreground">
+                    <span className="sm:hidden">Исп. — {ownReferralCode._count.uses}</span>
+                    <span className="hidden sm:inline">Использований: {ownReferralCode._count.uses}</span>
+                  </p>
+                </div>
+              </div>
+              <AppCopyTextButton
+                className="self-center"
+                label={
+                  <>
+                    <span className="sm:hidden">Скопировать</span>
+                    <span className="hidden sm:inline">Скопировать код</span>
+                  </>
+                }
+                successMessage="Реферальный код скопирован."
+                value={ownReferralCode.code}
+              />
+            </div>
           </div>
-        ) : (
-          <div className="rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md">
-            <p className="text-sm text-muted-foreground">
-              У вас пока нет referral-кода. На текущем этапе его можно сгенерировать только один раз.
-            </p>
-          </div>
-        )}
+        ) : null}
 
-        <form action={generateOwnReferralCodeAction}>
-          <Button
-            className="h-button w-full px-button-x"
-            disabled={!canGenerate}
-            radius="card"
-            type="submit"
-          >
-            {ownReferralCode ? "ReferralCode уже создан" : "Сгенерировать ReferralCode"}
-          </Button>
-        </form>
+        {!ownReferralCode ? (
+          <GenerateReferralCodeForm canGenerate={canGenerate} />
+        ) : null}
 
         {!canGenerate && !ownReferralCode ? (
           <p className="text-[12px] text-muted-foreground">
@@ -301,6 +394,215 @@ function ReferralSystemDialog({
               : "Генерация сейчас недоступна из-за глобальных настроек реферальной системы."}
           </p>
         ) : null}
+
+        <div className="grid gap-2 sm:grid-cols-3">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="w-full" radius="card" type="button" variant="outline">
+                <BarChart3 className="size-4" />
+                Детальная аналитика
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-h-[85svh] overflow-y-auto sm:max-w-3xl">
+              <DialogHeader className="text-left">
+                <DialogTitle>Детальная аналитика</DialogTitle>
+                <DialogDescription>Основные метрики приглашений и выплат.</DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <div className="rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md">
+                  <div className="flex items-center gap-3">
+                    <div className="inline-flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-card border border-border bg-background/60">
+                      <UsersRound className="size-5 text-foreground" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Приглашено</p>
+                      <p className="text-lg font-semibold text-foreground">
+                        {formatPeopleMetric(referralStats.totalInvitedCount)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md">
+                  <div className="flex items-center gap-3">
+                    <div className="inline-flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-card border border-border bg-background/60">
+                      <BadgeCheck className="size-5 text-foreground" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Активных</p>
+                      <p className="text-lg font-semibold text-foreground">
+                        {formatPeopleMetric(referralStats.confirmedInvitedCount)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md">
+                  <div className="flex items-center gap-3">
+                    <div className="inline-flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-card border border-border bg-background/60">
+                      <Wallet className="size-5 text-foreground" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Заработано</p>
+                      <p className="text-lg font-semibold text-foreground">
+                        {formatRubMetric(referralStats.totalEarnedCredits)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md">
+                  <div className="flex items-center gap-3">
+                    <div className="inline-flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-card border border-border bg-background/60">
+                      <BanknoteArrowDown className="size-5 text-foreground" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Выплачено</p>
+                      <p className="text-lg font-semibold text-foreground">
+                        {formatRubMetric(payout.totalPaidOutCredits)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="w-full" radius="card" type="button" variant="outline">
+                <CircleDollarSign className="size-4" />
+                История и активность
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-h-[85svh] overflow-y-auto sm:max-w-3xl">
+              <DialogHeader className="text-left">
+                <DialogTitle>История заявок и активность</DialogTitle>
+                <DialogDescription>История заявок на вывод и реферальная активность.</DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4">
+                <div className="rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md">
+                  <div className="mb-3 flex items-center gap-2">
+                    <CircleDollarSign className="size-4 text-muted-foreground" />
+                    <p className="text-sm font-semibold">История заявок на вывод</p>
+                  </div>
+                  <div className="space-y-2">
+                    {payout.recentRequests.length ? (
+                      payout.recentRequests.map((request) => (
+                        <div
+                          className="space-y-3 rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md"
+                          key={request.id}
+                        >
+                          <Badge
+                            className="w-full justify-center sm:hidden"
+                            variant={mapPayoutStatusVariant(request.status)}
+                          >
+                            {mapPayoutStatusLabel(request.status)}
+                          </Badge>
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex min-w-0 items-center gap-3">
+                              <div className="inline-flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-card border border-border bg-background/60">
+                                <BanknoteArrowDown className="size-5 text-foreground" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-semibold text-foreground">{request.amountRub} ₽</p>
+                                <p className="text-xs text-muted-foreground">
+                                  Создано: {formatDate(request.createdAt)}
+                                </p>
+                              </div>
+                            </div>
+                            <Badge className="hidden sm:inline-flex" variant={mapPayoutStatusVariant(request.status)}>
+                              {mapPayoutStatusLabel(request.status)}
+                            </Badge>
+                          </div>
+                          {request.rejectionReason ? (
+                            <p className="mt-1 text-xs text-destructive">{request.rejectionReason}</p>
+                          ) : null}
+                          {request.status === "PENDING" ? (
+                            <CancelPayoutRequestForm payoutRequestId={request.id} />
+                          ) : null}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="rounded-card border border-border/60 bg-background/30 p-3 text-sm text-muted-foreground">
+                        Пока нет заявок на вывод.
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md">
+                  <div className="mb-2 flex items-center gap-2">
+                    <UsersRound className="size-4 text-muted-foreground" />
+                    <p className="text-sm font-semibold">Последняя реферальная активность</p>
+                  </div>
+                  <div className="space-y-2">
+                    {recentReferralActivity.length ? (
+                      recentReferralActivity.map((event) => (
+                        <div
+                          className="rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md"
+                          key={event.id}
+                        >
+                          <Badge
+                            className="mb-3 w-full justify-center sm:hidden"
+                            variant={event.rewardGrantedAt ? "success" : "warning"}
+                          >
+                            {event.rewardGrantedAt ? "Начислено" : "Ожидает"}
+                          </Badge>
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex min-w-0 items-center gap-3">
+                              <div className="inline-flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-card border border-border bg-background/60">
+                                <UsersRound className="size-5 text-foreground" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-semibold text-foreground">{event.referredUsername}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  Создано: {formatDate(event.createdAt)}
+                                </p>
+                              </div>
+                            </div>
+                            <Badge
+                              className="hidden sm:inline-flex"
+                              variant={event.rewardGrantedAt ? "success" : "warning"}
+                            >
+                              {event.rewardGrantedAt ? "Начислено" : "Ожидает"}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="rounded-card border border-border/60 bg-background/30 p-3 text-sm text-muted-foreground">
+                        Реферальные события появятся после регистраций по вашему коду.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="w-full" radius="card" type="button" variant="outline">
+                <BanknoteArrowDown className="size-4" />
+                Вывести
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-h-[85svh] overflow-y-auto sm:max-w-lg">
+              <DialogHeader className="text-left">
+                <DialogTitle>Создать заявку на вывод</DialogTitle>
+                <DialogDescription>
+                  Вывод доступного баланса кредитов на банковскую карту.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="rounded-card border border-border/70 bg-background/40 p-3 text-sm text-muted-foreground">
+                <p>Доступно: {payout.availableCredits} credits</p>
+                <p>Минимум: {payout.minimumPayoutCredits} credits</p>
+              </div>
+
+              <CreatePayoutRequestForm minimumPayoutCredits={payout.minimumPayoutCredits} />
+            </DialogContent>
+          </Dialog>
+        </div>
       </DialogContent>
     </Dialog>
   );
@@ -314,8 +616,11 @@ export function AppDashboardPrototypeSection({
   hasApprovedPayment,
   legalDocuments,
   ownReferralCode,
+  payout,
   promoCodeRedemptions,
+  recentReferralActivity,
   referralProgramSettings,
+  referralStats,
   username,
 }: {
   activeSubscription: ActiveSubscriptionItem;
@@ -325,8 +630,11 @@ export function AppDashboardPrototypeSection({
   hasApprovedPayment: boolean;
   legalDocuments: LegalDocuments;
   ownReferralCode: OwnReferralCode;
+  payout: PayoutSummary;
   promoCodeRedemptions: PromoRedemption[];
+  recentReferralActivity: RecentReferralActivity[];
   referralProgramSettings: ReferralProgramSettings;
+  referralStats: ReferralStats;
   username: string;
 }) {
   const subscriptionStatus = activeSubscription
@@ -423,7 +731,10 @@ export function AppDashboardPrototypeSection({
                 defaultOpen={isReferralDialogOpenByDefault}
                 hasApprovedPayment={hasApprovedPayment}
                 ownReferralCode={ownReferralCode}
+                payout={payout}
+                recentReferralActivity={recentReferralActivity}
                 referralProgramSettings={referralProgramSettings}
+                referralStats={referralStats}
               />
             </div>
           </AppSurface>

@@ -104,6 +104,11 @@ export type DeviceSlot = $Result.DefaultSelection<Prisma.$DeviceSlotPayload>
  */
 export type IntegrationSyncLog = $Result.DefaultSelection<Prisma.$IntegrationSyncLogPayload>
 /**
+ * Model PayoutRequest
+ * 
+ */
+export type PayoutRequest = $Result.DefaultSelection<Prisma.$PayoutRequestPayload>
+/**
  * Model Session
  * 
  */
@@ -190,6 +195,17 @@ export const PlategaWebhookLogStatus: {
 
 export type PlategaWebhookLogStatus = (typeof PlategaWebhookLogStatus)[keyof typeof PlategaWebhookLogStatus]
 
+
+export const PayoutRequestStatus: {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  PAID: 'PAID',
+  CANCELED: 'CANCELED'
+};
+
+export type PayoutRequestStatus = (typeof PayoutRequestStatus)[keyof typeof PayoutRequestStatus]
+
 }
 
 export type Role = $Enums.Role
@@ -227,6 +243,10 @@ export const PaymentMethod: typeof $Enums.PaymentMethod
 export type PlategaWebhookLogStatus = $Enums.PlategaWebhookLogStatus
 
 export const PlategaWebhookLogStatus: typeof $Enums.PlategaWebhookLogStatus
+
+export type PayoutRequestStatus = $Enums.PayoutRequestStatus
+
+export const PayoutRequestStatus: typeof $Enums.PayoutRequestStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -528,6 +548,16 @@ export class PrismaClient<
     * ```
     */
   get integrationSyncLog(): Prisma.IntegrationSyncLogDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.payoutRequest`: Exposes CRUD operations for the **PayoutRequest** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PayoutRequests
+    * const payoutRequests = await prisma.payoutRequest.findMany()
+    * ```
+    */
+  get payoutRequest(): Prisma.PayoutRequestDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.session`: Exposes CRUD operations for the **Session** model.
@@ -990,6 +1020,7 @@ export namespace Prisma {
     Subscription: 'Subscription',
     DeviceSlot: 'DeviceSlot',
     IntegrationSyncLog: 'IntegrationSyncLog',
+    PayoutRequest: 'PayoutRequest',
     Session: 'Session'
   };
 
@@ -1006,7 +1037,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "inviteCode" | "referralCode" | "referralCodeUse" | "promoCode" | "promoCodeRedemption" | "referralProgramSettings" | "legalDocumentSettings" | "serviceCapacitySettings" | "supportTicket" | "supportMessage" | "subscriptionDurationRule" | "subscriptionPricingSettings" | "paymentRequest" | "plategaWebhookLog" | "subscription" | "deviceSlot" | "integrationSyncLog" | "session"
+      modelProps: "user" | "inviteCode" | "referralCode" | "referralCodeUse" | "promoCode" | "promoCodeRedemption" | "referralProgramSettings" | "legalDocumentSettings" | "serviceCapacitySettings" | "supportTicket" | "supportMessage" | "subscriptionDurationRule" | "subscriptionPricingSettings" | "paymentRequest" | "plategaWebhookLog" | "subscription" | "deviceSlot" | "integrationSyncLog" | "payoutRequest" | "session"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2342,6 +2373,80 @@ export namespace Prisma {
           }
         }
       }
+      PayoutRequest: {
+        payload: Prisma.$PayoutRequestPayload<ExtArgs>
+        fields: Prisma.PayoutRequestFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PayoutRequestFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PayoutRequestPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PayoutRequestFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PayoutRequestPayload>
+          }
+          findFirst: {
+            args: Prisma.PayoutRequestFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PayoutRequestPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PayoutRequestFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PayoutRequestPayload>
+          }
+          findMany: {
+            args: Prisma.PayoutRequestFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PayoutRequestPayload>[]
+          }
+          create: {
+            args: Prisma.PayoutRequestCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PayoutRequestPayload>
+          }
+          createMany: {
+            args: Prisma.PayoutRequestCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PayoutRequestCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PayoutRequestPayload>[]
+          }
+          delete: {
+            args: Prisma.PayoutRequestDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PayoutRequestPayload>
+          }
+          update: {
+            args: Prisma.PayoutRequestUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PayoutRequestPayload>
+          }
+          deleteMany: {
+            args: Prisma.PayoutRequestDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PayoutRequestUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.PayoutRequestUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PayoutRequestPayload>[]
+          }
+          upsert: {
+            args: Prisma.PayoutRequestUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PayoutRequestPayload>
+          }
+          aggregate: {
+            args: Prisma.PayoutRequestAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePayoutRequest>
+          }
+          groupBy: {
+            args: Prisma.PayoutRequestGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PayoutRequestGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PayoutRequestCountArgs<ExtArgs>
+            result: $Utils.Optional<PayoutRequestCountAggregateOutputType> | number
+          }
+        }
+      }
       Session: {
         payload: Prisma.$SessionPayload<ExtArgs>
         fields: Prisma.SessionFieldRefs
@@ -2542,6 +2647,7 @@ export namespace Prisma {
     subscription?: SubscriptionOmit
     deviceSlot?: DeviceSlotOmit
     integrationSyncLog?: IntegrationSyncLogOmit
+    payoutRequest?: PayoutRequestOmit
     session?: SessionOmit
   }
 
@@ -2626,6 +2732,8 @@ export namespace Prisma {
     inviteCodesUsed: number
     referralCodesCreated: number
     paymentRequests: number
+    payoutRequests: number
+    reviewedPayoutRequests: number
     subscriptions: number
     supportMessages: number
     supportTickets: number
@@ -2637,6 +2745,8 @@ export namespace Prisma {
     inviteCodesUsed?: boolean | UserCountOutputTypeCountInviteCodesUsedArgs
     referralCodesCreated?: boolean | UserCountOutputTypeCountReferralCodesCreatedArgs
     paymentRequests?: boolean | UserCountOutputTypeCountPaymentRequestsArgs
+    payoutRequests?: boolean | UserCountOutputTypeCountPayoutRequestsArgs
+    reviewedPayoutRequests?: boolean | UserCountOutputTypeCountReviewedPayoutRequestsArgs
     subscriptions?: boolean | UserCountOutputTypeCountSubscriptionsArgs
     supportMessages?: boolean | UserCountOutputTypeCountSupportMessagesArgs
     supportTickets?: boolean | UserCountOutputTypeCountSupportTicketsArgs
@@ -2674,6 +2784,20 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountPaymentRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PaymentRequestWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountPayoutRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PayoutRequestWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountReviewedPayoutRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PayoutRequestWhereInput
   }
 
   /**
@@ -2885,10 +3009,12 @@ export namespace Prisma {
 
   export type UserAvgAggregateOutputType = {
     credits: number | null
+    reservedCredits: number | null
   }
 
   export type UserSumAggregateOutputType = {
     credits: number | null
+    reservedCredits: number | null
   }
 
   export type UserMinAggregateOutputType = {
@@ -2897,6 +3023,7 @@ export namespace Prisma {
     passwordHash: string | null
     role: $Enums.Role | null
     credits: number | null
+    reservedCredits: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2907,6 +3034,7 @@ export namespace Prisma {
     passwordHash: string | null
     role: $Enums.Role | null
     credits: number | null
+    reservedCredits: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2917,6 +3045,7 @@ export namespace Prisma {
     passwordHash: number
     role: number
     credits: number
+    reservedCredits: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -2925,10 +3054,12 @@ export namespace Prisma {
 
   export type UserAvgAggregateInputType = {
     credits?: true
+    reservedCredits?: true
   }
 
   export type UserSumAggregateInputType = {
     credits?: true
+    reservedCredits?: true
   }
 
   export type UserMinAggregateInputType = {
@@ -2937,6 +3068,7 @@ export namespace Prisma {
     passwordHash?: true
     role?: true
     credits?: true
+    reservedCredits?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2947,6 +3079,7 @@ export namespace Prisma {
     passwordHash?: true
     role?: true
     credits?: true
+    reservedCredits?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2957,6 +3090,7 @@ export namespace Prisma {
     passwordHash?: true
     role?: true
     credits?: true
+    reservedCredits?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -3054,6 +3188,7 @@ export namespace Prisma {
     passwordHash: string
     role: $Enums.Role
     credits: number
+    reservedCredits: number
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -3083,12 +3218,15 @@ export namespace Prisma {
     passwordHash?: boolean
     role?: boolean
     credits?: boolean
+    reservedCredits?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     inviteCodesUsed?: boolean | User$inviteCodesUsedArgs<ExtArgs>
     referralCodesCreated?: boolean | User$referralCodesCreatedArgs<ExtArgs>
     referralCodeUse?: boolean | User$referralCodeUseArgs<ExtArgs>
     paymentRequests?: boolean | User$paymentRequestsArgs<ExtArgs>
+    payoutRequests?: boolean | User$payoutRequestsArgs<ExtArgs>
+    reviewedPayoutRequests?: boolean | User$reviewedPayoutRequestsArgs<ExtArgs>
     subscriptions?: boolean | User$subscriptionsArgs<ExtArgs>
     supportMessages?: boolean | User$supportMessagesArgs<ExtArgs>
     supportTickets?: boolean | User$supportTicketsArgs<ExtArgs>
@@ -3103,6 +3241,7 @@ export namespace Prisma {
     passwordHash?: boolean
     role?: boolean
     credits?: boolean
+    reservedCredits?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -3113,6 +3252,7 @@ export namespace Prisma {
     passwordHash?: boolean
     role?: boolean
     credits?: boolean
+    reservedCredits?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -3123,16 +3263,19 @@ export namespace Prisma {
     passwordHash?: boolean
     role?: boolean
     credits?: boolean
+    reservedCredits?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "username" | "passwordHash" | "role" | "credits" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "username" | "passwordHash" | "role" | "credits" | "reservedCredits" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     inviteCodesUsed?: boolean | User$inviteCodesUsedArgs<ExtArgs>
     referralCodesCreated?: boolean | User$referralCodesCreatedArgs<ExtArgs>
     referralCodeUse?: boolean | User$referralCodeUseArgs<ExtArgs>
     paymentRequests?: boolean | User$paymentRequestsArgs<ExtArgs>
+    payoutRequests?: boolean | User$payoutRequestsArgs<ExtArgs>
+    reviewedPayoutRequests?: boolean | User$reviewedPayoutRequestsArgs<ExtArgs>
     subscriptions?: boolean | User$subscriptionsArgs<ExtArgs>
     supportMessages?: boolean | User$supportMessagesArgs<ExtArgs>
     supportTickets?: boolean | User$supportTicketsArgs<ExtArgs>
@@ -3150,6 +3293,8 @@ export namespace Prisma {
       referralCodesCreated: Prisma.$ReferralCodePayload<ExtArgs>[]
       referralCodeUse: Prisma.$ReferralCodeUsePayload<ExtArgs> | null
       paymentRequests: Prisma.$PaymentRequestPayload<ExtArgs>[]
+      payoutRequests: Prisma.$PayoutRequestPayload<ExtArgs>[]
+      reviewedPayoutRequests: Prisma.$PayoutRequestPayload<ExtArgs>[]
       subscriptions: Prisma.$SubscriptionPayload<ExtArgs>[]
       supportMessages: Prisma.$SupportMessagePayload<ExtArgs>[]
       supportTickets: Prisma.$SupportTicketPayload<ExtArgs>[]
@@ -3162,6 +3307,7 @@ export namespace Prisma {
       passwordHash: string
       role: $Enums.Role
       credits: number
+      reservedCredits: number
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -3562,6 +3708,8 @@ export namespace Prisma {
     referralCodesCreated<T extends User$referralCodesCreatedArgs<ExtArgs> = {}>(args?: Subset<T, User$referralCodesCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReferralCodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     referralCodeUse<T extends User$referralCodeUseArgs<ExtArgs> = {}>(args?: Subset<T, User$referralCodeUseArgs<ExtArgs>>): Prisma__ReferralCodeUseClient<$Result.GetResult<Prisma.$ReferralCodeUsePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     paymentRequests<T extends User$paymentRequestsArgs<ExtArgs> = {}>(args?: Subset<T, User$paymentRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PaymentRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    payoutRequests<T extends User$payoutRequestsArgs<ExtArgs> = {}>(args?: Subset<T, User$payoutRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PayoutRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    reviewedPayoutRequests<T extends User$reviewedPayoutRequestsArgs<ExtArgs> = {}>(args?: Subset<T, User$reviewedPayoutRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PayoutRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     subscriptions<T extends User$subscriptionsArgs<ExtArgs> = {}>(args?: Subset<T, User$subscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     supportMessages<T extends User$supportMessagesArgs<ExtArgs> = {}>(args?: Subset<T, User$supportMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SupportMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     supportTickets<T extends User$supportTicketsArgs<ExtArgs> = {}>(args?: Subset<T, User$supportTicketsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SupportTicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3601,6 +3749,7 @@ export namespace Prisma {
     readonly passwordHash: FieldRef<"User", 'String'>
     readonly role: FieldRef<"User", 'Role'>
     readonly credits: FieldRef<"User", 'Int'>
+    readonly reservedCredits: FieldRef<"User", 'Int'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -4077,6 +4226,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: PaymentRequestScalarFieldEnum | PaymentRequestScalarFieldEnum[]
+  }
+
+  /**
+   * User.payoutRequests
+   */
+  export type User$payoutRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PayoutRequest
+     */
+    select?: PayoutRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PayoutRequest
+     */
+    omit?: PayoutRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PayoutRequestInclude<ExtArgs> | null
+    where?: PayoutRequestWhereInput
+    orderBy?: PayoutRequestOrderByWithRelationInput | PayoutRequestOrderByWithRelationInput[]
+    cursor?: PayoutRequestWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PayoutRequestScalarFieldEnum | PayoutRequestScalarFieldEnum[]
+  }
+
+  /**
+   * User.reviewedPayoutRequests
+   */
+  export type User$reviewedPayoutRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PayoutRequest
+     */
+    select?: PayoutRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PayoutRequest
+     */
+    omit?: PayoutRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PayoutRequestInclude<ExtArgs> | null
+    where?: PayoutRequestWhereInput
+    orderBy?: PayoutRequestOrderByWithRelationInput | PayoutRequestOrderByWithRelationInput[]
+    cursor?: PayoutRequestWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PayoutRequestScalarFieldEnum | PayoutRequestScalarFieldEnum[]
   }
 
   /**
@@ -9854,12 +10051,14 @@ export namespace Prisma {
     id: number | null
     defaultDiscountPct: number | null
     defaultRewardCredits: number | null
+    minimumPayoutCredits: number | null
   }
 
   export type ReferralProgramSettingsSumAggregateOutputType = {
     id: number | null
     defaultDiscountPct: number | null
     defaultRewardCredits: number | null
+    minimumPayoutCredits: number | null
   }
 
   export type ReferralProgramSettingsMinAggregateOutputType = {
@@ -9867,6 +10066,7 @@ export namespace Prisma {
     isEnabled: boolean | null
     defaultDiscountPct: number | null
     defaultRewardCredits: number | null
+    minimumPayoutCredits: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -9876,6 +10076,7 @@ export namespace Prisma {
     isEnabled: boolean | null
     defaultDiscountPct: number | null
     defaultRewardCredits: number | null
+    minimumPayoutCredits: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -9885,6 +10086,7 @@ export namespace Prisma {
     isEnabled: number
     defaultDiscountPct: number
     defaultRewardCredits: number
+    minimumPayoutCredits: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -9895,12 +10097,14 @@ export namespace Prisma {
     id?: true
     defaultDiscountPct?: true
     defaultRewardCredits?: true
+    minimumPayoutCredits?: true
   }
 
   export type ReferralProgramSettingsSumAggregateInputType = {
     id?: true
     defaultDiscountPct?: true
     defaultRewardCredits?: true
+    minimumPayoutCredits?: true
   }
 
   export type ReferralProgramSettingsMinAggregateInputType = {
@@ -9908,6 +10112,7 @@ export namespace Prisma {
     isEnabled?: true
     defaultDiscountPct?: true
     defaultRewardCredits?: true
+    minimumPayoutCredits?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -9917,6 +10122,7 @@ export namespace Prisma {
     isEnabled?: true
     defaultDiscountPct?: true
     defaultRewardCredits?: true
+    minimumPayoutCredits?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -9926,6 +10132,7 @@ export namespace Prisma {
     isEnabled?: true
     defaultDiscountPct?: true
     defaultRewardCredits?: true
+    minimumPayoutCredits?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -10022,6 +10229,7 @@ export namespace Prisma {
     isEnabled: boolean
     defaultDiscountPct: number
     defaultRewardCredits: number
+    minimumPayoutCredits: number
     createdAt: Date
     updatedAt: Date
     _count: ReferralProgramSettingsCountAggregateOutputType | null
@@ -10050,6 +10258,7 @@ export namespace Prisma {
     isEnabled?: boolean
     defaultDiscountPct?: boolean
     defaultRewardCredits?: boolean
+    minimumPayoutCredits?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["referralProgramSettings"]>
@@ -10059,6 +10268,7 @@ export namespace Prisma {
     isEnabled?: boolean
     defaultDiscountPct?: boolean
     defaultRewardCredits?: boolean
+    minimumPayoutCredits?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["referralProgramSettings"]>
@@ -10068,6 +10278,7 @@ export namespace Prisma {
     isEnabled?: boolean
     defaultDiscountPct?: boolean
     defaultRewardCredits?: boolean
+    minimumPayoutCredits?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["referralProgramSettings"]>
@@ -10077,11 +10288,12 @@ export namespace Prisma {
     isEnabled?: boolean
     defaultDiscountPct?: boolean
     defaultRewardCredits?: boolean
+    minimumPayoutCredits?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ReferralProgramSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "isEnabled" | "defaultDiscountPct" | "defaultRewardCredits" | "createdAt" | "updatedAt", ExtArgs["result"]["referralProgramSettings"]>
+  export type ReferralProgramSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "isEnabled" | "defaultDiscountPct" | "defaultRewardCredits" | "minimumPayoutCredits" | "createdAt" | "updatedAt", ExtArgs["result"]["referralProgramSettings"]>
 
   export type $ReferralProgramSettingsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "ReferralProgramSettings"
@@ -10091,6 +10303,7 @@ export namespace Prisma {
       isEnabled: boolean
       defaultDiscountPct: number
       defaultRewardCredits: number
+      minimumPayoutCredits: number
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["referralProgramSettings"]>
@@ -10520,6 +10733,7 @@ export namespace Prisma {
     readonly isEnabled: FieldRef<"ReferralProgramSettings", 'Boolean'>
     readonly defaultDiscountPct: FieldRef<"ReferralProgramSettings", 'Int'>
     readonly defaultRewardCredits: FieldRef<"ReferralProgramSettings", 'Int'>
+    readonly minimumPayoutCredits: FieldRef<"ReferralProgramSettings", 'Int'>
     readonly createdAt: FieldRef<"ReferralProgramSettings", 'DateTime'>
     readonly updatedAt: FieldRef<"ReferralProgramSettings", 'DateTime'>
   }
@@ -23806,6 +24020,1244 @@ export namespace Prisma {
 
 
   /**
+   * Model PayoutRequest
+   */
+
+  export type AggregatePayoutRequest = {
+    _count: PayoutRequestCountAggregateOutputType | null
+    _avg: PayoutRequestAvgAggregateOutputType | null
+    _sum: PayoutRequestSumAggregateOutputType | null
+    _min: PayoutRequestMinAggregateOutputType | null
+    _max: PayoutRequestMaxAggregateOutputType | null
+  }
+
+  export type PayoutRequestAvgAggregateOutputType = {
+    amountCredits: number | null
+    amountRub: number | null
+  }
+
+  export type PayoutRequestSumAggregateOutputType = {
+    amountCredits: number | null
+    amountRub: number | null
+  }
+
+  export type PayoutRequestMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    amountCredits: number | null
+    amountRub: number | null
+    status: $Enums.PayoutRequestStatus | null
+    payoutMethod: string | null
+    payoutDetailsSnapshot: string | null
+    rejectionReason: string | null
+    adminNote: string | null
+    reviewedByAdminId: string | null
+    reviewedAt: Date | null
+    paidAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PayoutRequestMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    amountCredits: number | null
+    amountRub: number | null
+    status: $Enums.PayoutRequestStatus | null
+    payoutMethod: string | null
+    payoutDetailsSnapshot: string | null
+    rejectionReason: string | null
+    adminNote: string | null
+    reviewedByAdminId: string | null
+    reviewedAt: Date | null
+    paidAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PayoutRequestCountAggregateOutputType = {
+    id: number
+    userId: number
+    amountCredits: number
+    amountRub: number
+    status: number
+    payoutMethod: number
+    payoutDetailsSnapshot: number
+    rejectionReason: number
+    adminNote: number
+    reviewedByAdminId: number
+    reviewedAt: number
+    paidAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type PayoutRequestAvgAggregateInputType = {
+    amountCredits?: true
+    amountRub?: true
+  }
+
+  export type PayoutRequestSumAggregateInputType = {
+    amountCredits?: true
+    amountRub?: true
+  }
+
+  export type PayoutRequestMinAggregateInputType = {
+    id?: true
+    userId?: true
+    amountCredits?: true
+    amountRub?: true
+    status?: true
+    payoutMethod?: true
+    payoutDetailsSnapshot?: true
+    rejectionReason?: true
+    adminNote?: true
+    reviewedByAdminId?: true
+    reviewedAt?: true
+    paidAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PayoutRequestMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    amountCredits?: true
+    amountRub?: true
+    status?: true
+    payoutMethod?: true
+    payoutDetailsSnapshot?: true
+    rejectionReason?: true
+    adminNote?: true
+    reviewedByAdminId?: true
+    reviewedAt?: true
+    paidAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PayoutRequestCountAggregateInputType = {
+    id?: true
+    userId?: true
+    amountCredits?: true
+    amountRub?: true
+    status?: true
+    payoutMethod?: true
+    payoutDetailsSnapshot?: true
+    rejectionReason?: true
+    adminNote?: true
+    reviewedByAdminId?: true
+    reviewedAt?: true
+    paidAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type PayoutRequestAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PayoutRequest to aggregate.
+     */
+    where?: PayoutRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PayoutRequests to fetch.
+     */
+    orderBy?: PayoutRequestOrderByWithRelationInput | PayoutRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PayoutRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PayoutRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PayoutRequests.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PayoutRequests
+    **/
+    _count?: true | PayoutRequestCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: PayoutRequestAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: PayoutRequestSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PayoutRequestMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PayoutRequestMaxAggregateInputType
+  }
+
+  export type GetPayoutRequestAggregateType<T extends PayoutRequestAggregateArgs> = {
+        [P in keyof T & keyof AggregatePayoutRequest]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePayoutRequest[P]>
+      : GetScalarType<T[P], AggregatePayoutRequest[P]>
+  }
+
+
+
+
+  export type PayoutRequestGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PayoutRequestWhereInput
+    orderBy?: PayoutRequestOrderByWithAggregationInput | PayoutRequestOrderByWithAggregationInput[]
+    by: PayoutRequestScalarFieldEnum[] | PayoutRequestScalarFieldEnum
+    having?: PayoutRequestScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PayoutRequestCountAggregateInputType | true
+    _avg?: PayoutRequestAvgAggregateInputType
+    _sum?: PayoutRequestSumAggregateInputType
+    _min?: PayoutRequestMinAggregateInputType
+    _max?: PayoutRequestMaxAggregateInputType
+  }
+
+  export type PayoutRequestGroupByOutputType = {
+    id: string
+    userId: string
+    amountCredits: number
+    amountRub: number
+    status: $Enums.PayoutRequestStatus
+    payoutMethod: string
+    payoutDetailsSnapshot: string
+    rejectionReason: string | null
+    adminNote: string | null
+    reviewedByAdminId: string | null
+    reviewedAt: Date | null
+    paidAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: PayoutRequestCountAggregateOutputType | null
+    _avg: PayoutRequestAvgAggregateOutputType | null
+    _sum: PayoutRequestSumAggregateOutputType | null
+    _min: PayoutRequestMinAggregateOutputType | null
+    _max: PayoutRequestMaxAggregateOutputType | null
+  }
+
+  type GetPayoutRequestGroupByPayload<T extends PayoutRequestGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PayoutRequestGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PayoutRequestGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PayoutRequestGroupByOutputType[P]>
+            : GetScalarType<T[P], PayoutRequestGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PayoutRequestSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    amountCredits?: boolean
+    amountRub?: boolean
+    status?: boolean
+    payoutMethod?: boolean
+    payoutDetailsSnapshot?: boolean
+    rejectionReason?: boolean
+    adminNote?: boolean
+    reviewedByAdminId?: boolean
+    reviewedAt?: boolean
+    paidAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    reviewedByAdmin?: boolean | PayoutRequest$reviewedByAdminArgs<ExtArgs>
+  }, ExtArgs["result"]["payoutRequest"]>
+
+  export type PayoutRequestSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    amountCredits?: boolean
+    amountRub?: boolean
+    status?: boolean
+    payoutMethod?: boolean
+    payoutDetailsSnapshot?: boolean
+    rejectionReason?: boolean
+    adminNote?: boolean
+    reviewedByAdminId?: boolean
+    reviewedAt?: boolean
+    paidAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    reviewedByAdmin?: boolean | PayoutRequest$reviewedByAdminArgs<ExtArgs>
+  }, ExtArgs["result"]["payoutRequest"]>
+
+  export type PayoutRequestSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    amountCredits?: boolean
+    amountRub?: boolean
+    status?: boolean
+    payoutMethod?: boolean
+    payoutDetailsSnapshot?: boolean
+    rejectionReason?: boolean
+    adminNote?: boolean
+    reviewedByAdminId?: boolean
+    reviewedAt?: boolean
+    paidAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    reviewedByAdmin?: boolean | PayoutRequest$reviewedByAdminArgs<ExtArgs>
+  }, ExtArgs["result"]["payoutRequest"]>
+
+  export type PayoutRequestSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    amountCredits?: boolean
+    amountRub?: boolean
+    status?: boolean
+    payoutMethod?: boolean
+    payoutDetailsSnapshot?: boolean
+    rejectionReason?: boolean
+    adminNote?: boolean
+    reviewedByAdminId?: boolean
+    reviewedAt?: boolean
+    paidAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type PayoutRequestOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "amountCredits" | "amountRub" | "status" | "payoutMethod" | "payoutDetailsSnapshot" | "rejectionReason" | "adminNote" | "reviewedByAdminId" | "reviewedAt" | "paidAt" | "createdAt" | "updatedAt", ExtArgs["result"]["payoutRequest"]>
+  export type PayoutRequestInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    reviewedByAdmin?: boolean | PayoutRequest$reviewedByAdminArgs<ExtArgs>
+  }
+  export type PayoutRequestIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    reviewedByAdmin?: boolean | PayoutRequest$reviewedByAdminArgs<ExtArgs>
+  }
+  export type PayoutRequestIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    reviewedByAdmin?: boolean | PayoutRequest$reviewedByAdminArgs<ExtArgs>
+  }
+
+  export type $PayoutRequestPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PayoutRequest"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+      reviewedByAdmin: Prisma.$UserPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      amountCredits: number
+      amountRub: number
+      status: $Enums.PayoutRequestStatus
+      payoutMethod: string
+      payoutDetailsSnapshot: string
+      rejectionReason: string | null
+      adminNote: string | null
+      reviewedByAdminId: string | null
+      reviewedAt: Date | null
+      paidAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["payoutRequest"]>
+    composites: {}
+  }
+
+  type PayoutRequestGetPayload<S extends boolean | null | undefined | PayoutRequestDefaultArgs> = $Result.GetResult<Prisma.$PayoutRequestPayload, S>
+
+  type PayoutRequestCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PayoutRequestFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PayoutRequestCountAggregateInputType | true
+    }
+
+  export interface PayoutRequestDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PayoutRequest'], meta: { name: 'PayoutRequest' } }
+    /**
+     * Find zero or one PayoutRequest that matches the filter.
+     * @param {PayoutRequestFindUniqueArgs} args - Arguments to find a PayoutRequest
+     * @example
+     * // Get one PayoutRequest
+     * const payoutRequest = await prisma.payoutRequest.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PayoutRequestFindUniqueArgs>(args: SelectSubset<T, PayoutRequestFindUniqueArgs<ExtArgs>>): Prisma__PayoutRequestClient<$Result.GetResult<Prisma.$PayoutRequestPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PayoutRequest that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PayoutRequestFindUniqueOrThrowArgs} args - Arguments to find a PayoutRequest
+     * @example
+     * // Get one PayoutRequest
+     * const payoutRequest = await prisma.payoutRequest.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PayoutRequestFindUniqueOrThrowArgs>(args: SelectSubset<T, PayoutRequestFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PayoutRequestClient<$Result.GetResult<Prisma.$PayoutRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PayoutRequest that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PayoutRequestFindFirstArgs} args - Arguments to find a PayoutRequest
+     * @example
+     * // Get one PayoutRequest
+     * const payoutRequest = await prisma.payoutRequest.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PayoutRequestFindFirstArgs>(args?: SelectSubset<T, PayoutRequestFindFirstArgs<ExtArgs>>): Prisma__PayoutRequestClient<$Result.GetResult<Prisma.$PayoutRequestPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PayoutRequest that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PayoutRequestFindFirstOrThrowArgs} args - Arguments to find a PayoutRequest
+     * @example
+     * // Get one PayoutRequest
+     * const payoutRequest = await prisma.payoutRequest.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PayoutRequestFindFirstOrThrowArgs>(args?: SelectSubset<T, PayoutRequestFindFirstOrThrowArgs<ExtArgs>>): Prisma__PayoutRequestClient<$Result.GetResult<Prisma.$PayoutRequestPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PayoutRequests that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PayoutRequestFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PayoutRequests
+     * const payoutRequests = await prisma.payoutRequest.findMany()
+     * 
+     * // Get first 10 PayoutRequests
+     * const payoutRequests = await prisma.payoutRequest.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const payoutRequestWithIdOnly = await prisma.payoutRequest.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PayoutRequestFindManyArgs>(args?: SelectSubset<T, PayoutRequestFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PayoutRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PayoutRequest.
+     * @param {PayoutRequestCreateArgs} args - Arguments to create a PayoutRequest.
+     * @example
+     * // Create one PayoutRequest
+     * const PayoutRequest = await prisma.payoutRequest.create({
+     *   data: {
+     *     // ... data to create a PayoutRequest
+     *   }
+     * })
+     * 
+     */
+    create<T extends PayoutRequestCreateArgs>(args: SelectSubset<T, PayoutRequestCreateArgs<ExtArgs>>): Prisma__PayoutRequestClient<$Result.GetResult<Prisma.$PayoutRequestPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PayoutRequests.
+     * @param {PayoutRequestCreateManyArgs} args - Arguments to create many PayoutRequests.
+     * @example
+     * // Create many PayoutRequests
+     * const payoutRequest = await prisma.payoutRequest.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PayoutRequestCreateManyArgs>(args?: SelectSubset<T, PayoutRequestCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many PayoutRequests and returns the data saved in the database.
+     * @param {PayoutRequestCreateManyAndReturnArgs} args - Arguments to create many PayoutRequests.
+     * @example
+     * // Create many PayoutRequests
+     * const payoutRequest = await prisma.payoutRequest.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many PayoutRequests and only return the `id`
+     * const payoutRequestWithIdOnly = await prisma.payoutRequest.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PayoutRequestCreateManyAndReturnArgs>(args?: SelectSubset<T, PayoutRequestCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PayoutRequestPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a PayoutRequest.
+     * @param {PayoutRequestDeleteArgs} args - Arguments to delete one PayoutRequest.
+     * @example
+     * // Delete one PayoutRequest
+     * const PayoutRequest = await prisma.payoutRequest.delete({
+     *   where: {
+     *     // ... filter to delete one PayoutRequest
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PayoutRequestDeleteArgs>(args: SelectSubset<T, PayoutRequestDeleteArgs<ExtArgs>>): Prisma__PayoutRequestClient<$Result.GetResult<Prisma.$PayoutRequestPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PayoutRequest.
+     * @param {PayoutRequestUpdateArgs} args - Arguments to update one PayoutRequest.
+     * @example
+     * // Update one PayoutRequest
+     * const payoutRequest = await prisma.payoutRequest.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PayoutRequestUpdateArgs>(args: SelectSubset<T, PayoutRequestUpdateArgs<ExtArgs>>): Prisma__PayoutRequestClient<$Result.GetResult<Prisma.$PayoutRequestPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PayoutRequests.
+     * @param {PayoutRequestDeleteManyArgs} args - Arguments to filter PayoutRequests to delete.
+     * @example
+     * // Delete a few PayoutRequests
+     * const { count } = await prisma.payoutRequest.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PayoutRequestDeleteManyArgs>(args?: SelectSubset<T, PayoutRequestDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PayoutRequests.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PayoutRequestUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PayoutRequests
+     * const payoutRequest = await prisma.payoutRequest.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PayoutRequestUpdateManyArgs>(args: SelectSubset<T, PayoutRequestUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PayoutRequests and returns the data updated in the database.
+     * @param {PayoutRequestUpdateManyAndReturnArgs} args - Arguments to update many PayoutRequests.
+     * @example
+     * // Update many PayoutRequests
+     * const payoutRequest = await prisma.payoutRequest.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more PayoutRequests and only return the `id`
+     * const payoutRequestWithIdOnly = await prisma.payoutRequest.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends PayoutRequestUpdateManyAndReturnArgs>(args: SelectSubset<T, PayoutRequestUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PayoutRequestPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one PayoutRequest.
+     * @param {PayoutRequestUpsertArgs} args - Arguments to update or create a PayoutRequest.
+     * @example
+     * // Update or create a PayoutRequest
+     * const payoutRequest = await prisma.payoutRequest.upsert({
+     *   create: {
+     *     // ... data to create a PayoutRequest
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PayoutRequest we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PayoutRequestUpsertArgs>(args: SelectSubset<T, PayoutRequestUpsertArgs<ExtArgs>>): Prisma__PayoutRequestClient<$Result.GetResult<Prisma.$PayoutRequestPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PayoutRequests.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PayoutRequestCountArgs} args - Arguments to filter PayoutRequests to count.
+     * @example
+     * // Count the number of PayoutRequests
+     * const count = await prisma.payoutRequest.count({
+     *   where: {
+     *     // ... the filter for the PayoutRequests we want to count
+     *   }
+     * })
+    **/
+    count<T extends PayoutRequestCountArgs>(
+      args?: Subset<T, PayoutRequestCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PayoutRequestCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PayoutRequest.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PayoutRequestAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PayoutRequestAggregateArgs>(args: Subset<T, PayoutRequestAggregateArgs>): Prisma.PrismaPromise<GetPayoutRequestAggregateType<T>>
+
+    /**
+     * Group by PayoutRequest.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PayoutRequestGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PayoutRequestGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PayoutRequestGroupByArgs['orderBy'] }
+        : { orderBy?: PayoutRequestGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PayoutRequestGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPayoutRequestGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PayoutRequest model
+   */
+  readonly fields: PayoutRequestFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PayoutRequest.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PayoutRequestClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    reviewedByAdmin<T extends PayoutRequest$reviewedByAdminArgs<ExtArgs> = {}>(args?: Subset<T, PayoutRequest$reviewedByAdminArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PayoutRequest model
+   */
+  interface PayoutRequestFieldRefs {
+    readonly id: FieldRef<"PayoutRequest", 'String'>
+    readonly userId: FieldRef<"PayoutRequest", 'String'>
+    readonly amountCredits: FieldRef<"PayoutRequest", 'Int'>
+    readonly amountRub: FieldRef<"PayoutRequest", 'Int'>
+    readonly status: FieldRef<"PayoutRequest", 'PayoutRequestStatus'>
+    readonly payoutMethod: FieldRef<"PayoutRequest", 'String'>
+    readonly payoutDetailsSnapshot: FieldRef<"PayoutRequest", 'String'>
+    readonly rejectionReason: FieldRef<"PayoutRequest", 'String'>
+    readonly adminNote: FieldRef<"PayoutRequest", 'String'>
+    readonly reviewedByAdminId: FieldRef<"PayoutRequest", 'String'>
+    readonly reviewedAt: FieldRef<"PayoutRequest", 'DateTime'>
+    readonly paidAt: FieldRef<"PayoutRequest", 'DateTime'>
+    readonly createdAt: FieldRef<"PayoutRequest", 'DateTime'>
+    readonly updatedAt: FieldRef<"PayoutRequest", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PayoutRequest findUnique
+   */
+  export type PayoutRequestFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PayoutRequest
+     */
+    select?: PayoutRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PayoutRequest
+     */
+    omit?: PayoutRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PayoutRequestInclude<ExtArgs> | null
+    /**
+     * Filter, which PayoutRequest to fetch.
+     */
+    where: PayoutRequestWhereUniqueInput
+  }
+
+  /**
+   * PayoutRequest findUniqueOrThrow
+   */
+  export type PayoutRequestFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PayoutRequest
+     */
+    select?: PayoutRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PayoutRequest
+     */
+    omit?: PayoutRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PayoutRequestInclude<ExtArgs> | null
+    /**
+     * Filter, which PayoutRequest to fetch.
+     */
+    where: PayoutRequestWhereUniqueInput
+  }
+
+  /**
+   * PayoutRequest findFirst
+   */
+  export type PayoutRequestFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PayoutRequest
+     */
+    select?: PayoutRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PayoutRequest
+     */
+    omit?: PayoutRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PayoutRequestInclude<ExtArgs> | null
+    /**
+     * Filter, which PayoutRequest to fetch.
+     */
+    where?: PayoutRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PayoutRequests to fetch.
+     */
+    orderBy?: PayoutRequestOrderByWithRelationInput | PayoutRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PayoutRequests.
+     */
+    cursor?: PayoutRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PayoutRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PayoutRequests.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PayoutRequests.
+     */
+    distinct?: PayoutRequestScalarFieldEnum | PayoutRequestScalarFieldEnum[]
+  }
+
+  /**
+   * PayoutRequest findFirstOrThrow
+   */
+  export type PayoutRequestFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PayoutRequest
+     */
+    select?: PayoutRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PayoutRequest
+     */
+    omit?: PayoutRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PayoutRequestInclude<ExtArgs> | null
+    /**
+     * Filter, which PayoutRequest to fetch.
+     */
+    where?: PayoutRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PayoutRequests to fetch.
+     */
+    orderBy?: PayoutRequestOrderByWithRelationInput | PayoutRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PayoutRequests.
+     */
+    cursor?: PayoutRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PayoutRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PayoutRequests.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PayoutRequests.
+     */
+    distinct?: PayoutRequestScalarFieldEnum | PayoutRequestScalarFieldEnum[]
+  }
+
+  /**
+   * PayoutRequest findMany
+   */
+  export type PayoutRequestFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PayoutRequest
+     */
+    select?: PayoutRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PayoutRequest
+     */
+    omit?: PayoutRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PayoutRequestInclude<ExtArgs> | null
+    /**
+     * Filter, which PayoutRequests to fetch.
+     */
+    where?: PayoutRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PayoutRequests to fetch.
+     */
+    orderBy?: PayoutRequestOrderByWithRelationInput | PayoutRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PayoutRequests.
+     */
+    cursor?: PayoutRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PayoutRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PayoutRequests.
+     */
+    skip?: number
+    distinct?: PayoutRequestScalarFieldEnum | PayoutRequestScalarFieldEnum[]
+  }
+
+  /**
+   * PayoutRequest create
+   */
+  export type PayoutRequestCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PayoutRequest
+     */
+    select?: PayoutRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PayoutRequest
+     */
+    omit?: PayoutRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PayoutRequestInclude<ExtArgs> | null
+    /**
+     * The data needed to create a PayoutRequest.
+     */
+    data: XOR<PayoutRequestCreateInput, PayoutRequestUncheckedCreateInput>
+  }
+
+  /**
+   * PayoutRequest createMany
+   */
+  export type PayoutRequestCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PayoutRequests.
+     */
+    data: PayoutRequestCreateManyInput | PayoutRequestCreateManyInput[]
+  }
+
+  /**
+   * PayoutRequest createManyAndReturn
+   */
+  export type PayoutRequestCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PayoutRequest
+     */
+    select?: PayoutRequestSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PayoutRequest
+     */
+    omit?: PayoutRequestOmit<ExtArgs> | null
+    /**
+     * The data used to create many PayoutRequests.
+     */
+    data: PayoutRequestCreateManyInput | PayoutRequestCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PayoutRequestIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PayoutRequest update
+   */
+  export type PayoutRequestUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PayoutRequest
+     */
+    select?: PayoutRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PayoutRequest
+     */
+    omit?: PayoutRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PayoutRequestInclude<ExtArgs> | null
+    /**
+     * The data needed to update a PayoutRequest.
+     */
+    data: XOR<PayoutRequestUpdateInput, PayoutRequestUncheckedUpdateInput>
+    /**
+     * Choose, which PayoutRequest to update.
+     */
+    where: PayoutRequestWhereUniqueInput
+  }
+
+  /**
+   * PayoutRequest updateMany
+   */
+  export type PayoutRequestUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PayoutRequests.
+     */
+    data: XOR<PayoutRequestUpdateManyMutationInput, PayoutRequestUncheckedUpdateManyInput>
+    /**
+     * Filter which PayoutRequests to update
+     */
+    where?: PayoutRequestWhereInput
+    /**
+     * Limit how many PayoutRequests to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PayoutRequest updateManyAndReturn
+   */
+  export type PayoutRequestUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PayoutRequest
+     */
+    select?: PayoutRequestSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PayoutRequest
+     */
+    omit?: PayoutRequestOmit<ExtArgs> | null
+    /**
+     * The data used to update PayoutRequests.
+     */
+    data: XOR<PayoutRequestUpdateManyMutationInput, PayoutRequestUncheckedUpdateManyInput>
+    /**
+     * Filter which PayoutRequests to update
+     */
+    where?: PayoutRequestWhereInput
+    /**
+     * Limit how many PayoutRequests to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PayoutRequestIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PayoutRequest upsert
+   */
+  export type PayoutRequestUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PayoutRequest
+     */
+    select?: PayoutRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PayoutRequest
+     */
+    omit?: PayoutRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PayoutRequestInclude<ExtArgs> | null
+    /**
+     * The filter to search for the PayoutRequest to update in case it exists.
+     */
+    where: PayoutRequestWhereUniqueInput
+    /**
+     * In case the PayoutRequest found by the `where` argument doesn't exist, create a new PayoutRequest with this data.
+     */
+    create: XOR<PayoutRequestCreateInput, PayoutRequestUncheckedCreateInput>
+    /**
+     * In case the PayoutRequest was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PayoutRequestUpdateInput, PayoutRequestUncheckedUpdateInput>
+  }
+
+  /**
+   * PayoutRequest delete
+   */
+  export type PayoutRequestDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PayoutRequest
+     */
+    select?: PayoutRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PayoutRequest
+     */
+    omit?: PayoutRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PayoutRequestInclude<ExtArgs> | null
+    /**
+     * Filter which PayoutRequest to delete.
+     */
+    where: PayoutRequestWhereUniqueInput
+  }
+
+  /**
+   * PayoutRequest deleteMany
+   */
+  export type PayoutRequestDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PayoutRequests to delete
+     */
+    where?: PayoutRequestWhereInput
+    /**
+     * Limit how many PayoutRequests to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * PayoutRequest.reviewedByAdmin
+   */
+  export type PayoutRequest$reviewedByAdminArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * PayoutRequest without action
+   */
+  export type PayoutRequestDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PayoutRequest
+     */
+    select?: PayoutRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PayoutRequest
+     */
+    omit?: PayoutRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PayoutRequestInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model Session
    */
 
@@ -24878,6 +26330,7 @@ export namespace Prisma {
     passwordHash: 'passwordHash',
     role: 'role',
     credits: 'credits',
+    reservedCredits: 'reservedCredits',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -24955,6 +26408,7 @@ export namespace Prisma {
     isEnabled: 'isEnabled',
     defaultDiscountPct: 'defaultDiscountPct',
     defaultRewardCredits: 'defaultRewardCredits',
+    minimumPayoutCredits: 'minimumPayoutCredits',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -25161,6 +26615,26 @@ export namespace Prisma {
   export type IntegrationSyncLogScalarFieldEnum = (typeof IntegrationSyncLogScalarFieldEnum)[keyof typeof IntegrationSyncLogScalarFieldEnum]
 
 
+  export const PayoutRequestScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    amountCredits: 'amountCredits',
+    amountRub: 'amountRub',
+    status: 'status',
+    payoutMethod: 'payoutMethod',
+    payoutDetailsSnapshot: 'payoutDetailsSnapshot',
+    rejectionReason: 'rejectionReason',
+    adminNote: 'adminNote',
+    reviewedByAdminId: 'reviewedByAdminId',
+    reviewedAt: 'reviewedAt',
+    paidAt: 'paidAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type PayoutRequestScalarFieldEnum = (typeof PayoutRequestScalarFieldEnum)[keyof typeof PayoutRequestScalarFieldEnum]
+
+
   export const SessionScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
@@ -25285,6 +26759,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'PayoutRequestStatus'
+   */
+  export type EnumPayoutRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PayoutRequestStatus'>
+    
+
+
+  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -25303,12 +26784,15 @@ export namespace Prisma {
     passwordHash?: StringFilter<"User"> | string
     role?: EnumRoleFilter<"User"> | $Enums.Role
     credits?: IntFilter<"User"> | number
+    reservedCredits?: IntFilter<"User"> | number
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     inviteCodesUsed?: InviteCodeListRelationFilter
     referralCodesCreated?: ReferralCodeListRelationFilter
     referralCodeUse?: XOR<ReferralCodeUseNullableScalarRelationFilter, ReferralCodeUseWhereInput> | null
     paymentRequests?: PaymentRequestListRelationFilter
+    payoutRequests?: PayoutRequestListRelationFilter
+    reviewedPayoutRequests?: PayoutRequestListRelationFilter
     subscriptions?: SubscriptionListRelationFilter
     supportMessages?: SupportMessageListRelationFilter
     supportTickets?: SupportTicketListRelationFilter
@@ -25322,12 +26806,15 @@ export namespace Prisma {
     passwordHash?: SortOrder
     role?: SortOrder
     credits?: SortOrder
+    reservedCredits?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     inviteCodesUsed?: InviteCodeOrderByRelationAggregateInput
     referralCodesCreated?: ReferralCodeOrderByRelationAggregateInput
     referralCodeUse?: ReferralCodeUseOrderByWithRelationInput
     paymentRequests?: PaymentRequestOrderByRelationAggregateInput
+    payoutRequests?: PayoutRequestOrderByRelationAggregateInput
+    reviewedPayoutRequests?: PayoutRequestOrderByRelationAggregateInput
     subscriptions?: SubscriptionOrderByRelationAggregateInput
     supportMessages?: SupportMessageOrderByRelationAggregateInput
     supportTickets?: SupportTicketOrderByRelationAggregateInput
@@ -25344,12 +26831,15 @@ export namespace Prisma {
     passwordHash?: StringFilter<"User"> | string
     role?: EnumRoleFilter<"User"> | $Enums.Role
     credits?: IntFilter<"User"> | number
+    reservedCredits?: IntFilter<"User"> | number
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     inviteCodesUsed?: InviteCodeListRelationFilter
     referralCodesCreated?: ReferralCodeListRelationFilter
     referralCodeUse?: XOR<ReferralCodeUseNullableScalarRelationFilter, ReferralCodeUseWhereInput> | null
     paymentRequests?: PaymentRequestListRelationFilter
+    payoutRequests?: PayoutRequestListRelationFilter
+    reviewedPayoutRequests?: PayoutRequestListRelationFilter
     subscriptions?: SubscriptionListRelationFilter
     supportMessages?: SupportMessageListRelationFilter
     supportTickets?: SupportTicketListRelationFilter
@@ -25363,6 +26853,7 @@ export namespace Prisma {
     passwordHash?: SortOrder
     role?: SortOrder
     credits?: SortOrder
+    reservedCredits?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -25381,6 +26872,7 @@ export namespace Prisma {
     passwordHash?: StringWithAggregatesFilter<"User"> | string
     role?: EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
     credits?: IntWithAggregatesFilter<"User"> | number
+    reservedCredits?: IntWithAggregatesFilter<"User"> | number
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
@@ -25734,6 +27226,7 @@ export namespace Prisma {
     isEnabled?: BoolFilter<"ReferralProgramSettings"> | boolean
     defaultDiscountPct?: IntFilter<"ReferralProgramSettings"> | number
     defaultRewardCredits?: IntFilter<"ReferralProgramSettings"> | number
+    minimumPayoutCredits?: IntFilter<"ReferralProgramSettings"> | number
     createdAt?: DateTimeFilter<"ReferralProgramSettings"> | Date | string
     updatedAt?: DateTimeFilter<"ReferralProgramSettings"> | Date | string
   }
@@ -25743,6 +27236,7 @@ export namespace Prisma {
     isEnabled?: SortOrder
     defaultDiscountPct?: SortOrder
     defaultRewardCredits?: SortOrder
+    minimumPayoutCredits?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -25755,6 +27249,7 @@ export namespace Prisma {
     isEnabled?: BoolFilter<"ReferralProgramSettings"> | boolean
     defaultDiscountPct?: IntFilter<"ReferralProgramSettings"> | number
     defaultRewardCredits?: IntFilter<"ReferralProgramSettings"> | number
+    minimumPayoutCredits?: IntFilter<"ReferralProgramSettings"> | number
     createdAt?: DateTimeFilter<"ReferralProgramSettings"> | Date | string
     updatedAt?: DateTimeFilter<"ReferralProgramSettings"> | Date | string
   }, "id">
@@ -25764,6 +27259,7 @@ export namespace Prisma {
     isEnabled?: SortOrder
     defaultDiscountPct?: SortOrder
     defaultRewardCredits?: SortOrder
+    minimumPayoutCredits?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ReferralProgramSettingsCountOrderByAggregateInput
@@ -25781,6 +27277,7 @@ export namespace Prisma {
     isEnabled?: BoolWithAggregatesFilter<"ReferralProgramSettings"> | boolean
     defaultDiscountPct?: IntWithAggregatesFilter<"ReferralProgramSettings"> | number
     defaultRewardCredits?: IntWithAggregatesFilter<"ReferralProgramSettings"> | number
+    minimumPayoutCredits?: IntWithAggregatesFilter<"ReferralProgramSettings"> | number
     createdAt?: DateTimeWithAggregatesFilter<"ReferralProgramSettings"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"ReferralProgramSettings"> | Date | string
   }
@@ -26802,6 +28299,111 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"IntegrationSyncLog"> | Date | string
   }
 
+  export type PayoutRequestWhereInput = {
+    AND?: PayoutRequestWhereInput | PayoutRequestWhereInput[]
+    OR?: PayoutRequestWhereInput[]
+    NOT?: PayoutRequestWhereInput | PayoutRequestWhereInput[]
+    id?: StringFilter<"PayoutRequest"> | string
+    userId?: StringFilter<"PayoutRequest"> | string
+    amountCredits?: IntFilter<"PayoutRequest"> | number
+    amountRub?: IntFilter<"PayoutRequest"> | number
+    status?: EnumPayoutRequestStatusFilter<"PayoutRequest"> | $Enums.PayoutRequestStatus
+    payoutMethod?: StringFilter<"PayoutRequest"> | string
+    payoutDetailsSnapshot?: StringFilter<"PayoutRequest"> | string
+    rejectionReason?: StringNullableFilter<"PayoutRequest"> | string | null
+    adminNote?: StringNullableFilter<"PayoutRequest"> | string | null
+    reviewedByAdminId?: StringNullableFilter<"PayoutRequest"> | string | null
+    reviewedAt?: DateTimeNullableFilter<"PayoutRequest"> | Date | string | null
+    paidAt?: DateTimeNullableFilter<"PayoutRequest"> | Date | string | null
+    createdAt?: DateTimeFilter<"PayoutRequest"> | Date | string
+    updatedAt?: DateTimeFilter<"PayoutRequest"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    reviewedByAdmin?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  }
+
+  export type PayoutRequestOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    amountCredits?: SortOrder
+    amountRub?: SortOrder
+    status?: SortOrder
+    payoutMethod?: SortOrder
+    payoutDetailsSnapshot?: SortOrder
+    rejectionReason?: SortOrderInput | SortOrder
+    adminNote?: SortOrderInput | SortOrder
+    reviewedByAdminId?: SortOrderInput | SortOrder
+    reviewedAt?: SortOrderInput | SortOrder
+    paidAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+    reviewedByAdmin?: UserOrderByWithRelationInput
+  }
+
+  export type PayoutRequestWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: PayoutRequestWhereInput | PayoutRequestWhereInput[]
+    OR?: PayoutRequestWhereInput[]
+    NOT?: PayoutRequestWhereInput | PayoutRequestWhereInput[]
+    userId?: StringFilter<"PayoutRequest"> | string
+    amountCredits?: IntFilter<"PayoutRequest"> | number
+    amountRub?: IntFilter<"PayoutRequest"> | number
+    status?: EnumPayoutRequestStatusFilter<"PayoutRequest"> | $Enums.PayoutRequestStatus
+    payoutMethod?: StringFilter<"PayoutRequest"> | string
+    payoutDetailsSnapshot?: StringFilter<"PayoutRequest"> | string
+    rejectionReason?: StringNullableFilter<"PayoutRequest"> | string | null
+    adminNote?: StringNullableFilter<"PayoutRequest"> | string | null
+    reviewedByAdminId?: StringNullableFilter<"PayoutRequest"> | string | null
+    reviewedAt?: DateTimeNullableFilter<"PayoutRequest"> | Date | string | null
+    paidAt?: DateTimeNullableFilter<"PayoutRequest"> | Date | string | null
+    createdAt?: DateTimeFilter<"PayoutRequest"> | Date | string
+    updatedAt?: DateTimeFilter<"PayoutRequest"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    reviewedByAdmin?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  }, "id">
+
+  export type PayoutRequestOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    amountCredits?: SortOrder
+    amountRub?: SortOrder
+    status?: SortOrder
+    payoutMethod?: SortOrder
+    payoutDetailsSnapshot?: SortOrder
+    rejectionReason?: SortOrderInput | SortOrder
+    adminNote?: SortOrderInput | SortOrder
+    reviewedByAdminId?: SortOrderInput | SortOrder
+    reviewedAt?: SortOrderInput | SortOrder
+    paidAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: PayoutRequestCountOrderByAggregateInput
+    _avg?: PayoutRequestAvgOrderByAggregateInput
+    _max?: PayoutRequestMaxOrderByAggregateInput
+    _min?: PayoutRequestMinOrderByAggregateInput
+    _sum?: PayoutRequestSumOrderByAggregateInput
+  }
+
+  export type PayoutRequestScalarWhereWithAggregatesInput = {
+    AND?: PayoutRequestScalarWhereWithAggregatesInput | PayoutRequestScalarWhereWithAggregatesInput[]
+    OR?: PayoutRequestScalarWhereWithAggregatesInput[]
+    NOT?: PayoutRequestScalarWhereWithAggregatesInput | PayoutRequestScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"PayoutRequest"> | string
+    userId?: StringWithAggregatesFilter<"PayoutRequest"> | string
+    amountCredits?: IntWithAggregatesFilter<"PayoutRequest"> | number
+    amountRub?: IntWithAggregatesFilter<"PayoutRequest"> | number
+    status?: EnumPayoutRequestStatusWithAggregatesFilter<"PayoutRequest"> | $Enums.PayoutRequestStatus
+    payoutMethod?: StringWithAggregatesFilter<"PayoutRequest"> | string
+    payoutDetailsSnapshot?: StringWithAggregatesFilter<"PayoutRequest"> | string
+    rejectionReason?: StringNullableWithAggregatesFilter<"PayoutRequest"> | string | null
+    adminNote?: StringNullableWithAggregatesFilter<"PayoutRequest"> | string | null
+    reviewedByAdminId?: StringNullableWithAggregatesFilter<"PayoutRequest"> | string | null
+    reviewedAt?: DateTimeNullableWithAggregatesFilter<"PayoutRequest"> | Date | string | null
+    paidAt?: DateTimeNullableWithAggregatesFilter<"PayoutRequest"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"PayoutRequest"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"PayoutRequest"> | Date | string
+  }
+
   export type SessionWhereInput = {
     AND?: SessionWhereInput | SessionWhereInput[]
     OR?: SessionWhereInput[]
@@ -26863,12 +28465,15 @@ export namespace Prisma {
     passwordHash: string
     role?: $Enums.Role
     credits?: number
+    reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     inviteCodesUsed?: InviteCodeCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestCreateNestedManyWithoutUserInput
+    payoutRequests?: PayoutRequestCreateNestedManyWithoutUserInput
+    reviewedPayoutRequests?: PayoutRequestCreateNestedManyWithoutReviewedByAdminInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     supportMessages?: SupportMessageCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketCreateNestedManyWithoutUserInput
@@ -26882,12 +28487,15 @@ export namespace Prisma {
     passwordHash: string
     role?: $Enums.Role
     credits?: number
+    reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     inviteCodesUsed?: InviteCodeUncheckedCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeUncheckedCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseUncheckedCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestUncheckedCreateNestedManyWithoutUserInput
+    payoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutUserInput
+    reviewedPayoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutReviewedByAdminInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     supportMessages?: SupportMessageUncheckedCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketUncheckedCreateNestedManyWithoutUserInput
@@ -26901,12 +28509,15 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     inviteCodesUsed?: InviteCodeUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUpdateManyWithoutUserNestedInput
+    payoutRequests?: PayoutRequestUpdateManyWithoutUserNestedInput
+    reviewedPayoutRequests?: PayoutRequestUpdateManyWithoutReviewedByAdminNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     supportMessages?: SupportMessageUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUpdateManyWithoutUserNestedInput
@@ -26920,12 +28531,15 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     inviteCodesUsed?: InviteCodeUncheckedUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUncheckedUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUncheckedUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUncheckedUpdateManyWithoutUserNestedInput
+    payoutRequests?: PayoutRequestUncheckedUpdateManyWithoutUserNestedInput
+    reviewedPayoutRequests?: PayoutRequestUncheckedUpdateManyWithoutReviewedByAdminNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     supportMessages?: SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUncheckedUpdateManyWithoutUserNestedInput
@@ -26939,6 +28553,7 @@ export namespace Prisma {
     passwordHash: string
     role?: $Enums.Role
     credits?: number
+    reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -26949,6 +28564,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -26959,6 +28575,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -27320,6 +28937,7 @@ export namespace Prisma {
     isEnabled?: boolean
     defaultDiscountPct?: number
     defaultRewardCredits?: number
+    minimumPayoutCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -27329,6 +28947,7 @@ export namespace Prisma {
     isEnabled?: boolean
     defaultDiscountPct?: number
     defaultRewardCredits?: number
+    minimumPayoutCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -27338,6 +28957,7 @@ export namespace Prisma {
     isEnabled?: BoolFieldUpdateOperationsInput | boolean
     defaultDiscountPct?: IntFieldUpdateOperationsInput | number
     defaultRewardCredits?: IntFieldUpdateOperationsInput | number
+    minimumPayoutCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -27347,6 +28967,7 @@ export namespace Prisma {
     isEnabled?: BoolFieldUpdateOperationsInput | boolean
     defaultDiscountPct?: IntFieldUpdateOperationsInput | number
     defaultRewardCredits?: IntFieldUpdateOperationsInput | number
+    minimumPayoutCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -27356,6 +28977,7 @@ export namespace Prisma {
     isEnabled?: boolean
     defaultDiscountPct?: number
     defaultRewardCredits?: number
+    minimumPayoutCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -27365,6 +28987,7 @@ export namespace Prisma {
     isEnabled?: BoolFieldUpdateOperationsInput | boolean
     defaultDiscountPct?: IntFieldUpdateOperationsInput | number
     defaultRewardCredits?: IntFieldUpdateOperationsInput | number
+    minimumPayoutCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -27374,6 +28997,7 @@ export namespace Prisma {
     isEnabled?: BoolFieldUpdateOperationsInput | boolean
     defaultDiscountPct?: IntFieldUpdateOperationsInput | number
     defaultRewardCredits?: IntFieldUpdateOperationsInput | number
+    minimumPayoutCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -28542,6 +30166,123 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type PayoutRequestCreateInput = {
+    id?: string
+    amountCredits: number
+    amountRub: number
+    status?: $Enums.PayoutRequestStatus
+    payoutMethod?: string
+    payoutDetailsSnapshot: string
+    rejectionReason?: string | null
+    adminNote?: string | null
+    reviewedAt?: Date | string | null
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutPayoutRequestsInput
+    reviewedByAdmin?: UserCreateNestedOneWithoutReviewedPayoutRequestsInput
+  }
+
+  export type PayoutRequestUncheckedCreateInput = {
+    id?: string
+    userId: string
+    amountCredits: number
+    amountRub: number
+    status?: $Enums.PayoutRequestStatus
+    payoutMethod?: string
+    payoutDetailsSnapshot: string
+    rejectionReason?: string | null
+    adminNote?: string | null
+    reviewedByAdminId?: string | null
+    reviewedAt?: Date | string | null
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PayoutRequestUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amountCredits?: IntFieldUpdateOperationsInput | number
+    amountRub?: IntFieldUpdateOperationsInput | number
+    status?: EnumPayoutRequestStatusFieldUpdateOperationsInput | $Enums.PayoutRequestStatus
+    payoutMethod?: StringFieldUpdateOperationsInput | string
+    payoutDetailsSnapshot?: StringFieldUpdateOperationsInput | string
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutPayoutRequestsNestedInput
+    reviewedByAdmin?: UserUpdateOneWithoutReviewedPayoutRequestsNestedInput
+  }
+
+  export type PayoutRequestUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    amountCredits?: IntFieldUpdateOperationsInput | number
+    amountRub?: IntFieldUpdateOperationsInput | number
+    status?: EnumPayoutRequestStatusFieldUpdateOperationsInput | $Enums.PayoutRequestStatus
+    payoutMethod?: StringFieldUpdateOperationsInput | string
+    payoutDetailsSnapshot?: StringFieldUpdateOperationsInput | string
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedByAdminId?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PayoutRequestCreateManyInput = {
+    id?: string
+    userId: string
+    amountCredits: number
+    amountRub: number
+    status?: $Enums.PayoutRequestStatus
+    payoutMethod?: string
+    payoutDetailsSnapshot: string
+    rejectionReason?: string | null
+    adminNote?: string | null
+    reviewedByAdminId?: string | null
+    reviewedAt?: Date | string | null
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PayoutRequestUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amountCredits?: IntFieldUpdateOperationsInput | number
+    amountRub?: IntFieldUpdateOperationsInput | number
+    status?: EnumPayoutRequestStatusFieldUpdateOperationsInput | $Enums.PayoutRequestStatus
+    payoutMethod?: StringFieldUpdateOperationsInput | string
+    payoutDetailsSnapshot?: StringFieldUpdateOperationsInput | string
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PayoutRequestUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    amountCredits?: IntFieldUpdateOperationsInput | number
+    amountRub?: IntFieldUpdateOperationsInput | number
+    status?: EnumPayoutRequestStatusFieldUpdateOperationsInput | $Enums.PayoutRequestStatus
+    payoutMethod?: StringFieldUpdateOperationsInput | string
+    payoutDetailsSnapshot?: StringFieldUpdateOperationsInput | string
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedByAdminId?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type SessionCreateInput = {
     id: string
     expiresAt: Date | string
@@ -28663,6 +30404,12 @@ export namespace Prisma {
     none?: PaymentRequestWhereInput
   }
 
+  export type PayoutRequestListRelationFilter = {
+    every?: PayoutRequestWhereInput
+    some?: PayoutRequestWhereInput
+    none?: PayoutRequestWhereInput
+  }
+
   export type SubscriptionListRelationFilter = {
     every?: SubscriptionWhereInput
     some?: SubscriptionWhereInput
@@ -28705,6 +30452,10 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type PayoutRequestOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type SubscriptionOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -28731,12 +30482,14 @@ export namespace Prisma {
     passwordHash?: SortOrder
     role?: SortOrder
     credits?: SortOrder
+    reservedCredits?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type UserAvgOrderByAggregateInput = {
     credits?: SortOrder
+    reservedCredits?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -28745,6 +30498,7 @@ export namespace Prisma {
     passwordHash?: SortOrder
     role?: SortOrder
     credits?: SortOrder
+    reservedCredits?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -28755,12 +30509,14 @@ export namespace Prisma {
     passwordHash?: SortOrder
     role?: SortOrder
     credits?: SortOrder
+    reservedCredits?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type UserSumOrderByAggregateInput = {
     credits?: SortOrder
+    reservedCredits?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -29114,6 +30870,7 @@ export namespace Prisma {
     isEnabled?: SortOrder
     defaultDiscountPct?: SortOrder
     defaultRewardCredits?: SortOrder
+    minimumPayoutCredits?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -29122,6 +30879,7 @@ export namespace Prisma {
     id?: SortOrder
     defaultDiscountPct?: SortOrder
     defaultRewardCredits?: SortOrder
+    minimumPayoutCredits?: SortOrder
   }
 
   export type ReferralProgramSettingsMaxOrderByAggregateInput = {
@@ -29129,6 +30887,7 @@ export namespace Prisma {
     isEnabled?: SortOrder
     defaultDiscountPct?: SortOrder
     defaultRewardCredits?: SortOrder
+    minimumPayoutCredits?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -29138,6 +30897,7 @@ export namespace Prisma {
     isEnabled?: SortOrder
     defaultDiscountPct?: SortOrder
     defaultRewardCredits?: SortOrder
+    minimumPayoutCredits?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -29146,6 +30906,7 @@ export namespace Prisma {
     id?: SortOrder
     defaultDiscountPct?: SortOrder
     defaultRewardCredits?: SortOrder
+    minimumPayoutCredits?: SortOrder
   }
 
   export type LegalDocumentSettingsCountOrderByAggregateInput = {
@@ -29982,6 +31743,84 @@ export namespace Prisma {
     _max?: NestedEnumIntegrationSyncStatusFilter<$PrismaModel>
   }
 
+  export type EnumPayoutRequestStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.PayoutRequestStatus | EnumPayoutRequestStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PayoutRequestStatus[]
+    notIn?: $Enums.PayoutRequestStatus[]
+    not?: NestedEnumPayoutRequestStatusFilter<$PrismaModel> | $Enums.PayoutRequestStatus
+  }
+
+  export type PayoutRequestCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    amountCredits?: SortOrder
+    amountRub?: SortOrder
+    status?: SortOrder
+    payoutMethod?: SortOrder
+    payoutDetailsSnapshot?: SortOrder
+    rejectionReason?: SortOrder
+    adminNote?: SortOrder
+    reviewedByAdminId?: SortOrder
+    reviewedAt?: SortOrder
+    paidAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PayoutRequestAvgOrderByAggregateInput = {
+    amountCredits?: SortOrder
+    amountRub?: SortOrder
+  }
+
+  export type PayoutRequestMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    amountCredits?: SortOrder
+    amountRub?: SortOrder
+    status?: SortOrder
+    payoutMethod?: SortOrder
+    payoutDetailsSnapshot?: SortOrder
+    rejectionReason?: SortOrder
+    adminNote?: SortOrder
+    reviewedByAdminId?: SortOrder
+    reviewedAt?: SortOrder
+    paidAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PayoutRequestMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    amountCredits?: SortOrder
+    amountRub?: SortOrder
+    status?: SortOrder
+    payoutMethod?: SortOrder
+    payoutDetailsSnapshot?: SortOrder
+    rejectionReason?: SortOrder
+    adminNote?: SortOrder
+    reviewedByAdminId?: SortOrder
+    reviewedAt?: SortOrder
+    paidAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PayoutRequestSumOrderByAggregateInput = {
+    amountCredits?: SortOrder
+    amountRub?: SortOrder
+  }
+
+  export type EnumPayoutRequestStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PayoutRequestStatus | EnumPayoutRequestStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PayoutRequestStatus[]
+    notIn?: $Enums.PayoutRequestStatus[]
+    not?: NestedEnumPayoutRequestStatusWithAggregatesFilter<$PrismaModel> | $Enums.PayoutRequestStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPayoutRequestStatusFilter<$PrismaModel>
+    _max?: NestedEnumPayoutRequestStatusFilter<$PrismaModel>
+  }
+
   export type SessionCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
@@ -30031,6 +31870,20 @@ export namespace Prisma {
     connectOrCreate?: PaymentRequestCreateOrConnectWithoutUserInput | PaymentRequestCreateOrConnectWithoutUserInput[]
     createMany?: PaymentRequestCreateManyUserInputEnvelope
     connect?: PaymentRequestWhereUniqueInput | PaymentRequestWhereUniqueInput[]
+  }
+
+  export type PayoutRequestCreateNestedManyWithoutUserInput = {
+    create?: XOR<PayoutRequestCreateWithoutUserInput, PayoutRequestUncheckedCreateWithoutUserInput> | PayoutRequestCreateWithoutUserInput[] | PayoutRequestUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PayoutRequestCreateOrConnectWithoutUserInput | PayoutRequestCreateOrConnectWithoutUserInput[]
+    createMany?: PayoutRequestCreateManyUserInputEnvelope
+    connect?: PayoutRequestWhereUniqueInput | PayoutRequestWhereUniqueInput[]
+  }
+
+  export type PayoutRequestCreateNestedManyWithoutReviewedByAdminInput = {
+    create?: XOR<PayoutRequestCreateWithoutReviewedByAdminInput, PayoutRequestUncheckedCreateWithoutReviewedByAdminInput> | PayoutRequestCreateWithoutReviewedByAdminInput[] | PayoutRequestUncheckedCreateWithoutReviewedByAdminInput[]
+    connectOrCreate?: PayoutRequestCreateOrConnectWithoutReviewedByAdminInput | PayoutRequestCreateOrConnectWithoutReviewedByAdminInput[]
+    createMany?: PayoutRequestCreateManyReviewedByAdminInputEnvelope
+    connect?: PayoutRequestWhereUniqueInput | PayoutRequestWhereUniqueInput[]
   }
 
   export type SubscriptionCreateNestedManyWithoutUserInput = {
@@ -30093,6 +31946,20 @@ export namespace Prisma {
     connectOrCreate?: PaymentRequestCreateOrConnectWithoutUserInput | PaymentRequestCreateOrConnectWithoutUserInput[]
     createMany?: PaymentRequestCreateManyUserInputEnvelope
     connect?: PaymentRequestWhereUniqueInput | PaymentRequestWhereUniqueInput[]
+  }
+
+  export type PayoutRequestUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<PayoutRequestCreateWithoutUserInput, PayoutRequestUncheckedCreateWithoutUserInput> | PayoutRequestCreateWithoutUserInput[] | PayoutRequestUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PayoutRequestCreateOrConnectWithoutUserInput | PayoutRequestCreateOrConnectWithoutUserInput[]
+    createMany?: PayoutRequestCreateManyUserInputEnvelope
+    connect?: PayoutRequestWhereUniqueInput | PayoutRequestWhereUniqueInput[]
+  }
+
+  export type PayoutRequestUncheckedCreateNestedManyWithoutReviewedByAdminInput = {
+    create?: XOR<PayoutRequestCreateWithoutReviewedByAdminInput, PayoutRequestUncheckedCreateWithoutReviewedByAdminInput> | PayoutRequestCreateWithoutReviewedByAdminInput[] | PayoutRequestUncheckedCreateWithoutReviewedByAdminInput[]
+    connectOrCreate?: PayoutRequestCreateOrConnectWithoutReviewedByAdminInput | PayoutRequestCreateOrConnectWithoutReviewedByAdminInput[]
+    createMany?: PayoutRequestCreateManyReviewedByAdminInputEnvelope
+    connect?: PayoutRequestWhereUniqueInput | PayoutRequestWhereUniqueInput[]
   }
 
   export type SubscriptionUncheckedCreateNestedManyWithoutUserInput = {
@@ -30200,6 +32067,34 @@ export namespace Prisma {
     update?: PaymentRequestUpdateWithWhereUniqueWithoutUserInput | PaymentRequestUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: PaymentRequestUpdateManyWithWhereWithoutUserInput | PaymentRequestUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: PaymentRequestScalarWhereInput | PaymentRequestScalarWhereInput[]
+  }
+
+  export type PayoutRequestUpdateManyWithoutUserNestedInput = {
+    create?: XOR<PayoutRequestCreateWithoutUserInput, PayoutRequestUncheckedCreateWithoutUserInput> | PayoutRequestCreateWithoutUserInput[] | PayoutRequestUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PayoutRequestCreateOrConnectWithoutUserInput | PayoutRequestCreateOrConnectWithoutUserInput[]
+    upsert?: PayoutRequestUpsertWithWhereUniqueWithoutUserInput | PayoutRequestUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: PayoutRequestCreateManyUserInputEnvelope
+    set?: PayoutRequestWhereUniqueInput | PayoutRequestWhereUniqueInput[]
+    disconnect?: PayoutRequestWhereUniqueInput | PayoutRequestWhereUniqueInput[]
+    delete?: PayoutRequestWhereUniqueInput | PayoutRequestWhereUniqueInput[]
+    connect?: PayoutRequestWhereUniqueInput | PayoutRequestWhereUniqueInput[]
+    update?: PayoutRequestUpdateWithWhereUniqueWithoutUserInput | PayoutRequestUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: PayoutRequestUpdateManyWithWhereWithoutUserInput | PayoutRequestUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: PayoutRequestScalarWhereInput | PayoutRequestScalarWhereInput[]
+  }
+
+  export type PayoutRequestUpdateManyWithoutReviewedByAdminNestedInput = {
+    create?: XOR<PayoutRequestCreateWithoutReviewedByAdminInput, PayoutRequestUncheckedCreateWithoutReviewedByAdminInput> | PayoutRequestCreateWithoutReviewedByAdminInput[] | PayoutRequestUncheckedCreateWithoutReviewedByAdminInput[]
+    connectOrCreate?: PayoutRequestCreateOrConnectWithoutReviewedByAdminInput | PayoutRequestCreateOrConnectWithoutReviewedByAdminInput[]
+    upsert?: PayoutRequestUpsertWithWhereUniqueWithoutReviewedByAdminInput | PayoutRequestUpsertWithWhereUniqueWithoutReviewedByAdminInput[]
+    createMany?: PayoutRequestCreateManyReviewedByAdminInputEnvelope
+    set?: PayoutRequestWhereUniqueInput | PayoutRequestWhereUniqueInput[]
+    disconnect?: PayoutRequestWhereUniqueInput | PayoutRequestWhereUniqueInput[]
+    delete?: PayoutRequestWhereUniqueInput | PayoutRequestWhereUniqueInput[]
+    connect?: PayoutRequestWhereUniqueInput | PayoutRequestWhereUniqueInput[]
+    update?: PayoutRequestUpdateWithWhereUniqueWithoutReviewedByAdminInput | PayoutRequestUpdateWithWhereUniqueWithoutReviewedByAdminInput[]
+    updateMany?: PayoutRequestUpdateManyWithWhereWithoutReviewedByAdminInput | PayoutRequestUpdateManyWithWhereWithoutReviewedByAdminInput[]
+    deleteMany?: PayoutRequestScalarWhereInput | PayoutRequestScalarWhereInput[]
   }
 
   export type SubscriptionUpdateManyWithoutUserNestedInput = {
@@ -30322,6 +32217,34 @@ export namespace Prisma {
     update?: PaymentRequestUpdateWithWhereUniqueWithoutUserInput | PaymentRequestUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: PaymentRequestUpdateManyWithWhereWithoutUserInput | PaymentRequestUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: PaymentRequestScalarWhereInput | PaymentRequestScalarWhereInput[]
+  }
+
+  export type PayoutRequestUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<PayoutRequestCreateWithoutUserInput, PayoutRequestUncheckedCreateWithoutUserInput> | PayoutRequestCreateWithoutUserInput[] | PayoutRequestUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PayoutRequestCreateOrConnectWithoutUserInput | PayoutRequestCreateOrConnectWithoutUserInput[]
+    upsert?: PayoutRequestUpsertWithWhereUniqueWithoutUserInput | PayoutRequestUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: PayoutRequestCreateManyUserInputEnvelope
+    set?: PayoutRequestWhereUniqueInput | PayoutRequestWhereUniqueInput[]
+    disconnect?: PayoutRequestWhereUniqueInput | PayoutRequestWhereUniqueInput[]
+    delete?: PayoutRequestWhereUniqueInput | PayoutRequestWhereUniqueInput[]
+    connect?: PayoutRequestWhereUniqueInput | PayoutRequestWhereUniqueInput[]
+    update?: PayoutRequestUpdateWithWhereUniqueWithoutUserInput | PayoutRequestUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: PayoutRequestUpdateManyWithWhereWithoutUserInput | PayoutRequestUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: PayoutRequestScalarWhereInput | PayoutRequestScalarWhereInput[]
+  }
+
+  export type PayoutRequestUncheckedUpdateManyWithoutReviewedByAdminNestedInput = {
+    create?: XOR<PayoutRequestCreateWithoutReviewedByAdminInput, PayoutRequestUncheckedCreateWithoutReviewedByAdminInput> | PayoutRequestCreateWithoutReviewedByAdminInput[] | PayoutRequestUncheckedCreateWithoutReviewedByAdminInput[]
+    connectOrCreate?: PayoutRequestCreateOrConnectWithoutReviewedByAdminInput | PayoutRequestCreateOrConnectWithoutReviewedByAdminInput[]
+    upsert?: PayoutRequestUpsertWithWhereUniqueWithoutReviewedByAdminInput | PayoutRequestUpsertWithWhereUniqueWithoutReviewedByAdminInput[]
+    createMany?: PayoutRequestCreateManyReviewedByAdminInputEnvelope
+    set?: PayoutRequestWhereUniqueInput | PayoutRequestWhereUniqueInput[]
+    disconnect?: PayoutRequestWhereUniqueInput | PayoutRequestWhereUniqueInput[]
+    delete?: PayoutRequestWhereUniqueInput | PayoutRequestWhereUniqueInput[]
+    connect?: PayoutRequestWhereUniqueInput | PayoutRequestWhereUniqueInput[]
+    update?: PayoutRequestUpdateWithWhereUniqueWithoutReviewedByAdminInput | PayoutRequestUpdateWithWhereUniqueWithoutReviewedByAdminInput[]
+    updateMany?: PayoutRequestUpdateManyWithWhereWithoutReviewedByAdminInput | PayoutRequestUpdateManyWithWhereWithoutReviewedByAdminInput[]
+    deleteMany?: PayoutRequestScalarWhereInput | PayoutRequestScalarWhereInput[]
   }
 
   export type SubscriptionUncheckedUpdateManyWithoutUserNestedInput = {
@@ -30894,6 +32817,40 @@ export namespace Prisma {
     set?: $Enums.IntegrationSyncStatus
   }
 
+  export type UserCreateNestedOneWithoutPayoutRequestsInput = {
+    create?: XOR<UserCreateWithoutPayoutRequestsInput, UserUncheckedCreateWithoutPayoutRequestsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPayoutRequestsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutReviewedPayoutRequestsInput = {
+    create?: XOR<UserCreateWithoutReviewedPayoutRequestsInput, UserUncheckedCreateWithoutReviewedPayoutRequestsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutReviewedPayoutRequestsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type EnumPayoutRequestStatusFieldUpdateOperationsInput = {
+    set?: $Enums.PayoutRequestStatus
+  }
+
+  export type UserUpdateOneRequiredWithoutPayoutRequestsNestedInput = {
+    create?: XOR<UserCreateWithoutPayoutRequestsInput, UserUncheckedCreateWithoutPayoutRequestsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutPayoutRequestsInput
+    upsert?: UserUpsertWithoutPayoutRequestsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutPayoutRequestsInput, UserUpdateWithoutPayoutRequestsInput>, UserUncheckedUpdateWithoutPayoutRequestsInput>
+  }
+
+  export type UserUpdateOneWithoutReviewedPayoutRequestsNestedInput = {
+    create?: XOR<UserCreateWithoutReviewedPayoutRequestsInput, UserUncheckedCreateWithoutReviewedPayoutRequestsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutReviewedPayoutRequestsInput
+    upsert?: UserUpsertWithoutReviewedPayoutRequestsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutReviewedPayoutRequestsInput, UserUpdateWithoutReviewedPayoutRequestsInput>, UserUncheckedUpdateWithoutReviewedPayoutRequestsInput>
+  }
+
   export type UserCreateNestedOneWithoutSessionsInput = {
     create?: XOR<UserCreateWithoutSessionsInput, UserUncheckedCreateWithoutSessionsInput>
     connectOrCreate?: UserCreateOrConnectWithoutSessionsInput
@@ -31262,6 +33219,23 @@ export namespace Prisma {
     _max?: NestedEnumIntegrationSyncStatusFilter<$PrismaModel>
   }
 
+  export type NestedEnumPayoutRequestStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.PayoutRequestStatus | EnumPayoutRequestStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PayoutRequestStatus[]
+    notIn?: $Enums.PayoutRequestStatus[]
+    not?: NestedEnumPayoutRequestStatusFilter<$PrismaModel> | $Enums.PayoutRequestStatus
+  }
+
+  export type NestedEnumPayoutRequestStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PayoutRequestStatus | EnumPayoutRequestStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PayoutRequestStatus[]
+    notIn?: $Enums.PayoutRequestStatus[]
+    not?: NestedEnumPayoutRequestStatusWithAggregatesFilter<$PrismaModel> | $Enums.PayoutRequestStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPayoutRequestStatusFilter<$PrismaModel>
+    _max?: NestedEnumPayoutRequestStatusFilter<$PrismaModel>
+  }
+
   export type InviteCodeCreateWithoutUsedByInput = {
     id?: string
     code: string
@@ -31414,6 +33388,88 @@ export namespace Prisma {
 
   export type PaymentRequestCreateManyUserInputEnvelope = {
     data: PaymentRequestCreateManyUserInput | PaymentRequestCreateManyUserInput[]
+  }
+
+  export type PayoutRequestCreateWithoutUserInput = {
+    id?: string
+    amountCredits: number
+    amountRub: number
+    status?: $Enums.PayoutRequestStatus
+    payoutMethod?: string
+    payoutDetailsSnapshot: string
+    rejectionReason?: string | null
+    adminNote?: string | null
+    reviewedAt?: Date | string | null
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    reviewedByAdmin?: UserCreateNestedOneWithoutReviewedPayoutRequestsInput
+  }
+
+  export type PayoutRequestUncheckedCreateWithoutUserInput = {
+    id?: string
+    amountCredits: number
+    amountRub: number
+    status?: $Enums.PayoutRequestStatus
+    payoutMethod?: string
+    payoutDetailsSnapshot: string
+    rejectionReason?: string | null
+    adminNote?: string | null
+    reviewedByAdminId?: string | null
+    reviewedAt?: Date | string | null
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PayoutRequestCreateOrConnectWithoutUserInput = {
+    where: PayoutRequestWhereUniqueInput
+    create: XOR<PayoutRequestCreateWithoutUserInput, PayoutRequestUncheckedCreateWithoutUserInput>
+  }
+
+  export type PayoutRequestCreateManyUserInputEnvelope = {
+    data: PayoutRequestCreateManyUserInput | PayoutRequestCreateManyUserInput[]
+  }
+
+  export type PayoutRequestCreateWithoutReviewedByAdminInput = {
+    id?: string
+    amountCredits: number
+    amountRub: number
+    status?: $Enums.PayoutRequestStatus
+    payoutMethod?: string
+    payoutDetailsSnapshot: string
+    rejectionReason?: string | null
+    adminNote?: string | null
+    reviewedAt?: Date | string | null
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutPayoutRequestsInput
+  }
+
+  export type PayoutRequestUncheckedCreateWithoutReviewedByAdminInput = {
+    id?: string
+    userId: string
+    amountCredits: number
+    amountRub: number
+    status?: $Enums.PayoutRequestStatus
+    payoutMethod?: string
+    payoutDetailsSnapshot: string
+    rejectionReason?: string | null
+    adminNote?: string | null
+    reviewedAt?: Date | string | null
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PayoutRequestCreateOrConnectWithoutReviewedByAdminInput = {
+    where: PayoutRequestWhereUniqueInput
+    create: XOR<PayoutRequestCreateWithoutReviewedByAdminInput, PayoutRequestUncheckedCreateWithoutReviewedByAdminInput>
+  }
+
+  export type PayoutRequestCreateManyReviewedByAdminInputEnvelope = {
+    data: PayoutRequestCreateManyReviewedByAdminInput | PayoutRequestCreateManyReviewedByAdminInput[]
   }
 
   export type SubscriptionCreateWithoutUserInput = {
@@ -31737,6 +33793,58 @@ export namespace Prisma {
     plategaConfirmedAt?: DateTimeNullableFilter<"PaymentRequest"> | Date | string | null
   }
 
+  export type PayoutRequestUpsertWithWhereUniqueWithoutUserInput = {
+    where: PayoutRequestWhereUniqueInput
+    update: XOR<PayoutRequestUpdateWithoutUserInput, PayoutRequestUncheckedUpdateWithoutUserInput>
+    create: XOR<PayoutRequestCreateWithoutUserInput, PayoutRequestUncheckedCreateWithoutUserInput>
+  }
+
+  export type PayoutRequestUpdateWithWhereUniqueWithoutUserInput = {
+    where: PayoutRequestWhereUniqueInput
+    data: XOR<PayoutRequestUpdateWithoutUserInput, PayoutRequestUncheckedUpdateWithoutUserInput>
+  }
+
+  export type PayoutRequestUpdateManyWithWhereWithoutUserInput = {
+    where: PayoutRequestScalarWhereInput
+    data: XOR<PayoutRequestUpdateManyMutationInput, PayoutRequestUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type PayoutRequestScalarWhereInput = {
+    AND?: PayoutRequestScalarWhereInput | PayoutRequestScalarWhereInput[]
+    OR?: PayoutRequestScalarWhereInput[]
+    NOT?: PayoutRequestScalarWhereInput | PayoutRequestScalarWhereInput[]
+    id?: StringFilter<"PayoutRequest"> | string
+    userId?: StringFilter<"PayoutRequest"> | string
+    amountCredits?: IntFilter<"PayoutRequest"> | number
+    amountRub?: IntFilter<"PayoutRequest"> | number
+    status?: EnumPayoutRequestStatusFilter<"PayoutRequest"> | $Enums.PayoutRequestStatus
+    payoutMethod?: StringFilter<"PayoutRequest"> | string
+    payoutDetailsSnapshot?: StringFilter<"PayoutRequest"> | string
+    rejectionReason?: StringNullableFilter<"PayoutRequest"> | string | null
+    adminNote?: StringNullableFilter<"PayoutRequest"> | string | null
+    reviewedByAdminId?: StringNullableFilter<"PayoutRequest"> | string | null
+    reviewedAt?: DateTimeNullableFilter<"PayoutRequest"> | Date | string | null
+    paidAt?: DateTimeNullableFilter<"PayoutRequest"> | Date | string | null
+    createdAt?: DateTimeFilter<"PayoutRequest"> | Date | string
+    updatedAt?: DateTimeFilter<"PayoutRequest"> | Date | string
+  }
+
+  export type PayoutRequestUpsertWithWhereUniqueWithoutReviewedByAdminInput = {
+    where: PayoutRequestWhereUniqueInput
+    update: XOR<PayoutRequestUpdateWithoutReviewedByAdminInput, PayoutRequestUncheckedUpdateWithoutReviewedByAdminInput>
+    create: XOR<PayoutRequestCreateWithoutReviewedByAdminInput, PayoutRequestUncheckedCreateWithoutReviewedByAdminInput>
+  }
+
+  export type PayoutRequestUpdateWithWhereUniqueWithoutReviewedByAdminInput = {
+    where: PayoutRequestWhereUniqueInput
+    data: XOR<PayoutRequestUpdateWithoutReviewedByAdminInput, PayoutRequestUncheckedUpdateWithoutReviewedByAdminInput>
+  }
+
+  export type PayoutRequestUpdateManyWithWhereWithoutReviewedByAdminInput = {
+    where: PayoutRequestScalarWhereInput
+    data: XOR<PayoutRequestUpdateManyMutationInput, PayoutRequestUncheckedUpdateManyWithoutReviewedByAdminInput>
+  }
+
   export type SubscriptionUpsertWithWhereUniqueWithoutUserInput = {
     where: SubscriptionWhereUniqueInput
     update: XOR<SubscriptionUpdateWithoutUserInput, SubscriptionUncheckedUpdateWithoutUserInput>
@@ -31911,11 +34019,14 @@ export namespace Prisma {
     passwordHash: string
     role?: $Enums.Role
     credits?: number
+    reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     referralCodesCreated?: ReferralCodeCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestCreateNestedManyWithoutUserInput
+    payoutRequests?: PayoutRequestCreateNestedManyWithoutUserInput
+    reviewedPayoutRequests?: PayoutRequestCreateNestedManyWithoutReviewedByAdminInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     supportMessages?: SupportMessageCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketCreateNestedManyWithoutUserInput
@@ -31929,11 +34040,14 @@ export namespace Prisma {
     passwordHash: string
     role?: $Enums.Role
     credits?: number
+    reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     referralCodesCreated?: ReferralCodeUncheckedCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseUncheckedCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestUncheckedCreateNestedManyWithoutUserInput
+    payoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutUserInput
+    reviewedPayoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutReviewedByAdminInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     supportMessages?: SupportMessageUncheckedCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketUncheckedCreateNestedManyWithoutUserInput
@@ -31963,11 +34077,14 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     referralCodesCreated?: ReferralCodeUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUpdateManyWithoutUserNestedInput
+    payoutRequests?: PayoutRequestUpdateManyWithoutUserNestedInput
+    reviewedPayoutRequests?: PayoutRequestUpdateManyWithoutReviewedByAdminNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     supportMessages?: SupportMessageUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUpdateManyWithoutUserNestedInput
@@ -31981,11 +34098,14 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     referralCodesCreated?: ReferralCodeUncheckedUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUncheckedUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUncheckedUpdateManyWithoutUserNestedInput
+    payoutRequests?: PayoutRequestUncheckedUpdateManyWithoutUserNestedInput
+    reviewedPayoutRequests?: PayoutRequestUncheckedUpdateManyWithoutReviewedByAdminNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     supportMessages?: SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUncheckedUpdateManyWithoutUserNestedInput
@@ -31999,11 +34119,14 @@ export namespace Prisma {
     passwordHash: string
     role?: $Enums.Role
     credits?: number
+    reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     inviteCodesUsed?: InviteCodeCreateNestedManyWithoutUsedByInput
     referralCodeUse?: ReferralCodeUseCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestCreateNestedManyWithoutUserInput
+    payoutRequests?: PayoutRequestCreateNestedManyWithoutUserInput
+    reviewedPayoutRequests?: PayoutRequestCreateNestedManyWithoutReviewedByAdminInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     supportMessages?: SupportMessageCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketCreateNestedManyWithoutUserInput
@@ -32017,11 +34140,14 @@ export namespace Prisma {
     passwordHash: string
     role?: $Enums.Role
     credits?: number
+    reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     inviteCodesUsed?: InviteCodeUncheckedCreateNestedManyWithoutUsedByInput
     referralCodeUse?: ReferralCodeUseUncheckedCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestUncheckedCreateNestedManyWithoutUserInput
+    payoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutUserInput
+    reviewedPayoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutReviewedByAdminInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     supportMessages?: SupportMessageUncheckedCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketUncheckedCreateNestedManyWithoutUserInput
@@ -32078,11 +34204,14 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     inviteCodesUsed?: InviteCodeUpdateManyWithoutUsedByNestedInput
     referralCodeUse?: ReferralCodeUseUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUpdateManyWithoutUserNestedInput
+    payoutRequests?: PayoutRequestUpdateManyWithoutUserNestedInput
+    reviewedPayoutRequests?: PayoutRequestUpdateManyWithoutReviewedByAdminNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     supportMessages?: SupportMessageUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUpdateManyWithoutUserNestedInput
@@ -32096,11 +34225,14 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     inviteCodesUsed?: InviteCodeUncheckedUpdateManyWithoutUsedByNestedInput
     referralCodeUse?: ReferralCodeUseUncheckedUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUncheckedUpdateManyWithoutUserNestedInput
+    payoutRequests?: PayoutRequestUncheckedUpdateManyWithoutUserNestedInput
+    reviewedPayoutRequests?: PayoutRequestUncheckedUpdateManyWithoutReviewedByAdminNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     supportMessages?: SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUncheckedUpdateManyWithoutUserNestedInput
@@ -32172,11 +34304,14 @@ export namespace Prisma {
     passwordHash: string
     role?: $Enums.Role
     credits?: number
+    reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     inviteCodesUsed?: InviteCodeCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeCreateNestedManyWithoutOwnerUserInput
     paymentRequests?: PaymentRequestCreateNestedManyWithoutUserInput
+    payoutRequests?: PayoutRequestCreateNestedManyWithoutUserInput
+    reviewedPayoutRequests?: PayoutRequestCreateNestedManyWithoutReviewedByAdminInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     supportMessages?: SupportMessageCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketCreateNestedManyWithoutUserInput
@@ -32190,11 +34325,14 @@ export namespace Prisma {
     passwordHash: string
     role?: $Enums.Role
     credits?: number
+    reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     inviteCodesUsed?: InviteCodeUncheckedCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeUncheckedCreateNestedManyWithoutOwnerUserInput
     paymentRequests?: PaymentRequestUncheckedCreateNestedManyWithoutUserInput
+    payoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutUserInput
+    reviewedPayoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutReviewedByAdminInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     supportMessages?: SupportMessageUncheckedCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketUncheckedCreateNestedManyWithoutUserInput
@@ -32259,11 +34397,14 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     inviteCodesUsed?: InviteCodeUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUpdateManyWithoutOwnerUserNestedInput
     paymentRequests?: PaymentRequestUpdateManyWithoutUserNestedInput
+    payoutRequests?: PayoutRequestUpdateManyWithoutUserNestedInput
+    reviewedPayoutRequests?: PayoutRequestUpdateManyWithoutReviewedByAdminNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     supportMessages?: SupportMessageUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUpdateManyWithoutUserNestedInput
@@ -32277,11 +34418,14 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     inviteCodesUsed?: InviteCodeUncheckedUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUncheckedUpdateManyWithoutOwnerUserNestedInput
     paymentRequests?: PaymentRequestUncheckedUpdateManyWithoutUserNestedInput
+    payoutRequests?: PayoutRequestUncheckedUpdateManyWithoutUserNestedInput
+    reviewedPayoutRequests?: PayoutRequestUncheckedUpdateManyWithoutReviewedByAdminNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     supportMessages?: SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUncheckedUpdateManyWithoutUserNestedInput
@@ -32359,12 +34503,15 @@ export namespace Prisma {
     passwordHash: string
     role?: $Enums.Role
     credits?: number
+    reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     inviteCodesUsed?: InviteCodeCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestCreateNestedManyWithoutUserInput
+    payoutRequests?: PayoutRequestCreateNestedManyWithoutUserInput
+    reviewedPayoutRequests?: PayoutRequestCreateNestedManyWithoutReviewedByAdminInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     supportMessages?: SupportMessageCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketCreateNestedManyWithoutUserInput
@@ -32377,12 +34524,15 @@ export namespace Prisma {
     passwordHash: string
     role?: $Enums.Role
     credits?: number
+    reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     inviteCodesUsed?: InviteCodeUncheckedCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeUncheckedCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseUncheckedCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestUncheckedCreateNestedManyWithoutUserInput
+    payoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutUserInput
+    reviewedPayoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutReviewedByAdminInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     supportMessages?: SupportMessageUncheckedCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketUncheckedCreateNestedManyWithoutUserInput
@@ -32444,12 +34594,15 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     inviteCodesUsed?: InviteCodeUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUpdateManyWithoutUserNestedInput
+    payoutRequests?: PayoutRequestUpdateManyWithoutUserNestedInput
+    reviewedPayoutRequests?: PayoutRequestUpdateManyWithoutReviewedByAdminNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     supportMessages?: SupportMessageUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUpdateManyWithoutUserNestedInput
@@ -32462,12 +34615,15 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     inviteCodesUsed?: InviteCodeUncheckedUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUncheckedUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUncheckedUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUncheckedUpdateManyWithoutUserNestedInput
+    payoutRequests?: PayoutRequestUncheckedUpdateManyWithoutUserNestedInput
+    reviewedPayoutRequests?: PayoutRequestUncheckedUpdateManyWithoutReviewedByAdminNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     supportMessages?: SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUncheckedUpdateManyWithoutUserNestedInput
@@ -32480,12 +34636,15 @@ export namespace Prisma {
     passwordHash: string
     role?: $Enums.Role
     credits?: number
+    reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     inviteCodesUsed?: InviteCodeCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestCreateNestedManyWithoutUserInput
+    payoutRequests?: PayoutRequestCreateNestedManyWithoutUserInput
+    reviewedPayoutRequests?: PayoutRequestCreateNestedManyWithoutReviewedByAdminInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     supportMessages?: SupportMessageCreateNestedManyWithoutSenderInput
     promoCodeRedemptions?: PromoCodeRedemptionCreateNestedManyWithoutUserInput
@@ -32498,12 +34657,15 @@ export namespace Prisma {
     passwordHash: string
     role?: $Enums.Role
     credits?: number
+    reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     inviteCodesUsed?: InviteCodeUncheckedCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeUncheckedCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseUncheckedCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestUncheckedCreateNestedManyWithoutUserInput
+    payoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutUserInput
+    reviewedPayoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutReviewedByAdminInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     supportMessages?: SupportMessageUncheckedCreateNestedManyWithoutSenderInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
@@ -32556,12 +34718,15 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     inviteCodesUsed?: InviteCodeUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUpdateManyWithoutUserNestedInput
+    payoutRequests?: PayoutRequestUpdateManyWithoutUserNestedInput
+    reviewedPayoutRequests?: PayoutRequestUpdateManyWithoutReviewedByAdminNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     supportMessages?: SupportMessageUpdateManyWithoutSenderNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUpdateManyWithoutUserNestedInput
@@ -32574,12 +34739,15 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     inviteCodesUsed?: InviteCodeUncheckedUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUncheckedUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUncheckedUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUncheckedUpdateManyWithoutUserNestedInput
+    payoutRequests?: PayoutRequestUncheckedUpdateManyWithoutUserNestedInput
+    reviewedPayoutRequests?: PayoutRequestUncheckedUpdateManyWithoutReviewedByAdminNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     supportMessages?: SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
@@ -32642,12 +34810,15 @@ export namespace Prisma {
     passwordHash: string
     role?: $Enums.Role
     credits?: number
+    reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     inviteCodesUsed?: InviteCodeCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestCreateNestedManyWithoutUserInput
+    payoutRequests?: PayoutRequestCreateNestedManyWithoutUserInput
+    reviewedPayoutRequests?: PayoutRequestCreateNestedManyWithoutReviewedByAdminInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     supportTickets?: SupportTicketCreateNestedManyWithoutUserInput
     promoCodeRedemptions?: PromoCodeRedemptionCreateNestedManyWithoutUserInput
@@ -32660,12 +34831,15 @@ export namespace Prisma {
     passwordHash: string
     role?: $Enums.Role
     credits?: number
+    reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     inviteCodesUsed?: InviteCodeUncheckedCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeUncheckedCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseUncheckedCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestUncheckedCreateNestedManyWithoutUserInput
+    payoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutUserInput
+    reviewedPayoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutReviewedByAdminInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     supportTickets?: SupportTicketUncheckedCreateNestedManyWithoutUserInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
@@ -32734,12 +34908,15 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     inviteCodesUsed?: InviteCodeUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUpdateManyWithoutUserNestedInput
+    payoutRequests?: PayoutRequestUpdateManyWithoutUserNestedInput
+    reviewedPayoutRequests?: PayoutRequestUpdateManyWithoutReviewedByAdminNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     supportTickets?: SupportTicketUpdateManyWithoutUserNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUpdateManyWithoutUserNestedInput
@@ -32752,12 +34929,15 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     inviteCodesUsed?: InviteCodeUncheckedUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUncheckedUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUncheckedUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUncheckedUpdateManyWithoutUserNestedInput
+    payoutRequests?: PayoutRequestUncheckedUpdateManyWithoutUserNestedInput
+    reviewedPayoutRequests?: PayoutRequestUncheckedUpdateManyWithoutReviewedByAdminNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     supportTickets?: SupportTicketUncheckedUpdateManyWithoutUserNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
@@ -32770,11 +34950,14 @@ export namespace Prisma {
     passwordHash: string
     role?: $Enums.Role
     credits?: number
+    reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     inviteCodesUsed?: InviteCodeCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseCreateNestedOneWithoutReferredUserInput
+    payoutRequests?: PayoutRequestCreateNestedManyWithoutUserInput
+    reviewedPayoutRequests?: PayoutRequestCreateNestedManyWithoutReviewedByAdminInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     supportMessages?: SupportMessageCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketCreateNestedManyWithoutUserInput
@@ -32788,11 +34971,14 @@ export namespace Prisma {
     passwordHash: string
     role?: $Enums.Role
     credits?: number
+    reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     inviteCodesUsed?: InviteCodeUncheckedCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeUncheckedCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseUncheckedCreateNestedOneWithoutReferredUserInput
+    payoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutUserInput
+    reviewedPayoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutReviewedByAdminInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     supportMessages?: SupportMessageUncheckedCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketUncheckedCreateNestedManyWithoutUserInput
@@ -32932,11 +35118,14 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     inviteCodesUsed?: InviteCodeUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUpdateOneWithoutReferredUserNestedInput
+    payoutRequests?: PayoutRequestUpdateManyWithoutUserNestedInput
+    reviewedPayoutRequests?: PayoutRequestUpdateManyWithoutReviewedByAdminNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     supportMessages?: SupportMessageUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUpdateManyWithoutUserNestedInput
@@ -32950,11 +35139,14 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     inviteCodesUsed?: InviteCodeUncheckedUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUncheckedUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUncheckedUpdateOneWithoutReferredUserNestedInput
+    payoutRequests?: PayoutRequestUncheckedUpdateManyWithoutUserNestedInput
+    reviewedPayoutRequests?: PayoutRequestUncheckedUpdateManyWithoutReviewedByAdminNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     supportMessages?: SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUncheckedUpdateManyWithoutUserNestedInput
@@ -33221,12 +35413,15 @@ export namespace Prisma {
     passwordHash: string
     role?: $Enums.Role
     credits?: number
+    reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     inviteCodesUsed?: InviteCodeCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestCreateNestedManyWithoutUserInput
+    payoutRequests?: PayoutRequestCreateNestedManyWithoutUserInput
+    reviewedPayoutRequests?: PayoutRequestCreateNestedManyWithoutReviewedByAdminInput
     supportMessages?: SupportMessageCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketCreateNestedManyWithoutUserInput
     promoCodeRedemptions?: PromoCodeRedemptionCreateNestedManyWithoutUserInput
@@ -33239,12 +35434,15 @@ export namespace Prisma {
     passwordHash: string
     role?: $Enums.Role
     credits?: number
+    reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     inviteCodesUsed?: InviteCodeUncheckedCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeUncheckedCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseUncheckedCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestUncheckedCreateNestedManyWithoutUserInput
+    payoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutUserInput
+    reviewedPayoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutReviewedByAdminInput
     supportMessages?: SupportMessageUncheckedCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketUncheckedCreateNestedManyWithoutUserInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
@@ -33375,12 +35573,15 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     inviteCodesUsed?: InviteCodeUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUpdateManyWithoutUserNestedInput
+    payoutRequests?: PayoutRequestUpdateManyWithoutUserNestedInput
+    reviewedPayoutRequests?: PayoutRequestUpdateManyWithoutReviewedByAdminNestedInput
     supportMessages?: SupportMessageUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUpdateManyWithoutUserNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUpdateManyWithoutUserNestedInput
@@ -33393,12 +35594,15 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     inviteCodesUsed?: InviteCodeUncheckedUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUncheckedUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUncheckedUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUncheckedUpdateManyWithoutUserNestedInput
+    payoutRequests?: PayoutRequestUncheckedUpdateManyWithoutUserNestedInput
+    reviewedPayoutRequests?: PayoutRequestUncheckedUpdateManyWithoutReviewedByAdminNestedInput
     supportMessages?: SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUncheckedUpdateManyWithoutUserNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
@@ -33663,18 +35867,221 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type UserCreateWithoutSessionsInput = {
+  export type UserCreateWithoutPayoutRequestsInput = {
     id?: string
     username: string
     passwordHash: string
     role?: $Enums.Role
     credits?: number
+    reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     inviteCodesUsed?: InviteCodeCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestCreateNestedManyWithoutUserInput
+    reviewedPayoutRequests?: PayoutRequestCreateNestedManyWithoutReviewedByAdminInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    supportMessages?: SupportMessageCreateNestedManyWithoutSenderInput
+    supportTickets?: SupportTicketCreateNestedManyWithoutUserInput
+    promoCodeRedemptions?: PromoCodeRedemptionCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutPayoutRequestsInput = {
+    id?: string
+    username: string
+    passwordHash: string
+    role?: $Enums.Role
+    credits?: number
+    reservedCredits?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    inviteCodesUsed?: InviteCodeUncheckedCreateNestedManyWithoutUsedByInput
+    referralCodesCreated?: ReferralCodeUncheckedCreateNestedManyWithoutOwnerUserInput
+    referralCodeUse?: ReferralCodeUseUncheckedCreateNestedOneWithoutReferredUserInput
+    paymentRequests?: PaymentRequestUncheckedCreateNestedManyWithoutUserInput
+    reviewedPayoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutReviewedByAdminInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    supportMessages?: SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+    supportTickets?: SupportTicketUncheckedCreateNestedManyWithoutUserInput
+    promoCodeRedemptions?: PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutPayoutRequestsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutPayoutRequestsInput, UserUncheckedCreateWithoutPayoutRequestsInput>
+  }
+
+  export type UserCreateWithoutReviewedPayoutRequestsInput = {
+    id?: string
+    username: string
+    passwordHash: string
+    role?: $Enums.Role
+    credits?: number
+    reservedCredits?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    inviteCodesUsed?: InviteCodeCreateNestedManyWithoutUsedByInput
+    referralCodesCreated?: ReferralCodeCreateNestedManyWithoutOwnerUserInput
+    referralCodeUse?: ReferralCodeUseCreateNestedOneWithoutReferredUserInput
+    paymentRequests?: PaymentRequestCreateNestedManyWithoutUserInput
+    payoutRequests?: PayoutRequestCreateNestedManyWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    supportMessages?: SupportMessageCreateNestedManyWithoutSenderInput
+    supportTickets?: SupportTicketCreateNestedManyWithoutUserInput
+    promoCodeRedemptions?: PromoCodeRedemptionCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutReviewedPayoutRequestsInput = {
+    id?: string
+    username: string
+    passwordHash: string
+    role?: $Enums.Role
+    credits?: number
+    reservedCredits?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    inviteCodesUsed?: InviteCodeUncheckedCreateNestedManyWithoutUsedByInput
+    referralCodesCreated?: ReferralCodeUncheckedCreateNestedManyWithoutOwnerUserInput
+    referralCodeUse?: ReferralCodeUseUncheckedCreateNestedOneWithoutReferredUserInput
+    paymentRequests?: PaymentRequestUncheckedCreateNestedManyWithoutUserInput
+    payoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    supportMessages?: SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+    supportTickets?: SupportTicketUncheckedCreateNestedManyWithoutUserInput
+    promoCodeRedemptions?: PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutReviewedPayoutRequestsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutReviewedPayoutRequestsInput, UserUncheckedCreateWithoutReviewedPayoutRequestsInput>
+  }
+
+  export type UserUpsertWithoutPayoutRequestsInput = {
+    update: XOR<UserUpdateWithoutPayoutRequestsInput, UserUncheckedUpdateWithoutPayoutRequestsInput>
+    create: XOR<UserCreateWithoutPayoutRequestsInput, UserUncheckedCreateWithoutPayoutRequestsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutPayoutRequestsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutPayoutRequestsInput, UserUncheckedUpdateWithoutPayoutRequestsInput>
+  }
+
+  export type UserUpdateWithoutPayoutRequestsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    inviteCodesUsed?: InviteCodeUpdateManyWithoutUsedByNestedInput
+    referralCodesCreated?: ReferralCodeUpdateManyWithoutOwnerUserNestedInput
+    referralCodeUse?: ReferralCodeUseUpdateOneWithoutReferredUserNestedInput
+    paymentRequests?: PaymentRequestUpdateManyWithoutUserNestedInput
+    reviewedPayoutRequests?: PayoutRequestUpdateManyWithoutReviewedByAdminNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    supportMessages?: SupportMessageUpdateManyWithoutSenderNestedInput
+    supportTickets?: SupportTicketUpdateManyWithoutUserNestedInput
+    promoCodeRedemptions?: PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutPayoutRequestsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    inviteCodesUsed?: InviteCodeUncheckedUpdateManyWithoutUsedByNestedInput
+    referralCodesCreated?: ReferralCodeUncheckedUpdateManyWithoutOwnerUserNestedInput
+    referralCodeUse?: ReferralCodeUseUncheckedUpdateOneWithoutReferredUserNestedInput
+    paymentRequests?: PaymentRequestUncheckedUpdateManyWithoutUserNestedInput
+    reviewedPayoutRequests?: PayoutRequestUncheckedUpdateManyWithoutReviewedByAdminNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    supportMessages?: SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+    supportTickets?: SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+    promoCodeRedemptions?: PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUpsertWithoutReviewedPayoutRequestsInput = {
+    update: XOR<UserUpdateWithoutReviewedPayoutRequestsInput, UserUncheckedUpdateWithoutReviewedPayoutRequestsInput>
+    create: XOR<UserCreateWithoutReviewedPayoutRequestsInput, UserUncheckedCreateWithoutReviewedPayoutRequestsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutReviewedPayoutRequestsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutReviewedPayoutRequestsInput, UserUncheckedUpdateWithoutReviewedPayoutRequestsInput>
+  }
+
+  export type UserUpdateWithoutReviewedPayoutRequestsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    inviteCodesUsed?: InviteCodeUpdateManyWithoutUsedByNestedInput
+    referralCodesCreated?: ReferralCodeUpdateManyWithoutOwnerUserNestedInput
+    referralCodeUse?: ReferralCodeUseUpdateOneWithoutReferredUserNestedInput
+    paymentRequests?: PaymentRequestUpdateManyWithoutUserNestedInput
+    payoutRequests?: PayoutRequestUpdateManyWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    supportMessages?: SupportMessageUpdateManyWithoutSenderNestedInput
+    supportTickets?: SupportTicketUpdateManyWithoutUserNestedInput
+    promoCodeRedemptions?: PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutReviewedPayoutRequestsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    inviteCodesUsed?: InviteCodeUncheckedUpdateManyWithoutUsedByNestedInput
+    referralCodesCreated?: ReferralCodeUncheckedUpdateManyWithoutOwnerUserNestedInput
+    referralCodeUse?: ReferralCodeUseUncheckedUpdateOneWithoutReferredUserNestedInput
+    paymentRequests?: PaymentRequestUncheckedUpdateManyWithoutUserNestedInput
+    payoutRequests?: PayoutRequestUncheckedUpdateManyWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    supportMessages?: SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+    supportTickets?: SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+    promoCodeRedemptions?: PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutSessionsInput = {
+    id?: string
+    username: string
+    passwordHash: string
+    role?: $Enums.Role
+    credits?: number
+    reservedCredits?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    inviteCodesUsed?: InviteCodeCreateNestedManyWithoutUsedByInput
+    referralCodesCreated?: ReferralCodeCreateNestedManyWithoutOwnerUserInput
+    referralCodeUse?: ReferralCodeUseCreateNestedOneWithoutReferredUserInput
+    paymentRequests?: PaymentRequestCreateNestedManyWithoutUserInput
+    payoutRequests?: PayoutRequestCreateNestedManyWithoutUserInput
+    reviewedPayoutRequests?: PayoutRequestCreateNestedManyWithoutReviewedByAdminInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     supportMessages?: SupportMessageCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketCreateNestedManyWithoutUserInput
@@ -33687,12 +36094,15 @@ export namespace Prisma {
     passwordHash: string
     role?: $Enums.Role
     credits?: number
+    reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     inviteCodesUsed?: InviteCodeUncheckedCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeUncheckedCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseUncheckedCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestUncheckedCreateNestedManyWithoutUserInput
+    payoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutUserInput
+    reviewedPayoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutReviewedByAdminInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     supportMessages?: SupportMessageUncheckedCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketUncheckedCreateNestedManyWithoutUserInput
@@ -33721,12 +36131,15 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     inviteCodesUsed?: InviteCodeUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUpdateManyWithoutUserNestedInput
+    payoutRequests?: PayoutRequestUpdateManyWithoutUserNestedInput
+    reviewedPayoutRequests?: PayoutRequestUpdateManyWithoutReviewedByAdminNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     supportMessages?: SupportMessageUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUpdateManyWithoutUserNestedInput
@@ -33739,12 +36152,15 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     credits?: IntFieldUpdateOperationsInput | number
+    reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     inviteCodesUsed?: InviteCodeUncheckedUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUncheckedUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUncheckedUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUncheckedUpdateManyWithoutUserNestedInput
+    payoutRequests?: PayoutRequestUncheckedUpdateManyWithoutUserNestedInput
+    reviewedPayoutRequests?: PayoutRequestUncheckedUpdateManyWithoutReviewedByAdminNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     supportMessages?: SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUncheckedUpdateManyWithoutUserNestedInput
@@ -33798,6 +36214,38 @@ export namespace Prisma {
     plategaStatus?: string | null
     plategaPayloadJson?: string | null
     plategaConfirmedAt?: Date | string | null
+  }
+
+  export type PayoutRequestCreateManyUserInput = {
+    id?: string
+    amountCredits: number
+    amountRub: number
+    status?: $Enums.PayoutRequestStatus
+    payoutMethod?: string
+    payoutDetailsSnapshot: string
+    rejectionReason?: string | null
+    adminNote?: string | null
+    reviewedByAdminId?: string | null
+    reviewedAt?: Date | string | null
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PayoutRequestCreateManyReviewedByAdminInput = {
+    id?: string
+    userId: string
+    amountCredits: number
+    amountRub: number
+    status?: $Enums.PayoutRequestStatus
+    payoutMethod?: string
+    payoutDetailsSnapshot: string
+    rejectionReason?: string | null
+    adminNote?: string | null
+    reviewedAt?: Date | string | null
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type SubscriptionCreateManyUserInput = {
@@ -34019,6 +36467,102 @@ export namespace Prisma {
     plategaStatus?: NullableStringFieldUpdateOperationsInput | string | null
     plategaPayloadJson?: NullableStringFieldUpdateOperationsInput | string | null
     plategaConfirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type PayoutRequestUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amountCredits?: IntFieldUpdateOperationsInput | number
+    amountRub?: IntFieldUpdateOperationsInput | number
+    status?: EnumPayoutRequestStatusFieldUpdateOperationsInput | $Enums.PayoutRequestStatus
+    payoutMethod?: StringFieldUpdateOperationsInput | string
+    payoutDetailsSnapshot?: StringFieldUpdateOperationsInput | string
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reviewedByAdmin?: UserUpdateOneWithoutReviewedPayoutRequestsNestedInput
+  }
+
+  export type PayoutRequestUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amountCredits?: IntFieldUpdateOperationsInput | number
+    amountRub?: IntFieldUpdateOperationsInput | number
+    status?: EnumPayoutRequestStatusFieldUpdateOperationsInput | $Enums.PayoutRequestStatus
+    payoutMethod?: StringFieldUpdateOperationsInput | string
+    payoutDetailsSnapshot?: StringFieldUpdateOperationsInput | string
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedByAdminId?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PayoutRequestUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amountCredits?: IntFieldUpdateOperationsInput | number
+    amountRub?: IntFieldUpdateOperationsInput | number
+    status?: EnumPayoutRequestStatusFieldUpdateOperationsInput | $Enums.PayoutRequestStatus
+    payoutMethod?: StringFieldUpdateOperationsInput | string
+    payoutDetailsSnapshot?: StringFieldUpdateOperationsInput | string
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedByAdminId?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PayoutRequestUpdateWithoutReviewedByAdminInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amountCredits?: IntFieldUpdateOperationsInput | number
+    amountRub?: IntFieldUpdateOperationsInput | number
+    status?: EnumPayoutRequestStatusFieldUpdateOperationsInput | $Enums.PayoutRequestStatus
+    payoutMethod?: StringFieldUpdateOperationsInput | string
+    payoutDetailsSnapshot?: StringFieldUpdateOperationsInput | string
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutPayoutRequestsNestedInput
+  }
+
+  export type PayoutRequestUncheckedUpdateWithoutReviewedByAdminInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    amountCredits?: IntFieldUpdateOperationsInput | number
+    amountRub?: IntFieldUpdateOperationsInput | number
+    status?: EnumPayoutRequestStatusFieldUpdateOperationsInput | $Enums.PayoutRequestStatus
+    payoutMethod?: StringFieldUpdateOperationsInput | string
+    payoutDetailsSnapshot?: StringFieldUpdateOperationsInput | string
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PayoutRequestUncheckedUpdateManyWithoutReviewedByAdminInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    amountCredits?: IntFieldUpdateOperationsInput | number
+    amountRub?: IntFieldUpdateOperationsInput | number
+    status?: EnumPayoutRequestStatusFieldUpdateOperationsInput | $Enums.PayoutRequestStatus
+    payoutMethod?: StringFieldUpdateOperationsInput | string
+    payoutDetailsSnapshot?: StringFieldUpdateOperationsInput | string
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SubscriptionUpdateWithoutUserInput = {

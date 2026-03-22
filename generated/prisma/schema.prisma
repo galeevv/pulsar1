@@ -58,23 +58,34 @@ enum PlategaWebhookLogStatus {
   ERROR
 }
 
+enum PayoutRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PAID
+  CANCELED
+}
+
 model User {
-  id                   String                @id @default(cuid())
-  username             String                @unique
-  passwordHash         String
-  role                 Role                  @default(USER)
-  credits              Int                   @default(0)
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @updatedAt
-  inviteCodesUsed      InviteCode[]          @relation("InviteCodeUsedBy")
-  referralCodesCreated ReferralCode[]        @relation("ReferralCodeOwner")
-  referralCodeUse      ReferralCodeUse?      @relation("ReferralCodeUseByUser")
-  paymentRequests      PaymentRequest[]
-  subscriptions        Subscription[]
-  supportMessages      SupportMessage[]      @relation("SupportMessageSender")
-  supportTickets       SupportTicket[]
-  promoCodeRedemptions PromoCodeRedemption[]
-  sessions             Session[]
+  id                     String                @id @default(cuid())
+  username               String                @unique
+  passwordHash           String
+  role                   Role                  @default(USER)
+  credits                Int                   @default(0)
+  reservedCredits        Int                   @default(0)
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+  inviteCodesUsed        InviteCode[]          @relation("InviteCodeUsedBy")
+  referralCodesCreated   ReferralCode[]        @relation("ReferralCodeOwner")
+  referralCodeUse        ReferralCodeUse?      @relation("ReferralCodeUseByUser")
+  paymentRequests        PaymentRequest[]
+  payoutRequests         PayoutRequest[]       @relation("PayoutRequestUser")
+  reviewedPayoutRequests PayoutRequest[]       @relation("PayoutRequestReviewer")
+  subscriptions          Subscription[]
+  supportMessages        SupportMessage[]      @relation("SupportMessageSender")
+  supportTickets         SupportTicket[]
+  promoCodeRedemptions   PromoCodeRedemption[]
+  sessions               Session[]
 }
 
 model InviteCode {
@@ -156,6 +167,7 @@ model ReferralProgramSettings {
   isEnabled            Boolean  @default(true)
   defaultDiscountPct   Int      @default(50)
   defaultRewardCredits Int      @default(100)
+  minimumPayoutCredits Int      @default(100)
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 }
@@ -370,6 +382,29 @@ model IntegrationSyncLog {
   @@index([provider, createdAt])
   @@index([targetType, targetId])
   @@index([status, createdAt])
+}
+
+model PayoutRequest {
+  id                    String              @id @default(cuid())
+  userId                String
+  user                  User                @relation("PayoutRequestUser", fields: [userId], references: [id], onDelete: Cascade)
+  amountCredits         Int
+  amountRub             Int
+  status                PayoutRequestStatus @default(PENDING)
+  payoutMethod          String              @default("bank_card")
+  payoutDetailsSnapshot String
+  rejectionReason       String?
+  adminNote             String?
+  reviewedByAdminId     String?
+  reviewedByAdmin       User?               @relation("PayoutRequestReviewer", fields: [reviewedByAdminId], references: [id], onDelete: SetNull)
+  reviewedAt            DateTime?
+  paidAt                DateTime?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  @@index([userId, status, createdAt])
+  @@index([status, createdAt])
+  @@index([createdAt])
 }
 
 model Session {

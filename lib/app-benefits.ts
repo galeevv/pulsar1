@@ -1,9 +1,27 @@
-import { prisma } from "@/lib/prisma";
+﻿import { prisma } from "@/lib/prisma";
 
 import { ensureBootstrapData, normalizeCode } from "./auth";
 
 function isExpired(expiresAt: Date | null) {
   return Boolean(expiresAt && expiresAt.getTime() <= Date.now());
+}
+
+export function buildReferralAnalyticsDerived(input: {
+  confirmedInvitedCount: number;
+  credits: number;
+  reservedCredits: number;
+  totalInvitedCount: number;
+}) {
+  const availableCredits = Math.max(0, input.credits - input.reservedCredits);
+  const conversionRatePct =
+    input.totalInvitedCount > 0
+      ? Math.round((input.confirmedInvitedCount / input.totalInvitedCount) * 100)
+      : 0;
+
+  return {
+    availableCredits,
+    conversionRatePct,
+  };
 }
 
 export async function getAppBenefitsData(username: string) {
@@ -41,7 +59,12 @@ export async function getAppBenefitsData(username: string) {
     ownReferralCode,
     approvedPaymentsCount,
     totalInvitedCount,
-    activeInvitedCount,
+    confirmedInvitedCount,
+    rewardedInvitesAggregate,
+    totalPaidOutAggregate,
+    activePayoutRequest,
+    recentPayoutRequests,
+    recentReferralActivity,
   ] = await Promise.all([
     prisma.referralProgramSettings.upsert({
       create: {
@@ -49,6 +72,7 @@ export async function getAppBenefitsData(username: string) {
         defaultRewardCredits: 100,
         id: 1,
         isEnabled: true,
+        minimumPayoutCredits: 100,
       },
       update: {},
       where: { id: 1 },
@@ -88,6 +112,81 @@ export async function getAppBenefitsData(username: string) {
         },
       },
     }),
+    prisma.referralCodeUse.aggregate({
+      _sum: {
+        rewardCreditsSnapshot: true,
+      },
+      where: {
+        referralCode: {
+          ownerUserId: user.id,
+        },
+        rewardGrantedAt: {
+          not: null,
+        },
+      },
+    }),
+    prisma.payoutRequest.aggregate({
+      _sum: {
+        amountCredits: true,
+      },
+      where: {
+        status: "PAID",
+        userId: user.id,
+      },
+    }),
+    prisma.payoutRequest.findFirst({
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        amountCredits: true,
+        amountRub: true,
+        createdAt: true,
+        id: true,
+        status: true,
+      },
+      where: {
+        status: {
+          in: ["PENDING", "APPROVED"],
+        },
+        userId: user.id,
+      },
+    }),
+    prisma.payoutRequest.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        amountCredits: true,
+        amountRub: true,
+        createdAt: true,
+        id: true,
+        rejectionReason: true,
+        status: true,
+      },
+      take: 8,
+      where: {
+        userId: user.id,
+      },
+    }),
+    prisma.referralCodeUse.findMany({
+      include: {
+        referredUser: {
+          select: {
+            username: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 8,
+      where: {
+        referralCode: {
+          ownerUserId: user.id,
+        },
+      },
+    }),
   ]);
 
   const hasApprovedPayment = approvedPaymentsCount > 0;
@@ -97,21 +196,49 @@ export async function getAppBenefitsData(username: string) {
     !hasApprovedPayment && user.referralCodeUse
       ? Math.max(0, Math.min(100, user.referralCodeUse.discountPctSnapshot))
       : 0;
+  const reservedCredits = user.reservedCredits;
+  const { availableCredits, conversionRatePct } = buildReferralAnalyticsDerived({
+    confirmedInvitedCount,
+    credits: user.credits,
+    reservedCredits,
+    totalInvitedCount,
+  });
+  const totalEarnedCredits = rewardedInvitesAggregate._sum.rewardCreditsSnapshot ?? 0;
+  const totalPaidOutCredits = totalPaidOutAggregate._sum.amountCredits ?? 0;
 
   return {
     canGenerateReferralCode,
     firstPurchaseDiscountPct,
     hasApprovedPayment,
     ownReferralCode,
+    payout: {
+      activeRequest: activePayoutRequest,
+      availableCredits,
+      minimumPayoutCredits: referralProgramSettings.minimumPayoutCredits,
+      recentRequests: recentPayoutRequests,
+      reservedCredits,
+      totalPaidOutCredits,
+    },
     promoCodeRedemptions: user.promoCodeRedemptions,
+    recentReferralActivity: recentReferralActivity.map((item) => ({
+      createdAt: item.createdAt,
+      discountPctSnapshot: item.discountPctSnapshot,
+      id: item.id,
+      referredUsername: item.referredUser.username,
+      rewardCreditsSnapshot: item.rewardCreditsSnapshot,
+      rewardGrantedAt: item.rewardGrantedAt,
+    })),
     referralProgramSettings,
     referralStats: {
-      activeInvitedCount,
+      confirmedInvitedCount,
+      conversionRatePct,
+      totalEarnedCredits,
       totalInvitedCount,
     },
     user: {
       credits: user.credits,
       id: user.id,
+      reservedCredits,
       username: user.username,
     },
   };
@@ -167,3 +294,4 @@ export async function validatePromoCodeForUser(userId: string, rawCode: string) 
     promoCode,
   };
 }
+

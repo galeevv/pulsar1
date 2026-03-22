@@ -1,6 +1,6 @@
 ﻿# Pulsar Dev AI Agent Context
 
-Last updated: 2026-03-19
+Last updated: 2026-03-21
 
 ## 1) Назначение
 
@@ -32,6 +32,8 @@ Last updated: 2026-03-19
 5. Invite-code используется строго один раз (atomic updateMany + guard).
 6. Пользователь видит только свои тикеты; admin видит все.
 7. Cookie мутации только в Server Actions/Route Handlers, не в Server Components.
+8. Outgoing referral payouts не смешивать с incoming payments (`/admin/payouts` отдельно от `/admin/payments`).
+9. Для payout использовать `credits + reservedCredits` модель без double-spend.
 
 ## 5) Платежная модель (актуально)
 
@@ -125,7 +127,25 @@ Runbook:
 
 - `docs/migrate-deploy-runbook.md`
 
-## 10) Минимальный workflow для изменений
+## 10) Referral payout domain (новое)
+
+- Пользователь:
+  - withdraw flow внутри referral dialog в `/app`,
+  - создание payout request резервирует кредиты, но не списывает их сразу,
+  - может отменить только свою `PENDING` заявку.
+- Админ:
+  - рабочая очередь выплат в `/admin/payouts`,
+  - действия: approve / reject / mark paid,
+  - `/admin/payments` остается только для входящих оплат сервиса.
+- Статусы `PayoutRequest`:
+  - `PENDING`, `APPROVED`, `REJECTED`, `PAID`, `CANCELED`.
+- Балансовая инвариантность:
+  - create: `reservedCredits += amount`
+  - reject/cancel: `reservedCredits -= amount`
+  - paid: `credits -= amount` и `reservedCredits -= amount`
+- Minimum payout хранится централизованно в `ReferralProgramSettings.minimumPayoutCredits`.
+
+## 11) Минимальный workflow для изменений
 
 1. Проверить `prisma/schema.prisma` и ключевые server-paths.
 2. Внести минимальные изменения без большого рефактора.

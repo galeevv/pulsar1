@@ -126,8 +126,11 @@ export default async function AppPage({
           credits={benefitsData.user.credits}
           hasApprovedPayment={benefitsData.hasApprovedPayment}
           ownReferralCode={benefitsData.ownReferralCode}
+          payout={benefitsData.payout}
           promoCodeRedemptions={benefitsData.promoCodeRedemptions}
+          recentReferralActivity={benefitsData.recentReferralActivity}
           referralProgramSettings={benefitsData.referralProgramSettings}
+          referralStats={benefitsData.referralStats}
           legalDocuments={legalDocuments}
           username={benefitsData.user.username}
           defaultDialog={defaultDashboardDialog}

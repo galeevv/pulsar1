@@ -507,33 +507,6 @@ export function AppTariffsSection({
                   }
                   value={selectedPaymentMethod}
                 >
-                  <label className="block cursor-pointer" htmlFor="payment-method-platega-sbp">
-                    <Card
-                      className={`transition-colors ${
-                        selectedPaymentMethod === "PLATEGA_SBP"
-                          ? "border-primary bg-primary/10"
-                          : "border-border bg-background/40 hover:bg-background/60"
-                      }`}
-                    >
-                      <div className="flex w-full items-start justify-between gap-3 p-3">
-                        <div className="min-w-0 flex-1 space-y-1 leading-snug">
-                          <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
-                            <Smartphone className="size-4" />
-                            СБП
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            Оплата по QR-коду
-                          </p>
-                        </div>
-                        <RadioGroupItem
-                          className="mt-0.5 shrink-0"
-                          id="payment-method-platega-sbp"
-                          value="PLATEGA_SBP"
-                        />
-                      </div>
-                    </Card>
-                  </label>
-
                   <label className="block cursor-pointer" htmlFor="payment-method-platega-card">
                     <Card
                       className={`transition-colors ${
@@ -554,6 +527,31 @@ export function AppTariffsSection({
                           className="mt-0.5 shrink-0"
                           id="payment-method-platega-card"
                           value="PLATEGA_CARD"
+                        />
+                      </div>
+                    </Card>
+                  </label>
+
+                  <label className="block cursor-pointer" htmlFor="payment-method-platega-sbp">
+                    <Card
+                      className={`transition-colors ${
+                        selectedPaymentMethod === "PLATEGA_SBP"
+                          ? "border-primary bg-primary/10"
+                          : "border-border bg-background/40 hover:bg-background/60"
+                      }`}
+                    >
+                      <div className="flex w-full items-start justify-between gap-3 p-3">
+                        <div className="min-w-0 flex-1 space-y-1 leading-snug">
+                          <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+                            <Smartphone className="size-4" />
+                            СБП
+                          </p>
+                          <p className="text-sm text-muted-foreground">Оплата по QR-коду</p>
+                        </div>
+                        <RadioGroupItem
+                          className="mt-0.5 shrink-0"
+                          id="payment-method-platega-sbp"
+                          value="PLATEGA_SBP"
                         />
                       </div>
                     </Card>

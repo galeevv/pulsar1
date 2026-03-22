@@ -7,6 +7,11 @@ import { generateReferralCodeValue } from "@/lib/admin-code-management";
 import { getAppBenefitsData, validatePromoCodeForUser } from "@/lib/app-benefits";
 import { getCurrentSession, normalizeCode } from "@/lib/auth";
 import { handleApprovedPaymentPostProcessing } from "@/lib/payment-post-approval-handler";
+import { PayoutDomainError } from "@/lib/payouts/payout-errors";
+import {
+  cancelOwnPayoutRequest,
+  createPayoutRequestForUser,
+} from "@/lib/payouts/payout-service";
 import { prisma } from "@/lib/prisma";
 import {
   calculateSubscriptionPrice,
@@ -49,6 +54,63 @@ function buildRedirectUrl(params: {
 
 function normalizeDiscountPct(discountPct: number) {
   return Math.max(0, Math.min(100, discountPct));
+}
+
+function mapPayoutErrorToMessage(error: unknown) {
+  if (!(error instanceof PayoutDomainError)) {
+    return "Не удалось выполнить операцию вывода. Попробуйте снова.";
+  }
+
+  if (error.code === "INVALID_AMOUNT") {
+    return "Введите корректную сумму вывода.";
+  }
+
+  if (error.code === "MINIMUM_PAYOUT_NOT_REACHED") {
+    return "Сумма меньше минимального порога вывода.";
+  }
+
+  if (error.code === "INSUFFICIENT_AVAILABLE_CREDITS") {
+    return "Сумма превышает доступный баланс.";
+  }
+
+  if (error.code === "PAYOUT_REQUEST_ALREADY_ACTIVE") {
+    return "У вас уже есть активная заявка на вывод.";
+  }
+
+  if (error.code === "USER_NOT_ELIGIBLE_FOR_PAYOUT") {
+    return "Вывод доступен только после первой подтвержденной оплаты.";
+  }
+
+  if (error.code === "INVALID_PAYOUT_DETAILS") {
+    return "Введите корректные реквизиты выплаты.";
+  }
+
+  if (error.code === "PAYOUT_REQUEST_NOT_FOUND") {
+    return "Заявка на вывод не найдена.";
+  }
+
+  if (error.code === "PAYOUT_STATUS_TRANSITION_FAILED") {
+    return "Не удалось изменить статус заявки. Обновите страницу и повторите попытку.";
+  }
+
+  return error.message;
+}
+
+type InlineDialogActionState = {
+  message: string;
+  nonce: number;
+  status: "error" | "idle" | "success";
+};
+
+function inlineActionResult(
+  status: InlineDialogActionState["status"],
+  message: string
+): InlineDialogActionState {
+  return {
+    message,
+    nonce: Date.now(),
+    status,
+  };
 }
 
 async function getFirstPurchaseReferralDiscountPct(userId: string) {
@@ -214,12 +276,13 @@ export async function generateOwnReferralCodeAction() {
   const appBenefitsData = await getAppBenefitsData(user.username);
 
   if (!appBenefitsData) {
-    redirect(buildRedirectUrl({ dialog: "referral", error: "Пользователь не найден." }));
+    redirect(buildRedirectUrl({ anchor: "", dialog: "referral", error: "Пользователь не найден." }));
   }
 
   if (!appBenefitsData.referralProgramSettings.isEnabled) {
     redirect(
       buildRedirectUrl({
+        anchor: "",
         dialog: "referral",
         error: "Реферальная программа сейчас отключена.",
       })
@@ -229,6 +292,7 @@ export async function generateOwnReferralCodeAction() {
   if (!appBenefitsData.hasApprovedPayment) {
     redirect(
       buildRedirectUrl({
+        anchor: "",
         dialog: "referral",
         error: "Реферальный код доступен после первой подтвержденной оплаты.",
       })
@@ -236,7 +300,13 @@ export async function generateOwnReferralCodeAction() {
   }
 
   if (appBenefitsData.ownReferralCode) {
-    redirect(buildRedirectUrl({ dialog: "referral", error: "У вас уже есть реферальный код." }));
+    redirect(
+      buildRedirectUrl({
+        anchor: "",
+        dialog: "referral",
+        error: "У вас уже есть реферальный код.",
+      })
+    );
   }
 
   const code = normalizeCode(generateReferralCodeValue());
@@ -252,7 +322,104 @@ export async function generateOwnReferralCodeAction() {
   });
 
   revalidatePath("/app");
-  redirect(buildRedirectUrl({ dialog: "referral", notice: "Ваш реферальный код создан." }));
+  redirect(
+    buildRedirectUrl({
+      anchor: "",
+      dialog: "referral",
+      notice: "Ваш реферальный код создан.",
+    })
+  );
+}
+
+export async function createPayoutRequestAction(formData: FormData) {
+  const user = await getUserActor();
+  const amountCredits = Number.parseInt(String(formData.get("amountCredits") ?? ""), 10);
+  const payoutBank = String(formData.get("payoutBank") ?? "").trim();
+  const payoutDestination = String(formData.get("payoutDestination") ?? "").trim();
+  const legacyPayoutDetails = String(formData.get("payoutDetailsSnapshot") ?? "").trim();
+  const allowedBanks = new Set(["Сбербанк", "Альфа-Банк", "Т-Банк", "Ozon Банк"]);
+
+  let payoutDetails = legacyPayoutDetails;
+
+  if (payoutBank || payoutDestination) {
+    if (!payoutBank || !allowedBanks.has(payoutBank) || !payoutDestination) {
+      redirect(
+        buildRedirectUrl({
+          anchor: "",
+          dialog: "referral",
+          error: "Укажите банк и номер телефона или карты.",
+        })
+      );
+    }
+
+    payoutDetails = `Банк: ${payoutBank}\nТелефон или карта: ${payoutDestination}`;
+  }
+
+  try {
+    await createPayoutRequestForUser({
+      amountCredits,
+      payoutDetailsSnapshot: payoutDetails,
+      userId: user.id,
+    });
+  } catch (error) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "",
+        dialog: "referral",
+        error: mapPayoutErrorToMessage(error),
+      })
+    );
+  }
+
+  revalidatePath("/app");
+  revalidatePath("/admin/payouts");
+  redirect(
+    buildRedirectUrl({
+      anchor: "",
+      dialog: "referral",
+      notice: "Заявка на вывод создана. Сумма зарезервирована до решения администратора.",
+    })
+  );
+}
+
+export async function cancelOwnPayoutRequestAction(formData: FormData) {
+  const user = await getUserActor();
+  const payoutRequestId = String(formData.get("payoutRequestId") ?? "").trim();
+
+  if (!payoutRequestId) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "",
+        dialog: "referral",
+        error: "Не удалось определить заявку для отмены.",
+      })
+    );
+  }
+
+  try {
+    await cancelOwnPayoutRequest({
+      payoutRequestId,
+      userId: user.id,
+    });
+  } catch (error) {
+    redirect(
+      buildRedirectUrl({
+        anchor: "",
+        dialog: "referral",
+        error: mapPayoutErrorToMessage(error),
+      })
+    );
+  }
+
+  revalidatePath("/app");
+  revalidatePath("/admin/payouts");
+  redirect(
+    buildRedirectUrl({
+      anchor: "",
+      dialog: "referral",
+      notice: "Заявка на вывод отменена, резерв разморожен.",
+    })
+  );
 }
 
 export async function applyPromoCodeAction(formData: FormData) {
@@ -261,7 +428,7 @@ export async function applyPromoCodeAction(formData: FormData) {
   const validation = await validatePromoCodeForUser(user.id, rawCode);
 
   if (!validation.ok) {
-    redirect(buildRedirectUrl({ dialog: "promo", error: validation.message }));
+    redirect(buildRedirectUrl({ anchor: "", dialog: "promo", error: validation.message }));
   }
 
   await prisma.$transaction([
@@ -284,9 +451,156 @@ export async function applyPromoCodeAction(formData: FormData) {
   revalidatePath("/app");
   redirect(
     buildRedirectUrl({
+      anchor: "",
       dialog: "promo",
       notice: `Промокод применен. Баланс увеличен на ${validation.promoCode.creditAmount} кредитов.`,
     })
+  );
+}
+
+export async function generateOwnReferralCodeInlineAction(
+  prevState: InlineDialogActionState,
+  formData: FormData
+): Promise<InlineDialogActionState> {
+  void prevState;
+  void formData;
+
+  const user = await getUserActor();
+  const appBenefitsData = await getAppBenefitsData(user.username);
+
+  if (!appBenefitsData) {
+    return inlineActionResult("error", "Пользователь не найден.");
+  }
+
+  if (!appBenefitsData.referralProgramSettings.isEnabled) {
+    return inlineActionResult("error", "Реферальная программа сейчас отключена.");
+  }
+
+  if (!appBenefitsData.hasApprovedPayment) {
+    return inlineActionResult("error", "Реферальный код доступен после первой подтвержденной оплаты.");
+  }
+
+  if (appBenefitsData.ownReferralCode) {
+    return inlineActionResult("error", "У вас уже есть реферальный код.");
+  }
+
+  try {
+    const code = normalizeCode(generateReferralCodeValue());
+
+    await prisma.referralCode.create({
+      data: {
+        code,
+        discountPct: appBenefitsData.referralProgramSettings.defaultDiscountPct,
+        isEnabled: true,
+        ownerUserId: user.id,
+        rewardCredits: appBenefitsData.referralProgramSettings.defaultRewardCredits,
+      },
+    });
+  } catch {
+    return inlineActionResult("error", "Не удалось сгенерировать реферальный код. Попробуйте снова.");
+  }
+
+  revalidatePath("/app");
+  return inlineActionResult("success", "Ваш реферальный код создан.");
+}
+
+export async function createPayoutRequestInlineAction(
+  _prevState: InlineDialogActionState,
+  formData: FormData
+): Promise<InlineDialogActionState> {
+  const user = await getUserActor();
+  const amountCredits = Number.parseInt(String(formData.get("amountCredits") ?? ""), 10);
+  const payoutBank = String(formData.get("payoutBank") ?? "").trim();
+  const payoutDestination = String(formData.get("payoutDestination") ?? "").trim();
+  const legacyPayoutDetails = String(formData.get("payoutDetailsSnapshot") ?? "").trim();
+  const allowedBanks = new Set(["Сбербанк", "Альфа-Банк", "Т-Банк", "Ozon Банк"]);
+
+  let payoutDetails = legacyPayoutDetails;
+
+  if (payoutBank || payoutDestination) {
+    if (!payoutBank || !allowedBanks.has(payoutBank) || !payoutDestination) {
+      return inlineActionResult("error", "Укажите банк и номер телефона или карты.");
+    }
+
+    payoutDetails = `Банк: ${payoutBank}\nТелефон или карта: ${payoutDestination}`;
+  }
+
+  try {
+    await createPayoutRequestForUser({
+      amountCredits,
+      payoutDetailsSnapshot: payoutDetails,
+      userId: user.id,
+    });
+  } catch (error) {
+    return inlineActionResult("error", mapPayoutErrorToMessage(error));
+  }
+
+  revalidatePath("/app");
+  revalidatePath("/admin/payouts");
+  return inlineActionResult(
+    "success",
+    "Заявка на вывод создана. Сумма зарезервирована до решения администратора."
+  );
+}
+
+export async function cancelOwnPayoutRequestInlineAction(
+  _prevState: InlineDialogActionState,
+  formData: FormData
+): Promise<InlineDialogActionState> {
+  const user = await getUserActor();
+  const payoutRequestId = String(formData.get("payoutRequestId") ?? "").trim();
+
+  if (!payoutRequestId) {
+    return inlineActionResult("error", "Не удалось определить заявку для отмены.");
+  }
+
+  try {
+    await cancelOwnPayoutRequest({
+      payoutRequestId,
+      userId: user.id,
+    });
+  } catch (error) {
+    return inlineActionResult("error", mapPayoutErrorToMessage(error));
+  }
+
+  revalidatePath("/app");
+  revalidatePath("/admin/payouts");
+  return inlineActionResult("success", "Заявка на вывод отменена, резерв разморожен.");
+}
+
+export async function applyPromoCodeInlineAction(
+  _prevState: InlineDialogActionState,
+  formData: FormData
+): Promise<InlineDialogActionState> {
+  const user = await getUserActor();
+  const rawCode = String(formData.get("code") ?? "");
+  const validation = await validatePromoCodeForUser(user.id, rawCode);
+
+  if (!validation.ok) {
+    return inlineActionResult("error", validation.message);
+  }
+
+  await prisma.$transaction([
+    prisma.promoCodeRedemption.create({
+      data: {
+        promoCodeId: validation.promoCode.id,
+        userId: user.id,
+      },
+    }),
+    prisma.user.update({
+      data: {
+        credits: {
+          increment: validation.promoCode.creditAmount,
+        },
+      },
+      where: { id: user.id },
+    }),
+  ]);
+
+  revalidatePath("/app");
+  return inlineActionResult(
+    "success",
+    `Промокод применен. Баланс увеличен на ${validation.promoCode.creditAmount} кредитов.`
   );
 }
 

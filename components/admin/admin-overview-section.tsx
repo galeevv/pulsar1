@@ -1,7 +1,9 @@
 import { type ComponentType } from "react";
 import {
+  AlertTriangle,
   BadgeCheck,
   BadgeDollarSign,
+  CheckCircle2,
   Headset,
   TrendingDown,
   TrendingUp,
@@ -123,12 +125,27 @@ export function AdminOverviewSection({
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           {cards.map((card) => {
             const Icon = card.icon;
-            const TrendIcon = card.trend >= 0 ? TrendingUp : TrendingDown;
-            const trendLabel =
-              card.trendType === "currency"
+            const isOpenTicketsCard = card.title === "Open Tickets";
+            const hasOpenTickets = openTickets > 0;
+            const TrendIcon = isOpenTicketsCard
+              ? hasOpenTickets
+                ? AlertTriangle
+                : CheckCircle2
+              : card.trend >= 0
+                ? TrendingUp
+                : TrendingDown;
+            const trendLabel = isOpenTicketsCard
+              ? hasOpenTickets
+                ? "needs attention"
+                : "all clear"
+              : card.trendType === "currency"
                 ? formatSignedCurrency(card.trend)
                 : formatSigned(card.trend);
-            const trendColorClass = getTrendColorClass(card.trend);
+            const trendColorClass = isOpenTicketsCard
+              ? hasOpenTickets
+                ? "text-rose-400"
+                : "text-emerald-400"
+              : getTrendColorClass(card.trend);
 
             return (
               <AdminSurface className="p-5 md:p-5" key={card.title}>
@@ -143,7 +160,7 @@ export function AdminOverviewSection({
                   <p className="text-3xl font-semibold leading-none tracking-tight">{card.value}</p>
                   <span className={`inline-flex items-center gap-1 text-xs font-medium ${trendColorClass}`}>
                     <TrendIcon className="size-3.5" />
-                    {trendLabel} {card.trendPeriod}
+                    {isOpenTicketsCard ? trendLabel : `${trendLabel} ${card.trendPeriod}`}
                   </span>
                 </div>
               </AdminSurface>

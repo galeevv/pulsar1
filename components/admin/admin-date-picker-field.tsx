@@ -46,7 +46,17 @@ export function AdminDatePickerField({
   label: string;
   name: string;
 }) {
-  const [selected, setSelected] = useState<Date | undefined>(defaultValue ?? undefined);
+  const [selected, setSelected] = useState<Date | undefined>(() => {
+    if (defaultValue) {
+      return new Date(
+        defaultValue.getFullYear(),
+        defaultValue.getMonth(),
+        defaultValue.getDate()
+      );
+    }
+
+    return getTodayStart();
+  });
 
   const serializedValue = useMemo(
     () => (selected ? toEndOfDayIso(selected) : ""),

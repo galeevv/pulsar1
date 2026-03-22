@@ -172,9 +172,11 @@ export async function updateReferralProgramSettingsAction(formData: FormData) {
   const rawIsEnabled = String(formData.get("isEnabled") ?? "");
   const rawDiscountPct = String(formData.get("defaultDiscountPct") ?? "");
   const rawRewardCredits = String(formData.get("defaultRewardCredits") ?? "");
+  const rawMinimumPayoutCredits = String(formData.get("minimumPayoutCredits") ?? "");
 
   const defaultDiscountPct = Number.parseInt(rawDiscountPct, 10);
   const defaultRewardCredits = Number.parseInt(rawRewardCredits, 10);
+  const minimumPayoutCredits = Number.parseInt(rawMinimumPayoutCredits, 10);
   const isEnabled = rawIsEnabled === "on";
 
   if (!Number.isFinite(defaultDiscountPct) || defaultDiscountPct <= 0 || defaultDiscountPct > 100) {
@@ -195,17 +197,28 @@ export async function updateReferralProgramSettingsAction(formData: FormData) {
     );
   }
 
+  if (!Number.isFinite(minimumPayoutCredits) || minimumPayoutCredits <= 0) {
+    redirect(
+      buildRedirectUrl({
+        path: "/admin/codes?tab=referral",
+        error: "Минимальный вывод должен быть больше 0.",
+      })
+    );
+  }
+
   await prisma.referralProgramSettings.upsert({
     create: {
       defaultDiscountPct,
       defaultRewardCredits,
       id: 1,
       isEnabled,
+      minimumPayoutCredits,
     },
     update: {
       defaultDiscountPct,
       defaultRewardCredits,
       isEnabled,
+      minimumPayoutCredits,
     },
     where: { id: 1 },
   });

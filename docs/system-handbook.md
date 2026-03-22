@@ -1,6 +1,6 @@
 ﻿# Pulsar System Handbook
 
-Last updated: 2026-03-12
+Last updated: 2026-03-21
 
 ## 1) Product Scope (MVP)
 
@@ -147,9 +147,33 @@ Dashboard includes:
 - Promo code redemption adds credits to user balance.
 - Credits can be used directly in constructor checkout (`Оплатить кредитами`).
 
-### 3.8 Support Tickets (Embedded)
+### 3.8 Referral Payout Workflow
 
-- Support is embedded into dashboard `/app` via a single `SupportDialog` (not a separate page).
+- Withdrawals are a dedicated referral domain, separate from incoming service payments.
+- User withdraw flow is inside referral dialog in `/app`.
+- Admin queue is `/admin/payouts` (not `/admin/payments`, not support tickets).
+- Balance model:
+  - `User.credits` = total credits
+  - `User.reservedCredits` = credits reserved for active payout requests
+  - `availableCredits = max(0, credits - reservedCredits)`
+- Payout request lifecycle:
+  - `PENDING -> APPROVED -> PAID`
+  - `PENDING -> REJECTED`
+  - `APPROVED -> REJECTED`
+  - `PENDING -> CANCELED` (user cancel)
+- Financial transitions:
+  - create payout request: reserve only (`reservedCredits += amount`)
+  - reject/cancel: unreserve (`reservedCredits -= amount`)
+  - paid: finalize (`credits -= amount`, `reservedCredits -= amount`)
+- Guards:
+  - minimum payout from `ReferralProgramSettings.minimumPayoutCredits`
+  - only users with first approved payment are eligible
+  - amount must be within available credits
+  - at most one active payout request (`PENDING`/`APPROVED`) per user
+
+### 3.9 Support Tickets (Embedded)
+
+Support is embedded into dashboard `/app` via a single `SupportDialog` (not a separate page).
 - Dialog states:
   - `list`: current user ticket list
   - `create`: create ticket form
@@ -166,11 +190,12 @@ Dashboard includes:
 
 Core entities:
 
-- `User` (`role`, `credits`)
+- `User` (`role`, `credits`, `reservedCredits`)
 - `Session` (server session store)
 - `InviteCode`, `ReferralCode`, `ReferralCodeUse`
 - `PromoCode`, `PromoCodeRedemption`
 - `ReferralProgramSettings`
+- `PayoutRequest` (`PENDING|APPROVED|REJECTED|PAID|CANCELED`)
 - `ServiceCapacitySettings` (`maxActiveSubscriptions`, singleton)
 - `SubscriptionDurationRule` (`months`, `discountPercent`, `isActive`)
 - `SubscriptionPricingSettings` (`minDevices`, `maxDevices`, `baseDeviceMonthlyPrice`, `extraDeviceMonthlyPrice`)
@@ -322,6 +347,7 @@ When updating, do both:
 
 | Date       | Decision | Why |
 |------------|----------|-----|
+| 2026-03-21 | Added referral payout workflow (`reservedCredits`, `PayoutRequest`, `/admin/payouts`, user withdraw in referral dialog) | Separate outgoing withdrawals from incoming payments and make balance transitions atomic/predictable |
 | 2026-03-20 | Hardened Platega runtime config (`PLATEGA_SECRET` primary, callback URLs configurable via `PLATEGA_RETURN_URL` / `PLATEGA_FAILED_URL`) and removed legacy payment server actions from `/app` | Align env model with production integration and reduce legacy runtime surface |
 | 2026-03-20 | Expanded webhook regression tests for unauthorized/invalid/not-found/out-of-order/partial-failure retry scenarios | Increase confidence in idempotency and terminal-state behavior under real webhook retry patterns |
 | 2026-03-07 | Removed legacy `Tariff` model and old tariff admin actions | Finalize transition to constructor-only pricing and eliminate dual-model maintenance risk |

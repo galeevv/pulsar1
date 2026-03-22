@@ -123,6 +123,7 @@ exports.Prisma.UserScalarFieldEnum = {
   passwordHash: 'passwordHash',
   role: 'role',
   credits: 'credits',
+  reservedCredits: 'reservedCredits',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -182,6 +183,7 @@ exports.Prisma.ReferralProgramSettingsScalarFieldEnum = {
   isEnabled: 'isEnabled',
   defaultDiscountPct: 'defaultDiscountPct',
   defaultRewardCredits: 'defaultRewardCredits',
+  minimumPayoutCredits: 'minimumPayoutCredits',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -352,6 +354,23 @@ exports.Prisma.IntegrationSyncLogScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.PayoutRequestScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  amountCredits: 'amountCredits',
+  amountRub: 'amountRub',
+  status: 'status',
+  payoutMethod: 'payoutMethod',
+  payoutDetailsSnapshot: 'payoutDetailsSnapshot',
+  rejectionReason: 'rejectionReason',
+  adminNote: 'adminNote',
+  reviewedByAdminId: 'reviewedByAdminId',
+  reviewedAt: 'reviewedAt',
+  paidAt: 'paidAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SessionScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -420,6 +439,14 @@ exports.IntegrationSyncStatus = exports.$Enums.IntegrationSyncStatus = {
   ERROR: 'ERROR'
 };
 
+exports.PayoutRequestStatus = exports.$Enums.PayoutRequestStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  PAID: 'PAID',
+  CANCELED: 'CANCELED'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   InviteCode: 'InviteCode',
@@ -439,6 +466,7 @@ exports.Prisma.ModelName = {
   Subscription: 'Subscription',
   DeviceSlot: 'DeviceSlot',
   IntegrationSyncLog: 'IntegrationSyncLog',
+  PayoutRequest: 'PayoutRequest',
   Session: 'Session'
 };
 

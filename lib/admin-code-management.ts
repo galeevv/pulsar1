@@ -115,6 +115,7 @@ export async function getAdminDashboardData() {
           defaultRewardCredits: 100,
           id: 1,
           isEnabled: true,
+          minimumPayoutCredits: 100,
         },
         update: {},
         where: { id: 1 },
