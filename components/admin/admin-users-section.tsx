@@ -1,10 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { toast } from "sonner";
 
+import { resetUserPasswordAction } from "@/app/admin/users/actions";
 import { AdminStatusPill } from "@/components/admin/admin-status-pill";
 import { AdminSectionShell } from "@/components/admin/admin-section-shell";
 import { AdminSurface } from "@/components/admin/admin-surface";
@@ -74,6 +76,18 @@ type FiltersData = {
   query: string;
   sort: UsersSort;
   subscription: SubscriptionFilter;
+};
+
+type ResetPasswordActionState = {
+  message: string;
+  nonce: number;
+  status: "error" | "idle" | "success";
+};
+
+const RESET_PASSWORD_INITIAL_STATE: ResetPasswordActionState = {
+  message: "",
+  nonce: 0,
+  status: "idle",
 };
 
 function formatDate(value: string) {
@@ -154,6 +168,79 @@ function buildPaginationItems(currentPage: number, totalPages: number) {
   }
 
   return result;
+}
+
+function UserPasswordResetForm({
+  userId,
+  username,
+}: {
+  userId: string;
+  username: string;
+}) {
+  const formRef = useRef<HTMLFormElement>(null);
+  const handledNonceRef = useRef(0);
+  const [state, formAction, isPending] = useActionState(
+    resetUserPasswordAction,
+    RESET_PASSWORD_INITIAL_STATE
+  );
+
+  useEffect(() => {
+    if (state.nonce === 0 || state.nonce === handledNonceRef.current) {
+      return;
+    }
+
+    handledNonceRef.current = state.nonce;
+
+    if (state.status === "success") {
+      toast.success(state.message, { position: "bottom-right" });
+      formRef.current?.reset();
+      return;
+    }
+
+    if (state.status === "error") {
+      toast.error(state.message, { position: "bottom-right" });
+    }
+  }, [state]);
+
+  return (
+    <form action={formAction} className="space-y-3" ref={formRef}>
+      <input name="userId" type="hidden" value={userId} />
+
+      <div className="space-y-2">
+        <label className="block text-sm font-medium" htmlFor={`user-reset-password-${userId}`}>
+          Новый пароль для {username}
+        </label>
+        <Input
+          autoComplete="new-password"
+          id={`user-reset-password-${userId}`}
+          minLength={8}
+          name="nextPassword"
+          placeholder="Минимум 8 символов"
+          required
+          type="password"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <label className="block text-sm font-medium" htmlFor={`user-reset-password-confirm-${userId}`}>
+          Подтверждение пароля
+        </label>
+        <Input
+          autoComplete="new-password"
+          id={`user-reset-password-confirm-${userId}`}
+          minLength={8}
+          name="nextPasswordConfirmation"
+          placeholder="Повторите новый пароль"
+          required
+          type="password"
+        />
+      </div>
+
+      <Button className="w-full sm:w-auto" disabled={isPending} radius="card" type="submit">
+        {isPending ? "Обновляем пароль..." : "Сбросить пароль"}
+      </Button>
+    </form>
+  );
 }
 
 export function AdminUsersSection({
@@ -492,6 +579,18 @@ export function AdminUsersSection({
 
               <div className="rounded-card border border-dashed border-border/70 bg-background/20 p-4 text-sm text-muted-foreground">
                 Tickets / audit / device management placeholder.
+              </div>
+
+              <div className="rounded-card border border-border/70 bg-background/35 p-4">
+                <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
+                  Password reset
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Установите новый пароль пользователю. После сброса все его активные сессии будут завершены.
+                </p>
+                <div className="mt-4">
+                  <UserPasswordResetForm userId={selectedUser.id} username={selectedUser.username} />
+                </div>
               </div>
 
               <div className="flex justify-end">
