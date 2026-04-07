@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import { useMemo, useState, type ComponentType } from "react";
+import { useMemo, useState, type ComponentType } from "react"
 
 import {
   Apple,
@@ -13,10 +13,10 @@ import {
   Monitor,
   Settings2,
   Smartphone,
-} from "lucide-react";
-import { toast } from "sonner";
+} from "lucide-react"
+import { toast } from "sonner"
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -24,11 +24,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/components/ui/dialog"
 
-type SetupStep = "start" | "choose-device" | "install-app" | "subscription" | "done";
-type DevicePlatform = "Android" | "iOS" | "Windows" | "MacOS";
-type InstallReturnStep = "start" | "choose-device";
+type SetupStep = "start" | "choose-device" | "install-app" | "subscription" | "done"
+type DevicePlatform = "Android" | "iOS" | "Windows" | "MacOS"
+type InstallReturnStep = "start" | "choose-device"
 
 const APP_LINKS: Record<DevicePlatform, string> = {
   Android: "https://play.google.com/store/apps/details?id=com.happproxy",
@@ -36,133 +36,137 @@ const APP_LINKS: Record<DevicePlatform, string> = {
   MacOS: "https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973",
   Windows:
     "https://github.com/Happ-proxy/happ-desktop/releases/latest/download/setup-Happ.x64.exe",
-};
+}
 
 const DEVICE_OPTIONS: Array<{
-  icon: ComponentType<{ className?: string }>;
-  platform: DevicePlatform;
+  icon: ComponentType<{ className?: string }>
+  platform: DevicePlatform
 }> = [
   { icon: Smartphone, platform: "Android" },
   { icon: Apple, platform: "iOS" },
   { icon: Monitor, platform: "Windows" },
   { icon: Laptop, platform: "MacOS" },
-];
+]
 
 function detectCurrentPlatform(): DevicePlatform {
   if (typeof navigator === "undefined") {
-    return "Windows";
+    return "Windows"
   }
 
-  const ua = navigator.userAgent.toLowerCase();
+  const ua = navigator.userAgent.toLowerCase()
 
   if (ua.includes("android")) {
-    return "Android";
+    return "Android"
   }
 
   if (ua.includes("iphone") || ua.includes("ipad") || ua.includes("ipod")) {
-    return "iOS";
+    return "iOS"
   }
 
   if (ua.includes("mac os")) {
-    return "MacOS";
+    return "MacOS"
   }
 
-  return "Windows";
+  return "Windows"
 }
 
 function formatSubscriptionUrlForDisplay(url: string | null, tokenLength: number) {
   if (!url) {
-    return "Ссылка пока недоступна";
+    return "Ссылка пока недоступна"
   }
 
-  const marker = "/sub/";
-  const markerIndex = url.indexOf(marker);
+  const marker = "/sub/"
+  const markerIndex = url.indexOf(marker)
 
   if (markerIndex === -1) {
-    return url.length > 44 ? `${url.slice(0, 44)}...` : url;
+    return url.length > 44 ? `${url.slice(0, 44)}...` : url
   }
 
-  const tokenStart = markerIndex + marker.length;
-  const token = url.slice(tokenStart);
+  const tokenStart = markerIndex + marker.length
+  const token = url.slice(tokenStart)
 
   if (token.length <= tokenLength) {
-    return url;
+    return url
   }
 
-  return `${url.slice(0, tokenStart)}${token.slice(0, tokenLength)}...`;
+  return `${url.slice(0, tokenStart)}${token.slice(0, tokenLength)}...`
 }
 
 function StepIcon({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mx-auto inline-flex size-20 items-center justify-center rounded-card border border-border bg-background/60">
+    <div className="mx-auto inline-flex size-18 items-center justify-center rounded-card border border-border bg-background/60 sm:size-20">
       {children}
     </div>
-  );
+  )
 }
 
 export function AppSetupDialog({
   defaultOpen = false,
   showTrigger = true,
   subscriptionUrl,
+  triggerLabel = "Настроить VPN",
+  triggerVariant = "outline",
 }: {
-  defaultOpen?: boolean;
-  showTrigger?: boolean;
-  subscriptionUrl: string | null;
+  defaultOpen?: boolean
+  showTrigger?: boolean
+  subscriptionUrl: string | null
+  triggerLabel?: string
+  triggerVariant?: "default" | "destructive" | "ghost" | "link" | "outline" | "secondary"
 }) {
-  const currentPlatform = useMemo(() => detectCurrentPlatform(), []);
-  const [open, setOpen] = useState(defaultOpen);
-  const [step, setStep] = useState<SetupStep>("start");
-  const [selectedPlatform, setSelectedPlatform] = useState<DevicePlatform>(currentPlatform);
-  const [installReturnStep, setInstallReturnStep] = useState<InstallReturnStep>("start");
+  const currentPlatform = useMemo(() => detectCurrentPlatform(), [])
+  const [open, setOpen] = useState(defaultOpen)
+  const [step, setStep] = useState<SetupStep>("start")
+  const [selectedPlatform, setSelectedPlatform] = useState<DevicePlatform>(currentPlatform)
+  const [installReturnStep, setInstallReturnStep] = useState<InstallReturnStep>("start")
 
   function handleOpenChange(nextOpen: boolean) {
-    setOpen(nextOpen);
+    setOpen(nextOpen)
 
     if (nextOpen) {
-      setStep("start");
-      setSelectedPlatform(currentPlatform);
-      setInstallReturnStep("start");
+      setStep("start")
+      setSelectedPlatform(currentPlatform)
+      setInstallReturnStep("start")
     }
   }
 
   function handleBack() {
     if (step === "choose-device") {
-      setStep("start");
-      return;
+      setStep("start")
+      return
     }
 
     if (step === "install-app") {
-      setStep(installReturnStep);
-      return;
+      setStep(installReturnStep)
+      return
     }
 
     if (step === "subscription") {
-      setStep("install-app");
-      return;
+      setStep("install-app")
+      return
     }
 
     if (step === "done") {
-      setStep("subscription");
+      setStep("subscription")
     }
   }
 
   async function copySubscriptionUrl() {
     if (!subscriptionUrl) {
-      toast.error("Ссылка подписки пока недоступна.", { position: "bottom-right" });
-      return;
+      toast.error("Ссылка подписки пока недоступна.", { position: "top-right" })
+      return
     }
 
     try {
-      await navigator.clipboard.writeText(subscriptionUrl);
-      toast.success("Ссылка подписки скопирована.", { position: "bottom-right" });
+      await navigator.clipboard.writeText(subscriptionUrl)
+      toast.success("Ссылка подписки скопирована.", { position: "top-right" })
     } catch {
-      toast.error("Не удалось скопировать ссылку.", { position: "bottom-right" });
+      toast.error("Не удалось скопировать ссылку.", { position: "top-right" })
     }
   }
 
-  const showBackButton = step !== "start";
-  const displaySubscriptionUrlMobile = formatSubscriptionUrlForDisplay(subscriptionUrl, 8);
-  const displaySubscriptionUrlDesktop = formatSubscriptionUrlForDisplay(subscriptionUrl, 20);
+  const showBackButton = step !== "start"
+  const displaySubscriptionUrlMobile = formatSubscriptionUrlForDisplay(subscriptionUrl, 8)
+  const displaySubscriptionUrlDesktop = formatSubscriptionUrlForDisplay(subscriptionUrl, 20)
 
   return (
     <Dialog onOpenChange={handleOpenChange} open={open}>
@@ -173,19 +177,20 @@ export function AppSetupDialog({
             disabled={!subscriptionUrl}
             radius="card"
             type="button"
+            variant={triggerVariant}
           >
-            <Settings2 className="size-4" />
-            Установка и настройка
+            <Settings2 data-icon="inline-start" />
+            {triggerLabel}
           </Button>
         </DialogTrigger>
       ) : null}
 
-      <DialogContent className="max-h-[calc(100svh-1rem)] overflow-y-auto p-4 sm:max-w-lg sm:p-6">
-        <div className="space-y-4 text-center sm:space-y-5">
+      <DialogContent className="w-[calc(100%-12px)] max-h-[calc(100svh-1rem)] overflow-y-auto p-4 sm:w-full sm:max-w-md sm:p-5">
+        <div className="mx-auto flex w-full max-w-sm flex-col gap-4 text-center sm:gap-5">
           {showBackButton ? (
             <div className="flex justify-start">
               <Button onClick={handleBack} radius="card" size="icon-sm" type="button" variant="ghost">
-                <ArrowLeft className="size-4" />
+                <ArrowLeft />
                 <span className="sr-only">Вернуться на предыдущий этап</span>
               </Button>
             </div>
@@ -194,12 +199,12 @@ export function AppSetupDialog({
           {step === "start" ? (
             <>
               <StepIcon>
-                <Settings2 className="size-9 text-foreground sm:size-11" />
+                <Settings2 className="size-8 text-foreground sm:size-10" />
               </StepIcon>
 
-              <DialogHeader className="items-center text-center sm:text-center">
+              <DialogHeader className="items-center text-center">
                 <DialogTitle>Настройка на {currentPlatform}</DialogTitle>
-                <DialogDescription className="w-full max-w-none sm:max-w-md">
+                <DialogDescription className="w-full max-w-none">
                   Выберите сценарий установки Happ для текущего или другого устройства.
                 </DialogDescription>
               </DialogHeader>
@@ -208,9 +213,9 @@ export function AppSetupDialog({
                 <Button
                   className="h-button w-full px-button-x"
                   onClick={() => {
-                    setSelectedPlatform(currentPlatform);
-                    setInstallReturnStep("start");
-                    setStep("install-app");
+                    setSelectedPlatform(currentPlatform)
+                    setInstallReturnStep("start")
+                    setStep("install-app")
                   }}
                   radius="card"
                   type="button"
@@ -233,37 +238,37 @@ export function AppSetupDialog({
           {step === "choose-device" ? (
             <>
               <StepIcon>
-                <Smartphone className="size-9 text-foreground sm:size-11" />
+                <Smartphone className="size-8 text-foreground sm:size-10" />
               </StepIcon>
 
-              <DialogHeader className="items-center text-center sm:text-center">
+              <DialogHeader className="items-center text-center">
                 <DialogTitle>Выберите устройство</DialogTitle>
-                <DialogDescription className="w-full max-w-none sm:max-w-md">
+                <DialogDescription className="w-full max-w-none">
                   Выберите операционную систему вашего устройства.
                 </DialogDescription>
               </DialogHeader>
 
               <div className="flex w-full flex-col gap-3">
                 {DEVICE_OPTIONS.map((item) => {
-                  const Icon = item.icon;
+                  const Icon = item.icon
 
                   return (
                     <Button
                       key={item.platform}
                       className="h-button w-full px-button-x"
                       onClick={() => {
-                        setSelectedPlatform(item.platform);
-                        setInstallReturnStep("choose-device");
-                        setStep("install-app");
+                        setSelectedPlatform(item.platform)
+                        setInstallReturnStep("choose-device")
+                        setStep("install-app")
                       }}
                       radius="card"
                       type="button"
                       variant="outline"
                     >
-                      <Icon className="size-4" />
+                      <Icon data-icon="inline-start" />
                       {item.platform}
                     </Button>
-                  );
+                  )
                 })}
               </div>
             </>
@@ -272,12 +277,12 @@ export function AppSetupDialog({
           {step === "install-app" ? (
             <>
               <StepIcon>
-                <Download className="size-9 text-foreground sm:size-11" />
+                <Download className="size-8 text-foreground sm:size-10" />
               </StepIcon>
 
-              <DialogHeader className="items-center text-center sm:text-center">
+              <DialogHeader className="items-center text-center">
                 <DialogTitle>Приложение</DialogTitle>
-                <DialogDescription className="w-full max-w-none sm:max-w-md">
+                <DialogDescription className="w-full max-w-none">
                   Установите приложение Happ и вернитесь к этому экрану.
                 </DialogDescription>
               </DialogHeader>
@@ -285,7 +290,7 @@ export function AppSetupDialog({
               <div className="flex w-full flex-col gap-3">
                 <Button asChild className="h-button w-full px-button-x" radius="card" type="button">
                   <a href={APP_LINKS[selectedPlatform]} rel="noreferrer" target="_blank">
-                    <Download className="size-4" />
+                    <Download data-icon="inline-start" />
                     Установить
                   </a>
                 </Button>
@@ -305,10 +310,10 @@ export function AppSetupDialog({
           {step === "subscription" ? (
             <>
               <StepIcon>
-                <Link2 className="size-9 text-foreground sm:size-11" />
+                <Link2 className="size-8 text-foreground sm:size-10" />
               </StepIcon>
 
-              <DialogHeader className="items-center text-center sm:text-center">
+              <DialogHeader className="items-center text-center">
                 <DialogTitle>Подписка</DialogTitle>
                 <DialogDescription className="w-full max-w-none">
                   Добавьте подписку в Happ через кнопку ниже или вставьте ссылку вручную.
@@ -316,7 +321,7 @@ export function AppSetupDialog({
               </DialogHeader>
 
               <Button
-                className="mb-3 h-button w-full min-w-0 justify-between overflow-hidden px-button-x"
+                className="h-button w-full min-w-0 justify-between overflow-hidden px-button-x"
                 onClick={copySubscriptionUrl}
                 radius="card"
                 type="button"
@@ -328,15 +333,15 @@ export function AppSetupDialog({
                 <span className="hidden min-w-0 flex-1 truncate text-left sm:block">
                   {displaySubscriptionUrlDesktop}
                 </span>
-                <Copy className="size-4 shrink-0" />
+                <Copy data-icon="inline-end" />
               </Button>
 
-              <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="flex w-full flex-col gap-3">
                 <Button
                   className="h-button w-full px-button-x"
                   onClick={() =>
                     toast.info("Функция автоматического добавления будет добавлена позже.", {
-                      position: "bottom-right",
+                      position: "top-right",
                     })
                   }
                   radius="card"
@@ -361,30 +366,24 @@ export function AppSetupDialog({
           {step === "done" ? (
             <>
               <StepIcon>
-                <CheckCircle2 className="size-9 text-foreground sm:size-11" />
+                <CheckCircle2 className="size-8 text-foreground sm:size-10" />
               </StepIcon>
 
-              <DialogHeader className="items-center text-center sm:text-center">
+              <DialogHeader className="items-center text-center">
                 <DialogTitle>Готово</DialogTitle>
-                <DialogDescription className="w-full max-w-none sm:max-w-md">
+                <DialogDescription className="w-full max-w-none">
                   Нажмите кнопку включения в приложении Happ.
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="flex w-full flex-col gap-3">
-                <Button
-                  className="h-button w-full px-button-x"
-                  onClick={() => setOpen(false)}
-                  radius="card"
-                  type="button"
-                >
-                  Завершить настройку
-                </Button>
-              </div>
+              <Button className="h-button w-full px-button-x" onClick={() => setOpen(false)} radius="card" type="button">
+                Завершить настройку
+              </Button>
             </>
           ) : null}
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
+

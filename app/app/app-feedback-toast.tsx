@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef } from "react";
 
@@ -16,15 +16,16 @@ export function AppFeedbackToast({
   useEffect(() => {
     if (notice && shownRef.current !== `notice:${notice}`) {
       shownRef.current = `notice:${notice}`;
-      toast.success(notice, { position: "bottom-right" });
+      toast.success(notice, { position: "top-right" });
       return;
     }
 
     if (error && shownRef.current !== `error:${error}`) {
       shownRef.current = `error:${error}`;
-      toast.error(error, { position: "bottom-right" });
+      toast.error(error, { position: "top-right" });
     }
   }, [error, notice]);
 
   return null;
 }
+

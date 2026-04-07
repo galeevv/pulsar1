@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Copy } from "lucide-react";
 import { toast } from "sonner";
@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 
 function formatSubscriptionUrlForDisplay(url: string | null, tokenLength: number) {
   if (!url) {
-    return "Ссылка пока недоступна";
+    return "РЎСЃС‹Р»РєР° РїРѕРєР° РЅРµРґРѕСЃС‚СѓРїРЅР°";
   }
 
   const marker = "/sub/";
@@ -42,9 +42,9 @@ export function AppCopySubscriptionButton({
 
     try {
       await navigator.clipboard.writeText(subscriptionUrl);
-      toast.success("Ссылка подписки скопирована.", { position: "bottom-right" });
+      toast.success("РЎСЃС‹Р»РєР° РїРѕРґРїРёСЃРєРё СЃРєРѕРїРёСЂРѕРІР°РЅР°.", { position: "top-right" });
     } catch {
-      toast.error("Не удалось скопировать ссылку.", { position: "bottom-right" });
+      toast.error("РќРµ СѓРґР°Р»РѕСЃСЊ СЃРєРѕРїРёСЂРѕРІР°С‚СЊ СЃСЃС‹Р»РєСѓ.", { position: "top-right" });
     }
   }
 
@@ -67,3 +67,4 @@ export function AppCopySubscriptionButton({
     </Button>
   );
 }
+

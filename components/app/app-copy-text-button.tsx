@@ -22,9 +22,9 @@ export function AppCopyTextButton({
   async function handleCopy() {
     try {
       await navigator.clipboard.writeText(value);
-      toast.success(successMessage, { position: "bottom-right" });
+      toast.success(successMessage, { position: "top-right" });
     } catch {
-      toast.error(errorMessage, { position: "bottom-right" });
+      toast.error(errorMessage, { position: "top-right" });
     }
   }
 
@@ -35,3 +35,4 @@ export function AppCopyTextButton({
     </Button>
   );
 }
+

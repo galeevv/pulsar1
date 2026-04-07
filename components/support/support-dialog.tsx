@@ -79,7 +79,7 @@ export function SupportDialog() {
       setTickets(payload.tickets);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Не удалось загрузить тикеты.", {
-        position: "bottom-right",
+        position: "top-right",
       });
     } finally {
       setListLoading(false);
@@ -97,7 +97,7 @@ export function SupportDialog() {
     } catch (error) {
       setActiveTicket(null);
       toast.error(error instanceof Error ? error.message : "Не удалось загрузить тикет.", {
-        position: "bottom-right",
+        position: "top-right",
       });
     } finally {
       setDetailLoading(false);
@@ -128,14 +128,14 @@ export function SupportDialog() {
         body: JSON.stringify(payload),
         method: "POST",
       });
-      toast.success("Тикет успешно отправлен.", { position: "bottom-right" });
+      toast.success("Тикет успешно отправлен.", { position: "top-right" });
 
       setView("detail");
       setActiveTicketId(response.ticketId);
       await Promise.all([loadTickets(), loadTicketDetail(response.ticketId)]);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Не удалось создать тикет.", {
-        position: "bottom-right",
+        position: "top-right",
       });
     } finally {
       setCreateSubmitting(false);
@@ -163,7 +163,7 @@ export function SupportDialog() {
       await Promise.all([loadTicketDetail(activeTicketId), loadTickets()]);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Не удалось отправить сообщение.", {
-        position: "bottom-right",
+        position: "top-right",
       });
     } finally {
       setMessageSubmitting(false);
@@ -210,7 +210,7 @@ export function SupportDialog() {
       <DialogTrigger asChild>
         <Button className="h-button w-full px-button-x" radius="card" type="button" variant="outline">
           <Headset className="size-4" />
-          Свзяться с поддержкой
+          Связаться с поддержкой
         </Button>
       </DialogTrigger>
 
@@ -241,3 +241,4 @@ export function SupportDialog() {
     </Dialog>
   );
 }
+

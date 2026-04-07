@@ -283,7 +283,7 @@ export function AppTariffsSection({
     } catch (error) {
       setIsCreatingPlategaPayment(false);
       toast.error(error instanceof Error ? error.message : "Не удалось создать платеж в Platega.", {
-        position: "bottom-right",
+        position: "top-right",
       });
     }
   }
@@ -650,3 +650,4 @@ export function AppTariffsSection({
     </AppSectionShell>
   );
 }
+

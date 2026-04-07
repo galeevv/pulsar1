@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useActionState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -47,7 +47,7 @@ function useInlineDialogActionFeedback(
     handledNonceRef.current = state.nonce;
 
     if (state.status === "success") {
-      toast.success(state.message, { position: "bottom-right" });
+      toast.success(state.message, { position: "top-right" });
       if (refreshOnSuccess) {
         router.refresh();
       }
@@ -55,7 +55,7 @@ function useInlineDialogActionFeedback(
     }
 
     if (state.status === "error") {
-      toast.error(state.message, { position: "bottom-right" });
+      toast.error(state.message, { position: "top-right" });
     }
   }, [refreshOnSuccess, router, state]);
 }
@@ -81,11 +81,11 @@ export function PromoCodeApplyForm() {
         <label className="mb-2 block text-sm font-medium" htmlFor="dashboard-promo-code-input">
           PromoCode
         </label>
-        <Input id="dashboard-promo-code-input" name="code" placeholder="Введите промокод" required />
+        <Input id="dashboard-promo-code-input" name="code" placeholder="Р’РІРµРґРёС‚Рµ РїСЂРѕРјРѕРєРѕРґ" required />
       </div>
 
       <Button className="h-button w-full px-button-x" disabled={isPending} radius="card" type="submit">
-        {isPending ? "Применяем..." : "Применить промокод"}
+        {isPending ? "РџСЂРёРјРµРЅСЏРµРј..." : "РџСЂРёРјРµРЅРёС‚СЊ РїСЂРѕРјРѕРєРѕРґ"}
       </Button>
     </form>
   );
@@ -111,7 +111,7 @@ export function GenerateReferralCodeForm({
         radius="card"
         type="submit"
       >
-        {isPending ? "Генерация..." : "Сгенерировать ReferralCode"}
+        {isPending ? "Р“РµРЅРµСЂР°С†РёСЏ..." : "РЎРіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ ReferralCode"}
       </Button>
     </form>
   );
@@ -140,29 +140,29 @@ export function CreatePayoutRequestForm({
     <form action={formAction} className="space-y-3" ref={formRef}>
       <div className="space-y-2">
         <label className="block text-sm font-medium" htmlFor="withdraw-bank">
-          Выберите банк
+          Р’С‹Р±РµСЂРёС‚Рµ Р±Р°РЅРє
         </label>
-        <Select defaultValue="Сбербанк" name="payoutBank" required>
+        <Select defaultValue="РЎР±РµСЂР±Р°РЅРє" name="payoutBank" required>
           <SelectTrigger id="withdraw-bank">
-            <SelectValue placeholder="Выберите банк" />
+            <SelectValue placeholder="Р’С‹Р±РµСЂРёС‚Рµ Р±Р°РЅРє" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="Сбербанк">Сбербанк</SelectItem>
-            <SelectItem value="Альфа-Банк">Альфа-Банк</SelectItem>
-            <SelectItem value="Т-Банк">Т-Банк</SelectItem>
-            <SelectItem value="Ozon Банк">Ozon Банк</SelectItem>
+            <SelectItem value="РЎР±РµСЂР±Р°РЅРє">РЎР±РµСЂР±Р°РЅРє</SelectItem>
+            <SelectItem value="РђР»СЊС„Р°-Р‘Р°РЅРє">РђР»СЊС„Р°-Р‘Р°РЅРє</SelectItem>
+            <SelectItem value="Рў-Р‘Р°РЅРє">Рў-Р‘Р°РЅРє</SelectItem>
+            <SelectItem value="Ozon Р‘Р°РЅРє">Ozon Р‘Р°РЅРє</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <div className="space-y-2">
         <label className="block text-sm font-medium" htmlFor="withdraw-destination">
-          Номер телефона или карты
+          РќРѕРјРµСЂ С‚РµР»РµС„РѕРЅР° РёР»Рё РєР°СЂС‚С‹
         </label>
         <Input
           id="withdraw-destination"
           name="payoutDestination"
-          placeholder="+7XXXXXXXXXX или 2200 XXXX XXXX XXXX"
+          placeholder="+7XXXXXXXXXX РёР»Рё 2200 XXXX XXXX XXXX"
           required
           type="text"
         />
@@ -170,7 +170,7 @@ export function CreatePayoutRequestForm({
 
       <div className="space-y-2">
         <label className="block text-sm font-medium" htmlFor="withdraw-amount">
-          Сумма (сredits)
+          РЎСѓРјРјР° (СЃredits)
         </label>
         <Input
           id="withdraw-amount"
@@ -183,7 +183,7 @@ export function CreatePayoutRequestForm({
       </div>
 
       <Button className="w-full" disabled={isPending} radius="card" type="submit">
-        {isPending ? "Создаем заявку..." : "Создать заявку"}
+        {isPending ? "РЎРѕР·РґР°РµРј Р·Р°СЏРІРєСѓ..." : "РЎРѕР·РґР°С‚СЊ Р·Р°СЏРІРєСѓ"}
       </Button>
     </form>
   );
@@ -205,8 +205,9 @@ export function CancelPayoutRequestForm({
     <form action={formAction} className="mt-2">
       <input name="payoutRequestId" type="hidden" value={payoutRequestId} />
       <Button className="w-full sm:w-auto" disabled={isPending} radius="card" size="sm" type="submit" variant="outline">
-        {isPending ? "Отменяем..." : "Отменить заявку"}
+        {isPending ? "РћС‚РјРµРЅСЏРµРј..." : "РћС‚РјРµРЅРёС‚СЊ Р·Р°СЏРІРєСѓ"}
       </Button>
     </form>
   );
 }
+

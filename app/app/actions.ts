@@ -3,6 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import {
+  mapLegacyAnchorToAppTab,
+  mapLegacyDialogToAppTab,
+  type AppTab,
+} from "@/lib/app-tabs";
 import { generateReferralCodeValue } from "@/lib/admin-code-management";
 import { getAppBenefitsData, validatePromoCodeForUser } from "@/lib/app-benefits";
 import { getCurrentSession, normalizeCode } from "@/lib/auth";
@@ -29,8 +34,14 @@ function buildRedirectUrl(params: {
   error?: string;
   notice?: string;
   openSetup?: boolean;
+  tab?: AppTab;
 }) {
   const searchParams = new URLSearchParams();
+  const tab =
+    params.tab ??
+    mapLegacyDialogToAppTab(params.dialog) ??
+    mapLegacyAnchorToAppTab(params.anchor);
+  searchParams.set("tab", tab);
 
   if (params.notice) {
     searchParams.set("notice", params.notice);
@@ -49,7 +60,7 @@ function buildRedirectUrl(params: {
   }
 
   const query = searchParams.toString();
-  return `/app${query ? `?${query}` : ""}${params.anchor ?? "#dashboard"}`;
+  return `/app${query ? `?${query}` : ""}`;
 }
 
 function normalizeDiscountPct(discountPct: number) {
@@ -773,7 +784,7 @@ export async function payTariffWithCreditsAction(formData: FormData) {
 
   redirect(
     buildRedirectUrl({
-      anchor: "#dashboard",
+      tab: "home",
       notice: `Оплата кредитами завершена: списано эквивалент ${chargedRub} ₽.${discountNotice}${rewardNotice}${integrationNotice}`,
       openSetup: true,
     })
@@ -818,7 +829,7 @@ export async function activateDeviceSlotAction(formData: FormData) {
   if (!slotId) {
     redirect(
       buildRedirectUrl({
-        anchor: "#dashboard",
+        tab: "devices",
         error: "Слот не найден.",
       })
     );
@@ -829,7 +840,7 @@ export async function activateDeviceSlotAction(formData: FormData) {
   if (!slot) {
     redirect(
       buildRedirectUrl({
-        anchor: "#dashboard",
+        tab: "devices",
         error: "Слот недоступен для управления.",
       })
     );
@@ -838,7 +849,7 @@ export async function activateDeviceSlotAction(formData: FormData) {
   if (slot.status === "BLOCKED") {
     redirect(
       buildRedirectUrl({
-        anchor: "#dashboard",
+        tab: "devices",
         error: "Слот заблокирован и не может быть активирован.",
       })
     );
@@ -847,7 +858,7 @@ export async function activateDeviceSlotAction(formData: FormData) {
   if (slot.status === "ACTIVE") {
     redirect(
       buildRedirectUrl({
-        anchor: "#dashboard",
+        tab: "devices",
         notice: `Слот ${slot.slotIndex} уже активен.`,
       })
     );
@@ -863,7 +874,7 @@ export async function activateDeviceSlotAction(formData: FormData) {
   if (activeCount >= slot.subscription.deviceLimit) {
     redirect(
       buildRedirectUrl({
-        anchor: "#dashboard",
+        tab: "devices",
         error: `Лимит устройств (${slot.subscription.deviceLimit}) уже достигнут.`,
       })
     );
@@ -885,7 +896,7 @@ export async function activateDeviceSlotAction(formData: FormData) {
   revalidatePath("/admin");
   redirect(
     buildRedirectUrl({
-      anchor: "#dashboard",
+      tab: "devices",
       notice: `Слот ${slot.slotIndex} активирован.${syncNotice}`,
     })
   );
@@ -898,7 +909,7 @@ export async function deactivateDeviceSlotAction(formData: FormData) {
   if (!slotId) {
     redirect(
       buildRedirectUrl({
-        anchor: "#dashboard",
+        tab: "devices",
         error: "Слот не найден.",
       })
     );
@@ -909,7 +920,7 @@ export async function deactivateDeviceSlotAction(formData: FormData) {
   if (!slot) {
     redirect(
       buildRedirectUrl({
-        anchor: "#dashboard",
+        tab: "devices",
         error: "Слот недоступен для управления.",
       })
     );
@@ -918,7 +929,7 @@ export async function deactivateDeviceSlotAction(formData: FormData) {
   if (slot.status !== "ACTIVE") {
     redirect(
       buildRedirectUrl({
-        anchor: "#dashboard",
+        tab: "devices",
         notice: `Слот ${slot.slotIndex} уже неактивен.`,
       })
     );
@@ -940,7 +951,7 @@ export async function deactivateDeviceSlotAction(formData: FormData) {
   revalidatePath("/admin");
   redirect(
     buildRedirectUrl({
-      anchor: "#dashboard",
+      tab: "devices",
       notice: `Слот ${slot.slotIndex} деактивирован.${syncNotice}`,
     })
   );
