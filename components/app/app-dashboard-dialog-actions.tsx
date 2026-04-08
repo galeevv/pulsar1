@@ -167,7 +167,6 @@ export function CreatePayoutRequestForm({
         <Input
           id="withdraw-destination"
           name="payoutDestination"
-          placeholder="+7XXXXXXXXXX или 2200 XXXX XXXX XXXX"
           required
           type="text"
         />
@@ -181,7 +180,6 @@ export function CreatePayoutRequestForm({
           id="withdraw-amount"
           min={minimumPayoutCredits}
           name="amountCredits"
-          placeholder={String(minimumPayoutCredits)}
           required
           type="number"
         />

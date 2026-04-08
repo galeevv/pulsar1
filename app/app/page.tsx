@@ -135,7 +135,6 @@ export default async function AppPage({
             currentActiveSubscriptionsCount={serviceCapacityState.activeSubscriptionsCount}
             durationRules={constructorData.durationRules}
             firstPurchaseDiscountPct={benefitsData.firstPurchaseDiscountPct}
-            hasApprovedPayment={benefitsData.hasApprovedPayment}
             isCapacityBlockedForNewSubscriptions={isCapacityBlockedForNewSubscriptions}
             maxActiveSubscriptions={serviceCapacityState.maxActiveSubscriptions}
             ownReferralCode={benefitsData.ownReferralCode?.code ?? null}

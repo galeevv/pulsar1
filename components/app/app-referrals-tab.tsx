@@ -1,25 +1,12 @@
-import { ChevronDownIcon, CircleDollarSignIcon, GiftIcon, UsersIcon } from "lucide-react"
+import Image from "next/image"
 
-import {
-  CancelPayoutRequestForm,
-  CreatePayoutRequestForm,
-} from "@/components/app/app-dashboard-dialog-actions"
 import { EmptyStateBlock } from "@/components/app/empty-state-block"
 import { QuickActionsSheet } from "@/components/app/quick-actions-sheet"
-import { ReferralHistoryList } from "@/components/app/referral-history-list"
+import { ReferralAnalyticsDrawer } from "@/components/app/referral-analytics-drawer"
+import { ReferralHistoryDrawer } from "@/components/app/referral-history-drawer"
+import { ReferralPayoutDrawer } from "@/components/app/referral-payout-drawer"
 import { ReferralSummaryCard } from "@/components/app/referral-summary-card"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { Separator } from "@/components/ui/separator"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Card, CardContent, CardTitle } from "@/components/ui/card"
 
 export function AppReferralsTab({
   canGenerateReferralCode,
@@ -28,7 +15,6 @@ export function AppReferralsTab({
   currentActiveSubscriptionsCount,
   durationRules,
   firstPurchaseDiscountPct,
-  hasApprovedPayment,
   isCapacityBlockedForNewSubscriptions,
   maxActiveSubscriptions,
   ownReferralCode,
@@ -51,7 +37,6 @@ export function AppReferralsTab({
     months: number
   }>
   firstPurchaseDiscountPct: number
-  hasApprovedPayment: boolean
   isCapacityBlockedForNewSubscriptions: boolean
   maxActiveSubscriptions: number
   ownReferralCode: string | null
@@ -131,144 +116,52 @@ export function AppReferralsTab({
     )
   }
 
-  const hasReferralActivity =
-    referralStats.totalInvitedCount > 0 || recentReferralActivity.length > 0
-
   return (
     <section className="space-y-4">
-      <ReferralSummaryCard
-        canGenerateReferralCode={canGenerateReferralCode}
-        discountPct={referralProgramSettings.defaultDiscountPct}
-        hasApprovedPayment={hasApprovedPayment}
-        isReferralEnabled={referralProgramSettings.isEnabled}
-        ownReferralCode={ownReferralCode}
-        rewardCredits={referralProgramSettings.defaultRewardCredits}
-        usesCount={usesCount}
-      />
+      <Card className="gap-0 overflow-hidden border-border/70 bg-card/40 py-0">
+        <div className="relative aspect-[16/9] w-full border-b border-border/70 bg-transparent">
+          <Image
+            alt="Реферальная система PulsarVPN"
+            className="object-contain p-0"
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 460px"
+            src="/details/physics.gif"
+            unoptimized
+          />
+        </div>
 
-      <Tabs defaultValue="summary">
-        <TabsList
-          className="grid w-full grid-cols-2 rounded-card border border-border/70 bg-card/30 p-1"
-          variant="outline"
-        >
-          <TabsTrigger value="summary">Сводка</TabsTrigger>
-          <TabsTrigger value="history">История</TabsTrigger>
-        </TabsList>
+        <CardContent className="space-y-4 p-4">
+          <CardTitle className="text-lg">Реферальная система</CardTitle>
 
-        <TabsContent className="mt-3 space-y-3" value="summary">
-          <div className="grid grid-cols-2 gap-3">
-            <Card className="border-border/70 bg-card/40">
-              <CardHeader className="p-3">
-                <CardTitle className="inline-flex items-center gap-2 text-sm">
-                  <UsersIcon className="size-4 text-muted-foreground" />
-                  Приглашено
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-3 pt-0">
-                <p className="text-lg font-semibold">{referralStats.totalInvitedCount}</p>
-              </CardContent>
-            </Card>
+          <ReferralSummaryCard
+            canGenerateReferralCode={canGenerateReferralCode}
+            discountPct={referralProgramSettings.defaultDiscountPct}
+            ownReferralCode={ownReferralCode}
+            rewardCredits={referralProgramSettings.defaultRewardCredits}
+            usesCount={usesCount}
+          />
 
-            <Card className="border-border/70 bg-card/40">
-              <CardHeader className="p-3">
-                <CardTitle className="inline-flex items-center gap-2 text-sm">
-                  <GiftIcon className="size-4 text-muted-foreground" />
-                  Начислено
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-3 pt-0">
-                <p className="text-lg font-semibold">{referralStats.totalEarnedCredits} credits</p>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-2 gap-2">
+            <ReferralHistoryDrawer
+              payouts={payout.recentRequests}
+              rewards={recentReferralActivity.map((item) => ({
+                createdAt: item.createdAt,
+                id: item.id,
+                referredUsername: item.referredUsername,
+                rewardCreditsSnapshot: item.rewardCreditsSnapshot,
+                rewardGrantedAt: item.rewardGrantedAt,
+              }))}
+            />
+            <ReferralPayoutDrawer payout={payout} />
           </div>
 
-          {!hasReferralActivity ? (
-            <EmptyStateBlock
-              description="Поделитесь кодом, чтобы увидеть первые начисления."
-              title="Нет реферальной активности"
-            />
-          ) : null}
-
-          <Collapsible className="rounded-card border border-border/70 bg-card/40">
-            <CollapsibleTrigger asChild>
-              <Button className="w-full justify-between rounded-card px-3 py-3" radius="card" variant="ghost">
-                <span className="inline-flex items-center gap-2">
-                  <CircleDollarSignIcon className="size-4 text-muted-foreground" />
-                  Вывод средств
-                </span>
-                <ChevronDownIcon className="size-4" />
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-3 p-3 pt-0">
-              <Separator />
-              <div className="rounded-card border border-border/70 bg-background/40 p-3 text-sm">
-                <p>Доступно: {payout.availableCredits} credits</p>
-                <p>В резерве: {payout.reservedCredits} credits</p>
-                <p>Минимум для вывода: {payout.minimumPayoutCredits} credits</p>
-                <p>Всего выплачено: {payout.totalPaidOutCredits} credits</p>
-              </div>
-
-              {payout.activeRequest ? (
-                <div className="rounded-card border border-border/70 bg-background/40 p-3">
-                  <div className="mb-2 flex items-center justify-between gap-2">
-                    <p className="text-sm font-medium">Активная заявка</p>
-                    <Badge variant="warning">{payout.activeRequest.status}</Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {payout.activeRequest.amountRub} ₽ / {payout.activeRequest.amountCredits} credits
-                  </p>
-                  {payout.activeRequest.status === "PENDING" ? (
-                    <CancelPayoutRequestForm payoutRequestId={payout.activeRequest.id} />
-                  ) : null}
-                </div>
-              ) : (
-                <CreatePayoutRequestForm minimumPayoutCredits={payout.minimumPayoutCredits} />
-              )}
-            </CollapsibleContent>
-          </Collapsible>
-
-          <Card className="border-border/70 bg-card/40">
-            <CardHeader className="p-4">
-              <CardTitle className="text-base">Как это работает</CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <Accordion collapsible type="single">
-                <AccordionItem value="item-1">
-                  <AccordionTrigger>Когда начисляется награда?</AccordionTrigger>
-                  <AccordionContent>
-                    После первой подтвержденной оплаты приглашенного пользователя.
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-2">
-                  <AccordionTrigger>Как вывести накопленные кредиты?</AccordionTrigger>
-                  <AccordionContent>
-                    Откройте блок «Вывод средств», укажите реквизиты и сумму не ниже минимального порога.
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-3">
-                  <AccordionTrigger>Что получает приглашенный пользователь?</AccordionTrigger>
-                  <AccordionContent>
-                    Скидку {referralProgramSettings.defaultDiscountPct}% на первую покупку.
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent className="mt-3" value="history">
-          <ReferralHistoryList
-            payouts={payout.recentRequests}
-            rewards={recentReferralActivity.map((item) => ({
-              createdAt: item.createdAt,
-              id: item.id,
-              referredUsername: item.referredUsername,
-              rewardCreditsSnapshot: item.rewardCreditsSnapshot,
-              rewardGrantedAt: item.rewardGrantedAt,
-            }))}
+          <ReferralAnalyticsDrawer
+            payout={payout}
+            referralStats={referralStats}
           />
-        </TabsContent>
-      </Tabs>
+        </CardContent>
+      </Card>
     </section>
   )
 }

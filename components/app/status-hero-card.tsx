@@ -16,7 +16,7 @@ export function StatusHeroCard({
       <div className="relative aspect-[16/9] w-full border-b border-border/70 bg-transparent">
         <Image
           alt="PulsarVPN"
-          className="object-contain p-4"
+          className="object-contain p-0"
           fill
           priority
           sizes="(max-width: 768px) 100vw, 460px"

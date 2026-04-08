@@ -1,7 +1,6 @@
-import { BanknoteArrowDownIcon, UsersIcon } from "lucide-react"
+import { BanknoteArrowDownIcon, UserIcon, UsersIcon } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 function formatDate(value: Date) {
   return value.toLocaleDateString("ru-RU")
@@ -28,13 +27,18 @@ function mapPayoutStatusVariant(status: "APPROVED" | "CANCELED" | "PAID" | "PEND
   if (status === "PENDING") {
     return "warning" as const
   }
-  if (status === "APPROVED") {
+  if (status === "APPROVED" || status === "PAID") {
     return "success" as const
   }
-  if (status === "PAID") {
-    return "secondary" as const
-  }
   return "destructive" as const
+}
+
+function IconContainer({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="inline-flex size-10 shrink-0 items-center justify-center rounded-card border border-border/70 bg-background/50">
+      {children}
+    </div>
+  )
 }
 
 export function ReferralHistoryList({
@@ -58,71 +62,76 @@ export function ReferralHistoryList({
   }>
 }) {
   return (
-    <div className="flex flex-col gap-3">
-      <Card className="border-border/70 bg-card/40">
-        <CardHeader className="p-4">
-          <CardTitle className="inline-flex items-center gap-2 text-base">
-            <UsersIcon className="size-4 text-muted-foreground" />
-            Rewards history
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 p-4 pt-0">
-          {rewards.length ? (
-            rewards.map((event) => (
-              <div
-                className="rounded-card border border-border/70 bg-background/40 p-3"
-                key={event.id}
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-medium">{event.referredUsername}</p>
-                  <Badge variant={event.rewardGrantedAt ? "success" : "warning"}>
-                    {event.rewardGrantedAt ? "Начислено" : "Ожидает"}
-                  </Badge>
-                </div>
-                <p className="mt-1 text-xs text-muted-foreground">Дата: {formatDate(event.createdAt)}</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Награда: {event.rewardCreditsSnapshot} credits
-                </p>
-              </div>
-            ))
-          ) : (
-            <p className="rounded-card border border-border/70 bg-background/40 p-3 text-sm text-muted-foreground">
-              Пока нет активности по приглашениям.
-            </p>
-          )}
-        </CardContent>
-      </Card>
+    <div className="flex flex-col gap-4">
+      <section className="flex flex-col gap-2">
+        <p className="inline-flex items-center gap-2 text-sm font-medium">
+          <UsersIcon className="size-4 text-muted-foreground" />
+          Приглашённые пользователи
+        </p>
 
-      <Card className="border-border/70 bg-card/40">
-        <CardHeader className="p-4">
-          <CardTitle className="inline-flex items-center gap-2 text-base">
-            <BanknoteArrowDownIcon className="size-4 text-muted-foreground" />
-            Payout history
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 p-4 pt-0">
-          {payouts.length ? (
-            payouts.map((item) => (
-              <div className="rounded-card border border-border/70 bg-background/40 p-3" key={item.id}>
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-medium">{item.amountRub} ₽</p>
-                  <Badge variant={mapPayoutStatusVariant(item.status)}>
-                    {mapPayoutStatusLabel(item.status)}
-                  </Badge>
+        {rewards.length ? (
+          rewards.map((event) => (
+            <div className="rounded-card border border-border/70 bg-card/40 p-3" key={event.id}>
+              <div className="flex items-center gap-3">
+                <IconContainer>
+                  <UserIcon className="size-4 text-muted-foreground" />
+                </IconContainer>
+
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium">{event.referredUsername}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Награда: {event.rewardCreditsSnapshot} credits
+                  </p>
                 </div>
-                <p className="mt-1 text-xs text-muted-foreground">Дата: {formatDate(item.createdAt)}</p>
-                {item.rejectionReason ? (
-                  <p className="mt-1 text-xs text-destructive">{item.rejectionReason}</p>
-                ) : null}
+
+                <Badge className="shrink-0" variant={event.rewardGrantedAt ? "success" : "warning"}>
+                  {event.rewardGrantedAt ? "Начислено" : "Ожидает"}
+                </Badge>
               </div>
-            ))
-          ) : (
-            <p className="rounded-card border border-border/70 bg-background/40 p-3 text-sm text-muted-foreground">
-              Заявок на вывод пока нет.
-            </p>
-          )}
-        </CardContent>
-      </Card>
+            </div>
+          ))
+        ) : (
+          <p className="rounded-card border border-border/70 bg-card/40 p-3 text-sm text-muted-foreground">
+            Пока нет активности по приглашениям.
+          </p>
+        )}
+      </section>
+
+      <section className="flex flex-col gap-2">
+        <p className="inline-flex items-center gap-2 text-sm font-medium">
+          <BanknoteArrowDownIcon className="size-4 text-muted-foreground" />
+          Заявки на вывод
+        </p>
+
+        {payouts.length ? (
+          payouts.map((item) => (
+            <div className="rounded-card border border-border/70 bg-card/40 p-3" key={item.id}>
+              <div className="flex items-center gap-3">
+                <IconContainer>
+                  <BanknoteArrowDownIcon className="size-4 text-muted-foreground" />
+                </IconContainer>
+
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium">{item.amountRub} ₽</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Дата: {formatDate(item.createdAt)}</p>
+                </div>
+
+                <Badge className="shrink-0" variant={mapPayoutStatusVariant(item.status)}>
+                  {mapPayoutStatusLabel(item.status)}
+                </Badge>
+              </div>
+
+              {item.rejectionReason ? (
+                <p className="mt-2 text-xs text-destructive">{item.rejectionReason}</p>
+              ) : null}
+            </div>
+          ))
+        ) : (
+          <p className="rounded-card border border-border/70 bg-card/40 p-3 text-sm text-muted-foreground">
+            Заявок на вывод пока нет.
+          </p>
+        )}
+      </section>
     </div>
   )
 }

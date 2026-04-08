@@ -7,7 +7,15 @@ import { PromoCodeApplyForm } from "@/components/app/app-dashboard-dialog-action
 import { AppUserAgreementDrawer } from "@/components/app/app-user-agreement-drawer"
 import { SupportDrawer } from "@/components/support/support-drawer"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardTitle } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import type { LegalDocuments } from "@/lib/legal-documents"
 
 export function AppProfileTab({
@@ -20,10 +28,10 @@ export function AppProfileTab({
   return (
     <section className="space-y-4">
       <Card className="gap-0 overflow-hidden border-border/70 bg-card/40 py-0">
-        <div className="relative aspect-[16/9] w-full bg-transparent">
+        <div className="relative aspect-[16/9] w-full border-b border-border/70 bg-transparent">
           <Image
             alt="Profile visual"
-            className="object-cover"
+            className="object-contain p-0"
             fill
             priority
             sizes="(max-width: 768px) 100vw, 460px"
@@ -32,39 +40,45 @@ export function AppProfileTab({
           />
         </div>
 
-        <CardContent className="flex flex-col gap-3 px-3 pb-3 pt-0">
-          <Card className="gap-0 border-border/70 bg-background/40 py-0">
-            <CardContent className="p-0">
-              <div className="flex items-center gap-3 px-3 py-3">
-                <div className="inline-flex size-10 items-center justify-center rounded-card border border-border/70 bg-background/50">
-                  <UserIcon className="size-4 text-muted-foreground" />
-                </div>
-                <p className="truncate text-sm font-medium">{username}</p>
-              </div>
-            </CardContent>
-          </Card>
+        <CardContent className="space-y-4 p-4">
+          <CardTitle className="text-lg">Профиль</CardTitle>
 
-          <Card className="gap-0 border-border/70 bg-background/40 py-0">
-            <CardHeader className="p-0">
-              <div className="px-3 pt-3">
-                <CardTitle className="inline-flex items-center gap-2 text-sm">
-                  <TicketPercentIcon className="size-4 text-muted-foreground" />
+          <div className="rounded-card border border-border/70 bg-background/40 p-3">
+            <div className="flex items-center gap-3">
+              <div className="inline-flex size-10 items-center justify-center rounded-card border border-border/70 bg-background/50">
+                <UserIcon className="size-4 text-muted-foreground" />
+              </div>
+              <p className="truncate text-sm font-medium">{username}</p>
+            </div>
+          </div>
+
+          <div className="mb-2">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="h-button w-full px-button-x" radius="card" type="button" variant="outline">
+                  <TicketPercentIcon className="size-4" />
                   Промокоды
-                </CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="space-y-2 px-3 pb-3">
-                <p className="text-xs text-muted-foreground">
-                  Введите промокод для пополнения баланса кредитов.
-                </p>
+                </Button>
+              </DialogTrigger>
+              <DialogContent showCloseButton={false}>
+                <DialogHeader className="text-left">
+                  <DialogTitle>Промокоды</DialogTitle>
+                  <DialogDescription>
+                    Введите промокод для пополнения баланса кредитов.
+                  </DialogDescription>
+                </DialogHeader>
                 <PromoCodeApplyForm />
-              </div>
-            </CardContent>
-          </Card>
+              </DialogContent>
+            </Dialog>
+          </div>
 
-          <SupportDrawer />
-          <AppUserAgreementDrawer legalDocuments={legalDocuments} />
+          <div className="mb-2">
+            <SupportDrawer />
+          </div>
+          
+          <div className="mb-2">
+            <AppUserAgreementDrawer legalDocuments={legalDocuments} />
+          </div>         
 
           <form action={logoutAction} className="w-full">
             <Button className="h-button w-full px-button-x" radius="card" type="submit" variant="outline">

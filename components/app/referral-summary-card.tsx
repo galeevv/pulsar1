@@ -1,147 +1,141 @@
 "use client"
 
-import { useMemo } from "react"
+import { useActionState, useEffect, useRef } from "react"
+import { useRouter } from "next/navigation"
 
-import { CopyIcon, Share2Icon, TicketIcon } from "lucide-react"
+import { CopyIcon, HandshakeIcon, TicketPercentIcon } from "lucide-react"
 import { toast } from "sonner"
 
-import { GenerateReferralCodeForm } from "@/components/app/app-dashboard-dialog-actions"
-import { Badge } from "@/components/ui/badge"
+import { generateOwnReferralCodeInlineAction } from "@/app/app/actions"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 
-function buildReferralLink(code: string | null) {
-  if (!code) {
-    return ""
-  }
+type InlineDialogActionState = {
+  message: string
+  nonce: number
+  status: "error" | "idle" | "success"
+}
 
-  if (typeof window === "undefined") {
-    return `/login?mode=register&code=${encodeURIComponent(code)}`
-  }
+const INLINE_DIALOG_ACTION_INITIAL_STATE: InlineDialogActionState = {
+  message: "",
+  nonce: 0,
+  status: "idle",
+}
 
-  const url = new URL("/login", window.location.origin)
-  url.searchParams.set("mode", "register")
-  url.searchParams.set("code", code)
-  return url.toString()
+function IconContainer({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="inline-flex size-10 shrink-0 items-center justify-center rounded-card border border-border/70 bg-background/50">
+      {children}
+    </div>
+  )
 }
 
 export function ReferralSummaryCard({
   canGenerateReferralCode,
   discountPct,
-  hasApprovedPayment,
-  isReferralEnabled,
   ownReferralCode,
   rewardCredits,
   usesCount,
 }: {
   canGenerateReferralCode: boolean
   discountPct: number
-  hasApprovedPayment: boolean
-  isReferralEnabled: boolean
   ownReferralCode: string | null
   rewardCredits: number
   usesCount: number
 }) {
-  const referralLink = useMemo(() => buildReferralLink(ownReferralCode), [ownReferralCode])
+  const router = useRouter()
+  const handledNonceRef = useRef(0)
+  const [state, formAction, isPending] = useActionState(
+    generateOwnReferralCodeInlineAction,
+    INLINE_DIALOG_ACTION_INITIAL_STATE
+  )
 
-  async function handleCopy(value: string, successMessage: string) {
-    if (!value) {
+  useEffect(() => {
+    if (state.nonce === 0 || state.nonce === handledNonceRef.current) {
+      return
+    }
+
+    handledNonceRef.current = state.nonce
+
+    if (state.status === "success") {
+      toast.success(state.message, { position: "top-right" })
+      router.refresh()
+      return
+    }
+
+    if (state.status === "error") {
+      toast.error(state.message, { position: "top-right" })
+    }
+  }, [router, state])
+
+  async function handleCopyCode() {
+    if (!ownReferralCode) {
       return
     }
 
     try {
-      await navigator.clipboard.writeText(value)
-      toast.success(successMessage)
+      await navigator.clipboard.writeText(ownReferralCode)
+      toast.success("Код скопирован.", { position: "top-right" })
     } catch {
-      toast.error("Не удалось скопировать значение.")
+      toast.error("Не удалось скопировать код.", { position: "top-right" })
     }
-  }
-
-  async function handleShare() {
-    if (!referralLink) {
-      return
-    }
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          text: "Подключайся к PulsarVPN по моей ссылке.",
-          title: "PulsarVPN",
-          url: referralLink,
-        })
-        return
-      } catch {
-        // Fallback to copy for cancelled/unsupported share attempts.
-      }
-    }
-
-    await handleCopy(referralLink, "Реферальная ссылка скопирована.")
   }
 
   return (
-    <Card className="border-border/70 bg-card/40">
-      <CardHeader className="space-y-2 p-4">
-        <CardTitle className="inline-flex items-center gap-2 text-base">
-          <TicketIcon className="size-4 text-muted-foreground" />
-          Реферальный код
-        </CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Друг получает скидку {discountPct}%, вы получаете {rewardCredits} credits за подтвержденную оплату.
-        </p>
-      </CardHeader>
-      <CardContent className="space-y-3 p-4 pt-0">
-        {ownReferralCode ? (
-          <>
-            <div className="rounded-card border border-border/70 bg-background/40 p-3">
-              <div className="mb-2 flex items-center justify-between gap-3">
-                <span className="text-xs text-muted-foreground">Код</span>
-                <Badge variant="secondary">Использований: {usesCount}</Badge>
+    <div className="flex flex-col gap-3">
+      <div className="rounded-card border border-border/70 bg-background/40 p-3">
+        <div className="flex items-center gap-3">
+          <IconContainer>
+            <HandshakeIcon className="size-4 text-muted-foreground" />
+          </IconContainer>
+          <div className="min-w-0">
+            <p className="text-sm font-medium">Другу скидка {discountPct}%</p>
+            <p className="mt-1 text-sm text-muted-foreground">Вам {rewardCredits} кредитов</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-card border border-border/70 bg-background/40 p-3">
+        <div className="flex items-center gap-3">
+          <IconContainer>
+            <TicketPercentIcon className="size-4 text-muted-foreground" />
+          </IconContainer>
+
+          {ownReferralCode ? (
+            <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium">{ownReferralCode}</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  <span className="sm:hidden">Исп. — {usesCount}</span>
+                  <span className="hidden sm:inline">Использований: {usesCount}</span>
+                </p>
               </div>
-              <Input readOnly value={ownReferralCode} />
-              <div className="mt-2 grid grid-cols-2 gap-2">
-                <Button
-                  className="h-button w-full px-button-x"
-                  onClick={() => void handleCopy(ownReferralCode, "Код скопирован.")}
-                  radius="card"
-                  variant="outline"
-                >
-                  <CopyIcon className="size-4" />
-                  Копировать код
-                </Button>
-                <Button className="h-button w-full px-button-x" onClick={handleShare} radius="card" variant="outline">
-                  <Share2Icon className="size-4" />
-                  Поделиться
-                </Button>
-              </div>
-            </div>
-            <div className="rounded-card border border-border/70 bg-background/40 p-3">
-              <p className="mb-2 text-xs text-muted-foreground">Ссылка</p>
-              <Input readOnly value={referralLink} />
+
               <Button
-                className="mt-2 h-button w-full px-button-x"
-                onClick={() => void handleCopy(referralLink, "Ссылка скопирована.")}
+                aria-label="Скопировать реферальный код"
+                className="shrink-0"
+                onClick={() => void handleCopyCode()}
                 radius="card"
+                size="icon-sm"
+                type="button"
                 variant="outline"
               >
                 <CopyIcon className="size-4" />
-                Копировать ссылку
               </Button>
             </div>
-          </>
-        ) : (
-          <div className="space-y-3 rounded-card border border-border/70 bg-background/40 p-3">
-            <p className="text-sm text-muted-foreground">
-              {isReferralEnabled
-                ? hasApprovedPayment
-                  ? "Сгенерируйте персональный код, чтобы приглашать друзей."
-                  : "Код станет доступен после первой подтвержденной оплаты."
-                : "Реферальная программа сейчас отключена."}
-            </p>
-            <GenerateReferralCodeForm canGenerate={canGenerateReferralCode} />
-          </div>
-        )}
-      </CardContent>
-    </Card>
+          ) : (
+            <form action={formAction} className="min-w-0 flex-1">
+              <Button
+                className="h-button w-full px-button-x"
+                disabled={!canGenerateReferralCode || isPending}
+                radius="card"
+                type="submit"
+              >
+                {isPending ? "Генерация..." : "Сгенерировать"}
+              </Button>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
   )
 }
