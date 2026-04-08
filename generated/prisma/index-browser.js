@@ -332,6 +332,9 @@ exports.Prisma.DeviceSlotScalarFieldEnum = {
   subscriptionId: 'subscriptionId',
   slotIndex: 'slotIndex',
   status: 'status',
+  deviceOs: 'deviceOs',
+  assignedAt: 'assignedAt',
+  assignedUserAgent: 'assignedUserAgent',
   label: 'label',
   marzbanUsername: 'marzbanUsername',
   configUrl: 'configUrl',
@@ -421,6 +424,14 @@ exports.DeviceSlotStatus = exports.$Enums.DeviceSlotStatus = {
   FREE: 'FREE',
   ACTIVE: 'ACTIVE',
   BLOCKED: 'BLOCKED'
+};
+
+exports.DeviceOS = exports.$Enums.DeviceOS = {
+  ANDROID: 'ANDROID',
+  IOS: 'IOS',
+  WINDOWS: 'WINDOWS',
+  MACOS: 'MACOS',
+  UNKNOWN: 'UNKNOWN'
 };
 
 exports.IntegrationProvider = exports.$Enums.IntegrationProvider = {

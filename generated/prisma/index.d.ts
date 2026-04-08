@@ -153,6 +153,17 @@ export const DeviceSlotStatus: {
 export type DeviceSlotStatus = (typeof DeviceSlotStatus)[keyof typeof DeviceSlotStatus]
 
 
+export const DeviceOS: {
+  ANDROID: 'ANDROID',
+  IOS: 'IOS',
+  WINDOWS: 'WINDOWS',
+  MACOS: 'MACOS',
+  UNKNOWN: 'UNKNOWN'
+};
+
+export type DeviceOS = (typeof DeviceOS)[keyof typeof DeviceOS]
+
+
 export const IntegrationProvider: {
   MARZBAN: 'MARZBAN'
 };
@@ -223,6 +234,10 @@ export const SubscriptionStatus: typeof $Enums.SubscriptionStatus
 export type DeviceSlotStatus = $Enums.DeviceSlotStatus
 
 export const DeviceSlotStatus: typeof $Enums.DeviceSlotStatus
+
+export type DeviceOS = $Enums.DeviceOS
+
+export const DeviceOS: typeof $Enums.DeviceOS
 
 export type IntegrationProvider = $Enums.IntegrationProvider
 
@@ -21818,6 +21833,9 @@ export namespace Prisma {
     subscriptionId: string | null
     slotIndex: number | null
     status: $Enums.DeviceSlotStatus | null
+    deviceOs: $Enums.DeviceOS | null
+    assignedAt: Date | null
+    assignedUserAgent: string | null
     label: string | null
     marzbanUsername: string | null
     configUrl: string | null
@@ -21832,6 +21850,9 @@ export namespace Prisma {
     subscriptionId: string | null
     slotIndex: number | null
     status: $Enums.DeviceSlotStatus | null
+    deviceOs: $Enums.DeviceOS | null
+    assignedAt: Date | null
+    assignedUserAgent: string | null
     label: string | null
     marzbanUsername: string | null
     configUrl: string | null
@@ -21846,6 +21867,9 @@ export namespace Prisma {
     subscriptionId: number
     slotIndex: number
     status: number
+    deviceOs: number
+    assignedAt: number
+    assignedUserAgent: number
     label: number
     marzbanUsername: number
     configUrl: number
@@ -21870,6 +21894,9 @@ export namespace Prisma {
     subscriptionId?: true
     slotIndex?: true
     status?: true
+    deviceOs?: true
+    assignedAt?: true
+    assignedUserAgent?: true
     label?: true
     marzbanUsername?: true
     configUrl?: true
@@ -21884,6 +21911,9 @@ export namespace Prisma {
     subscriptionId?: true
     slotIndex?: true
     status?: true
+    deviceOs?: true
+    assignedAt?: true
+    assignedUserAgent?: true
     label?: true
     marzbanUsername?: true
     configUrl?: true
@@ -21898,6 +21928,9 @@ export namespace Prisma {
     subscriptionId?: true
     slotIndex?: true
     status?: true
+    deviceOs?: true
+    assignedAt?: true
+    assignedUserAgent?: true
     label?: true
     marzbanUsername?: true
     configUrl?: true
@@ -21999,6 +22032,9 @@ export namespace Prisma {
     subscriptionId: string
     slotIndex: number
     status: $Enums.DeviceSlotStatus
+    deviceOs: $Enums.DeviceOS
+    assignedAt: Date | null
+    assignedUserAgent: string | null
     label: string | null
     marzbanUsername: string | null
     configUrl: string | null
@@ -22032,6 +22068,9 @@ export namespace Prisma {
     subscriptionId?: boolean
     slotIndex?: boolean
     status?: boolean
+    deviceOs?: boolean
+    assignedAt?: boolean
+    assignedUserAgent?: boolean
     label?: boolean
     marzbanUsername?: boolean
     configUrl?: boolean
@@ -22047,6 +22086,9 @@ export namespace Prisma {
     subscriptionId?: boolean
     slotIndex?: boolean
     status?: boolean
+    deviceOs?: boolean
+    assignedAt?: boolean
+    assignedUserAgent?: boolean
     label?: boolean
     marzbanUsername?: boolean
     configUrl?: boolean
@@ -22062,6 +22104,9 @@ export namespace Prisma {
     subscriptionId?: boolean
     slotIndex?: boolean
     status?: boolean
+    deviceOs?: boolean
+    assignedAt?: boolean
+    assignedUserAgent?: boolean
     label?: boolean
     marzbanUsername?: boolean
     configUrl?: boolean
@@ -22077,6 +22122,9 @@ export namespace Prisma {
     subscriptionId?: boolean
     slotIndex?: boolean
     status?: boolean
+    deviceOs?: boolean
+    assignedAt?: boolean
+    assignedUserAgent?: boolean
     label?: boolean
     marzbanUsername?: boolean
     configUrl?: boolean
@@ -22086,7 +22134,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type DeviceSlotOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "subscriptionId" | "slotIndex" | "status" | "label" | "marzbanUsername" | "configUrl" | "lastSyncAt" | "lastSyncError" | "createdAt" | "updatedAt", ExtArgs["result"]["deviceSlot"]>
+  export type DeviceSlotOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "subscriptionId" | "slotIndex" | "status" | "deviceOs" | "assignedAt" | "assignedUserAgent" | "label" | "marzbanUsername" | "configUrl" | "lastSyncAt" | "lastSyncError" | "createdAt" | "updatedAt", ExtArgs["result"]["deviceSlot"]>
   export type DeviceSlotInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     subscription?: boolean | SubscriptionDefaultArgs<ExtArgs>
   }
@@ -22107,6 +22155,9 @@ export namespace Prisma {
       subscriptionId: string
       slotIndex: number
       status: $Enums.DeviceSlotStatus
+      deviceOs: $Enums.DeviceOS
+      assignedAt: Date | null
+      assignedUserAgent: string | null
       label: string | null
       marzbanUsername: string | null
       configUrl: string | null
@@ -22542,6 +22593,9 @@ export namespace Prisma {
     readonly subscriptionId: FieldRef<"DeviceSlot", 'String'>
     readonly slotIndex: FieldRef<"DeviceSlot", 'Int'>
     readonly status: FieldRef<"DeviceSlot", 'DeviceSlotStatus'>
+    readonly deviceOs: FieldRef<"DeviceSlot", 'DeviceOS'>
+    readonly assignedAt: FieldRef<"DeviceSlot", 'DateTime'>
+    readonly assignedUserAgent: FieldRef<"DeviceSlot", 'String'>
     readonly label: FieldRef<"DeviceSlot", 'String'>
     readonly marzbanUsername: FieldRef<"DeviceSlot", 'String'>
     readonly configUrl: FieldRef<"DeviceSlot", 'String'>
@@ -26587,6 +26641,9 @@ export namespace Prisma {
     subscriptionId: 'subscriptionId',
     slotIndex: 'slotIndex',
     status: 'status',
+    deviceOs: 'deviceOs',
+    assignedAt: 'assignedAt',
+    assignedUserAgent: 'assignedUserAgent',
     label: 'label',
     marzbanUsername: 'marzbanUsername',
     configUrl: 'configUrl',
@@ -26734,6 +26791,13 @@ export namespace Prisma {
    * Reference to a field of type 'DeviceSlotStatus'
    */
   export type EnumDeviceSlotStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DeviceSlotStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'DeviceOS'
+   */
+  export type EnumDeviceOSFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DeviceOS'>
     
 
 
@@ -28142,6 +28206,9 @@ export namespace Prisma {
     subscriptionId?: StringFilter<"DeviceSlot"> | string
     slotIndex?: IntFilter<"DeviceSlot"> | number
     status?: EnumDeviceSlotStatusFilter<"DeviceSlot"> | $Enums.DeviceSlotStatus
+    deviceOs?: EnumDeviceOSFilter<"DeviceSlot"> | $Enums.DeviceOS
+    assignedAt?: DateTimeNullableFilter<"DeviceSlot"> | Date | string | null
+    assignedUserAgent?: StringNullableFilter<"DeviceSlot"> | string | null
     label?: StringNullableFilter<"DeviceSlot"> | string | null
     marzbanUsername?: StringNullableFilter<"DeviceSlot"> | string | null
     configUrl?: StringNullableFilter<"DeviceSlot"> | string | null
@@ -28157,6 +28224,9 @@ export namespace Prisma {
     subscriptionId?: SortOrder
     slotIndex?: SortOrder
     status?: SortOrder
+    deviceOs?: SortOrder
+    assignedAt?: SortOrderInput | SortOrder
+    assignedUserAgent?: SortOrderInput | SortOrder
     label?: SortOrderInput | SortOrder
     marzbanUsername?: SortOrderInput | SortOrder
     configUrl?: SortOrderInput | SortOrder
@@ -28176,6 +28246,9 @@ export namespace Prisma {
     subscriptionId?: StringFilter<"DeviceSlot"> | string
     slotIndex?: IntFilter<"DeviceSlot"> | number
     status?: EnumDeviceSlotStatusFilter<"DeviceSlot"> | $Enums.DeviceSlotStatus
+    deviceOs?: EnumDeviceOSFilter<"DeviceSlot"> | $Enums.DeviceOS
+    assignedAt?: DateTimeNullableFilter<"DeviceSlot"> | Date | string | null
+    assignedUserAgent?: StringNullableFilter<"DeviceSlot"> | string | null
     label?: StringNullableFilter<"DeviceSlot"> | string | null
     marzbanUsername?: StringNullableFilter<"DeviceSlot"> | string | null
     configUrl?: StringNullableFilter<"DeviceSlot"> | string | null
@@ -28191,6 +28264,9 @@ export namespace Prisma {
     subscriptionId?: SortOrder
     slotIndex?: SortOrder
     status?: SortOrder
+    deviceOs?: SortOrder
+    assignedAt?: SortOrderInput | SortOrder
+    assignedUserAgent?: SortOrderInput | SortOrder
     label?: SortOrderInput | SortOrder
     marzbanUsername?: SortOrderInput | SortOrder
     configUrl?: SortOrderInput | SortOrder
@@ -28213,6 +28289,9 @@ export namespace Prisma {
     subscriptionId?: StringWithAggregatesFilter<"DeviceSlot"> | string
     slotIndex?: IntWithAggregatesFilter<"DeviceSlot"> | number
     status?: EnumDeviceSlotStatusWithAggregatesFilter<"DeviceSlot"> | $Enums.DeviceSlotStatus
+    deviceOs?: EnumDeviceOSWithAggregatesFilter<"DeviceSlot"> | $Enums.DeviceOS
+    assignedAt?: DateTimeNullableWithAggregatesFilter<"DeviceSlot"> | Date | string | null
+    assignedUserAgent?: StringNullableWithAggregatesFilter<"DeviceSlot"> | string | null
     label?: StringNullableWithAggregatesFilter<"DeviceSlot"> | string | null
     marzbanUsername?: StringNullableWithAggregatesFilter<"DeviceSlot"> | string | null
     configUrl?: StringNullableWithAggregatesFilter<"DeviceSlot"> | string | null
@@ -29982,6 +30061,9 @@ export namespace Prisma {
     id?: string
     slotIndex: number
     status?: $Enums.DeviceSlotStatus
+    deviceOs?: $Enums.DeviceOS
+    assignedAt?: Date | string | null
+    assignedUserAgent?: string | null
     label?: string | null
     marzbanUsername?: string | null
     configUrl?: string | null
@@ -29997,6 +30079,9 @@ export namespace Prisma {
     subscriptionId: string
     slotIndex: number
     status?: $Enums.DeviceSlotStatus
+    deviceOs?: $Enums.DeviceOS
+    assignedAt?: Date | string | null
+    assignedUserAgent?: string | null
     label?: string | null
     marzbanUsername?: string | null
     configUrl?: string | null
@@ -30010,6 +30095,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     slotIndex?: IntFieldUpdateOperationsInput | number
     status?: EnumDeviceSlotStatusFieldUpdateOperationsInput | $Enums.DeviceSlotStatus
+    deviceOs?: EnumDeviceOSFieldUpdateOperationsInput | $Enums.DeviceOS
+    assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    assignedUserAgent?: NullableStringFieldUpdateOperationsInput | string | null
     label?: NullableStringFieldUpdateOperationsInput | string | null
     marzbanUsername?: NullableStringFieldUpdateOperationsInput | string | null
     configUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30025,6 +30113,9 @@ export namespace Prisma {
     subscriptionId?: StringFieldUpdateOperationsInput | string
     slotIndex?: IntFieldUpdateOperationsInput | number
     status?: EnumDeviceSlotStatusFieldUpdateOperationsInput | $Enums.DeviceSlotStatus
+    deviceOs?: EnumDeviceOSFieldUpdateOperationsInput | $Enums.DeviceOS
+    assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    assignedUserAgent?: NullableStringFieldUpdateOperationsInput | string | null
     label?: NullableStringFieldUpdateOperationsInput | string | null
     marzbanUsername?: NullableStringFieldUpdateOperationsInput | string | null
     configUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30039,6 +30130,9 @@ export namespace Prisma {
     subscriptionId: string
     slotIndex: number
     status?: $Enums.DeviceSlotStatus
+    deviceOs?: $Enums.DeviceOS
+    assignedAt?: Date | string | null
+    assignedUserAgent?: string | null
     label?: string | null
     marzbanUsername?: string | null
     configUrl?: string | null
@@ -30052,6 +30146,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     slotIndex?: IntFieldUpdateOperationsInput | number
     status?: EnumDeviceSlotStatusFieldUpdateOperationsInput | $Enums.DeviceSlotStatus
+    deviceOs?: EnumDeviceOSFieldUpdateOperationsInput | $Enums.DeviceOS
+    assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    assignedUserAgent?: NullableStringFieldUpdateOperationsInput | string | null
     label?: NullableStringFieldUpdateOperationsInput | string | null
     marzbanUsername?: NullableStringFieldUpdateOperationsInput | string | null
     configUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30066,6 +30163,9 @@ export namespace Prisma {
     subscriptionId?: StringFieldUpdateOperationsInput | string
     slotIndex?: IntFieldUpdateOperationsInput | number
     status?: EnumDeviceSlotStatusFieldUpdateOperationsInput | $Enums.DeviceSlotStatus
+    deviceOs?: EnumDeviceOSFieldUpdateOperationsInput | $Enums.DeviceOS
+    assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    assignedUserAgent?: NullableStringFieldUpdateOperationsInput | string | null
     label?: NullableStringFieldUpdateOperationsInput | string | null
     marzbanUsername?: NullableStringFieldUpdateOperationsInput | string | null
     configUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31583,6 +31683,13 @@ export namespace Prisma {
     not?: NestedEnumDeviceSlotStatusFilter<$PrismaModel> | $Enums.DeviceSlotStatus
   }
 
+  export type EnumDeviceOSFilter<$PrismaModel = never> = {
+    equals?: $Enums.DeviceOS | EnumDeviceOSFieldRefInput<$PrismaModel>
+    in?: $Enums.DeviceOS[]
+    notIn?: $Enums.DeviceOS[]
+    not?: NestedEnumDeviceOSFilter<$PrismaModel> | $Enums.DeviceOS
+  }
+
   export type SubscriptionScalarRelationFilter = {
     is?: SubscriptionWhereInput
     isNot?: SubscriptionWhereInput
@@ -31598,6 +31705,9 @@ export namespace Prisma {
     subscriptionId?: SortOrder
     slotIndex?: SortOrder
     status?: SortOrder
+    deviceOs?: SortOrder
+    assignedAt?: SortOrder
+    assignedUserAgent?: SortOrder
     label?: SortOrder
     marzbanUsername?: SortOrder
     configUrl?: SortOrder
@@ -31616,6 +31726,9 @@ export namespace Prisma {
     subscriptionId?: SortOrder
     slotIndex?: SortOrder
     status?: SortOrder
+    deviceOs?: SortOrder
+    assignedAt?: SortOrder
+    assignedUserAgent?: SortOrder
     label?: SortOrder
     marzbanUsername?: SortOrder
     configUrl?: SortOrder
@@ -31630,6 +31743,9 @@ export namespace Prisma {
     subscriptionId?: SortOrder
     slotIndex?: SortOrder
     status?: SortOrder
+    deviceOs?: SortOrder
+    assignedAt?: SortOrder
+    assignedUserAgent?: SortOrder
     label?: SortOrder
     marzbanUsername?: SortOrder
     configUrl?: SortOrder
@@ -31651,6 +31767,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumDeviceSlotStatusFilter<$PrismaModel>
     _max?: NestedEnumDeviceSlotStatusFilter<$PrismaModel>
+  }
+
+  export type EnumDeviceOSWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DeviceOS | EnumDeviceOSFieldRefInput<$PrismaModel>
+    in?: $Enums.DeviceOS[]
+    notIn?: $Enums.DeviceOS[]
+    not?: NestedEnumDeviceOSWithAggregatesFilter<$PrismaModel> | $Enums.DeviceOS
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDeviceOSFilter<$PrismaModel>
+    _max?: NestedEnumDeviceOSFilter<$PrismaModel>
   }
 
   export type EnumIntegrationProviderFilter<$PrismaModel = never> = {
@@ -32797,6 +32923,10 @@ export namespace Prisma {
     set?: $Enums.DeviceSlotStatus
   }
 
+  export type EnumDeviceOSFieldUpdateOperationsInput = {
+    set?: $Enums.DeviceOS
+  }
+
   export type SubscriptionUpdateOneRequiredWithoutDeviceSlotsNestedInput = {
     create?: XOR<SubscriptionCreateWithoutDeviceSlotsInput, SubscriptionUncheckedCreateWithoutDeviceSlotsInput>
     connectOrCreate?: SubscriptionCreateOrConnectWithoutDeviceSlotsInput
@@ -33158,6 +33288,13 @@ export namespace Prisma {
     not?: NestedEnumDeviceSlotStatusFilter<$PrismaModel> | $Enums.DeviceSlotStatus
   }
 
+  export type NestedEnumDeviceOSFilter<$PrismaModel = never> = {
+    equals?: $Enums.DeviceOS | EnumDeviceOSFieldRefInput<$PrismaModel>
+    in?: $Enums.DeviceOS[]
+    notIn?: $Enums.DeviceOS[]
+    not?: NestedEnumDeviceOSFilter<$PrismaModel> | $Enums.DeviceOS
+  }
+
   export type NestedEnumDeviceSlotStatusWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.DeviceSlotStatus | EnumDeviceSlotStatusFieldRefInput<$PrismaModel>
     in?: $Enums.DeviceSlotStatus[]
@@ -33166,6 +33303,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumDeviceSlotStatusFilter<$PrismaModel>
     _max?: NestedEnumDeviceSlotStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumDeviceOSWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DeviceOS | EnumDeviceOSFieldRefInput<$PrismaModel>
+    in?: $Enums.DeviceOS[]
+    notIn?: $Enums.DeviceOS[]
+    not?: NestedEnumDeviceOSWithAggregatesFilter<$PrismaModel> | $Enums.DeviceOS
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDeviceOSFilter<$PrismaModel>
+    _max?: NestedEnumDeviceOSFilter<$PrismaModel>
   }
 
   export type NestedEnumIntegrationProviderFilter<$PrismaModel = never> = {
@@ -35525,6 +35672,9 @@ export namespace Prisma {
     id?: string
     slotIndex: number
     status?: $Enums.DeviceSlotStatus
+    deviceOs?: $Enums.DeviceOS
+    assignedAt?: Date | string | null
+    assignedUserAgent?: string | null
     label?: string | null
     marzbanUsername?: string | null
     configUrl?: string | null
@@ -35538,6 +35688,9 @@ export namespace Prisma {
     id?: string
     slotIndex: number
     status?: $Enums.DeviceSlotStatus
+    deviceOs?: $Enums.DeviceOS
+    assignedAt?: Date | string | null
+    assignedUserAgent?: string | null
     label?: string | null
     marzbanUsername?: string | null
     configUrl?: string | null
@@ -35706,6 +35859,9 @@ export namespace Prisma {
     subscriptionId?: StringFilter<"DeviceSlot"> | string
     slotIndex?: IntFilter<"DeviceSlot"> | number
     status?: EnumDeviceSlotStatusFilter<"DeviceSlot"> | $Enums.DeviceSlotStatus
+    deviceOs?: EnumDeviceOSFilter<"DeviceSlot"> | $Enums.DeviceOS
+    assignedAt?: DateTimeNullableFilter<"DeviceSlot"> | Date | string | null
+    assignedUserAgent?: StringNullableFilter<"DeviceSlot"> | string | null
     label?: StringNullableFilter<"DeviceSlot"> | string | null
     marzbanUsername?: StringNullableFilter<"DeviceSlot"> | string | null
     configUrl?: StringNullableFilter<"DeviceSlot"> | string | null
@@ -36922,6 +37078,9 @@ export namespace Prisma {
     id?: string
     slotIndex: number
     status?: $Enums.DeviceSlotStatus
+    deviceOs?: $Enums.DeviceOS
+    assignedAt?: Date | string | null
+    assignedUserAgent?: string | null
     label?: string | null
     marzbanUsername?: string | null
     configUrl?: string | null
@@ -36935,6 +37094,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     slotIndex?: IntFieldUpdateOperationsInput | number
     status?: EnumDeviceSlotStatusFieldUpdateOperationsInput | $Enums.DeviceSlotStatus
+    deviceOs?: EnumDeviceOSFieldUpdateOperationsInput | $Enums.DeviceOS
+    assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    assignedUserAgent?: NullableStringFieldUpdateOperationsInput | string | null
     label?: NullableStringFieldUpdateOperationsInput | string | null
     marzbanUsername?: NullableStringFieldUpdateOperationsInput | string | null
     configUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36948,6 +37110,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     slotIndex?: IntFieldUpdateOperationsInput | number
     status?: EnumDeviceSlotStatusFieldUpdateOperationsInput | $Enums.DeviceSlotStatus
+    deviceOs?: EnumDeviceOSFieldUpdateOperationsInput | $Enums.DeviceOS
+    assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    assignedUserAgent?: NullableStringFieldUpdateOperationsInput | string | null
     label?: NullableStringFieldUpdateOperationsInput | string | null
     marzbanUsername?: NullableStringFieldUpdateOperationsInput | string | null
     configUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36961,6 +37126,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     slotIndex?: IntFieldUpdateOperationsInput | number
     status?: EnumDeviceSlotStatusFieldUpdateOperationsInput | $Enums.DeviceSlotStatus
+    deviceOs?: EnumDeviceOSFieldUpdateOperationsInput | $Enums.DeviceOS
+    assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    assignedUserAgent?: NullableStringFieldUpdateOperationsInput | string | null
     label?: NullableStringFieldUpdateOperationsInput | string | null
     marzbanUsername?: NullableStringFieldUpdateOperationsInput | string | null
     configUrl?: NullableStringFieldUpdateOperationsInput | string | null

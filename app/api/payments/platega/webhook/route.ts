@@ -7,7 +7,10 @@ import {
   handleRejectedPaymentPostProcessing,
 } from "@/lib/payment-post-approval-handler";
 import { prisma } from "@/lib/prisma";
-import { issueSubscriptionInXui, revokeSubscriptionInXui } from "@/lib/xui-integration";
+import {
+  provisionSubscriptionSlotsInXui,
+  revokeSubscriptionInXui,
+} from "@/lib/xui-integration";
 import {
   parsePlategaWebhookPayload,
   validatePlategaWebhookHeaders,
@@ -314,7 +317,7 @@ export async function POST(request: Request) {
     }
 
     if (txResult.createdSubscriptionId) {
-      await issueSubscriptionInXui(txResult.createdSubscriptionId);
+      await provisionSubscriptionSlotsInXui(txResult.createdSubscriptionId);
     }
 
     await prisma.plategaWebhookLog.update({

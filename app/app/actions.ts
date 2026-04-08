@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { DeviceOS } from "@/generated/prisma";
 
 import {
   mapLegacyAnchorToAppTab,
@@ -11,6 +12,11 @@ import {
 import { generateReferralCodeValue } from "@/lib/admin-code-management";
 import { getAppBenefitsData, validatePromoCodeForUser } from "@/lib/app-benefits";
 import { getCurrentSession, normalizeCode } from "@/lib/auth";
+import { parseSelectableDeviceOsValue } from "@/lib/device-os";
+import {
+  assignManagedSlotForUser,
+  syncSlotConfigWithRetry,
+} from "@/lib/device-slot-management";
 import { handleApprovedPaymentPostProcessing } from "@/lib/payment-post-approval-handler";
 import { PayoutDomainError } from "@/lib/payouts/payout-errors";
 import {
@@ -23,7 +29,8 @@ import {
   getAppSubscriptionConstructorData,
 } from "@/lib/subscription-constructor";
 import {
-  issueSubscriptionInXui,
+  provisionSubscriptionSlotsInXui,
+  reissueDeviceSlotCredentialInXui,
   revokeSubscriptionInXui,
   syncSubscriptionInXui,
 } from "@/lib/xui-integration";
@@ -121,6 +128,99 @@ function inlineActionResult(
     message,
     nonce: Date.now(),
     status,
+  };
+}
+
+function resolveRequestedDeviceOs(rawDeviceOs: string | null | undefined) {
+  const fromForm = parseSelectableDeviceOsValue(rawDeviceOs, null);
+  return fromForm ? (fromForm as DeviceOS) : null;
+}
+
+type SetupAssignedSlotPayload = {
+  configUrl: string | null;
+  deviceOs: DeviceOS;
+  id: string;
+  slotIndex: number;
+  status: "ACTIVE" | "BLOCKED" | "FREE";
+};
+
+type SetupSlotActionCode =
+  | "ASSIGNED"
+  | "NO_ACTIVE_SUBSCRIPTION"
+  | "NO_FREE_SLOTS";
+
+type SetupPreviewSlotPayload = {
+  configUrl: string;
+  id: string;
+  slotIndex: number;
+};
+
+export type AssignSetupSlotActionResult = {
+  code: SetupSlotActionCode;
+  message: string;
+  ok: boolean;
+  slot: SetupAssignedSlotPayload | null;
+};
+
+function toSetupAssignedSlotPayload(slot: {
+  configUrl: string | null;
+  deviceOs: DeviceOS;
+  id: string;
+  slotIndex: number;
+  status: "ACTIVE" | "BLOCKED" | "FREE";
+}): SetupAssignedSlotPayload {
+  return {
+    configUrl: slot.configUrl,
+    deviceOs: slot.deviceOs,
+    id: slot.id,
+    slotIndex: slot.slotIndex,
+    status: slot.status,
+  };
+}
+
+export async function getSetupPreviewSlotAction(): Promise<{
+  ok: boolean;
+  slot: SetupPreviewSlotPayload | null;
+}> {
+  const user = await getUserActor();
+  const activeSubscription = await prisma.subscription.findFirst({
+    orderBy: [{ startsAt: "desc" }, { startedAt: "desc" }],
+    select: {
+      deviceSlots: {
+        orderBy: {
+          slotIndex: "asc",
+        },
+        select: {
+          configUrl: true,
+          id: true,
+          slotIndex: true,
+        },
+        take: 1,
+        where: {
+          configUrl: {
+            not: null,
+          },
+          status: "FREE",
+        },
+      },
+    },
+    where: {
+      status: "ACTIVE",
+      userId: user.id,
+    },
+  });
+
+  const slot = activeSubscription?.deviceSlots[0] ?? null;
+
+  return {
+    ok: true,
+    slot: slot
+      ? {
+          configUrl: slot.configUrl!,
+          id: slot.id,
+          slotIndex: slot.slotIndex,
+        }
+      : null,
   };
 }
 
@@ -764,7 +864,7 @@ export async function payTariffWithCreditsAction(formData: FormData) {
   }
 
   if (createdSubscriptionId) {
-    const integrationResult = await issueSubscriptionInXui(createdSubscriptionId);
+    const integrationResult = await provisionSubscriptionSlotsInXui(createdSubscriptionId);
 
     if (!integrationResult.ok) {
       integrationNotice +=
@@ -822,7 +922,70 @@ async function getManagedSlotForUser(input: { slotId: string; userId: string }) 
   return slot;
 }
 
-export async function activateDeviceSlotAction(formData: FormData) {
+export async function assignSetupSlotAction(input: {
+  deviceOs?: string;
+  slotId?: string;
+}): Promise<AssignSetupSlotActionResult> {
+  const user = await getUserActor();
+  const slotId = String(input.slotId ?? "").trim();
+  const requestedDeviceOs = resolveRequestedDeviceOs(input.deviceOs);
+
+  if (!slotId) {
+    return {
+      code: "NO_FREE_SLOTS",
+      message:
+        "Все устройства заняты. Замените один из слотов в разделе \"Устройства\".",
+      ok: false,
+      slot: null,
+    };
+  }
+
+  if (!requestedDeviceOs) {
+    return {
+      code: "NO_FREE_SLOTS",
+      message: "Выберите операционную систему устройства.",
+      ok: false,
+      slot: null,
+    };
+  }
+
+  const assignmentResult = await assignManagedSlotForUser({
+    deviceOs: requestedDeviceOs,
+    slotId,
+    userId: user.id,
+  });
+
+  if (assignmentResult.type !== "ASSIGNED") {
+    if (assignmentResult.type === "NO_ACTIVE_SUBSCRIPTION") {
+      return {
+        code: "NO_ACTIVE_SUBSCRIPTION",
+        message: "Для настройки устройства нужна активная подписка.",
+        ok: false,
+        slot: null,
+      };
+    }
+
+    return {
+      code: "NO_FREE_SLOTS",
+      message:
+        "Все устройства заняты. Замените один из слотов в разделе \"Устройства\".",
+      ok: false,
+      slot: null,
+    };
+  }
+
+  revalidatePath("/app");
+  revalidatePath("/admin");
+
+  return {
+    code: "ASSIGNED",
+    message: "Настройка завершена.",
+    ok: true,
+    slot: toSetupAssignedSlotPayload(assignmentResult.slot),
+  };
+}
+
+export async function retrySlotSyncAction(formData: FormData) {
   const user = await getUserActor();
   const slotId = String(formData.get("slotId") ?? "");
 
@@ -831,6 +994,76 @@ export async function activateDeviceSlotAction(formData: FormData) {
       buildRedirectUrl({
         tab: "devices",
         error: "Слот не найден.",
+      })
+    );
+  }
+
+  const slot = await getManagedSlotForUser({ slotId, userId: user.id });
+
+  if (!slot) {
+    redirect(
+      buildRedirectUrl({
+        tab: "devices",
+        error: "Слот недоступен для управления.",
+      })
+    );
+  }
+
+  if (slot.status !== "ACTIVE") {
+    redirect(
+      buildRedirectUrl({
+        tab: "devices",
+        notice: `Слот ${slot.slotIndex} неактивен.`,
+      })
+    );
+  }
+
+  const syncResult = await syncSlotConfigWithRetry({
+    slotId: slot.id,
+    subscriptionId: slot.subscription.id,
+  });
+
+  revalidatePath("/app");
+  revalidatePath("/admin");
+
+  if (syncResult.type === "SYNC_FAILED") {
+    redirect(
+      buildRedirectUrl({
+        tab: "devices",
+        error: `Слот ${slot.slotIndex}: ${syncResult.errorMessage}`,
+      })
+    );
+  }
+
+  redirect(
+    buildRedirectUrl({
+      tab: "devices",
+      notice: `Слот ${syncResult.slot.slotIndex} синхронизирован.`,
+    })
+  );
+}
+
+export async function activateDeviceSlotAction(formData: FormData) {
+  const user = await getUserActor();
+  const slotId = String(formData.get("slotId") ?? "");
+  const requestedDeviceOs = resolveRequestedDeviceOs(
+    String(formData.get("deviceOs") ?? "")
+  );
+
+  if (!slotId) {
+    redirect(
+      buildRedirectUrl({
+        tab: "devices",
+        error: "Слот не найден.",
+      })
+    );
+  }
+
+  if (!requestedDeviceOs) {
+    redirect(
+      buildRedirectUrl({
+        tab: "devices",
+        error: "Выберите операционную систему устройства.",
       })
     );
   }
@@ -864,40 +1097,155 @@ export async function activateDeviceSlotAction(formData: FormData) {
     );
   }
 
-  const activeCount = await prisma.deviceSlot.count({
-    where: {
-      status: "ACTIVE",
-      subscriptionId: slot.subscription.id,
-    },
-  });
-
-  if (activeCount >= slot.subscription.deviceLimit) {
-    redirect(
-      buildRedirectUrl({
-        tab: "devices",
-        error: `Лимит устройств (${slot.subscription.deviceLimit}) уже достигнут.`,
-      })
-    );
-  }
-
   await prisma.deviceSlot.update({
     data: {
+      deviceOs: requestedDeviceOs,
       status: "ACTIVE",
     },
     where: { id: slot.id },
   });
 
-  const syncResult = await syncSubscriptionInXui(slot.subscription.id);
-  const syncNotice = syncResult.ok
-    ? ""
-    : " 3x-ui вернул ошибку синхронизации, проверьте логи интеграции.";
-
   revalidatePath("/app");
   revalidatePath("/admin");
+
   redirect(
     buildRedirectUrl({
       tab: "devices",
-      notice: `Слот ${slot.slotIndex} активирован.${syncNotice}`,
+      notice: `Слот ${slot.slotIndex} активирован.`,
+    })
+  );
+}
+
+export async function updateDeviceSlotOsInlineAction(input: {
+  deviceOs?: string;
+  slotId?: string;
+}) {
+  const user = await getUserActor();
+  const slotId = String(input.slotId ?? "").trim();
+  const requestedDeviceOs = resolveRequestedDeviceOs(input.deviceOs);
+
+  if (!slotId) {
+    return {
+      message: "Слот не найден.",
+      ok: false,
+    } as const;
+  }
+
+  if (!requestedDeviceOs) {
+    return {
+      message: "Выберите операционную систему устройства.",
+      ok: false,
+    } as const;
+  }
+
+  const slot = await getManagedSlotForUser({ slotId, userId: user.id });
+
+  if (!slot) {
+    return {
+      message: "Слот недоступен для управления.",
+      ok: false,
+    } as const;
+  }
+
+  if (slot.status === "BLOCKED") {
+    return {
+      message: "Слот заблокирован и не может быть изменен.",
+      ok: false,
+    } as const;
+  }
+
+  await prisma.deviceSlot.update({
+    data: {
+      deviceOs: requestedDeviceOs,
+    },
+    where: { id: slot.id },
+  });
+
+  revalidatePath("/app");
+  revalidatePath("/admin");
+  return {
+    message: `ОС слота ${slot.slotIndex} обновлена.`,
+    ok: true,
+  } as const;
+}
+
+export async function updateDeviceSlotOsAction(formData: FormData) {
+  const result = await updateDeviceSlotOsInlineAction({
+    deviceOs: String(formData.get("deviceOs") ?? ""),
+    slotId: String(formData.get("slotId") ?? ""),
+  });
+
+  redirect(
+    buildRedirectUrl({
+      tab: "devices",
+      [result.ok ? "notice" : "error"]: result.message,
+    })
+  );
+}
+
+export async function reissueDeviceSlotLinkAction(formData: FormData) {
+  const user = await getUserActor();
+  const slotId = String(formData.get("slotId") ?? "");
+  const requestedDeviceOs = resolveRequestedDeviceOs(
+    String(formData.get("deviceOs") ?? "")
+  );
+
+  if (!slotId) {
+    redirect(
+      buildRedirectUrl({
+        tab: "devices",
+        error: "Слот не найден.",
+      })
+    );
+  }
+
+  const slot = await getManagedSlotForUser({ slotId, userId: user.id });
+
+  if (!slot) {
+    redirect(
+      buildRedirectUrl({
+        tab: "devices",
+        error: "Слот недоступен для управления.",
+      })
+    );
+  }
+
+  if (slot.status !== "ACTIVE") {
+    redirect(
+      buildRedirectUrl({
+        tab: "devices",
+        error: "Перевыпуск доступен только для активного слота.",
+      })
+    );
+  }
+
+  if (requestedDeviceOs) {
+    await prisma.deviceSlot.update({
+      data: {
+        deviceOs: requestedDeviceOs,
+      },
+      where: { id: slot.id },
+    });
+  }
+
+  const reissueResult = await reissueDeviceSlotCredentialInXui({ slotId: slot.id });
+
+  revalidatePath("/app");
+  revalidatePath("/admin");
+
+  if (!reissueResult.ok) {
+    redirect(
+      buildRedirectUrl({
+        tab: "devices",
+        error: `Слот ${slot.slotIndex}: ${reissueResult.error ?? "не удалось перевыпустить ссылку."}`,
+      })
+    );
+  }
+
+  redirect(
+    buildRedirectUrl({
+      tab: "devices",
+      notice: `Ссылка для слота ${slot.slotIndex} перевыпущена.`,
     })
   );
 }
@@ -937,6 +1285,10 @@ export async function deactivateDeviceSlotAction(formData: FormData) {
 
   await prisma.deviceSlot.update({
     data: {
+      assignedAt: null,
+      assignedUserAgent: null,
+      deviceOs: "UNKNOWN",
+      lastSyncError: null,
       status: "FREE",
     },
     where: { id: slot.id },

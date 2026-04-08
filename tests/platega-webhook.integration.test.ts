@@ -55,7 +55,7 @@ const hoisted = vi.hoisted(() => {
     revokedSubscriptionId: "revoked_sub_1",
   }));
 
-  const issueSubscriptionInXuiMock = vi.fn(async () => ({ ok: true as const }));
+  const provisionSubscriptionSlotsInXuiMock = vi.fn(async () => ({ ok: true as const }));
   const revokeSubscriptionInXuiMock = vi.fn(async () => ({ ok: true as const }));
 
   const validatePlategaWebhookHeadersMock = vi.fn(() => true);
@@ -143,7 +143,7 @@ const hoisted = vi.hoisted(() => {
   return {
     handleApprovedPaymentPostProcessingMock,
     handleRejectedPaymentPostProcessingMock,
-    issueSubscriptionInXuiMock,
+    provisionSubscriptionSlotsInXuiMock,
     parsePlategaWebhookPayloadMock,
     paymentRequests,
     prismaMock,
@@ -159,7 +159,7 @@ vi.mock("@/lib/payment-post-approval-handler", () => ({
 }));
 
 vi.mock("@/lib/xui-integration", () => ({
-  issueSubscriptionInXui: hoisted.issueSubscriptionInXuiMock,
+  provisionSubscriptionSlotsInXui: hoisted.provisionSubscriptionSlotsInXuiMock,
   revokeSubscriptionInXui: hoisted.revokeSubscriptionInXuiMock,
 }));
 
@@ -225,7 +225,7 @@ describe("Platega webhook idempotency", () => {
 
     hoisted.handleApprovedPaymentPostProcessingMock.mockClear();
     hoisted.handleRejectedPaymentPostProcessingMock.mockClear();
-    hoisted.issueSubscriptionInXuiMock.mockClear();
+    hoisted.provisionSubscriptionSlotsInXuiMock.mockClear();
     hoisted.revokeSubscriptionInXuiMock.mockClear();
     hoisted.validatePlategaWebhookHeadersMock.mockClear();
     hoisted.parsePlategaWebhookPayloadMock.mockClear();
@@ -247,7 +247,7 @@ describe("Platega webhook idempotency", () => {
 
     expect(firstResponse.status).toBe(200);
     expect(hoisted.handleApprovedPaymentPostProcessingMock).toHaveBeenCalledTimes(1);
-    expect(hoisted.issueSubscriptionInXuiMock).toHaveBeenCalledTimes(1);
+    expect(hoisted.provisionSubscriptionSlotsInXuiMock).toHaveBeenCalledTimes(1);
     expect(hoisted.webhookLogs.size).toBe(1);
 
     const secondResponse = await POST(
@@ -262,7 +262,7 @@ describe("Platega webhook idempotency", () => {
     expect(secondResponse.status).toBe(200);
     expect(secondBody.dedup).toBe(true);
     expect(hoisted.handleApprovedPaymentPostProcessingMock).toHaveBeenCalledTimes(1);
-    expect(hoisted.issueSubscriptionInXuiMock).toHaveBeenCalledTimes(1);
+    expect(hoisted.provisionSubscriptionSlotsInXuiMock).toHaveBeenCalledTimes(1);
     expect(hoisted.webhookLogs.size).toBe(1);
   });
 
@@ -281,7 +281,7 @@ describe("Platega webhook idempotency", () => {
 
     expect(response.status).toBe(200);
     expect(hoisted.handleApprovedPaymentPostProcessingMock).not.toHaveBeenCalled();
-    expect(hoisted.issueSubscriptionInXuiMock).not.toHaveBeenCalled();
+    expect(hoisted.provisionSubscriptionSlotsInXuiMock).not.toHaveBeenCalled();
     expect(hoisted.revokeSubscriptionInXuiMock).not.toHaveBeenCalled();
 
     const payment = hoisted.paymentRequests.get("payment_pending_1");
@@ -304,7 +304,7 @@ describe("Platega webhook idempotency", () => {
 
     expect(firstResponse.status).toBe(200);
     expect(hoisted.handleApprovedPaymentPostProcessingMock).toHaveBeenCalledTimes(1);
-    expect(hoisted.issueSubscriptionInXuiMock).toHaveBeenCalledTimes(1);
+    expect(hoisted.provisionSubscriptionSlotsInXuiMock).toHaveBeenCalledTimes(1);
 
     const secondResponse = await POST(
       buildWebhookRequest({
@@ -316,7 +316,7 @@ describe("Platega webhook idempotency", () => {
 
     expect(secondResponse.status).toBe(200);
     expect(hoisted.handleApprovedPaymentPostProcessingMock).toHaveBeenCalledTimes(1);
-    expect(hoisted.issueSubscriptionInXuiMock).toHaveBeenCalledTimes(1);
+    expect(hoisted.provisionSubscriptionSlotsInXuiMock).toHaveBeenCalledTimes(1);
     expect(hoisted.webhookLogs.size).toBe(2);
 
     const payment = hoisted.paymentRequests.get("payment_2");
@@ -369,7 +369,7 @@ describe("Platega webhook idempotency", () => {
 
     expect(response.status).toBe(200);
     expect(hoisted.handleApprovedPaymentPostProcessingMock).not.toHaveBeenCalled();
-    expect(hoisted.issueSubscriptionInXuiMock).not.toHaveBeenCalled();
+    expect(hoisted.provisionSubscriptionSlotsInXuiMock).not.toHaveBeenCalled();
     expect(hoisted.revokeSubscriptionInXuiMock).not.toHaveBeenCalled();
     expect(hoisted.webhookLogs.size).toBe(1);
   });
@@ -398,7 +398,7 @@ describe("Platega webhook idempotency", () => {
     expect(confirmedResponse.status).toBe(200);
 
     expect(hoisted.handleApprovedPaymentPostProcessingMock).not.toHaveBeenCalled();
-    expect(hoisted.issueSubscriptionInXuiMock).not.toHaveBeenCalled();
+    expect(hoisted.provisionSubscriptionSlotsInXuiMock).not.toHaveBeenCalled();
     expect(hoisted.revokeSubscriptionInXuiMock).not.toHaveBeenCalled();
 
     const payment = hoisted.paymentRequests.get("payment_out_of_order_1");
@@ -465,7 +465,7 @@ describe("Platega webhook idempotency", () => {
       transactionId: "txn_partial_failure_1",
     });
 
-    hoisted.issueSubscriptionInXuiMock.mockRejectedValueOnce(
+    hoisted.provisionSubscriptionSlotsInXuiMock.mockRejectedValueOnce(
       new Error("xui temporary failure")
     );
 
@@ -486,9 +486,10 @@ describe("Platega webhook idempotency", () => {
     expect(secondResponse.status).toBe(200);
 
     expect(hoisted.handleApprovedPaymentPostProcessingMock).toHaveBeenCalledTimes(1);
-    expect(hoisted.issueSubscriptionInXuiMock).toHaveBeenCalledTimes(1);
+    expect(hoisted.provisionSubscriptionSlotsInXuiMock).toHaveBeenCalledTimes(1);
 
     const payment = hoisted.paymentRequests.get("payment_partial_failure_1");
     expect(payment?.status).toBe("APPROVED");
   });
 });
+

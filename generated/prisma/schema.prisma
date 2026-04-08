@@ -30,6 +30,14 @@ enum DeviceSlotStatus {
   BLOCKED
 }
 
+enum DeviceOS {
+  ANDROID
+  IOS
+  WINDOWS
+  MACOS
+  UNKNOWN
+}
+
 enum IntegrationProvider {
   MARZBAN
 }
@@ -350,21 +358,26 @@ model Subscription {
 }
 
 model DeviceSlot {
-  id              String           @id @default(cuid())
-  subscriptionId  String
-  slotIndex       Int
-  status          DeviceSlotStatus @default(FREE)
-  label           String?
-  marzbanUsername String?
-  configUrl       String?
-  lastSyncAt      DateTime?
-  lastSyncError   String?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  subscription    Subscription     @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  id                String           @id @default(cuid())
+  subscriptionId    String
+  slotIndex         Int
+  status            DeviceSlotStatus @default(FREE)
+  deviceOs          DeviceOS         @default(UNKNOWN)
+  assignedAt        DateTime?
+  assignedUserAgent String?
+  label             String?
+  marzbanUsername   String?
+  configUrl         String?
+  lastSyncAt        DateTime?
+  lastSyncError     String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  subscription      Subscription     @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
 
   @@unique([subscriptionId, slotIndex])
   @@index([status])
+  @@index([assignedAt])
+  @@index([subscriptionId, status, assignedAt])
 }
 
 model IntegrationSyncLog {

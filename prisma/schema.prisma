@@ -30,6 +30,14 @@ enum DeviceSlotStatus {
   BLOCKED
 }
 
+enum DeviceOS {
+  ANDROID
+  IOS
+  WINDOWS
+  MACOS
+  UNKNOWN
+}
+
 enum IntegrationProvider {
   MARZBAN
 }
@@ -354,6 +362,9 @@ model DeviceSlot {
   subscriptionId String
   slotIndex      Int
   status         DeviceSlotStatus @default(FREE)
+  deviceOs       DeviceOS         @default(UNKNOWN)
+  assignedAt     DateTime?
+  assignedUserAgent String?
   label          String?
   marzbanUsername String?
   configUrl      String?
@@ -365,6 +376,8 @@ model DeviceSlot {
 
   @@unique([subscriptionId, slotIndex])
   @@index([status])
+  @@index([assignedAt])
+  @@index([subscriptionId, status, assignedAt])
 }
 
 model IntegrationSyncLog {

@@ -1,9 +1,9 @@
-import { TriangleAlertIcon } from "lucide-react"
+import Image from "next/image"
 
 import { DeviceList } from "@/components/app/device-list"
 import { EmptyStateBlock } from "@/components/app/empty-state-block"
 import { QuickActionsSheet } from "@/components/app/quick-actions-sheet"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Card, CardContent, CardTitle } from "@/components/ui/card"
 
 type DurationRuleItem = {
   discountPercent: number
@@ -23,8 +23,8 @@ type ActiveSubscriptionItem = {
   deviceLimit: number
   deviceSlots: Array<{
     configUrl: string | null
+    deviceOs: "ANDROID" | "IOS" | "MACOS" | "UNKNOWN" | "WINDOWS"
     id: string
-    label: string | null
     lastSyncError: string | null
     slotIndex: number
     status: "ACTIVE" | "BLOCKED" | "FREE"
@@ -81,30 +81,33 @@ export function AppDevicesTab({
     )
   }
 
-  const deviceLimit = Math.max(activeSubscription.devices, activeSubscription.deviceLimit)
-  const activeDevices = activeSubscription.deviceSlots.filter((slot) => slot.status === "ACTIVE").length
-  const isDeviceLimitReached = deviceLimit > 0 && activeDevices >= deviceLimit
-
   return (
     <section className="space-y-4">
-      {isDeviceLimitReached ? (
-        <Alert>
-          <TriangleAlertIcon />
-          <AlertTitle>Лимит устройств достигнут</AlertTitle>
-          <AlertDescription>
-            Активно {activeDevices} из {deviceLimit}. Отключите один из слотов, чтобы подключить новое устройство.
-          </AlertDescription>
-        </Alert>
-      ) : null}
+      <Card className="gap-0 overflow-hidden border-border/70 bg-card/40 py-0">
+        <div className="relative aspect-[16/9] w-full border-b border-border/70 bg-transparent">
+          <Image
+            alt="Устройства PulsarVPN"
+            className="object-contain p-4"
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 460px"
+            src="/details/observed.gif"
+            unoptimized
+          />
+        </div>
+        <CardContent className="space-y-4 p-4">
+          <CardTitle className="text-lg">Устройства</CardTitle>
 
-      {activeSubscription.deviceSlots.length ? (
-        <DeviceList slots={activeSubscription.deviceSlots} />
-      ) : (
-        <EmptyStateBlock
-          description="Слоты пока не созданы. Повторите позже или обратитесь в поддержку."
-          title="Нет устройств"
-        />
-      )}
+          {activeSubscription.deviceSlots.length ? (
+            <DeviceList slots={activeSubscription.deviceSlots} />
+          ) : (
+            <EmptyStateBlock
+              description="Слоты пока не созданы. Повторите позже или обратитесь в поддержку."
+              title="Нет устройств"
+            />
+          )}
+        </CardContent>
+      </Card>
     </section>
   )
 }

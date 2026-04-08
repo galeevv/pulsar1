@@ -24,6 +24,7 @@ type ActiveSubscriptionItem = {
   deviceLimit: number
   deviceSlots: Array<{
     configUrl: string | null
+    deviceOs: "ANDROID" | "IOS" | "MACOS" | "UNKNOWN" | "WINDOWS"
     id: string
     label: string | null
     lastSyncError: string | null
@@ -105,6 +106,10 @@ export function AppHomeTab({
   pricingSettings: PricingSettings
 }) {
   const state = getSubscriptionState(activeSubscription, latestSubscriptionStatus)
+  const setupPreviewSlot =
+    activeSubscription?.deviceSlots.find(
+      (slot) => slot.status === "FREE" && Boolean(slot.configUrl)
+    ) ?? null
 
   return (
     <section className="space-y-4">
@@ -131,8 +136,17 @@ export function AppHomeTab({
             triggerLabel={state.ctaLabel}
           />
           <AppSetupDialog
+            canStartSetup={Boolean(activeSubscription)}
             defaultOpen={autoOpenSetupDialog}
-            subscriptionUrl={activeSubscription?.subscriptionUrl ?? null}
+            previewSlot={
+              setupPreviewSlot
+                ? {
+                    configUrl: setupPreviewSlot.configUrl!,
+                    id: setupPreviewSlot.id,
+                    slotIndex: setupPreviewSlot.slotIndex,
+                  }
+                : null
+            }
             triggerLabel="Настроить VPN"
             triggerVariant="outline"
           />
@@ -141,4 +155,3 @@ export function AppHomeTab({
     </section>
   )
 }
-

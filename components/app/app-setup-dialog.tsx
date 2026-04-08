@@ -1,6 +1,7 @@
 "use client"
 
-import { useMemo, useState, type ComponentType } from "react"
+import { useMemo, useState, useTransition, type ComponentType } from "react"
+import { useRouter } from "next/navigation"
 
 import {
   Apple,
@@ -10,12 +11,22 @@ import {
   Download,
   Laptop,
   Link2,
+  Loader2Icon,
   Monitor,
   Settings2,
   Smartphone,
 } from "lucide-react"
 import { toast } from "sonner"
 
+import {
+  assignSetupSlotAction,
+  getSetupPreviewSlotAction,
+} from "@/app/app/actions"
+import {
+  detectDeviceOsFromNavigator,
+  mapSetupPlatformToDeviceOs,
+} from "@/lib/device-os"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -49,21 +60,17 @@ const DEVICE_OPTIONS: Array<{
 ]
 
 function detectCurrentPlatform(): DevicePlatform {
-  if (typeof navigator === "undefined") {
-    return "Windows"
-  }
+  const os = detectDeviceOsFromNavigator()
 
-  const ua = navigator.userAgent.toLowerCase()
-
-  if (ua.includes("android")) {
+  if (os === "ANDROID") {
     return "Android"
   }
 
-  if (ua.includes("iphone") || ua.includes("ipad") || ua.includes("ipod")) {
+  if (os === "IOS") {
     return "iOS"
   }
 
-  if (ua.includes("mac os")) {
+  if (os === "MACOS") {
     return "MacOS"
   }
 
@@ -75,17 +82,30 @@ function formatCompactSubscriptionUrl(url: string | null) {
     return "Ссылка пока недоступна"
   }
 
-  const marker = "/sub/"
-  const markerIndex = url.indexOf(marker)
+  try {
+    const parsedUrl = new URL(url)
+    const pathSegments = parsedUrl.pathname.split("/").filter(Boolean)
+    const token = pathSegments[pathSegments.length - 1] ?? ""
 
-  if (markerIndex === -1) {
-    return url.length > 26 ? `${url.slice(0, 26)}...` : url
+    if (!token) {
+      return parsedUrl.host
+    }
+
+    const tokenTail = token.slice(-4)
+    return `${parsedUrl.host}/…${tokenTail}`
+  } catch {
+    const hostMatch = url.match(/^https?:\/\/([^/]+)/i)
+    const host = hostMatch?.[1] ?? url
+    const pathSegments = url.split("/").filter(Boolean)
+    const token = pathSegments[pathSegments.length - 1] ?? ""
+    const tokenTail = token.slice(-4)
+
+    if (!tokenTail) {
+      return host
+    }
+
+    return `${host}/…${tokenTail}`
   }
-
-  const tokenStart = markerIndex + marker.length
-  const token = url.slice(tokenStart)
-  const tokenPreview = token.length > 12 ? `${token.slice(0, 12)}...` : token
-  return `.../sub/${tokenPreview}`
 }
 
 function StepIcon({ children }: { children: React.ReactNode }) {
@@ -97,23 +117,43 @@ function StepIcon({ children }: { children: React.ReactNode }) {
 }
 
 export function AppSetupDialog({
+  canStartSetup,
   defaultOpen = false,
+  previewSlot = null,
   showTrigger = true,
-  subscriptionUrl,
+  subscriptionUrl = null,
   triggerLabel = "Настроить VPN",
   triggerVariant = "outline",
 }: {
+  canStartSetup?: boolean
   defaultOpen?: boolean
+  previewSlot?: {
+    configUrl: string
+    id: string
+    slotIndex: number
+  } | null
   showTrigger?: boolean
-  subscriptionUrl: string | null
+  subscriptionUrl?: string | null
   triggerLabel?: string
   triggerVariant?: "default" | "destructive" | "ghost" | "link" | "outline" | "secondary"
 }) {
+  const router = useRouter()
   const currentPlatform = useMemo(() => detectCurrentPlatform(), [])
   const [open, setOpen] = useState(defaultOpen)
   const [step, setStep] = useState<SetupStep>("start")
   const [selectedPlatform, setSelectedPlatform] = useState<DevicePlatform>(currentPlatform)
   const [installReturnStep, setInstallReturnStep] = useState<InstallReturnStep>("start")
+  const [selectedPreviewSlot, setSelectedPreviewSlot] = useState(previewSlot)
+  const [setupError, setSetupError] = useState<string | null>(null)
+  const [setupErrorCode, setSetupErrorCode] = useState<
+    "NO_ACTIVE_SUBSCRIPTION" | "NO_FREE_SLOTS" | null
+  >(null)
+  const [, startRefreshPreviewTransition] = useTransition()
+  const [isAssigning, startAssignTransition] = useTransition()
+
+  const isSetupAvailable = canStartSetup ?? Boolean(previewSlot || subscriptionUrl)
+  const effectiveSubscriptionUrl = selectedPreviewSlot?.configUrl ?? subscriptionUrl
+  const displaySubscriptionUrl = formatCompactSubscriptionUrl(effectiveSubscriptionUrl)
 
   function handleOpenChange(nextOpen: boolean) {
     setOpen(nextOpen)
@@ -122,6 +162,20 @@ export function AppSetupDialog({
       setStep("start")
       setSelectedPlatform(currentPlatform)
       setInstallReturnStep("start")
+      setSelectedPreviewSlot(previewSlot)
+      setSetupError(null)
+      setSetupErrorCode(null)
+
+      startRefreshPreviewTransition(async () => {
+        try {
+          const result = await getSetupPreviewSlotAction()
+          if (result.ok) {
+            setSelectedPreviewSlot(result.slot)
+          }
+        } catch {
+          // Keep optimistic value from props if fetch fails.
+        }
+      })
     }
   }
 
@@ -147,21 +201,68 @@ export function AppSetupDialog({
   }
 
   async function copySubscriptionUrl() {
-    if (!subscriptionUrl) {
+    if (!effectiveSubscriptionUrl) {
       toast.error("Ссылка подписки пока недоступна.", { position: "top-right" })
       return
     }
 
     try {
-      await navigator.clipboard.writeText(subscriptionUrl)
+      await navigator.clipboard.writeText(effectiveSubscriptionUrl)
       toast.success("Ссылка подписки скопирована.", { position: "top-right" })
     } catch {
       toast.error("Не удалось скопировать ссылку.", { position: "top-right" })
     }
   }
 
+  function handleFinishSetup() {
+    if (isAssigning) {
+      return
+    }
+
+    if (!selectedPreviewSlot) {
+      setSetupError("Все устройства заняты. Замените один из слотов в разделе \"Устройства\".")
+      setSetupErrorCode("NO_FREE_SLOTS")
+      return
+    }
+
+    setSetupError(null)
+    setSetupErrorCode(null)
+
+    startAssignTransition(async () => {
+      try {
+        const result = await assignSetupSlotAction({
+          deviceOs: mapSetupPlatformToDeviceOs(selectedPlatform),
+          slotId: selectedPreviewSlot.id,
+        })
+
+        if (!result.ok) {
+          setSetupError(result.message)
+          setSetupErrorCode(result.code === "ASSIGNED" ? null : result.code)
+
+          toast.error(result.message, { position: "top-right" })
+          return
+        }
+
+        setSetupError(null)
+        setSetupErrorCode(null)
+        toast.success(result.message, { position: "top-right" })
+        setOpen(false)
+        router.refresh()
+      } catch {
+        const message = "Не удалось завершить настройку устройства. Повторите попытку."
+        setSetupError(message)
+        setSetupErrorCode(null)
+        toast.error(message, { position: "top-right" })
+      }
+    })
+  }
+
+  function handleGoToDevices() {
+    setOpen(false)
+    router.push("/app?tab=devices")
+  }
+
   const showBackButton = step !== "start"
-  const displaySubscriptionUrl = formatCompactSubscriptionUrl(subscriptionUrl)
 
   return (
     <Dialog onOpenChange={handleOpenChange} open={open}>
@@ -169,7 +270,7 @@ export function AppSetupDialog({
         <DialogTrigger asChild>
           <Button
             className="h-button w-full px-button-x"
-            disabled={!subscriptionUrl}
+            disabled={!isSetupAvailable}
             radius="card"
             type="button"
             variant={triggerVariant}
@@ -321,22 +422,48 @@ export function AppSetupDialog({
                 </DialogDescription>
               </DialogHeader>
 
-              <Button
-                className="h-button w-full min-w-0 justify-between overflow-hidden px-button-x"
-                onClick={copySubscriptionUrl}
-                radius="card"
-                type="button"
-                variant="outline"
-              >
-                <span className="min-w-0 flex-1 truncate text-left font-mono text-xs sm:text-sm">
-                  {displaySubscriptionUrl}
-                </span>
-                <Copy className="size-4 shrink-0" />
-              </Button>
+              {selectedPreviewSlot ? (
+                <>
+                  <Button
+                    className="h-button w-full min-w-0 justify-between overflow-hidden px-3"
+                    onClick={copySubscriptionUrl}
+                    radius="card"
+                    type="button"
+                    variant="outline"
+                  >
+                    <span className="min-w-0 flex-1 truncate text-left font-mono text-xs sm:text-sm">
+                      {displaySubscriptionUrl}
+                    </span>
+                    <Copy className="size-4 shrink-0" />
+                  </Button>
 
-              <Button className="h-button w-full px-button-x" onClick={() => setStep("done")} radius="card" type="button">
-                Далее
-              </Button>
+                  <Button
+                    className="h-button w-full px-button-x"
+                    onClick={() => setStep("done")}
+                    radius="card"
+                    type="button"
+                  >
+                    Далее
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Alert className="text-left">
+                    <AlertTitle>Все устройства заняты</AlertTitle>
+                    <AlertDescription>
+                      Все устройства заняты. Замените один из слотов в разделе «Устройства».
+                    </AlertDescription>
+                  </Alert>
+                  <Button
+                    className="h-button w-full px-button-x"
+                    onClick={handleGoToDevices}
+                    radius="card"
+                    type="button"
+                  >
+                    Перейти в устройства
+                  </Button>
+                </>
+              )}
             </>
           ) : null}
 
@@ -353,9 +480,62 @@ export function AppSetupDialog({
                 </DialogDescription>
               </DialogHeader>
 
-              <Button className="h-button w-full px-button-x" onClick={() => setOpen(false)} radius="card" type="button">
-                Завершить настройку
-              </Button>
+              {setupError ? <p className="text-xs text-destructive">{setupError}</p> : null}
+
+              <div className="flex w-full flex-col gap-2">
+                {!selectedPreviewSlot ? (
+                  <Button
+                    className="h-button w-full px-button-x"
+                    onClick={handleGoToDevices}
+                    radius="card"
+                    type="button"
+                  >
+                    Перейти в устройства
+                  </Button>
+                ) : (
+                  <Button
+                    className="h-button w-full px-button-x"
+                    disabled={isAssigning}
+                    onClick={handleFinishSetup}
+                    radius="card"
+                    type="button"
+                  >
+                    {isAssigning ? (
+                      <span className="inline-flex items-center gap-2">
+                        <Loader2Icon className="size-4 animate-spin" />
+                        Назначаем слот...
+                      </span>
+                    ) : (
+                      "Завершить настройку"
+                    )}
+                  </Button>
+                )}
+
+                {setupError && !isAssigning ? (
+                  <>
+                    {setupErrorCode === "NO_FREE_SLOTS" ? (
+                      <Button
+                        className="h-button w-full px-button-x"
+                        onClick={handleGoToDevices}
+                        radius="card"
+                        type="button"
+                      >
+                        Перейти в устройства
+                      </Button>
+                    ) : (
+                      <Button
+                        className="h-button w-full px-button-x"
+                        onClick={handleFinishSetup}
+                        radius="card"
+                        type="button"
+                        variant="outline"
+                      >
+                        Повторить попытку
+                      </Button>
+                    )}
+                  </>
+                ) : null}
+              </div>
             </>
           ) : null}
         </div>
