@@ -100,12 +100,17 @@ export function ReferralSummaryCard({
               </div>
               <Input readOnly value={ownReferralCode} />
               <div className="mt-2 grid grid-cols-2 gap-2">
-                <Button onClick={() => void handleCopy(ownReferralCode, "Код скопирован.")} radius="card" variant="outline">
-                  <CopyIcon data-icon="inline-start" />
+                <Button
+                  className="h-button w-full px-button-x"
+                  onClick={() => void handleCopy(ownReferralCode, "Код скопирован.")}
+                  radius="card"
+                  variant="outline"
+                >
+                  <CopyIcon className="size-4" />
                   Копировать код
                 </Button>
-                <Button onClick={handleShare} radius="card" variant="outline">
-                  <Share2Icon data-icon="inline-start" />
+                <Button className="h-button w-full px-button-x" onClick={handleShare} radius="card" variant="outline">
+                  <Share2Icon className="size-4" />
                   Поделиться
                 </Button>
               </div>
@@ -114,12 +119,12 @@ export function ReferralSummaryCard({
               <p className="mb-2 text-xs text-muted-foreground">Ссылка</p>
               <Input readOnly value={referralLink} />
               <Button
-                className="mt-2 w-full"
+                className="mt-2 h-button w-full px-button-x"
                 onClick={() => void handleCopy(referralLink, "Ссылка скопирована.")}
                 radius="card"
                 variant="outline"
               >
-                <CopyIcon data-icon="inline-start" />
+                <CopyIcon className="size-4" />
                 Копировать ссылку
               </Button>
             </div>

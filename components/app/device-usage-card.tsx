@@ -53,9 +53,9 @@ export function DeviceUsageCard({
           </div>
         </div>
 
-        <Button asChild className="w-full" radius="card" variant="outline">
+        <Button asChild className="h-button w-full px-button-x" radius="card" variant="outline">
           <Link href="/app?tab=devices">
-            <ActivityIcon data-icon="inline-start" />
+            <ActivityIcon className="size-4" />
             Управлять устройствами
           </Link>
         </Button>

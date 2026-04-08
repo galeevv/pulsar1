@@ -1,21 +1,21 @@
-import { MessageCircleDashed } from "lucide-react";
+import { MessageCircleDashed } from "lucide-react"
 
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Skeleton } from "@/components/ui/skeleton";
-import type { UserSupportTicketListItemSerialized } from "@/lib/support/client-types";
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Skeleton } from "@/components/ui/skeleton"
+import type { UserSupportTicketListItemSerialized } from "@/lib/support/client-types"
 
-import { SupportTicketCard } from "./support-ticket-card";
+import { SupportTicketCard } from "./support-ticket-card"
 
 export function SupportTicketList({
   isLoading,
   onOpenTicket,
   tickets,
 }: {
-  isLoading: boolean;
-  onOpenTicket: (ticketId: number) => void;
-  tickets: UserSupportTicketListItemSerialized[];
+  isLoading: boolean
+  onOpenTicket: (ticketId: number) => void
+  tickets: UserSupportTicketListItemSerialized[]
 }) {
-  const shouldConstrainHeight = tickets.length > 3;
+  const shouldConstrainHeight = tickets.length > 3
 
   return (
     <div className="space-y-4">
@@ -48,5 +48,6 @@ export function SupportTicketList({
         </div>
       )}
     </div>
-  );
+  )
 }
+

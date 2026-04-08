@@ -1,17 +1,17 @@
-import { ArrowUpRight, MessageSquare, Reply } from "lucide-react";
+import { ArrowUpRight, MessageSquare, Reply } from "lucide-react"
 
-import { Badge } from "@/components/ui/badge";
-import type { UserSupportTicketListItemSerialized } from "@/lib/support/client-types";
-import { getSupportCategoryLabel } from "@/lib/support/helpers";
+import { Badge } from "@/components/ui/badge"
+import type { UserSupportTicketListItemSerialized } from "@/lib/support/client-types"
+import { getSupportCategoryLabel } from "@/lib/support/helpers"
 
-import { SupportStatusBadge } from "./support-status-badge";
+import { SupportStatusBadge } from "./support-status-badge"
 
 export function SupportTicketCard({
   onOpen,
   ticket,
 }: {
-  onOpen: (ticketId: number) => void;
-  ticket: UserSupportTicketListItemSerialized;
+  onOpen: (ticketId: number) => void
+  ticket: UserSupportTicketListItemSerialized
 }) {
   return (
     <button
@@ -43,5 +43,6 @@ export function SupportTicketCard({
         </div>
       </div>
     </button>
-  );
+  )
 }
+

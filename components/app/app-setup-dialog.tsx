@@ -70,7 +70,7 @@ function detectCurrentPlatform(): DevicePlatform {
   return "Windows"
 }
 
-function formatSubscriptionUrlForDisplay(url: string | null, tokenLength: number) {
+function formatCompactSubscriptionUrl(url: string | null) {
   if (!url) {
     return "Ссылка пока недоступна"
   }
@@ -79,17 +79,13 @@ function formatSubscriptionUrlForDisplay(url: string | null, tokenLength: number
   const markerIndex = url.indexOf(marker)
 
   if (markerIndex === -1) {
-    return url.length > 44 ? `${url.slice(0, 44)}...` : url
+    return url.length > 26 ? `${url.slice(0, 26)}...` : url
   }
 
   const tokenStart = markerIndex + marker.length
   const token = url.slice(tokenStart)
-
-  if (token.length <= tokenLength) {
-    return url
-  }
-
-  return `${url.slice(0, tokenStart)}${token.slice(0, tokenLength)}...`
+  const tokenPreview = token.length > 12 ? `${token.slice(0, 12)}...` : token
+  return `.../sub/${tokenPreview}`
 }
 
 function StepIcon({ children }: { children: React.ReactNode }) {
@@ -165,8 +161,7 @@ export function AppSetupDialog({
   }
 
   const showBackButton = step !== "start"
-  const displaySubscriptionUrlMobile = formatSubscriptionUrlForDisplay(subscriptionUrl, 8)
-  const displaySubscriptionUrlDesktop = formatSubscriptionUrlForDisplay(subscriptionUrl, 20)
+  const displaySubscriptionUrl = formatCompactSubscriptionUrl(subscriptionUrl)
 
   return (
     <Dialog onOpenChange={handleOpenChange} open={open}>
@@ -179,7 +174,7 @@ export function AppSetupDialog({
             type="button"
             variant={triggerVariant}
           >
-            <Settings2 data-icon="inline-start" />
+            <Settings2 className="size-4" />
             {triggerLabel}
           </Button>
         </DialogTrigger>
@@ -189,8 +184,14 @@ export function AppSetupDialog({
         <div className="mx-auto flex w-full max-w-sm flex-col gap-4 text-center sm:gap-5">
           {showBackButton ? (
             <div className="flex justify-start">
-              <Button onClick={handleBack} radius="card" size="icon-sm" type="button" variant="ghost">
-                <ArrowLeft />
+              <Button
+                className="bg-secondary"
+                onClick={handleBack}
+                size="icon-sm"
+                type="button"
+                variant="ghost"
+              >
+                <ArrowLeft className="size-4" />
                 <span className="sr-only">Вернуться на предыдущий этап</span>
               </Button>
             </div>
@@ -265,7 +266,7 @@ export function AppSetupDialog({
                       type="button"
                       variant="outline"
                     >
-                      <Icon data-icon="inline-start" />
+                      <Icon className="size-4" />
                       {item.platform}
                     </Button>
                   )
@@ -290,7 +291,7 @@ export function AppSetupDialog({
               <div className="flex w-full flex-col gap-3">
                 <Button asChild className="h-button w-full px-button-x" radius="card" type="button">
                   <a href={APP_LINKS[selectedPlatform]} rel="noreferrer" target="_blank">
-                    <Download data-icon="inline-start" />
+                    <Download className="size-4" />
                     Установить
                   </a>
                 </Button>
@@ -316,7 +317,7 @@ export function AppSetupDialog({
               <DialogHeader className="items-center text-center">
                 <DialogTitle>Подписка</DialogTitle>
                 <DialogDescription className="w-full max-w-none">
-                  Добавьте подписку в Happ через кнопку ниже или вставьте ссылку вручную.
+                  Скопируйте ссылку и добавьте подписку в Happ вручную.
                 </DialogDescription>
               </DialogHeader>
 
@@ -327,39 +328,15 @@ export function AppSetupDialog({
                 type="button"
                 variant="outline"
               >
-                <span className="min-w-0 flex-1 truncate text-left sm:hidden">
-                  {displaySubscriptionUrlMobile}
+                <span className="min-w-0 flex-1 truncate text-left font-mono text-xs sm:text-sm">
+                  {displaySubscriptionUrl}
                 </span>
-                <span className="hidden min-w-0 flex-1 truncate text-left sm:block">
-                  {displaySubscriptionUrlDesktop}
-                </span>
-                <Copy data-icon="inline-end" />
+                <Copy className="size-4 shrink-0" />
               </Button>
 
-              <div className="flex w-full flex-col gap-3">
-                <Button
-                  className="h-button w-full px-button-x"
-                  onClick={() =>
-                    toast.info("Функция автоматического добавления будет добавлена позже.", {
-                      position: "top-right",
-                    })
-                  }
-                  radius="card"
-                  type="button"
-                >
-                  Добавить
-                </Button>
-
-                <Button
-                  className="h-button w-full px-button-x"
-                  onClick={() => setStep("done")}
-                  radius="card"
-                  type="button"
-                  variant="outline"
-                >
-                  Далее
-                </Button>
-              </div>
+              <Button className="h-button w-full px-button-x" onClick={() => setStep("done")} radius="card" type="button">
+                Далее
+              </Button>
             </>
           ) : null}
 
@@ -386,4 +363,3 @@ export function AppSetupDialog({
     </Dialog>
   )
 }
-

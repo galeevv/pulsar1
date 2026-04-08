@@ -1,18 +1,15 @@
 import Image from "next/image"
 
-import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardTitle } from "@/components/ui/card"
 
 export function StatusHeroCard({
   balanceCredits,
   statusLabel,
-  statusVariant,
   children,
 }: {
   balanceCredits: number
   children: React.ReactNode
   statusLabel: string
-  statusVariant: "default" | "warning" | "success"
 }) {
   return (
     <Card className="gap-0 overflow-hidden border-border/70 bg-card/40 py-0">
@@ -34,11 +31,9 @@ export function StatusHeroCard({
             <p className="text-xs text-muted-foreground">Баланс кредитов</p>
             <p className="mt-1 text-base font-semibold">{balanceCredits}</p>
           </div>
-          <div className="rounded-card border border-border/70 bg-background/40 p-3 text-right">
+          <div className="rounded-card border border-border/70 bg-background/40 p-3">
             <p className="text-xs text-muted-foreground">Статус подписки</p>
-            <div className="mt-1 inline-flex">
-              <Badge variant={statusVariant}>{statusLabel}</Badge>
-            </div>
+            <p className="mt-1 text-base font-semibold">{statusLabel}</p>
           </div>
         </div>
         {children}
@@ -46,3 +41,4 @@ export function StatusHeroCard({
     </Card>
   )
 }
+

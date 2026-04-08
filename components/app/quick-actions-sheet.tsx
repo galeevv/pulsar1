@@ -291,7 +291,7 @@ export function QuickActionsSheet({
           className={fullWidthTrigger ? "h-button w-full px-button-x" : "h-button px-button-x"}
           radius="card"
         >
-          <CreditCardIcon data-icon="inline-start" />
+          <CreditCardIcon className="size-4" />
           {triggerLabel}
         </Button>
       </DrawerTrigger>
@@ -529,7 +529,7 @@ export function QuickActionsSheet({
                   {selectedPaymentMethod !== "CREDITS" ? (
                     isCreatingPlategaPayment ? (
                       <>
-                        <Loader2Icon className="animate-spin" data-icon="inline-start" />
+                        <Loader2Icon className="size-4 animate-spin" />
                         Создаем платеж...
                       </>
                     ) : hasReferralDiscount ? (
@@ -544,7 +544,7 @@ export function QuickActionsSheet({
                     )
                   ) : isSubmittingCredits ? (
                     <>
-                      <Loader2Icon className="animate-spin" data-icon="inline-start" />
+                      <Loader2Icon className="size-4 animate-spin" />
                       Выдаем подписку...
                     </>
                   ) : (
@@ -559,4 +559,3 @@ export function QuickActionsSheet({
     </Drawer>
   )
 }
-

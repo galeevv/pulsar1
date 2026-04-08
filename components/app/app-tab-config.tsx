@@ -1,4 +1,4 @@
-import { HomeIcon, ShieldCheckIcon, SmartphoneIcon, UserCircle2Icon } from "lucide-react"
+import { HomeIcon, SmartphoneIcon, UserCircle2Icon, UsersIcon } from "lucide-react"
 
 import type { AppTab } from "@/lib/app-tabs"
 
@@ -26,7 +26,7 @@ export const APP_TAB_ITEMS: Array<{
   {
     description: "Рефералы",
     href: "/app?tab=referrals",
-    icon: ShieldCheckIcon,
+    icon: UsersIcon,
     id: "referrals",
     label: "Рефералы",
   },

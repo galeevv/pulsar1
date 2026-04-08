@@ -1,50 +1,50 @@
-﻿"use client";
+"use client"
 
-import { Copy } from "lucide-react";
-import { toast } from "sonner";
+import { Copy } from "lucide-react"
+import { toast } from "sonner"
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"
 
 function formatSubscriptionUrlForDisplay(url: string | null, tokenLength: number) {
   if (!url) {
-    return "РЎСЃС‹Р»РєР° РїРѕРєР° РЅРµРґРѕСЃС‚СѓРїРЅР°";
+    return "Ссылка пока недоступна"
   }
 
-  const marker = "/sub/";
-  const markerIndex = url.indexOf(marker);
+  const marker = "/sub/"
+  const markerIndex = url.indexOf(marker)
 
   if (markerIndex === -1) {
-    return url.length > tokenLength + 24 ? `${url.slice(0, tokenLength + 24)}...` : url;
+    return url.length > tokenLength + 24 ? `${url.slice(0, tokenLength + 24)}...` : url
   }
 
-  const tokenStart = markerIndex + marker.length;
-  const token = url.slice(tokenStart);
+  const tokenStart = markerIndex + marker.length
+  const token = url.slice(tokenStart)
 
   if (token.length <= tokenLength) {
-    return url;
+    return url
   }
 
-  return `${url.slice(0, tokenStart)}${token.slice(0, tokenLength)}...`;
+  return `${url.slice(0, tokenStart)}${token.slice(0, tokenLength)}...`
 }
 
 export function AppCopySubscriptionButton({
   subscriptionUrl,
 }: {
-  subscriptionUrl: string | null;
+  subscriptionUrl: string | null
 }) {
-  const displayUrlMobile = formatSubscriptionUrlForDisplay(subscriptionUrl, 2);
-  const displayUrlDesktop = formatSubscriptionUrlForDisplay(subscriptionUrl, 20);
+  const displayUrlMobile = formatSubscriptionUrlForDisplay(subscriptionUrl, 2)
+  const displayUrlDesktop = formatSubscriptionUrlForDisplay(subscriptionUrl, 20)
 
   async function handleCopy() {
     if (!subscriptionUrl) {
-      return;
+      return
     }
 
     try {
-      await navigator.clipboard.writeText(subscriptionUrl);
-      toast.success("РЎСЃС‹Р»РєР° РїРѕРґРїРёСЃРєРё СЃРєРѕРїРёСЂРѕРІР°РЅР°.", { position: "top-right" });
+      await navigator.clipboard.writeText(subscriptionUrl)
+      toast.success("Ссылка подписки скопирована.", { position: "top-right" })
     } catch {
-      toast.error("РќРµ СѓРґР°Р»РѕСЃСЊ СЃРєРѕРїРёСЂРѕРІР°С‚СЊ СЃСЃС‹Р»РєСѓ.", { position: "top-right" });
+      toast.error("Не удалось скопировать ссылку.", { position: "top-right" })
     }
   }
 
@@ -57,14 +57,9 @@ export function AppCopySubscriptionButton({
       type="button"
       variant="outline"
     >
-      <span className="min-w-0 flex-1 truncate text-left sm:hidden">
-        {displayUrlMobile}
-      </span>
-      <span className="hidden min-w-0 flex-1 truncate text-left sm:block">
-        {displayUrlDesktop}
-      </span>
+      <span className="min-w-0 flex-1 truncate text-left sm:hidden">{displayUrlMobile}</span>
+      <span className="hidden min-w-0 flex-1 truncate text-left sm:block">{displayUrlDesktop}</span>
       <Copy className="size-4 shrink-0" />
     </Button>
-  );
+  )
 }
-

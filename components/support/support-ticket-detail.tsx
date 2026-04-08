@@ -1,30 +1,30 @@
-"use client";
+"use client"
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react"
 
-import { ArrowLeft, Lock, SendHorizontal } from "lucide-react";
+import { ArrowLeft, Lock, SendHorizontal } from "lucide-react"
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
-import type { UserSupportTicketDetailSerialized } from "@/lib/support/client-types";
-import { getSupportCategoryLabel } from "@/lib/support/helpers";
-import { createTicketMessageSchema } from "@/lib/support/validators";
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Separator } from "@/components/ui/separator"
+import { Skeleton } from "@/components/ui/skeleton"
+import type { UserSupportTicketDetailSerialized } from "@/lib/support/client-types"
+import { getSupportCategoryLabel } from "@/lib/support/helpers"
+import { createTicketMessageSchema } from "@/lib/support/validators"
 
-import { SupportMessageItem } from "./support-message-item";
-import { SupportStatusBadge } from "./support-status-badge";
+import { SupportMessageItem } from "./support-message-item"
+import { SupportStatusBadge } from "./support-status-badge"
 
 function formatDateTime(value: string | null) {
   if (!value) {
-    return "—";
+    return "—"
   }
 
-  const parsed = new Date(value);
+  const parsed = new Date(value)
   if (Number.isNaN(parsed.getTime())) {
-    return "—";
+    return "—"
   }
 
   return parsed.toLocaleString("ru-RU", {
@@ -33,7 +33,7 @@ function formatDateTime(value: string | null) {
     minute: "2-digit",
     month: "2-digit",
     year: "numeric",
-  });
+  })
 }
 
 export function SupportTicketDetail({
@@ -43,59 +43,59 @@ export function SupportTicketDetail({
   onSendMessage,
   ticket,
 }: {
-  isLoading: boolean;
-  isSendingMessage: boolean;
-  onBack: () => void;
-  onSendMessage: (message: string) => Promise<void>;
-  ticket: UserSupportTicketDetailSerialized | null;
+  isLoading: boolean
+  isSendingMessage: boolean
+  onBack: () => void
+  onSendMessage: (message: string) => Promise<void>
+  ticket: UserSupportTicketDetailSerialized | null
 }) {
-  const [message, setMessage] = useState("");
-  const [messageError, setMessageError] = useState<string | null>(null);
-  const messagesContainerRef = useRef<HTMLDivElement | null>(null);
-  const ticketId = ticket?.id ?? null;
-  const messagesCount = ticket?.messages.length ?? 0;
+  const [message, setMessage] = useState("")
+  const [messageError, setMessageError] = useState<string | null>(null)
+  const messagesContainerRef = useRef<HTMLDivElement | null>(null)
+  const ticketId = ticket?.id ?? null
+  const messagesCount = ticket?.messages.length ?? 0
 
   function scrollMessagesToBottom() {
     if (!messagesContainerRef.current) {
-      return;
+      return
     }
 
     const viewport = messagesContainerRef.current.querySelector<HTMLElement>(
       '[data-slot="scroll-area-viewport"]'
-    );
+    )
     if (!viewport) {
-      return;
+      return
     }
 
-    viewport.scrollTop = viewport.scrollHeight;
+    viewport.scrollTop = viewport.scrollHeight
   }
 
   useEffect(() => {
     if (isLoading || ticketId === null) {
-      return;
+      return
     }
 
     const frameId = requestAnimationFrame(() => {
-      scrollMessagesToBottom();
-    });
+      scrollMessagesToBottom()
+    })
 
     return () => {
-      cancelAnimationFrame(frameId);
-    };
-  }, [isLoading, ticketId, messagesCount]);
+      cancelAnimationFrame(frameId)
+    }
+  }, [isLoading, ticketId, messagesCount])
 
   async function handleSendMessage(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+    event.preventDefault()
 
-    const parsed = createTicketMessageSchema.safeParse({ message });
+    const parsed = createTicketMessageSchema.safeParse({ message })
     if (!parsed.success) {
-      setMessageError("Сообщение должно содержать от 1 до 2000 символов.");
-      return;
+      setMessageError("Сообщение должно содержать от 1 до 2000 символов.")
+      return
     }
 
-    setMessageError(null);
-    await onSendMessage(parsed.data.message);
-    setMessage("");
+    setMessageError(null)
+    await onSendMessage(parsed.data.message)
+    setMessage("")
   }
 
   if (isLoading) {
@@ -105,13 +105,13 @@ export function SupportTicketDetail({
         <Skeleton className="h-20 w-full rounded-card" />
         <Skeleton className="h-96 w-full rounded-card" />
       </div>
-    );
+    )
   }
 
   if (!ticket) {
     return (
       <div className="space-y-3">
-        <Button onClick={onBack} radius="card" type="button" variant="outline">
+        <Button className="h-button px-button-x" onClick={onBack} radius="card" type="button" variant="outline">
           <ArrowLeft className="size-4" />
           К списку тикетов
         </Button>
@@ -119,13 +119,13 @@ export function SupportTicketDetail({
           Тикет не найден.
         </div>
       </div>
-    );
+    )
   }
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <Button onClick={onBack} radius="card" type="button" variant="outline">
+        <Button className="h-button px-button-x" onClick={onBack} radius="card" type="button" variant="outline">
           <ArrowLeft className="size-4" />
           К списку
         </Button>
@@ -150,7 +150,10 @@ export function SupportTicketDetail({
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-card border border-border/70 bg-background/20" ref={messagesContainerRef}>
+      <div
+        className="overflow-hidden rounded-card border border-border/70 bg-background/20"
+        ref={messagesContainerRef}
+      >
         <ScrollArea className="h-[42svh] min-h-[260px] p-card-compact md:h-[420px] md:p-card-compact-md [&_[data-slot=scroll-area-viewport]]:overflow-x-hidden">
           {ticket.messages.length ? (
             <div className="min-w-0 space-y-3">
@@ -210,5 +213,5 @@ export function SupportTicketDetail({
         </div>
       </div>
     </div>
-  );
+  )
 }

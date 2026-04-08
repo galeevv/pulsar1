@@ -1,107 +1,112 @@
-﻿"use client";
+"use client"
 
-import { useActionState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { useActionState, useEffect, useRef } from "react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 import {
   applyPromoCodeInlineAction,
   cancelOwnPayoutRequestInlineAction,
   createPayoutRequestInlineAction,
   generateOwnReferralCodeInlineAction,
-} from "@/app/app/actions";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+} from "@/app/app/actions"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui/select"
 
 type InlineDialogActionState = {
-  message: string;
-  nonce: number;
-  status: "error" | "idle" | "success";
-};
+  message: string
+  nonce: number
+  status: "error" | "idle" | "success"
+}
 
 const INLINE_DIALOG_ACTION_INITIAL_STATE: InlineDialogActionState = {
   message: "",
   nonce: 0,
   status: "idle",
-};
+}
 
 function useInlineDialogActionFeedback(
   state: InlineDialogActionState,
   refreshOnSuccess: boolean
 ) {
-  const router = useRouter();
-  const handledNonceRef = useRef(0);
+  const router = useRouter()
+  const handledNonceRef = useRef(0)
 
   useEffect(() => {
     if (state.nonce === 0 || state.nonce === handledNonceRef.current) {
-      return;
+      return
     }
 
-    handledNonceRef.current = state.nonce;
+    handledNonceRef.current = state.nonce
 
     if (state.status === "success") {
-      toast.success(state.message, { position: "top-right" });
+      toast.success(state.message, { position: "top-right" })
       if (refreshOnSuccess) {
-        router.refresh();
+        router.refresh()
       }
-      return;
+      return
     }
 
     if (state.status === "error") {
-      toast.error(state.message, { position: "top-right" });
+      toast.error(state.message, { position: "top-right" })
     }
-  }, [refreshOnSuccess, router, state]);
+  }, [refreshOnSuccess, router, state])
 }
 
 export function PromoCodeApplyForm() {
-  const formRef = useRef<HTMLFormElement>(null);
+  const formRef = useRef<HTMLFormElement>(null)
   const [state, formAction, isPending] = useActionState(
     applyPromoCodeInlineAction,
     INLINE_DIALOG_ACTION_INITIAL_STATE
-  );
+  )
 
-  useInlineDialogActionFeedback(state, true);
+  useInlineDialogActionFeedback(state, true)
 
   useEffect(() => {
     if (state.status === "success") {
-      formRef.current?.reset();
+      formRef.current?.reset()
     }
-  }, [state]);
+  }, [state])
 
   return (
     <form action={formAction} className="space-y-4" ref={formRef}>
       <div>
         <label className="mb-2 block text-sm font-medium" htmlFor="dashboard-promo-code-input">
-          PromoCode
+          Промокод
         </label>
-        <Input id="dashboard-promo-code-input" name="code" placeholder="Р’РІРµРґРёС‚Рµ РїСЂРѕРјРѕРєРѕРґ" required />
+        <Input
+          id="dashboard-promo-code-input"
+          name="code"
+          placeholder="Введите промокод"
+          required
+        />
       </div>
 
       <Button className="h-button w-full px-button-x" disabled={isPending} radius="card" type="submit">
-        {isPending ? "РџСЂРёРјРµРЅСЏРµРј..." : "РџСЂРёРјРµРЅРёС‚СЊ РїСЂРѕРјРѕРєРѕРґ"}
+        {isPending ? "Применяем..." : "Применить промокод"}
       </Button>
     </form>
-  );
+  )
 }
 
 export function GenerateReferralCodeForm({
   canGenerate,
 }: {
-  canGenerate: boolean;
+  canGenerate: boolean
 }) {
   const [state, formAction, isPending] = useActionState(
     generateOwnReferralCodeInlineAction,
     INLINE_DIALOG_ACTION_INITIAL_STATE
-  );
+  )
 
-  useInlineDialogActionFeedback(state, true);
+  useInlineDialogActionFeedback(state, true)
 
   return (
     <form action={formAction}>
@@ -111,58 +116,58 @@ export function GenerateReferralCodeForm({
         radius="card"
         type="submit"
       >
-        {isPending ? "Р“РµРЅРµСЂР°С†РёСЏ..." : "РЎРіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ ReferralCode"}
+        {isPending ? "Генерация..." : "Сгенерировать реферальный код"}
       </Button>
     </form>
-  );
+  )
 }
 
 export function CreatePayoutRequestForm({
   minimumPayoutCredits,
 }: {
-  minimumPayoutCredits: number;
+  minimumPayoutCredits: number
 }) {
-  const formRef = useRef<HTMLFormElement>(null);
+  const formRef = useRef<HTMLFormElement>(null)
   const [state, formAction, isPending] = useActionState(
     createPayoutRequestInlineAction,
     INLINE_DIALOG_ACTION_INITIAL_STATE
-  );
+  )
 
-  useInlineDialogActionFeedback(state, true);
+  useInlineDialogActionFeedback(state, true)
 
   useEffect(() => {
     if (state.status === "success") {
-      formRef.current?.reset();
+      formRef.current?.reset()
     }
-  }, [state]);
+  }, [state])
 
   return (
     <form action={formAction} className="space-y-3" ref={formRef}>
       <div className="space-y-2">
         <label className="block text-sm font-medium" htmlFor="withdraw-bank">
-          Р’С‹Р±РµСЂРёС‚Рµ Р±Р°РЅРє
+          Выберите банк
         </label>
-        <Select defaultValue="РЎР±РµСЂР±Р°РЅРє" name="payoutBank" required>
+        <Select defaultValue="Сбербанк" name="payoutBank" required>
           <SelectTrigger id="withdraw-bank">
-            <SelectValue placeholder="Р’С‹Р±РµСЂРёС‚Рµ Р±Р°РЅРє" />
+            <SelectValue placeholder="Выберите банк" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="РЎР±РµСЂР±Р°РЅРє">РЎР±РµСЂР±Р°РЅРє</SelectItem>
-            <SelectItem value="РђР»СЊС„Р°-Р‘Р°РЅРє">РђР»СЊС„Р°-Р‘Р°РЅРє</SelectItem>
-            <SelectItem value="Рў-Р‘Р°РЅРє">Рў-Р‘Р°РЅРє</SelectItem>
-            <SelectItem value="Ozon Р‘Р°РЅРє">Ozon Р‘Р°РЅРє</SelectItem>
+            <SelectItem value="Сбербанк">Сбербанк</SelectItem>
+            <SelectItem value="Альфа-Банк">Альфа-Банк</SelectItem>
+            <SelectItem value="Т-Банк">Т-Банк</SelectItem>
+            <SelectItem value="Ozon Банк">Ozon Банк</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <div className="space-y-2">
         <label className="block text-sm font-medium" htmlFor="withdraw-destination">
-          РќРѕРјРµСЂ С‚РµР»РµС„РѕРЅР° РёР»Рё РєР°СЂС‚С‹
+          Номер телефона или карты
         </label>
         <Input
           id="withdraw-destination"
           name="payoutDestination"
-          placeholder="+7XXXXXXXXXX РёР»Рё 2200 XXXX XXXX XXXX"
+          placeholder="+7XXXXXXXXXX или 2200 XXXX XXXX XXXX"
           required
           type="text"
         />
@@ -170,7 +175,7 @@ export function CreatePayoutRequestForm({
 
       <div className="space-y-2">
         <label className="block text-sm font-medium" htmlFor="withdraw-amount">
-          РЎСѓРјРјР° (СЃredits)
+          Сумма (credits)
         </label>
         <Input
           id="withdraw-amount"
@@ -182,32 +187,37 @@ export function CreatePayoutRequestForm({
         />
       </div>
 
-      <Button className="w-full" disabled={isPending} radius="card" type="submit">
-        {isPending ? "РЎРѕР·РґР°РµРј Р·Р°СЏРІРєСѓ..." : "РЎРѕР·РґР°С‚СЊ Р·Р°СЏРІРєСѓ"}
+      <Button className="h-button w-full px-button-x" disabled={isPending} radius="card" type="submit">
+        {isPending ? "Создаем заявку..." : "Создать заявку"}
       </Button>
     </form>
-  );
+  )
 }
 
 export function CancelPayoutRequestForm({
   payoutRequestId,
 }: {
-  payoutRequestId: string;
+  payoutRequestId: string
 }) {
   const [state, formAction, isPending] = useActionState(
     cancelOwnPayoutRequestInlineAction,
     INLINE_DIALOG_ACTION_INITIAL_STATE
-  );
+  )
 
-  useInlineDialogActionFeedback(state, true);
+  useInlineDialogActionFeedback(state, true)
 
   return (
     <form action={formAction} className="mt-2">
       <input name="payoutRequestId" type="hidden" value={payoutRequestId} />
-      <Button className="w-full sm:w-auto" disabled={isPending} radius="card" size="sm" type="submit" variant="outline">
-        {isPending ? "РћС‚РјРµРЅСЏРµРј..." : "РћС‚РјРµРЅРёС‚СЊ Р·Р°СЏРІРєСѓ"}
+      <Button
+        className="h-button w-full px-button-x sm:w-auto"
+        disabled={isPending}
+        radius="card"
+        type="submit"
+        variant="outline"
+      >
+        {isPending ? "Отменяем..." : "Отменить заявку"}
       </Button>
     </form>
-  );
+  )
 }
-

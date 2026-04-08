@@ -1,62 +1,62 @@
-"use client";
+"use client"
 
-import { useState } from "react";
+import { useState } from "react"
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { SUPPORT_TICKET_CATEGORIES } from "@/lib/support/constants";
-import { getSupportCategoryLabel } from "@/lib/support/helpers";
-import { createTicketSchema } from "@/lib/support/validators";
+} from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { SUPPORT_TICKET_CATEGORIES } from "@/lib/support/constants"
+import { getSupportCategoryLabel } from "@/lib/support/helpers"
+import { createTicketSchema } from "@/lib/support/validators"
 
 type FieldErrors = {
-  category?: string;
-  message?: string;
-  subject?: string;
-};
+  category?: string
+  message?: string
+  subject?: string
+}
 
 export function SupportTicketCreateForm({
   isSubmitting,
   onSubmit,
 }: {
-  isSubmitting: boolean;
-  onSubmit: (payload: { category: string; message: string; subject: string }) => Promise<void>;
+  isSubmitting: boolean
+  onSubmit: (payload: { category: string; message: string; subject: string }) => Promise<void>
 }) {
-  const [category, setCategory] = useState<(typeof SUPPORT_TICKET_CATEGORIES)[number]>("payment");
-  const [subject, setSubject] = useState("");
-  const [message, setMessage] = useState("");
-  const [errors, setErrors] = useState<FieldErrors>({});
+  const [category, setCategory] = useState<(typeof SUPPORT_TICKET_CATEGORIES)[number]>("payment")
+  const [subject, setSubject] = useState("")
+  const [message, setMessage] = useState("")
+  const [errors, setErrors] = useState<FieldErrors>({})
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+    event.preventDefault()
 
     const parsed = createTicketSchema.safeParse({
       category,
       message,
       subject,
-    });
+    })
 
     if (!parsed.success) {
-      const nextErrors: FieldErrors = {};
+      const nextErrors: FieldErrors = {}
       for (const issue of parsed.error.issues) {
-        const field = issue.path[0];
+        const field = issue.path[0]
         if (field === "category" || field === "subject" || field === "message") {
-          nextErrors[field] = issue.message;
+          nextErrors[field] = issue.message
         }
       }
-      setErrors(nextErrors);
-      return;
+      setErrors(nextErrors)
+      return
     }
 
-    setErrors({});
-    await onSubmit(parsed.data);
+    setErrors({})
+    await onSubmit(parsed.data)
   }
 
   return (
@@ -66,8 +66,8 @@ export function SupportTicketCreateForm({
         <Select
           disabled={isSubmitting}
           onValueChange={(value) => {
-            setCategory(value as (typeof SUPPORT_TICKET_CATEGORIES)[number]);
-            setErrors((prev) => ({ ...prev, category: undefined }));
+            setCategory(value as (typeof SUPPORT_TICKET_CATEGORIES)[number])
+            setErrors((prev) => ({ ...prev, category: undefined }))
           }}
           value={category}
         >
@@ -92,8 +92,8 @@ export function SupportTicketCreateForm({
           maxLength={120}
           minLength={5}
           onChange={(event) => {
-            setSubject(event.target.value);
-            setErrors((prev) => ({ ...prev, subject: undefined }));
+            setSubject(event.target.value)
+            setErrors((prev) => ({ ...prev, subject: undefined }))
           }}
           placeholder="Опишите проблему кратко"
           value={subject}
@@ -109,8 +109,8 @@ export function SupportTicketCreateForm({
           maxLength={5000}
           minLength={10}
           onChange={(event) => {
-            setMessage(event.target.value);
-            setErrors((prev) => ({ ...prev, message: undefined }));
+            setMessage(event.target.value)
+            setErrors((prev) => ({ ...prev, message: undefined }))
           }}
           placeholder="Опишите детали обращения"
           value={message}
@@ -124,5 +124,6 @@ export function SupportTicketCreateForm({
         </Button>
       </div>
     </form>
-  );
+  )
 }
+

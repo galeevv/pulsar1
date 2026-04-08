@@ -35,3 +35,4 @@ export const SUPPORT_TICKET_CATEGORY_LABELS: Record<SupportTicketCategory, strin
   technical: "Техническая проблема",
   other: "Другое",
 }
+

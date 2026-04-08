@@ -4,8 +4,8 @@ import { LogOutIcon, TicketPercentIcon, UserIcon } from "lucide-react"
 
 import { logoutAction } from "@/app/login/actions"
 import { PromoCodeApplyForm } from "@/components/app/app-dashboard-dialog-actions"
-import { AppUserAgreementDialog } from "@/components/app/app-user-agreement-dialog"
-import { SupportDialog } from "@/components/support/support-dialog"
+import { AppUserAgreementDrawer } from "@/components/app/app-user-agreement-drawer"
+import { SupportDrawer } from "@/components/support/support-drawer"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type { LegalDocuments } from "@/lib/legal-documents"
@@ -63,12 +63,12 @@ export function AppProfileTab({
             </CardContent>
           </Card>
 
-          <SupportDialog />
-          <AppUserAgreementDialog legalDocuments={legalDocuments} />
+          <SupportDrawer />
+          <AppUserAgreementDrawer legalDocuments={legalDocuments} />
 
           <form action={logoutAction} className="w-full">
             <Button className="h-button w-full px-button-x" radius="card" type="submit" variant="outline">
-              <LogOutIcon data-icon="inline-start" />
+              <LogOutIcon className="size-4" />
               Выйти из аккаунта
             </Button>
           </form>
@@ -77,4 +77,3 @@ export function AppProfileTab({
     </section>
   )
 }
-

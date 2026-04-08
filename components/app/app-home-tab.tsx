@@ -54,7 +54,6 @@ function getSubscriptionState(
     return {
       ctaLabel: "Продлить подписку",
       label: `До ${endAt.toLocaleDateString("ru-RU")}`,
-      variant: "success" as const,
     }
   }
 
@@ -62,7 +61,6 @@ function getSubscriptionState(
     return {
       ctaLabel: "Продлить подписку",
       label: "Истекла",
-      variant: "warning" as const,
     }
   }
 
@@ -70,14 +68,12 @@ function getSubscriptionState(
     return {
       ctaLabel: "Купить подписку",
       label: "Отозвана",
-      variant: "warning" as const,
     }
   }
 
   return {
     ctaLabel: "Купить подписку",
     label: "Не активна",
-    variant: "default" as const,
   }
 }
 
@@ -120,7 +116,7 @@ export function AppHomeTab({
         </Alert>
       ) : null}
 
-      <StatusHeroCard balanceCredits={credits} statusLabel={state.label} statusVariant={state.variant}>
+      <StatusHeroCard balanceCredits={credits} statusLabel={state.label}>
         <ActionRow>
           <QuickActionsSheet
             canExtendSubscription={canExtendSubscription}
@@ -145,3 +141,4 @@ export function AppHomeTab({
     </section>
   )
 }
+

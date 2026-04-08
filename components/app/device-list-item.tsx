@@ -71,8 +71,8 @@ export function DeviceListItem({ slot }: { slot: DeviceSlotItem }) {
             <AppCopySubscriptionButton subscriptionUrl={slot.configUrl} />
             <form action={deactivateDeviceSlotAction} className="w-full">
               <input name="slotId" type="hidden" value={slot.id} />
-              <Button className="w-full" radius="card" type="submit" variant="outline">
-                <UnplugIcon data-icon="inline-start" />
+              <Button className="h-button w-full px-button-x" radius="card" type="submit" variant="outline">
+                <UnplugIcon className="size-4" />
                 Отключить
               </Button>
             </form>
@@ -82,16 +82,16 @@ export function DeviceListItem({ slot }: { slot: DeviceSlotItem }) {
         {slot.status === "FREE" ? (
           <form action={activateDeviceSlotAction}>
             <input name="slotId" type="hidden" value={slot.id} />
-            <Button className="w-full" radius="card" type="submit">
-              <PlugZapIcon data-icon="inline-start" />
+            <Button className="h-button w-full px-button-x" radius="card" type="submit">
+              <PlugZapIcon className="size-4" />
               Подключить устройство
             </Button>
           </form>
         ) : null}
 
         {slot.status === "BLOCKED" ? (
-          <Button className="w-full" disabled radius="card" type="button" variant="outline">
-            <ShieldAlertIcon data-icon="inline-start" />
+          <Button className="h-button w-full px-button-x" disabled radius="card" type="button" variant="outline">
+            <ShieldAlertIcon className="size-4" />
             Слот заблокирован
           </Button>
         ) : null}
@@ -99,4 +99,3 @@ export function DeviceListItem({ slot }: { slot: DeviceSlotItem }) {
     </Card>
   )
 }
-
