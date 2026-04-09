@@ -13,7 +13,7 @@ export function RegisterCodeField() {
   return (
     <div>
       <label className="mb-2 block text-sm font-medium" htmlFor="register-code">
-        Invite Code
+        Referral Code
       </label>
       <div className="relative">
         <Input
@@ -21,7 +21,7 @@ export function RegisterCodeField() {
           id="register-code"
           name="code"
           onChange={(event) => setCode(event.target.value)}
-          placeholder="Введите invite или referral код"
+          placeholder="Введите referral код"
           required
           value={code}
         />

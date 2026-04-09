@@ -8,7 +8,7 @@ export function ActionRow({
   className?: string
 }) {
   return (
-    <div className={cn("flex flex-col gap-3 sm:flex-row", className)}>
+    <div className={cn("flex flex-col gap-3", className)}>
       {children}
     </div>
   )

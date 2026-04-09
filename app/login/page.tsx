@@ -83,7 +83,7 @@ export default async function LoginPage({
           <p className="text-[14px] text-muted-foreground">
             {mode === "login"
               ? "Введите username и пароль."
-              : "Регистрация доступна только по одноразовому invite или referral коду."}
+              : "Регистрация доступна только по referral коду."}
           </p>
         </div>
 
@@ -137,22 +137,6 @@ export default async function LoginPage({
                 id="register-password"
                 name="password"
                 placeholder="Введите пароль"
-                required
-                type="password"
-              />
-            </div>
-
-            <div>
-              <label
-                className="mb-2 block text-sm font-medium"
-                htmlFor="register-password-confirmation"
-              >
-                Password Confirmation
-              </label>
-              <Input
-                id="register-password-confirmation"
-                name="passwordConfirmation"
-                placeholder="Повторите пароль"
                 required
                 type="password"
               />

@@ -60,7 +60,7 @@ export function AppProfileTab({
                   Промокоды
                 </Button>
               </DialogTrigger>
-              <DialogContent showCloseButton={false}>
+              <DialogContent preventAutoFocus showCloseButton={false}>
                 <DialogHeader className="text-left">
                   <DialogTitle>Промокоды</DialogTitle>
                   <DialogDescription>
@@ -81,7 +81,12 @@ export function AppProfileTab({
           </div>         
 
           <form action={logoutAction} className="w-full">
-            <Button className="h-button w-full px-button-x" radius="card" type="submit" variant="outline">
+            <Button
+              className="h-button w-full border-destructive px-button-x text-destructive hover:bg-destructive/10 hover:text-destructive"
+              radius="card"
+              type="submit"
+              variant="outline"
+            >
               <LogOutIcon className="size-4" />
               Выйти из аккаунта
             </Button>

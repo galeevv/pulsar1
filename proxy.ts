@@ -2,6 +2,9 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 type Role = "USER" | "ADMIN";
+const COOKIE_NAME = "pulsar_session";
+const SESSION_TTL_DAYS = 180;
+const SESSION_TTL_SECONDS = 60 * 60 * 24 * SESSION_TTL_DAYS;
 
 function decodeBase64Url(value: string) {
   const base64 = value.replace(/-/g, "+").replace(/_/g, "/");
@@ -33,14 +36,11 @@ function readSessionSnapshot(cookieValue: string | undefined) {
 
   try {
     const parsed = JSON.parse(decoded) as {
-      exp?: number;
       sessionId?: string;
       role?: Role;
     };
 
     if (
-      !parsed.exp ||
-      parsed.exp <= Date.now() ||
       typeof parsed.sessionId !== "string" ||
       !parsed.sessionId ||
       (parsed.role !== "ADMIN" && parsed.role !== "USER")
@@ -56,7 +56,8 @@ function readSessionSnapshot(cookieValue: string | undefined) {
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const session = readSessionSnapshot(request.cookies.get("pulsar_session")?.value);
+  const cookieValue = request.cookies.get(COOKIE_NAME)?.value;
+  const session = readSessionSnapshot(cookieValue);
 
   if (pathname.startsWith("/app") && !session) {
     const url = request.nextUrl.clone();
@@ -72,7 +73,19 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+
+  if (session && cookieValue) {
+    response.cookies.set(COOKIE_NAME, cookieValue, {
+      httpOnly: true,
+      maxAge: SESSION_TTL_SECONDS,
+      path: "/",
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
+  }
+
+  return response;
 }
 
 export const config = {

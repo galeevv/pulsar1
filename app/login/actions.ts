@@ -32,7 +32,6 @@ export async function registerAction(formData: FormData) {
   const result = await attemptRegistration({
     code: String(formData.get("code") ?? ""),
     password: String(formData.get("password") ?? ""),
-    passwordConfirmation: String(formData.get("passwordConfirmation") ?? ""),
     username: String(formData.get("username") ?? ""),
   });
 

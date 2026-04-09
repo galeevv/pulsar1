@@ -142,7 +142,7 @@ export function AppReferralsTab({
             usesCount={usesCount}
           />
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2 mb-2">
             <ReferralHistoryDrawer
               payouts={payout.recentRequests}
               rewards={recentReferralActivity.map((item) => ({

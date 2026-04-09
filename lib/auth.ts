@@ -20,10 +20,14 @@ type SessionSnapshot = {
 };
 
 const COOKIE_NAME = "pulsar_session";
-const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 7;
+const SESSION_TTL_DAYS = 180;
+const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * SESSION_TTL_DAYS;
+const SESSION_TTL_SECONDS = SESSION_TTL_MS / 1000;
+const SESSION_ROLLING_REFRESH_INTERVAL_HOURS = 6;
+const SESSION_ROLLING_REFRESH_INTERVAL_MS =
+  1000 * 60 * 60 * SESSION_ROLLING_REFRESH_INTERVAL_HOURS;
 const SESSION_SECRET = process.env.SESSION_SECRET;
 const INVALID_REGISTRATION_CODE_ERROR = "INVALID_REGISTRATION_CODE";
-const INVITE_CODE_ALREADY_USED_ERROR = "INVITE_CODE_ALREADY_USED";
 const LEGACY_SCRYPT_SALT = "pulsar-dev-salt";
 const ARGON2_OPTIONS = {
   algorithm: 2,
@@ -108,7 +112,6 @@ function decodeSession(value: string | undefined): SessionPayload | null {
 
     if (
       typeof parsed.exp !== "number" ||
-      parsed.exp <= Date.now() ||
       typeof parsed.sessionId !== "string" ||
       !parsed.sessionId ||
       typeof parsed.username !== "string" ||
@@ -184,6 +187,44 @@ export async function getCurrentSession() {
     return null;
   }
 
+  const now = Date.now();
+  const refreshThresholdDate = new Date(
+    now + (SESSION_TTL_MS - SESSION_ROLLING_REFRESH_INTERVAL_MS)
+  );
+  const shouldRefreshSession = session.expiresAt.getTime() <= refreshThresholdDate.getTime();
+
+  if (shouldRefreshSession) {
+    const nextExpiresAt = new Date(now + SESSION_TTL_MS);
+    const refreshResult = await prisma.session.updateMany({
+      data: { expiresAt: nextExpiresAt },
+      where: {
+        expiresAt: { lte: refreshThresholdDate },
+        id: session.id,
+      },
+    });
+
+    if (refreshResult.count === 1) {
+      const refreshedValue = encodeSession({
+        exp: nextExpiresAt.getTime(),
+        role: session.user.role,
+        sessionId: session.id,
+        username: session.user.username,
+      });
+
+      try {
+        cookieStore.set(COOKIE_NAME, refreshedValue, {
+          httpOnly: true,
+          maxAge: SESSION_TTL_SECONDS,
+          path: "/",
+          sameSite: "lax",
+          secure: process.env.NODE_ENV === "production",
+        });
+      } catch {
+        // Cookie mutation is not allowed in all execution contexts (e.g. Server Components).
+      }
+    }
+  }
+
   return {
     role: session.user.role,
     sessionId: session.id,
@@ -222,6 +263,7 @@ export async function setSession(username: string, role: Role) {
 
   cookieStore.set(COOKIE_NAME, value, {
     httpOnly: true,
+    maxAge: SESSION_TTL_SECONDS,
     path: "/",
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
@@ -281,7 +323,6 @@ export async function attemptLogin(rawUsername: string, password: string) {
 export async function attemptRegistration(input: {
   code: string;
   password: string;
-  passwordConfirmation: string;
   username: string;
 }) {
   await ensureBootstrapData();
@@ -289,11 +330,10 @@ export async function attemptRegistration(input: {
   const username = input.username.trim();
   const normalizedUsername = normalizeUsername(username);
   const password = input.password;
-  const passwordConfirmation = input.passwordConfirmation;
   const code = input.code.trim();
   const normalizedCode = normalizeCode(code);
 
-  if (!username || !password || !passwordConfirmation || !code) {
+  if (!username || !password || !code) {
     return {
       message: "Заполните все поля регистрации.",
       ok: false as const,
@@ -319,35 +359,16 @@ export async function attemptRegistration(input: {
     };
   }
 
-  if (password !== passwordConfirmation) {
-    return {
-      message: "Пароль и подтверждение не совпадают.",
-      ok: false as const,
-    };
-  }
-
   try {
     const user = await prisma.$transaction(async (tx) => {
-      const now = new Date();
-      const [inviteCode, referralCode] = await Promise.all([
-        tx.inviteCode.findUnique({
-          where: { code: normalizedCode },
-        }),
-        tx.referralCode.findUnique({
-          where: { code: normalizedCode },
-        }),
-      ]);
-
-      const validInviteCode =
-        inviteCode &&
-        inviteCode.isEnabled &&
-        !inviteCode.usedByUserId &&
-        !isExpired(inviteCode.expiresAt);
+      const referralCode = await tx.referralCode.findUnique({
+        where: { code: normalizedCode },
+      });
 
       const validReferralCode =
         referralCode && referralCode.isEnabled && !isExpired(referralCode.expiresAt);
 
-      if (!validInviteCode && !validReferralCode) {
+      if (!validReferralCode) {
         throw new Error(INVALID_REGISTRATION_CODE_ERROR);
       }
 
@@ -359,26 +380,6 @@ export async function attemptRegistration(input: {
           username: normalizedUsername,
         },
       });
-
-      if (validInviteCode) {
-        const inviteClaim = await tx.inviteCode.updateMany({
-          data: {
-            isEnabled: false,
-            usedAt: now,
-            usedByUserId: createdUser.id,
-          },
-          where: {
-            id: inviteCode.id,
-            isEnabled: true,
-            OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
-            usedByUserId: null,
-          },
-        });
-
-        if (inviteClaim.count !== 1) {
-          throw new Error(INVITE_CODE_ALREADY_USED_ERROR);
-        }
-      }
 
       if (validReferralCode) {
         await tx.referralCodeUse.create({
@@ -404,14 +405,7 @@ export async function attemptRegistration(input: {
   } catch (error) {
     if (error instanceof Error && error.message === INVALID_REGISTRATION_CODE_ERROR) {
       return {
-        message: "Код недействителен, выключен, истек или уже использован.",
-        ok: false as const,
-      };
-    }
-
-    if (error instanceof Error && error.message === INVITE_CODE_ALREADY_USED_ERROR) {
-      return {
-        message: "Invite-код уже использован другим пользователем. Запросите новый код.",
+        message: "Referral-код недействителен, выключен или истек.",
         ok: false as const,
       };
     }

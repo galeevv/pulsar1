@@ -89,7 +89,7 @@ export function ReferralSummaryCard({
           </IconContainer>
           <div className="min-w-0">
             <p className="text-sm font-medium">Другу скидка {discountPct}%</p>
-            <p className="mt-1 text-sm text-muted-foreground">Вам {rewardCredits} кредитов</p>
+            <p className="text-sm text-muted-foreground">Вам {rewardCredits} кредитов</p>
           </div>
         </div>
       </div>
@@ -104,7 +104,7 @@ export function ReferralSummaryCard({
             <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium">{ownReferralCode}</p>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   <span className="sm:hidden">Исп. — {usesCount}</span>
                   <span className="hidden sm:inline">Использований: {usesCount}</span>
                 </p>
