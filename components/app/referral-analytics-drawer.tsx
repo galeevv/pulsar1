@@ -62,7 +62,7 @@ export function ReferralAnalyticsDrawer({
       <DrawerContent className="before:shadow-none">
         <DrawerHeader className="text-left">
           <DrawerTitle>Детальная аналитика</DrawerTitle>
-          <DrawerDescription>Основные метрики приглашений и выплат.</DrawerDescription>
+          <DrawerDescription>Метрики приглашений и выплат.</DrawerDescription>
         </DrawerHeader>
 
         <div className="max-h-[68svh] overflow-y-auto px-4 pb-4">

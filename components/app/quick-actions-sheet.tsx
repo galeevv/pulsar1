@@ -26,7 +26,6 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Slider } from "@/components/ui/slider"
 import { calculateAppSubscriptionPreviewPrice } from "@/lib/subscription-preview"
 
@@ -302,8 +301,8 @@ export function QuickActionsSheet({
           <DrawerDescription>Настройте параметры и выберите способ оплаты.</DrawerDescription>
         </DrawerHeader>
 
-        <ScrollArea className="max-h-[60svh] px-4 pb-6">
-          <div className="space-y-4 pb-2 pt-6">
+        <div className="min-h-0 flex-1 overflow-y-auto px-4">
+          <div className="space-y-4 pb-6 pt-6">
             {isCheckingPlategaPayment ? (
               <Alert>
                 <Loader2Icon className="animate-spin" />
@@ -466,7 +465,7 @@ export function QuickActionsSheet({
               </>
             )}
           </div>
-        </ScrollArea>
+        </div>
 
         <form action={payTariffWithCreditsAction} ref={creditsFormRef}>
           <input name="devices" type="hidden" value={effectiveSelectedDevices} />

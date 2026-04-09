@@ -45,7 +45,7 @@ export function ReferralHistoryDrawer({
       <DrawerContent className="before:shadow-none">
         <DrawerHeader className="text-left">
           <DrawerTitle>История</DrawerTitle>
-          <DrawerDescription>Приглашённые пользователи и заявки на вывод.</DrawerDescription>
+          <DrawerDescription>Рефералы и выплаты.</DrawerDescription>
         </DrawerHeader>
 
         <div className="max-h-[68svh] overflow-y-auto px-4 pb-4">
