@@ -1,5 +1,7 @@
 import Image from "next/image"
+import { GaugeIcon } from "lucide-react"
 
+import { DeviceLimitChangeDialog } from "@/components/app/device-limit-change-dialog"
 import { DeviceList } from "@/components/app/device-list"
 import { EmptyStateBlock } from "@/components/app/empty-state-block"
 import { QuickActionsSheet } from "@/components/app/quick-actions-sheet"
@@ -30,6 +32,9 @@ type ActiveSubscriptionItem = {
     status: "ACTIVE" | "BLOCKED" | "FREE"
   }>
   devices: number
+  endsAt: Date
+  expiresAt: Date | null
+  subscriptionUrl: string | null
 } | null
 
 export function AppDevicesTab({
@@ -99,13 +104,37 @@ export function AppDevicesTab({
           <CardTitle className="text-lg">Устройства</CardTitle>
 
           {activeSubscription.deviceSlots.length ? (
-            <DeviceList slots={activeSubscription.deviceSlots} />
+            <DeviceList slots={activeSubscription.deviceSlots.slice(0, 1)} subscriptionUrl={activeSubscription.subscriptionUrl} />
           ) : (
             <EmptyStateBlock
               description="Слоты пока не созданы. Повторите позже или обратитесь в поддержку."
               title="Нет устройств"
             />
           )}
+
+          <Card className="gap-0 border-border/70 bg-card/40 py-0">
+            <CardContent className="flex items-center gap-3 p-3">
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-card border border-border bg-background/60">
+                <GaugeIcon className="size-4 text-muted-foreground" />
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold">Лимит устройств</p>
+                <p className="truncate text-xs text-muted-foreground">
+                  До {activeSubscription.deviceLimit} одновременного подключения.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <DeviceLimitChangeDialog
+            credits={credits}
+            currentDevices={activeSubscription.deviceLimit}
+            expiresAt={(activeSubscription.expiresAt ?? activeSubscription.endsAt).toISOString()}
+            pricingSettings={{
+              extraDeviceMonthlyPrice: pricingSettings.extraDeviceMonthlyPrice,
+              maxDevices: pricingSettings.maxDevices,
+            }}
+          />
         </CardContent>
       </Card>
     </section>

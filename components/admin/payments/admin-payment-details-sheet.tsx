@@ -200,10 +200,6 @@ export function AdminPaymentDetailsSheet({
                     )}
                   />
                   <KeyValue
-                    label="VPN monthly price"
-                    value={formatRub(payment.details.pricingSnapshot.vpnMonthlyPrice ?? null)}
-                  />
-                  <KeyValue
                     label="Devices monthly price"
                     value={formatRub(payment.details.pricingSnapshot.devicesMonthlyPrice ?? null)}
                   />

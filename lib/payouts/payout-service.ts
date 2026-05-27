@@ -24,7 +24,9 @@ type UserScopedPayoutRequest = Pick<
   | "updatedAt"
 >;
 
-type PrismaLike = Pick<typeof prisma, "$transaction">;
+type PrismaLike = {
+  $transaction<T>(callback: (tx: any) => Promise<T>): Promise<T>;
+};
 
 function normalizeAmount(amountCredits: number) {
   if (!Number.isFinite(amountCredits)) {
@@ -327,6 +329,44 @@ export async function approvePayoutRequest(
 ): Promise<AdminPayoutTransitionResult> {
   return db.$transaction(async (tx) => {
     const now = new Date();
+    const request = await tx.payoutRequest.findUnique({
+      select: {
+        amountCredits: true,
+        id: true,
+        status: true,
+        userId: true,
+      },
+      where: {
+        id: input.payoutRequestId,
+      },
+    });
+
+    if (!request) {
+      throw new PayoutDomainError("PAYOUT_REQUEST_NOT_FOUND", "Payout request not found.");
+    }
+
+    if (request.status !== PayoutRequestStatus.PENDING) {
+      throw new PayoutDomainError(
+        "PAYOUT_STATUS_TRANSITION_FAILED",
+        "Only pending requests can be approved."
+      );
+    }
+
+    const user = await tx.user.findUnique({
+      select: {
+        credits: true,
+        reservedCredits: true,
+      },
+      where: { id: request.userId },
+    });
+
+    if (!user || user.credits < request.amountCredits || user.reservedCredits < request.amountCredits) {
+      throw new PayoutDomainError(
+        "INSUFFICIENT_AVAILABLE_CREDITS",
+        "Could not approve payout due to insufficient reserved balance."
+      );
+    }
+
     const updateResult = await tx.payoutRequest.updateMany({
       data: {
         adminNote: input.adminNote?.trim() || null,
@@ -335,7 +375,7 @@ export async function approvePayoutRequest(
         status: PayoutRequestStatus.APPROVED,
       },
       where: {
-        id: input.payoutRequestId,
+        id: request.id,
         status: PayoutRequestStatus.PENDING,
       },
     });
@@ -365,7 +405,7 @@ export async function approvePayoutRequest(
         userId: true,
       },
       where: {
-        id: input.payoutRequestId,
+        id: request.id,
       },
     });
   });

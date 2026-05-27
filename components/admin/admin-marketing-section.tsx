@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-import { BarChart3, Gift, Ticket, Users } from "lucide-react";
+import { BarChart3, Gift, HandCoins, Users } from "lucide-react";
 
 import { AdminSurface } from "@/components/admin/admin-surface";
 import {
@@ -15,15 +15,14 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { AdminInviteCodesSection } from "./admin-invite-codes-section";
 import { AdminPromoCodesSection } from "./admin-promo-codes-section";
 import { AdminReferralCodesSection } from "./admin-referral-codes-section";
 import { AdminSectionShell } from "./admin-section-shell";
 
-type CodesTab = "referral" | "invite" | "promo";
+type CodesTab = "referral" | "promo";
 
 function normalizeTab(value: string | null): CodesTab {
-  if (value === "invite" || value === "promo" || value === "referral") {
+  if (value === "promo" || value === "referral") {
     return value;
   }
 
@@ -61,12 +60,10 @@ function SummaryCard({
 }
 
 export function AdminMarketingSection({
-  inviteCodes,
   promoCodes,
   referralCodes,
   referralProgramSettings,
-}: React.ComponentProps<typeof AdminInviteCodesSection> &
-  React.ComponentProps<typeof AdminPromoCodesSection> &
+}: React.ComponentProps<typeof AdminPromoCodesSection> &
   React.ComponentProps<typeof AdminReferralCodesSection>) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -87,9 +84,6 @@ export function AdminMarketingSection({
   }
 
   const summary = useMemo(() => {
-    const activeInviteCodes = inviteCodes.filter(
-      (item) => item.isEnabled && !item.usedAt && !item.usedBy && isNotExpired(item.expiresAt)
-    ).length;
     const activeReferralCodes = referralCodes.filter(
       (item) => item.isEnabled && isNotExpired(item.expiresAt)
     ).length;
@@ -97,35 +91,43 @@ export function AdminMarketingSection({
       (item) => item.isEnabled && isNotExpired(item.expiresAt)
     ).length;
 
-    const inviteUses = inviteCodes.filter((item) => Boolean(item.usedAt)).length;
     const referralUses = referralCodes.reduce((sum, item) => sum + item._count.uses, 0);
     const promoRedemptions = promoCodes.reduce((sum, item) => sum + item._count.redemptions, 0);
-    const totalUses = inviteUses + referralUses + promoRedemptions;
+    const totalUses = referralUses + promoRedemptions;
+    const referrers = referralCodes.filter((item) => item.ownerUser).length;
 
       return {
-        activeInviteCodes,
         activePromoCodes,
         activeReferralCodes,
+        kFactor: referrers > 0 ? referralUses / referrers : 0,
+        rewardIssued: referralCodes.reduce(
+          (sum, item) =>
+            sum +
+            ((item as typeof item & { grantedRewardsCount?: number }).grantedRewardsCount ?? 0) *
+              item.rewardCredits,
+          0
+        ),
+        toPayout: referralProgramSettings.minimumPayoutCredits,
         totalUses,
       };
-  }, [inviteCodes, promoCodes, referralCodes]);
+  }, [promoCodes, referralCodes, referralProgramSettings.minimumPayoutCredits]);
 
   return (
     <AdminSectionShell
-      description="Manage all registration and rewards codes in one place."
+      description=""
       eyebrow="CODES"
       id="codes"
-      title="Codes"
+      title=""
     >
       <div className="space-y-4">
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          <SummaryCard icon={Ticket} title="Active Invite Codes" value={String(summary.activeInviteCodes)} />
-          <SummaryCard icon={Users} title="Active Referral Codes" value={String(summary.activeReferralCodes)} />
-          <SummaryCard icon={Gift} title="Active Promo Codes" value={String(summary.activePromoCodes)} />
+          <SummaryCard icon={BarChart3} title="K-factor" value={summary.kFactor.toFixed(2)} />
+          <SummaryCard icon={Users} title="Active codes" value={String(summary.activeReferralCodes + summary.activePromoCodes)} />
+          <SummaryCard icon={Gift} title="Reward issued" value={String(summary.rewardIssued)} />
           <SummaryCard
-            icon={BarChart3}
-            title="Total Uses"
-            value={String(summary.totalUses)}
+            icon={HandCoins}
+            title="To payout"
+            value={String(summary.toPayout)}
           />
         </div>
 
@@ -137,18 +139,16 @@ export function AdminMarketingSection({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="referral">Referral Codes</SelectItem>
-                <SelectItem value="invite">Invite Codes</SelectItem>
                 <SelectItem value="promo">Promo Codes</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <TabsList
-            className="hidden h-11 w-full grid-cols-3 rounded-card border border-border bg-background/40 p-0 md:grid"
+            className="hidden h-11 w-full grid-cols-2 rounded-card border border-border bg-background/40 p-0 md:grid"
             variant="default"
           >
             <TabsTrigger value="referral">Referral Codes</TabsTrigger>
-            <TabsTrigger value="invite">Invite Codes</TabsTrigger>
             <TabsTrigger value="promo">Promo Codes</TabsTrigger>
           </TabsList>
 
@@ -158,10 +158,6 @@ export function AdminMarketingSection({
               referralCodes={referralCodes}
               referralProgramSettings={referralProgramSettings}
             />
-          </TabsContent>
-
-          <TabsContent className="mt-0" value="invite">
-            <AdminInviteCodesSection embedded inviteCodes={inviteCodes} />
           </TabsContent>
 
           <TabsContent className="mt-0" value="promo">

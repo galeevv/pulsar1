@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Activity,
@@ -105,7 +105,16 @@ export function AdminAppSidebar({
   const { setOpenMobile, toggleSidebar } = useSidebar();
   const pathname = normalizePathname(usePathname() ?? "/admin");
   const [accountDialogOpen, setAccountDialogOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const roleLabel = currentRole === "ADMIN" ? "Admin" : "User";
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <Sidebar collapsible="icon">
@@ -145,7 +154,7 @@ export function AdminAppSidebar({
                         className={cn(
                           "h-10 rounded-card px-3 text-sm",
                           isActive
-                            ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90 hover:text-sidebar-primary-foreground"
+                            ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground"
                             : "text-sidebar-foreground/70 hover:text-sidebar-foreground"
                         )}
                         isActive={isActive}

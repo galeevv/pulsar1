@@ -9,11 +9,17 @@ type DeviceSlotItem = {
   status: "ACTIVE" | "BLOCKED" | "FREE"
 }
 
-export function DeviceList({ slots }: { slots: DeviceSlotItem[] }) {
+export function DeviceList({
+  slots,
+  subscriptionUrl,
+}: {
+  slots: DeviceSlotItem[]
+  subscriptionUrl: string | null
+}) {
   return (
     <div className="flex flex-col gap-2">
       {slots.map((slot) => (
-        <DeviceListItem key={slot.id} slot={slot} />
+        <DeviceListItem key={slot.id} slot={slot} subscriptionUrl={subscriptionUrl} />
       ))}
     </div>
   )

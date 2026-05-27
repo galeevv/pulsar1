@@ -39,7 +39,7 @@ enum DeviceOS {
 }
 
 enum IntegrationProvider {
-  MARZBAN
+  XUI
 }
 
 enum IntegrationTargetType {
@@ -83,7 +83,6 @@ model User {
   reservedCredits      Int                  @default(0)
   createdAt            DateTime             @default(now())
   updatedAt            DateTime             @updatedAt
-  inviteCodesUsed      InviteCode[]         @relation("InviteCodeUsedBy")
   referralCodesCreated ReferralCode[]       @relation("ReferralCodeOwner")
   referralCodeUse      ReferralCodeUse?     @relation("ReferralCodeUseByUser")
   paymentRequests      PaymentRequest[]
@@ -93,21 +92,17 @@ model User {
   supportMessages      SupportMessage[]     @relation("SupportMessageSender")
   supportTickets       SupportTicket[]
   promoCodeRedemptions PromoCodeRedemption[]
+  operationLock        UserOperationLock?
   sessions             Session[]
 }
 
-model InviteCode {
-  id           String    @id @default(cuid())
-  code         String    @unique
-  isEnabled    Boolean   @default(true)
-  expiresAt    DateTime?
-  createdAt    DateTime  @default(now())
-  usedAt       DateTime?
-  usedByUserId String?   @unique
-  usedBy       User?     @relation("InviteCodeUsedBy", fields: [usedByUserId], references: [id], onDelete: SetNull)
+model UserOperationLock {
+  userId    String   @id
+  operation String
+  lockedAt  DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([isEnabled])
-  @@index([expiresAt])
+  @@index([lockedAt])
 }
 
 model ReferralCode {
@@ -287,6 +282,7 @@ model PaymentRequest {
   plategaConfirmedAt                  DateTime?
   user                                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   subscription                        Subscription?
+  subscriptionRenewal                 SubscriptionRenewal?
   plategaWebhookLogs                  PlategaWebhookLog[]
 
   @@index([userId])
@@ -350,11 +346,35 @@ model Subscription {
   user                            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   paymentRequest                  PaymentRequest?    @relation(fields: [paymentRequestId], references: [id], onDelete: SetNull)
   deviceSlots                     DeviceSlot[]
+  renewals                        SubscriptionRenewal[]
 
   @@index([userId])
   @@index([status])
   @@index([endsAt])
   @@index([expiresAt])
+}
+
+model SubscriptionRenewal {
+  id                              String        @id @default(cuid())
+  subscriptionId                  String
+  paymentRequestId                String        @unique
+  previousExpiresAt               DateTime?
+  nextExpiresAt                   DateTime
+  previousDevices                 Int
+  nextDevices                     Int
+  months                          Int
+  amountRub                       Int
+  currency                        String        @default("RUB")
+  baseDeviceMonthlyPriceSnapshot  Int           @default(0)
+  extraDeviceMonthlyPriceSnapshot Int           @default(0)
+  monthlyPriceSnapshot            Int           @default(0)
+  durationDiscountPercentSnapshot Int           @default(0)
+  referralDiscountPercentSnapshot Int           @default(0)
+  createdAt                       DateTime      @default(now())
+  subscription                    Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  paymentRequest                  PaymentRequest @relation(fields: [paymentRequestId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId, createdAt])
 }
 
 model DeviceSlot {

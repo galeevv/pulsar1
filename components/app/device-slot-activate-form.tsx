@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Loader2Icon, PlugZapIcon } from "lucide-react"
 import { useFormStatus } from "react-dom"
 
@@ -84,10 +84,16 @@ export function DeviceSlotActivateForm({
 
     return detectSelectableDeviceOsFromNavigator("WINDOWS")
   })
+  const [assignedUserAgent, setAssignedUserAgent] = useState("")
+
+  useEffect(() => {
+    setAssignedUserAgent(navigator.userAgent)
+  }, [])
 
   return (
     <form action={activateDeviceSlotAction}>
       <input name="slotId" type="hidden" value={slotId} />
+      <input name="assignedUserAgent" type="hidden" value={assignedUserAgent} />
       <ActivateSlotFields deviceOs={deviceOs} onDeviceOsChange={setDeviceOs} />
     </form>
   )

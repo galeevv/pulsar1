@@ -231,7 +231,9 @@ export async function getAdminPayoutsPageData(
       },
       user: {
         select: {
+          credits: true,
           id: true,
+          reservedCredits: true,
           username: true,
         },
       },
@@ -254,7 +256,10 @@ export async function getAdminPayoutsPageData(
       reviewedAt: request.reviewedAt ? request.reviewedAt.toISOString() : null,
       reviewedByAdminId: request.reviewedByAdminId,
       reviewedByUsername: request.reviewedByAdmin?.username ?? null,
+      userAvailableCredits: Math.max(0, request.user.credits - request.user.reservedCredits),
+      userCredits: request.user.credits,
       userId: request.user.id,
+      userReservedCredits: request.user.reservedCredits,
       username: request.user.username,
     },
     id: request.id,

@@ -24,19 +24,16 @@ export function calculateSubscriptionPrice(input: CalculateSubscriptionPriceInpu
   const months = Math.max(1, Math.floor(input.months));
   const baseDeviceMonthlyPrice = Math.max(0, Math.floor(input.baseDeviceMonthlyPrice));
   const extraDeviceMonthlyPrice = Math.max(0, Math.floor(input.extraDeviceMonthlyPrice));
-  const vpnMonthlyPrice = Math.max(0, Math.floor(input.vpnMonthlyPrice));
+  const vpnMonthlyPrice = 0;
 
   const devicesMonthlyPrice =
     baseDeviceMonthlyPrice + Math.max(0, devices - 1) * extraDeviceMonthlyPrice;
-  const monthlyPrice = vpnMonthlyPrice + devicesMonthlyPrice;
+  const monthlyPrice = devicesMonthlyPrice;
   const totalBeforeDiscountRub = monthlyPrice * months;
-  const vpnTotalBeforeDurationDiscountRub = vpnMonthlyPrice * months;
-  const vpnTotalAfterDurationDiscountRub = applyPercentDiscount(
-    vpnTotalBeforeDurationDiscountRub,
+  const totalAfterDurationDiscountRub = applyPercentDiscount(
+    totalBeforeDiscountRub,
     durationDiscountPercent
   );
-  const devicesTotalRub = devicesMonthlyPrice * months;
-  const totalAfterDurationDiscountRub = vpnTotalAfterDurationDiscountRub + devicesTotalRub;
   const appliedReferralDiscountPercent = months === 1 ? referralDiscountPercent : 0;
   const finalTotalRub = applyPercentDiscount(
     totalAfterDurationDiscountRub,

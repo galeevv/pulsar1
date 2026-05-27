@@ -2,22 +2,19 @@
 
 import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-
-import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, RefreshCw, Search } from "lucide-react";
 import { toast } from "sonner";
 
-import { resetUserPasswordAction } from "@/app/admin/users/actions";
-import { AdminStatusPill } from "@/components/admin/admin-status-pill";
-import { AdminSectionShell } from "@/components/admin/admin-section-shell";
-import { AdminSurface } from "@/components/admin/admin-surface";
-import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  grantUserCreditsAction,
+  resetUserPasswordAction,
+  syncUserSubscriptionAction,
+} from "@/app/admin/users/actions";
+import { AdminSectionShell } from "@/components/admin/admin-section-shell";
+import { AdminStatusPill } from "@/components/admin/admin-status-pill";
+import { AdminSurface } from "@/components/admin/admin-surface";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Pagination,
@@ -26,13 +23,14 @@ import {
   PaginationItem,
   PaginationLink,
 } from "@/components/ui/pagination";
+import { Separator } from "@/components/ui/separator";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import {
   Table,
   TableBody,
@@ -42,24 +40,29 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-type SubscriptionFilter = "all" | "active" | "expired" | "none" | "revoked";
+type SubscriptionFilter = "all" | "active" | "expired" | "none";
 type UsersSort =
-  | "newest"
-  | "oldest"
-  | "credits_desc"
-  | "last_payment_desc"
-  | "active_subscription_first";
+  | "newest";
 
 export type AdminUsersListItem = {
   createdAt: string;
   credits: number;
   devices: number | null;
   id: string;
+  invitedCount: number;
   invitedByCode: string | null;
-  invitedByType: "invite" | "none" | "referral";
+  invitedByType: "none" | "referral";
   lastPaymentAt: string | null;
   ownReferralCode: string | null;
-  subscriptionState: "active" | "expired" | "none" | "revoked";
+  payments: Array<{
+    amountRub: number;
+    date: string;
+    method: "CREDITS" | "PLATEGA";
+    status: "APPROVED" | "CREATED" | "REJECTED";
+    tariff: string;
+  }>;
+  subscriptionEndsAt: string | null;
+  subscriptionState: "active" | "expired" | "none";
   username: string;
 };
 
@@ -72,29 +75,28 @@ type PaginationData = {
 
 type FiltersData = {
   page: number;
-  perPage: 10 | 20 | 50;
+  perPage: 10;
   query: string;
   sort: UsersSort;
   subscription: SubscriptionFilter;
 };
 
-type ResetPasswordActionState = {
+type UserActionState = {
   message: string;
   nonce: number;
   status: "error" | "idle" | "success";
 };
 
-const RESET_PASSWORD_INITIAL_STATE: ResetPasswordActionState = {
+const ACTION_INITIAL_STATE: UserActionState = {
   message: "",
   nonce: 0,
   status: "idle",
 };
 
-function formatDate(value: string) {
+function formatDate(value: string | null) {
+  if (!value) return "-";
   const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return "—";
-  }
+  if (Number.isNaN(parsed.getTime())) return "-";
 
   return parsed.toLocaleDateString("ru-RU", {
     day: "2-digit",
@@ -104,14 +106,9 @@ function formatDate(value: string) {
 }
 
 function formatDateTime(value: string | null) {
-  if (!value) {
-    return "—";
-  }
-
+  if (!value) return "-";
   const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return "—";
-  }
+  if (Number.isNaN(parsed.getTime())) return "-";
 
   return parsed.toLocaleString("ru-RU", {
     day: "2-digit",
@@ -120,6 +117,10 @@ function formatDateTime(value: string | null) {
     month: "2-digit",
     year: "numeric",
   });
+}
+
+function formatRub(value: number) {
+  return `${new Intl.NumberFormat("ru-RU").format(value)} ₽`;
 }
 
 function getSubscriptionMeta(state: AdminUsersListItem["subscriptionState"]) {
@@ -131,11 +132,7 @@ function getSubscriptionMeta(state: AdminUsersListItem["subscriptionState"]) {
     return { label: "Expired", tone: "warning" as const };
   }
 
-  if (state === "revoked") {
-    return { label: "Revoked", tone: "default" as const };
-  }
-
-  return { label: "—", tone: "default" as const };
+  return { label: "None", tone: "default" as const };
 }
 
 function buildPaginationItems(currentPage: number, totalPages: number) {
@@ -170,19 +167,8 @@ function buildPaginationItems(currentPage: number, totalPages: number) {
   return result;
 }
 
-function UserPasswordResetForm({
-  userId,
-  username,
-}: {
-  userId: string;
-  username: string;
-}) {
-  const formRef = useRef<HTMLFormElement>(null);
+function useActionToast(state: UserActionState, formRef: React.RefObject<HTMLFormElement | null>) {
   const handledNonceRef = useRef(0);
-  const [state, formAction, isPending] = useActionState(
-    resetUserPasswordAction,
-    RESET_PASSWORD_INITIAL_STATE
-  );
 
   useEffect(() => {
     if (state.nonce === 0 || state.nonce === handledNonceRef.current) {
@@ -200,46 +186,106 @@ function UserPasswordResetForm({
     if (state.status === "error") {
       toast.error(state.message, { position: "bottom-right" });
     }
-  }, [state]);
+  }, [formRef, state]);
+}
+
+function UserPasswordResetForm({
+  userId,
+  username,
+}: {
+  userId: string;
+  username: string;
+}) {
+  const formRef = useRef<HTMLFormElement>(null);
+  const [state, formAction, isPending] = useActionState(
+    resetUserPasswordAction,
+    ACTION_INITIAL_STATE
+  );
+  useActionToast(state, formRef);
 
   return (
-    <form action={formAction} className="space-y-3" ref={formRef}>
+    <form action={formAction} className="flex flex-col gap-3" ref={formRef}>
       <input name="userId" type="hidden" value={userId} />
-
-      <div className="space-y-2">
-        <label className="block text-sm font-medium" htmlFor={`user-reset-password-${userId}`}>
-          Новый пароль для {username}
-        </label>
+      <label className="flex flex-col gap-2 text-sm font-medium" htmlFor={`user-reset-password-${userId}`}>
+        New password for {username}
         <Input
           autoComplete="new-password"
           id={`user-reset-password-${userId}`}
-          minLength={8}
           name="nextPassword"
-          placeholder="Минимум 8 символов"
+          placeholder="New password"
           required
           type="password"
         />
-      </div>
-
-      <div className="space-y-2">
-        <label className="block text-sm font-medium" htmlFor={`user-reset-password-confirm-${userId}`}>
-          Подтверждение пароля
-        </label>
-        <Input
-          autoComplete="new-password"
-          id={`user-reset-password-confirm-${userId}`}
-          minLength={8}
-          name="nextPasswordConfirmation"
-          placeholder="Повторите новый пароль"
-          required
-          type="password"
-        />
-      </div>
-
-      <Button className="w-full sm:w-auto" disabled={isPending} radius="card" type="submit">
-        {isPending ? "Обновляем пароль..." : "Сбросить пароль"}
+      </label>
+      <Button className="h-input w-full sm:w-auto" disabled={isPending} radius="card" type="submit">
+        {isPending ? "Updating..." : "Change password"}
       </Button>
     </form>
+  );
+}
+
+function GrantCreditsForm({ userId }: { userId: string }) {
+  const formRef = useRef<HTMLFormElement>(null);
+  const [state, formAction, isPending] = useActionState(
+    grantUserCreditsAction,
+    ACTION_INITIAL_STATE
+  );
+  useActionToast(state, formRef);
+
+  return (
+    <form action={formAction} className="flex flex-col gap-3 sm:flex-row sm:items-center" ref={formRef}>
+      <input name="userId" type="hidden" value={userId} />
+      <Input min={1} name="amountCredits" placeholder="Credits amount" required type="number" />
+      <Button className="h-input w-full sm:w-auto" disabled={isPending} radius="card" type="submit">
+        {isPending ? "Issuing..." : "Issue credits"}
+      </Button>
+    </form>
+  );
+}
+
+function SyncUserSubscriptionForm({ userId }: { userId: string }) {
+  const formRef = useRef<HTMLFormElement>(null);
+  const [state, formAction, isPending] = useActionState(
+    syncUserSubscriptionAction,
+    ACTION_INITIAL_STATE
+  );
+  useActionToast(state, formRef);
+
+  return (
+    <form action={formAction} className="flex flex-col gap-3 sm:flex-row sm:items-center" ref={formRef}>
+      <input name="userId" type="hidden" value={userId} />
+      <Button className="h-input w-full px-button-x sm:w-auto" disabled={isPending} radius="card" type="submit" variant="outline">
+        <RefreshCw className={isPending ? "animate-spin" : undefined} />
+        {isPending ? "Syncing..." : "Sync subscription"}
+      </Button>
+    </form>
+  );
+}
+
+function DetailBlock({
+  children,
+  title,
+}: {
+  children: React.ReactNode;
+  title: string;
+}) {
+  return (
+    <section className="rounded-card border border-border/70 bg-background/35 p-4">
+      <div className="mb-3 flex items-center gap-3">
+        <h3 className="text-sm font-semibold">{title}</h3>
+        <Separator className="flex-1" />
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function KeyValue({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="grid grid-cols-[110px_minmax(0,1fr)] gap-2 text-sm">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="min-w-0 break-words text-foreground">{value}</span>
+    </div>
   );
 }
 
@@ -285,133 +331,97 @@ export function AdminUsersSection({
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const query = String(formData.get("q") ?? "").trim();
-    navigate({
-      page: "1",
-      q: query || undefined,
-    });
-  }
-
-  function handleReset() {
-    navigate({
-      page: undefined,
-      perPage: undefined,
-      q: undefined,
-      sort: undefined,
-      subscription: undefined,
-    });
+    navigate({ page: "1", q: query || undefined });
   }
 
   return (
-    <AdminSectionShell
-      description="Users table with filters and pagination."
-      eyebrow="USERS"
-      id="users"
-      title="Users"
-    >
+    <AdminSectionShell description="" eyebrow="USERS" id="users" title="">
       <div className="space-y-3">
         <AdminSurface className="p-4 md:p-4">
-          <form className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_220px_260px_auto_auto]" onSubmit={handleSearchSubmit}>
+          <form className="grid items-center gap-3 lg:grid-cols-[minmax(0,1fr)_auto]" onSubmit={handleSearchSubmit}>
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                className="pl-9"
-                defaultValue={filters.query}
-                name="q"
-                placeholder="Search by username"
-              />
+              <Input className="pl-9" defaultValue={filters.query} name="q" placeholder="Search by username" />
             </div>
 
-            <Select
-              onValueChange={(value) =>
-                navigate({
-                  page: "1",
-                  subscription: value === "all" ? undefined : value,
-                })
-              }
-              value={filters.subscription}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Subscription state" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All subscriptions</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="expired">Expired</SelectItem>
-                <SelectItem value="none">None</SelectItem>
-                <SelectItem value="revoked">Revoked</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select
-              onValueChange={(value) =>
-                navigate({
-                  page: "1",
-                  sort: value === "newest" ? undefined : value,
-                })
-              }
-              value={filters.sort}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Sort" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="newest">Newest</SelectItem>
-                <SelectItem value="oldest">Oldest</SelectItem>
-                <SelectItem value="credits_desc">Credits desc</SelectItem>
-                <SelectItem value="last_payment_desc">Last payment desc</SelectItem>
-                <SelectItem value="active_subscription_first">Active subscription first</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Button className="px-4" radius="card" type="submit" variant="outline">
-              Apply
-            </Button>
-
-            <Button className="px-4" onClick={handleReset} radius="card" type="button" variant="ghost">
-              Reset
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              {(["all", "active", "expired", "none"] as const).map((value) => (
+                <Button
+                  className="h-input px-button-x"
+                  key={value}
+                  onClick={() => navigate({ page: "1", subscription: value === "all" ? undefined : value })}
+                  radius="card"
+                  type="button"
+                  variant={filters.subscription === value ? "default" : "outline"}
+                >
+                  {value[0].toUpperCase() + value.slice(1)}
+                </Button>
+              ))}
+            </div>
           </form>
         </AdminSurface>
 
         <AdminSurface className="overflow-hidden p-0">
           {users.length ? (
             <>
-              <div className="max-h-[600px] overflow-auto">
+              <div className="space-y-3 p-3 md:hidden">
+                {users.map((user) => {
+                  const subscriptionMeta = getSubscriptionMeta(user.subscriptionState);
+
+                  return (
+                    <button
+                      className="block w-full rounded-card border border-border/70 bg-background/35 p-3 text-left"
+                      key={user.id}
+                      onClick={() => setSelectedUser(user)}
+                      type="button"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold text-foreground">{user.username}</p>
+                          <p className="mt-1 text-xs text-muted-foreground">Joined {formatDate(user.createdAt)}</p>
+                        </div>
+                        <AdminStatusPill label={subscriptionMeta.label} tone={subscriptionMeta.tone} />
+                      </div>
+
+                      <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Devices</p>
+                          <p className="mt-1 text-foreground">{user.devices ?? "-"}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Credits</p>
+                          <p className="mt-1 text-foreground">{user.credits}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Invited By</p>
+                          <p className="mt-1 truncate text-muted-foreground">{user.invitedByCode ?? "-"}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Referral</p>
+                          <p className="mt-1 truncate text-muted-foreground">{user.ownReferralCode ?? "-"}</p>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="hidden max-h-[600px] overflow-auto md:block">
                 <Table>
                   <TableHeader className="sticky top-0 z-10 bg-card/95 backdrop-blur-sm">
                     <TableRow className="border-border/70">
-                      <TableHead className="h-12 px-6 text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                        Username
-                      </TableHead>
-                      <TableHead className="h-12 px-6 text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                        Subscription
-                      </TableHead>
-                      <TableHead className="h-12 px-6 text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                        Devices
-                      </TableHead>
-                      <TableHead className="h-12 px-6 text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                        Credits
-                      </TableHead>
-                      <TableHead className="h-12 px-6 text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                        Invited By
-                      </TableHead>
-                      <TableHead className="h-12 px-6 text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                        Own Referral Code
-                      </TableHead>
-                      <TableHead className="h-12 px-6 text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                        Joined
-                      </TableHead>
+                      <TableHead className="h-12 px-6 text-xs uppercase tracking-[0.16em] text-muted-foreground">Username</TableHead>
+                      <TableHead className="h-12 px-6 text-xs uppercase tracking-[0.16em] text-muted-foreground">Subscription</TableHead>
+                      <TableHead className="h-12 px-6 text-xs uppercase tracking-[0.16em] text-muted-foreground">Devices</TableHead>
+                      <TableHead className="h-12 px-6 text-xs uppercase tracking-[0.16em] text-muted-foreground">Credits</TableHead>
+                      <TableHead className="h-12 px-6 text-xs uppercase tracking-[0.16em] text-muted-foreground">Invited By</TableHead>
+                      <TableHead className="h-12 px-6 text-xs uppercase tracking-[0.16em] text-muted-foreground">Referral Code</TableHead>
+                      <TableHead className="h-12 px-6 text-xs uppercase tracking-[0.16em] text-muted-foreground">Joined</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {users.map((user) => {
                       const subscriptionMeta = getSubscriptionMeta(user.subscriptionState);
-                      const devicesLabel =
-                        user.subscriptionState === "none" || user.devices === null
-                          ? "—"
-                          : `${user.devices}`;
-                      const invitedByLabel = user.invitedByCode ?? "—";
-                      const ownReferralCode = user.ownReferralCode ?? "—";
 
                       return (
                         <TableRow
@@ -430,13 +440,11 @@ export function AdminUsersSection({
                           <TableCell className="px-6 py-4">
                             <AdminStatusPill label={subscriptionMeta.label} tone={subscriptionMeta.tone} />
                           </TableCell>
-                          <TableCell className="px-6 py-4 text-muted-foreground">{devicesLabel}</TableCell>
+                          <TableCell className="px-6 py-4 text-muted-foreground">{user.devices ?? "-"}</TableCell>
                           <TableCell className="px-6 py-4 text-muted-foreground">{user.credits}</TableCell>
-                          <TableCell className="px-6 py-4 text-muted-foreground">{invitedByLabel}</TableCell>
-                          <TableCell className="px-6 py-4 text-muted-foreground">{ownReferralCode}</TableCell>
-                          <TableCell className="px-6 py-4 text-muted-foreground">
-                            {formatDate(user.createdAt)}
-                          </TableCell>
+                          <TableCell className="px-6 py-4 text-muted-foreground">{user.invitedByCode ?? "-"}</TableCell>
+                          <TableCell className="px-6 py-4 text-muted-foreground">{user.ownReferralCode ?? "-"}</TableCell>
+                          <TableCell className="px-6 py-4 text-muted-foreground">{formatDate(user.createdAt)}</TableCell>
                         </TableRow>
                       );
                     })}
@@ -446,28 +454,7 @@ export function AdminUsersSection({
 
               <div className="grid gap-3 border-t border-border/70 p-4 md:grid-cols-[1fr_auto_1fr] md:items-center">
                 <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                  <span>Rows per page:</span>
-                  <Select
-                    onValueChange={(value) =>
-                      navigate({
-                        page: "1",
-                        perPage: value === "10" ? undefined : value,
-                      })
-                    }
-                    value={String(filters.perPage)}
-                  >
-                    <SelectTrigger className="h-9 w-[92px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="10">10</SelectItem>
-                      <SelectItem value="20">20</SelectItem>
-                      <SelectItem value="50">50</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <span>
-                    Showing {pagination.from}-{pagination.to} of {pagination.total} users
-                  </span>
+                  <span>Showing {pagination.from}-{pagination.to} of {pagination.total} users</span>
                 </div>
 
                 <Pagination className="justify-center">
@@ -476,9 +463,7 @@ export function AdminUsersSection({
                       <PaginationLink
                         aria-label="Previous page"
                         className={filters.page <= 1 ? "pointer-events-none opacity-50" : undefined}
-                        href={buildHref({
-                          page: String(Math.max(1, filters.page - 1)),
-                        })}
+                        href={buildHref({ page: String(Math.max(1, filters.page - 1)) })}
                       >
                         <ChevronLeft className="size-4" />
                       </PaginationLink>
@@ -491,12 +476,7 @@ export function AdminUsersSection({
                         </PaginationItem>
                       ) : (
                         <PaginationItem key={item}>
-                          <PaginationLink
-                            href={buildHref({
-                              page: String(item),
-                            })}
-                            isActive={item === filters.page}
-                          >
+                          <PaginationLink href={buildHref({ page: String(item) })} isActive={item === filters.page}>
                             {item}
                           </PaginationLink>
                         </PaginationItem>
@@ -506,14 +486,8 @@ export function AdminUsersSection({
                     <PaginationItem>
                       <PaginationLink
                         aria-label="Next page"
-                        className={
-                          filters.page >= pagination.totalPages
-                            ? "pointer-events-none opacity-50"
-                            : undefined
-                        }
-                        href={buildHref({
-                          page: String(Math.min(pagination.totalPages, filters.page + 1)),
-                        })}
+                        className={filters.page >= pagination.totalPages ? "pointer-events-none opacity-50" : undefined}
+                        href={buildHref({ page: String(Math.min(pagination.totalPages, filters.page + 1)) })}
                       >
                         <ChevronRight className="size-4" />
                       </PaginationLink>
@@ -532,76 +506,90 @@ export function AdminUsersSection({
         </AdminSurface>
       </div>
 
-      <Dialog onOpenChange={(open) => !open && setSelectedUser(null)} open={Boolean(selectedUser)}>
-        <DialogContent className="max-h-[90svh] overflow-y-auto sm:max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>User Details View</DialogTitle>
-            <DialogDescription>
-              Temporary placeholder UI for upcoming full user profile dialog.
-            </DialogDescription>
-          </DialogHeader>
+      <Sheet onOpenChange={(open) => !open && setSelectedUser(null)} open={Boolean(selectedUser)}>
+        <SheetContent className="w-full overflow-y-auto p-4 sm:max-w-3xl sm:p-6 lg:max-w-4xl">
+          <SheetHeader className="p-0 text-left">
+            <SheetTitle>User details</SheetTitle>
+            <SheetDescription className="sr-only">User details</SheetDescription>
+          </SheetHeader>
 
           {selectedUser ? (
-            <div className="space-y-4">
-              <div className="rounded-card border border-border/70 bg-background/35 p-4">
-                <p className="text-lg font-semibold">{selectedUser.username}</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Joined: {formatDate(selectedUser.createdAt)}
-                </p>
-              </div>
-
-              <div className="grid gap-3 md:grid-cols-2">
-                <div className="rounded-card border border-border/70 bg-background/35 p-4">
-                  <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Subscription</p>
-                  <p className="mt-2 text-sm">
-                    {getSubscriptionMeta(selectedUser.subscriptionState).label}
-                  </p>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Devices: {selectedUser.devices ?? "—"}
-                  </p>
+            <div className="mt-4 space-y-4">
+              <DetailBlock title="User">
+                <div className="space-y-2">
+                  <KeyValue label="Username" value={<span className="font-medium">{selectedUser.username}</span>} />
+                  <KeyValue label="Joined" value={formatDateTime(selectedUser.createdAt)} />
                 </div>
+              </DetailBlock>
 
-                <div className="rounded-card border border-border/70 bg-background/35 p-4">
-                  <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Balance & codes</p>
-                  <p className="mt-2 text-sm">Credits: {selectedUser.credits}</p>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Invited by: {selectedUser.invitedByCode ?? "—"}
-                  </p>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Referral code: {selectedUser.ownReferralCode ?? "—"}
-                  </p>
+              <DetailBlock title="Subscription">
+                <div className="space-y-2">
+                  <KeyValue
+                    label="Status"
+                    value={<Badge variant="secondary">{getSubscriptionMeta(selectedUser.subscriptionState).label}</Badge>}
+                  />
+                  <KeyValue label="Active until" value={formatDateTime(selectedUser.subscriptionEndsAt)} />
+                  <KeyValue label="Devices" value={selectedUser.devices ?? "-"} />
                 </div>
-              </div>
+              </DetailBlock>
 
-              <div className="rounded-card border border-dashed border-border/70 bg-background/20 p-4 text-sm text-muted-foreground">
-                Payments timeline placeholder. Last payment: {formatDateTime(selectedUser.lastPaymentAt)}.
-              </div>
+              <DetailBlock title="Payments">
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Tariff</TableHead>
+                        <TableHead>Amount</TableHead>
+                        <TableHead>Method</TableHead>
+                        <TableHead>Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {selectedUser.payments.length > 0 ? (
+                        selectedUser.payments.map((payment, index) => (
+                          <TableRow key={`${payment.date}-${index}`}>
+                            <TableCell>{formatDate(payment.date)}</TableCell>
+                            <TableCell className="min-w-[180px]">{payment.tariff}</TableCell>
+                            <TableCell>{formatRub(payment.amountRub)}</TableCell>
+                            <TableCell>{payment.method}</TableCell>
+                            <TableCell>{payment.status}</TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell className="text-muted-foreground" colSpan={5}>
+                            No payments yet.
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </DetailBlock>
 
-              <div className="rounded-card border border-dashed border-border/70 bg-background/20 p-4 text-sm text-muted-foreground">
-                Tickets / audit / device management placeholder.
-              </div>
+              <DetailBlock title="Balance & Codes">
+                <div className="space-y-2">
+                  <KeyValue label="Credits" value={selectedUser.credits} />
+                  <KeyValue label="Invited by" value={selectedUser.invitedByCode ?? "-"} />
+                  <KeyValue label="Referral code" value={selectedUser.ownReferralCode ?? "-"} />
+                  <KeyValue label="Invited" value={selectedUser.invitedCount} />
+                </div>
+              </DetailBlock>
 
-              <div className="rounded-card border border-border/70 bg-background/35 p-4">
-                <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                  Password reset
-                </p>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Установите новый пароль пользователю. После сброса все его активные сессии будут завершены.
-                </p>
-                <div className="mt-4">
+              <DetailBlock title="Actions">
+                <div className="space-y-4">
+                  <SyncUserSubscriptionForm userId={selectedUser.id} />
+                  <Separator />
                   <UserPasswordResetForm userId={selectedUser.id} username={selectedUser.username} />
+                  <Separator />
+                  <GrantCreditsForm userId={selectedUser.id} />
                 </div>
-              </div>
-
-              <div className="flex justify-end">
-                <Button onClick={() => setSelectedUser(null)} radius="card" type="button" variant="outline">
-                  Close
-                </Button>
-              </div>
+              </DetailBlock>
             </div>
           ) : null}
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
     </AdminSectionShell>
   );
 }

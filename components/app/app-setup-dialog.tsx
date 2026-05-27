@@ -1,7 +1,6 @@
 "use client"
 
-import { useMemo, useState, useTransition, type ComponentType } from "react"
-import { useRouter } from "next/navigation"
+import { useMemo, useState, type ComponentType } from "react"
 
 import {
   Apple,
@@ -11,22 +10,15 @@ import {
   Download,
   Laptop,
   Link2,
-  Loader2Icon,
   Monitor,
   Settings2,
   Smartphone,
 } from "lucide-react"
 import { toast } from "sonner"
 
-import {
-  assignSetupSlotAction,
-  getSetupPreviewSlotAction,
-} from "@/app/app/actions"
-import {
-  detectDeviceOsFromNavigator,
-  mapSetupPlatformToDeviceOs,
-} from "@/lib/device-os"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { syncOwnSubscriptionAction } from "@/app/app/actions"
+import { FormSubmitButton } from "@/components/app/form-submit-button"
+import { detectDeviceOsFromNavigator } from "@/lib/device-os"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -137,22 +129,14 @@ export function AppSetupDialog({
   triggerLabel?: string
   triggerVariant?: "default" | "destructive" | "ghost" | "link" | "outline" | "secondary"
 }) {
-  const router = useRouter()
   const currentPlatform = useMemo(() => detectCurrentPlatform(), [])
   const [open, setOpen] = useState(defaultOpen)
   const [step, setStep] = useState<SetupStep>("start")
   const [selectedPlatform, setSelectedPlatform] = useState<DevicePlatform>(currentPlatform)
   const [installReturnStep, setInstallReturnStep] = useState<InstallReturnStep>("start")
-  const [selectedPreviewSlot, setSelectedPreviewSlot] = useState(previewSlot)
-  const [setupError, setSetupError] = useState<string | null>(null)
-  const [setupErrorCode, setSetupErrorCode] = useState<
-    "NO_ACTIVE_SUBSCRIPTION" | "NO_FREE_SLOTS" | null
-  >(null)
-  const [, startRefreshPreviewTransition] = useTransition()
-  const [isAssigning, startAssignTransition] = useTransition()
 
   const isSetupAvailable = canStartSetup ?? Boolean(previewSlot || subscriptionUrl)
-  const effectiveSubscriptionUrl = selectedPreviewSlot?.configUrl ?? subscriptionUrl
+  const effectiveSubscriptionUrl = subscriptionUrl ?? previewSlot?.configUrl ?? null
   const displaySubscriptionUrl = formatCompactSubscriptionUrl(effectiveSubscriptionUrl)
 
   function handleOpenChange(nextOpen: boolean) {
@@ -162,20 +146,6 @@ export function AppSetupDialog({
       setStep("start")
       setSelectedPlatform(currentPlatform)
       setInstallReturnStep("start")
-      setSelectedPreviewSlot(previewSlot)
-      setSetupError(null)
-      setSetupErrorCode(null)
-
-      startRefreshPreviewTransition(async () => {
-        try {
-          const result = await getSetupPreviewSlotAction()
-          if (result.ok) {
-            setSelectedPreviewSlot(result.slot)
-          }
-        } catch {
-          // Keep optimistic value from props if fetch fails.
-        }
-      })
     }
   }
 
@@ -215,51 +185,7 @@ export function AppSetupDialog({
   }
 
   function handleFinishSetup() {
-    if (isAssigning) {
-      return
-    }
-
-    if (!selectedPreviewSlot) {
-      setSetupError("Все устройства заняты. Замените один из слотов в разделе \"Устройства\".")
-      setSetupErrorCode("NO_FREE_SLOTS")
-      return
-    }
-
-    setSetupError(null)
-    setSetupErrorCode(null)
-
-    startAssignTransition(async () => {
-      try {
-        const result = await assignSetupSlotAction({
-          deviceOs: mapSetupPlatformToDeviceOs(selectedPlatform),
-          slotId: selectedPreviewSlot.id,
-        })
-
-        if (!result.ok) {
-          setSetupError(result.message)
-          setSetupErrorCode(result.code === "ASSIGNED" ? null : result.code)
-
-          toast.error(result.message, { position: "top-right" })
-          return
-        }
-
-        setSetupError(null)
-        setSetupErrorCode(null)
-        toast.success(result.message, { position: "top-right" })
-        setOpen(false)
-        router.refresh()
-      } catch {
-        const message = "Не удалось завершить настройку устройства. Повторите попытку."
-        setSetupError(message)
-        setSetupErrorCode(null)
-        toast.error(message, { position: "top-right" })
-      }
-    })
-  }
-
-  function handleGoToDevices() {
     setOpen(false)
-    router.push("/app?tab=devices")
   }
 
   const showBackButton = step !== "start"
@@ -422,7 +348,7 @@ export function AppSetupDialog({
                 </DialogDescription>
               </DialogHeader>
 
-              {selectedPreviewSlot ? (
+              {effectiveSubscriptionUrl ? (
                 <>
                   <Button
                     className="h-button w-full min-w-0 justify-between overflow-hidden px-3"
@@ -448,20 +374,19 @@ export function AppSetupDialog({
                 </>
               ) : (
                 <>
-                  <Alert className="text-left">
-                    <AlertTitle>Все устройства заняты</AlertTitle>
-                    <AlertDescription>
-                      Все устройства заняты. Замените один из слотов в разделе «Устройства».
-                    </AlertDescription>
-                  </Alert>
-                  <Button
-                    className="h-button w-full px-button-x"
-                    onClick={handleGoToDevices}
-                    radius="card"
-                    type="button"
-                  >
-                    Перейти в устройства
-                  </Button>
+                  <div className="rounded-card border border-border/70 bg-background/40 p-3 text-left text-sm text-muted-foreground">
+                    Ссылка подписки пока недоступна. Повторите синхронизацию в разделе устройств или обратитесь в поддержку.
+                  </div>
+                  <form action={syncOwnSubscriptionAction}>
+                    <FormSubmitButton
+                      className="h-button w-full px-button-x"
+                      pendingLabel="Синхронизируем..."
+                      radius="card"
+                      type="submit"
+                    >
+                      Синхронизировать
+                    </FormSubmitButton>
+                  </form>
                 </>
               )}
             </>
@@ -479,62 +404,15 @@ export function AppSetupDialog({
                   Нажмите кнопку включения в приложении Happ.
                 </DialogDescription>
               </DialogHeader>
-
-              {setupError ? <p className="text-xs text-destructive">{setupError}</p> : null}
-
               <div className="flex w-full flex-col gap-2">
-                {!selectedPreviewSlot ? (
-                  <Button
-                    className="h-button w-full px-button-x"
-                    onClick={handleGoToDevices}
-                    radius="card"
-                    type="button"
-                  >
-                    Перейти в устройства
-                  </Button>
-                ) : (
-                  <Button
-                    className="h-button w-full px-button-x"
-                    disabled={isAssigning}
-                    onClick={handleFinishSetup}
-                    radius="card"
-                    type="button"
-                  >
-                    {isAssigning ? (
-                      <span className="inline-flex items-center gap-2">
-                        <Loader2Icon className="size-4 animate-spin" />
-                        Назначаем слот...
-                      </span>
-                    ) : (
-                      "Завершить настройку"
-                    )}
-                  </Button>
-                )}
-
-                {setupError && !isAssigning ? (
-                  <>
-                    {setupErrorCode === "NO_FREE_SLOTS" ? (
-                      <Button
-                        className="h-button w-full px-button-x"
-                        onClick={handleGoToDevices}
-                        radius="card"
-                        type="button"
-                      >
-                        Перейти в устройства
-                      </Button>
-                    ) : (
-                      <Button
-                        className="h-button w-full px-button-x"
-                        onClick={handleFinishSetup}
-                        radius="card"
-                        type="button"
-                        variant="outline"
-                      >
-                        Повторить попытку
-                      </Button>
-                    )}
-                  </>
-                ) : null}
+                <Button
+                  className="h-button w-full px-button-x"
+                  onClick={handleFinishSetup}
+                  radius="card"
+                  type="button"
+                >
+                  Завершить настройку
+                </Button>
               </div>
             </>
           ) : null}

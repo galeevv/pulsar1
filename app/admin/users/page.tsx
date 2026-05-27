@@ -2,13 +2,9 @@ import { AdminUsersSection, type AdminUsersListItem } from "@/components/admin/a
 import { prisma } from "@/lib/prisma";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
-type SubscriptionFilter = "all" | "active" | "expired" | "none" | "revoked";
+type SubscriptionFilter = "all" | "active" | "expired" | "none";
 type UsersSort =
-  | "newest"
-  | "oldest"
-  | "credits_desc"
-  | "last_payment_desc"
-  | "active_subscription_first";
+  | "newest";
 
 function getValue(
   searchParams: Record<string, string | string[] | undefined>,
@@ -23,7 +19,6 @@ function normalizeSubscriptionFilter(value: string | undefined): SubscriptionFil
     value === "active" ||
     value === "expired" ||
     value === "none" ||
-    value === "revoked" ||
     value === "all"
   ) {
     return value;
@@ -33,16 +28,7 @@ function normalizeSubscriptionFilter(value: string | undefined): SubscriptionFil
 }
 
 function normalizeSort(value: string | undefined): UsersSort {
-  if (
-    value === "newest" ||
-    value === "oldest" ||
-    value === "credits_desc" ||
-    value === "last_payment_desc" ||
-    value === "active_subscription_first"
-  ) {
-    return value;
-  }
-
+  void value;
   return "newest";
 }
 
@@ -53,19 +39,6 @@ function parsePositiveInt(rawValue: string | undefined, fallback: number) {
   }
 
   return value;
-}
-
-function getLastPaymentTimestamp(value: string | null) {
-  if (!value) {
-    return 0;
-  }
-
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return 0;
-  }
-
-  return parsed.getTime();
 }
 
 function getJoinedTimestamp(value: string) {
@@ -90,8 +63,7 @@ export default async function AdminUsersPage({
   );
   const sort = normalizeSort(getValue(resolvedSearchParams, "sort"));
   const page = parsePositiveInt(getValue(resolvedSearchParams, "page"), 1);
-  const requestedPerPage = parsePositiveInt(getValue(resolvedSearchParams, "perPage"), 10);
-  const perPage = requestedPerPage === 50 ? 50 : requestedPerPage === 20 ? 20 : 10;
+  const perPage = 10 as const;
 
   const rawUsers = await prisma.user.findMany({
     orderBy: {
@@ -101,24 +73,19 @@ export default async function AdminUsersPage({
       createdAt: true,
       credits: true,
       id: true,
-      inviteCodesUsed: {
-        orderBy: {
-          createdAt: "desc",
-        },
-        select: {
-          code: true,
-        },
-        take: 1,
-      },
       paymentRequests: {
         orderBy: {
           createdAt: "desc",
         },
         select: {
+          amountRub: true,
           approvedAt: true,
           createdAt: true,
+          method: true,
+          status: true,
+          tariffName: true,
         },
-        take: 1,
+        take: 10,
       },
       referralCodeUse: {
         select: {
@@ -135,6 +102,11 @@ export default async function AdminUsersPage({
         },
         select: {
           code: true,
+          uses: {
+            select: {
+              id: true,
+            },
+          },
         },
         take: 1,
       },
@@ -144,6 +116,8 @@ export default async function AdminUsersPage({
         },
         select: {
           devices: true,
+          endsAt: true,
+          expiresAt: true,
           status: true,
         },
         take: 1,
@@ -169,9 +143,8 @@ export default async function AdminUsersPage({
         ? "active"
         : latestSubscription.status === "EXPIRED"
           ? "expired"
-          : "revoked"
+          : "expired"
       : "none";
-    const invitedByInviteCode = user.inviteCodesUsed[0]?.code ?? null;
     const invitedByReferralCode = user.referralCodeUse?.referralCode.code ?? null;
     const lastPayment = user.paymentRequests[0] ?? null;
     const lastPaymentAt = lastPayment
@@ -183,14 +156,20 @@ export default async function AdminUsersPage({
       credits: user.credits,
       devices: latestSubscription ? latestSubscription.devices : null,
       id: user.id,
-      invitedByCode: invitedByInviteCode ?? invitedByReferralCode,
-      invitedByType: invitedByInviteCode
-        ? "invite"
-        : invitedByReferralCode
-          ? "referral"
-          : "none",
+      invitedByCode: invitedByReferralCode,
+      invitedByType: invitedByReferralCode ? "referral" : "none",
+      invitedCount: user.referralCodesCreated[0]?.uses.length ?? 0,
       lastPaymentAt,
+      payments: user.paymentRequests.map((payment) => ({
+        amountRub: payment.amountRub,
+        date: (payment.approvedAt ?? payment.createdAt).toISOString(),
+        method: payment.method,
+        status: payment.status,
+        tariff: payment.tariffName,
+      })),
       ownReferralCode: user.referralCodesCreated[0]?.code ?? null,
+      subscriptionEndsAt:
+        latestSubscription?.expiresAt?.toISOString() ?? latestSubscription?.endsAt?.toISOString() ?? null,
       subscriptionState,
       username: user.username,
     };
@@ -201,35 +180,7 @@ export default async function AdminUsersPage({
   }
 
   users.sort((left, right) => {
-    if (sort === "oldest") {
-      return getJoinedTimestamp(left.createdAt) - getJoinedTimestamp(right.createdAt);
-    }
-
-    if (sort === "credits_desc") {
-      return (
-        right.credits - left.credits ||
-        getJoinedTimestamp(right.createdAt) - getJoinedTimestamp(left.createdAt)
-      );
-    }
-
-    if (sort === "last_payment_desc") {
-      return (
-        getLastPaymentTimestamp(right.lastPaymentAt) - getLastPaymentTimestamp(left.lastPaymentAt) ||
-        getJoinedTimestamp(right.createdAt) - getJoinedTimestamp(left.createdAt)
-      );
-    }
-
-    if (sort === "active_subscription_first") {
-      const leftWeight = left.subscriptionState === "active" ? 0 : 1;
-      const rightWeight = right.subscriptionState === "active" ? 0 : 1;
-
-      return (
-        leftWeight - rightWeight ||
-        getLastPaymentTimestamp(right.lastPaymentAt) - getLastPaymentTimestamp(left.lastPaymentAt) ||
-        getJoinedTimestamp(right.createdAt) - getJoinedTimestamp(left.createdAt)
-      );
-    }
-
+    void sort;
     return getJoinedTimestamp(right.createdAt) - getJoinedTimestamp(left.createdAt);
   });
 

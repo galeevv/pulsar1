@@ -139,7 +139,7 @@ export function normalizeUsername(username: string) {
   return username.trim().toLowerCase();
 }
 
-export function isValidMarzbanCompatibleUsername(username: string) {
+export function isValidXuiCompatibleUsername(username: string) {
   return /^[a-z0-9_]{3,32}$/.test(username);
 }
 
@@ -340,7 +340,7 @@ export async function attemptRegistration(input: {
     };
   }
 
-  if (!isValidMarzbanCompatibleUsername(normalizedUsername)) {
+  if (!isValidXuiCompatibleUsername(normalizedUsername)) {
     return {
       message:
         "Username должен быть от 3 до 32 символов и содержать только a-z, 0-9 и _.",
@@ -426,28 +426,15 @@ export async function getDevCodes() {
 
   const now = new Date();
 
-  const [inviteCodes, referralCodes] = await Promise.all([
-    prisma.inviteCode.findMany({
-      orderBy: { createdAt: "asc" },
-      where: {
-        isEnabled: true,
-        OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
-        usedByUserId: null,
-      },
-    }),
-    prisma.referralCode.findMany({
-      orderBy: { createdAt: "asc" },
-      where: {
-        isEnabled: true,
-        OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
-      },
-    }),
-  ]);
+  const referralCodes = await prisma.referralCode.findMany({
+    orderBy: { createdAt: "asc" },
+    where: {
+      isEnabled: true,
+      OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
+    },
+  });
 
-  return [
-    ...inviteCodes.map((item) => item.code),
-    ...referralCodes.map((item) => item.code),
-  ];
+  return referralCodes.map((item) => item.code);
 }
 
 export function getSessionDestination(role: Role) {

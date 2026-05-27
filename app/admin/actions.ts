@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import {
-  generateInviteCodeValue,
   generatePromoCodeValue,
   generateReferralCodeValue,
   isCodeTakenAcrossSystem,
@@ -83,87 +82,6 @@ async function getAdminActor() {
   }
 
   return user;
-}
-
-export async function createInviteCodeAction(formData: FormData) {
-  await getAdminActor();
-
-  const rawCode = String(formData.get("code") ?? "");
-  const rawExpiresAt = String(formData.get("expiresAt") ?? "");
-  const rawRedirectPath = String(formData.get("redirectPath") ?? "");
-  const redirectPath = resolveAdminRedirectPath(rawRedirectPath.trim(), "/admin/codes?tab=invite");
-  const expiresAt = parseExpiryDate(rawExpiresAt);
-  const code = normalizeCode(rawCode || generateInviteCodeValue());
-
-  if (!expiresAt) {
-    redirect(
-      buildRedirectUrl({
-        path: redirectPath,
-        error: "Set an expiration date for the invite code.",
-      })
-    );
-  }
-
-  if (expiresAt.getTime() <= Date.now()) {
-    redirect(
-      buildRedirectUrl({
-        path: redirectPath,
-        error: "Invite code expiration must be in the future.",
-      })
-    );
-  }
-
-  if (await isCodeTakenAcrossSystem(code)) {
-    redirect(
-      buildRedirectUrl({
-        path: redirectPath,
-        error: "This code already exists in the system.",
-      })
-    );
-  }
-
-  await prisma.inviteCode.create({
-    data: {
-      code,
-      expiresAt,
-      isEnabled: true,
-    },
-  });
-
-  revalidatePath("/admin");
-  const successPath = withSearchParams(redirectPath, {
-    codeTab: "invite",
-    generatedInviteCode: code,
-  });
-  redirect(
-    buildRedirectUrl({
-      path: successPath,
-      notice: "Invite code created.",
-    })
-  );
-}
-export async function toggleInviteCodeAction(formData: FormData) {
-  await getAdminActor();
-
-  const id = String(formData.get("id") ?? "");
-  const nextEnabled = String(formData.get("nextEnabled") ?? "") === "true";
-
-  if (!id) {
-    redirect(buildRedirectUrl({ path: "/admin/codes?tab=invite", error: "Invite-код не найден." }));
-  }
-
-  await prisma.inviteCode.update({
-    data: { isEnabled: nextEnabled },
-    where: { id },
-  });
-
-  revalidatePath("/admin");
-  redirect(
-    buildRedirectUrl({
-      path: "/admin/codes?tab=invite",
-      notice: nextEnabled ? "Invite-код включен." : "Invite-код выключен.",
-    })
-  );
 }
 
 export async function updateReferralProgramSettingsAction(formData: FormData) {
@@ -459,10 +377,6 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
     String(formData.get("extraDeviceMonthlyPrice") ?? ""),
     10
   );
-  const durationMonthlyPrice = Number.parseInt(
-    String(formData.get("durationMonthlyPrice") ?? ""),
-    10
-  );
   let parsedRows: Array<{
     id?: string;
     months: number;
@@ -497,15 +411,6 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
       buildRedirectUrl({
         path: "/admin/tariffs",
         error: "Цена доп. устройства в месяц должна быть 0 или больше.",
-      })
-    );
-  }
-
-  if (!Number.isFinite(durationMonthlyPrice) || durationMonthlyPrice < 0) {
-    redirect(
-      buildRedirectUrl({
-        path: "/admin/tariffs",
-        error: "Цена VPN в месяц должна быть 0 или больше.",
       })
     );
   }
@@ -618,7 +523,7 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
           data: {
             discountPercent: row.discountPercent,
             isActive: true,
-            monthlyPrice: durationMonthlyPrice,
+            monthlyPrice: 0,
             months: row.months,
           },
           where: { id: row.id },
@@ -628,7 +533,7 @@ export async function saveSubscriptionDurationRulesAction(formData: FormData) {
           data: {
             discountPercent: row.discountPercent,
             isActive: true,
-            monthlyPrice: durationMonthlyPrice,
+            monthlyPrice: 0,
             months: row.months,
           },
         });

@@ -11,10 +11,6 @@ function buildCode(prefix: string) {
   return `${prefix}-${randomBytes(3).toString("hex").toUpperCase()}`;
 }
 
-export function generateInviteCodeValue() {
-  return buildCode("INV");
-}
-
 export function generateReferralCodeValue() {
   return buildCode("REF");
 }
@@ -26,13 +22,12 @@ export function generatePromoCodeValue() {
 export async function isCodeTakenAcrossSystem(code: string) {
   const normalizedCode = normalizeCode(code);
 
-  const [inviteCode, referralCode, promoCode] = await Promise.all([
-    prisma.inviteCode.findUnique({ where: { code: normalizedCode }, select: { id: true } }),
+  const [referralCode, promoCode] = await Promise.all([
     prisma.referralCode.findUnique({ where: { code: normalizedCode }, select: { id: true } }),
     prisma.promoCode.findUnique({ where: { code: normalizedCode }, select: { id: true } }),
   ]);
 
-  return Boolean(inviteCode || referralCode || promoCode);
+  return Boolean(referralCode || promoCode);
 }
 
 export async function getAdminDashboardData() {
@@ -44,7 +39,6 @@ export async function getAdminDashboardData() {
 
   const [
     users,
-    inviteCodes,
     referralCodes,
     referralCodeGrantedRewardCounts,
     promoCodes,
@@ -70,14 +64,6 @@ export async function getAdminDashboardData() {
           username: true,
         },
         take: 8,
-      }),
-      prisma.inviteCode.findMany({
-        include: {
-          usedBy: {
-            select: { username: true },
-          },
-        },
-        orderBy: { createdAt: "desc" },
       }),
       prisma.referralCode.findMany({
         include: {
@@ -176,7 +162,6 @@ export async function getAdminDashboardData() {
       blocked: blockedDeviceSlots,
       free: freeDeviceSlots,
     },
-    inviteCodes,
     paymentRequests,
     promoCodes,
     recentSubscriptions,

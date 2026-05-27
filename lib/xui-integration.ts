@@ -19,7 +19,9 @@ type ManagedSubscription = {
   deviceLimit: number;
   endsAt: Date;
   id: string;
+  marzbanUsername: string | null;
   provisionedAt: Date | null;
+  subscriptionUrl: string | null;
   user: {
     username: string;
   };
@@ -28,7 +30,6 @@ type ManagedSubscription = {
 
 const ERROR_LIMIT = 400;
 const JSON_LIMIT = 6000;
-const SLOT_LIMIT_IP = 2;
 
 function toSafeErrorMessage(error: unknown) {
   if (error instanceof XuiHttpError) {
@@ -85,6 +86,10 @@ function isValidXuiUsername(username: string) {
   return /^[a-z0-9_]{3,32}$/.test(username);
 }
 
+function isLegacyDeviceSlotUsername(username: string) {
+  return /_d\d+$/.test(username);
+}
+
 export function buildXuiSubscriptionUsername(
   subscriptionId: string,
   appUsername?: string | null
@@ -119,21 +124,24 @@ export function buildXuiDeviceSlotUsername(input: {
   return isValidXuiUsername(candidate) ? candidate : "pulsar_slot";
 }
 
-function resolveSlotUsername(input: {
+function resolveSubscriptionUsername(input: {
   appUsername?: string | null;
   existing?: string | null;
-  slotIndex: number;
   subscriptionId: string;
 }) {
-  if (input.existing && isValidXuiUsername(input.existing)) {
+  if (
+    input.existing &&
+    isValidXuiUsername(input.existing) &&
+    !isLegacyDeviceSlotUsername(input.existing)
+  ) {
     return input.existing;
   }
 
-  return buildXuiDeviceSlotUsername({
-    appUsername: input.appUsername,
-    slotIndex: input.slotIndex,
-    subscriptionId: input.subscriptionId,
-  });
+  return buildXuiSubscriptionUsername(input.subscriptionId, input.appUsername);
+}
+
+function resolveSubscriptionIpLimit(subscription: ManagedSubscription) {
+  return Math.max(1, Math.floor(subscription.deviceLimit));
 }
 
 async function logIntegrationEvent(input: {
@@ -149,7 +157,7 @@ async function logIntegrationEvent(input: {
     data: {
       errorMessage: input.errorMessage ?? null,
       operation: input.operation,
-      provider: "MARZBAN",
+      provider: "XUI",
       requestJson: input.requestJson ?? null,
       responseJson: input.responseJson ?? null,
       status: input.status,
@@ -175,7 +183,9 @@ async function loadManagedSubscription(subscriptionId: string) {
       },
       endsAt: true,
       id: true,
+      marzbanUsername: true,
       provisionedAt: true,
+      subscriptionUrl: true,
       user: {
         select: {
           username: true,
@@ -216,236 +226,180 @@ async function syncSubscriptionSlotsInXui(
 ): Promise<IntegrationResult> {
   const now = new Date();
   const adapter = getXuiAdapter();
+  const username = resolveSubscriptionUsername({
+    appUsername: subscription.user.username,
+    existing: subscription.marzbanUsername,
+    subscriptionId: subscription.id,
+  });
+  const limitIp = resolveSubscriptionIpLimit(subscription);
+  const requestPayload = {
+    expireAt: subscription.endsAt.toISOString(),
+    includeFreeSlots: input.includeFreeSlots,
+    limitIp,
+    status: "active",
+    subscriptionId: subscription.id,
+    username,
+  };
   const states: SlotSyncState[] = [];
-  const errors: string[] = [];
+  let subscriptionError: string | null = null;
+  let responseRaw: unknown = null;
+  let subscriptionUrl: string | null = null;
+
+  try {
+    const existing = await adapter.getVpnUser(username);
+    const user = existing
+      ? await adapter.updateVpnUser({
+          expireAt: subscription.endsAt,
+          limitIp,
+          note: `Pulsar subscription ${subscription.id}`,
+          status: "active",
+          username,
+        })
+      : await adapter.createVpnUser({
+          expireAt: subscription.endsAt,
+          limitIp,
+          note: `Pulsar subscription ${subscription.id}`,
+          status: "active",
+          username,
+        });
+
+    responseRaw = user.raw;
+    subscriptionUrl =
+      user.subscriptionUrl ?? (await adapter.getSubscriptionUrl(user.username || username));
+
+    if (!subscriptionUrl) {
+      throw new Error("x-ui did not return a subscription URL.");
+    }
+
+    await logIntegrationEvent({
+      operation: existing
+        ? `${input.operationPrefix}_UPDATE_XUI_SUBSCRIPTION`
+        : `${input.operationPrefix}_CREATE_XUI_SUBSCRIPTION`,
+      requestJson: toJsonSnapshot(requestPayload),
+      responseJson: toJsonSnapshot(user.raw),
+      status: "SUCCESS",
+      targetId: subscription.id,
+      targetType: "SUBSCRIPTION",
+    });
+  } catch (error) {
+    subscriptionError = toSafeErrorMessage(error);
+
+    await logIntegrationEvent({
+      errorMessage: subscriptionError,
+      operation: `${input.operationPrefix}_UPSERT_XUI_SUBSCRIPTION`,
+      requestJson: toJsonSnapshot(requestPayload),
+      status: "ERROR",
+      targetId: subscription.id,
+      targetType: "SUBSCRIPTION",
+    });
+  }
+
+  const legacySlotUsernames = new Set(
+    subscription.deviceSlots
+      .map((slot) => slot.marzbanUsername)
+      .filter((value): value is string => Boolean(value && value !== username && isValidXuiUsername(value)))
+  );
+  if (
+    subscription.marzbanUsername &&
+    subscription.marzbanUsername !== username &&
+    isValidXuiUsername(subscription.marzbanUsername)
+  ) {
+    legacySlotUsernames.add(subscription.marzbanUsername);
+  }
+
+  for (const legacyUsername of legacySlotUsernames) {
+    try {
+      await adapter.revokeVpnUser(legacyUsername);
+
+      await logIntegrationEvent({
+        operation: `${input.operationPrefix}_REVOKE_LEGACY_XUI_SLOT`,
+        requestJson: toJsonSnapshot({
+          reason: "single_subscription_link_migration",
+          subscriptionId: subscription.id,
+          username: legacyUsername,
+        }),
+        status: "SUCCESS",
+        targetId: subscription.id,
+        targetType: "SUBSCRIPTION",
+      });
+    } catch (error) {
+      const errorMessage = toSafeErrorMessage(error);
+      subscriptionError = [subscriptionError, errorMessage].filter(Boolean).join("; ").slice(0, 2000);
+
+      await logIntegrationEvent({
+        errorMessage,
+        operation: `${input.operationPrefix}_REVOKE_LEGACY_XUI_SLOT`,
+        requestJson: toJsonSnapshot({
+          reason: "single_subscription_link_migration",
+          subscriptionId: subscription.id,
+          username: legacyUsername,
+        }),
+        status: "ERROR",
+        targetId: subscription.id,
+        targetType: "SUBSCRIPTION",
+      });
+    }
+  }
 
   for (const slot of subscription.deviceSlots) {
-    const shouldProvisionSlot =
-      slot.status === "ACTIVE" || (input.includeFreeSlots && slot.status === "FREE");
-
-    if (shouldProvisionSlot) {
-      const username = resolveSlotUsername({
-        appUsername: subscription.user.username,
-        existing: slot.marzbanUsername,
-        slotIndex: slot.slotIndex,
-        subscriptionId: subscription.id,
-      });
-      const requestPayload = {
-        expireAt: subscription.endsAt.toISOString(),
-        limitIp: SLOT_LIMIT_IP,
-        slotId: slot.id,
-        slotIndex: slot.slotIndex,
-        status: "active",
-        username,
-      };
-
-      try {
-        const existing = await adapter.getVpnUser(username);
-        const user = existing
-          ? await adapter.updateVpnUser({
-              expireAt: subscription.endsAt,
-              limitIp: SLOT_LIMIT_IP,
-              note: `Pulsar slot ${slot.slotIndex}`,
-              status: "active",
-              username,
-            })
-          : await adapter.createVpnUser({
-              expireAt: subscription.endsAt,
-              limitIp: SLOT_LIMIT_IP,
-              note: `Pulsar slot ${slot.slotIndex}`,
-              status: "active",
-              username,
-            });
-        const configUrl =
-          user.subscriptionUrl ?? (await adapter.getSubscriptionUrl(username));
-
-        await prisma.deviceSlot.update({
-          data: {
-            configUrl: configUrl ?? null,
-            lastSyncAt: now,
-            lastSyncError: null,
-            marzbanUsername: user.username || username,
-          },
-          where: { id: slot.id },
-        });
-
-        const successfulState: SlotSyncState = {
-          configUrl: configUrl ?? null,
-          errorMessage: null,
-          marzbanUsername: user.username || username,
-          raw: user.raw,
-          slotId: slot.id,
-          slotIndex: slot.slotIndex,
-          status: slot.status,
-        };
-        states.push(successfulState);
-
-        await logIntegrationEvent({
-          operation: existing
-            ? `${input.operationPrefix}_UPDATE_XUI_SLOT`
-            : `${input.operationPrefix}_CREATE_XUI_SLOT`,
-          requestJson: toJsonSnapshot(requestPayload),
-          responseJson: toJsonSnapshot(user.raw),
-          status: "SUCCESS",
-          targetId: slot.id,
-          targetType: "DEVICE_SLOT",
-        });
-      } catch (error) {
-        const errorMessage = toSafeErrorMessage(error);
-
-        await prisma.deviceSlot.update({
-          data: {
-            configUrl: null,
-            lastSyncAt: now,
-            lastSyncError: errorMessage,
-            marzbanUsername: username,
-          },
-          where: { id: slot.id },
-        });
-
-        states.push({
-          configUrl: null,
-          errorMessage,
-          marzbanUsername: username,
-          slotId: slot.id,
-          slotIndex: slot.slotIndex,
-          status: slot.status,
-        });
-        errors.push(`slot ${slot.slotIndex}: ${errorMessage}`);
-
-        await logIntegrationEvent({
-          errorMessage,
-          operation: `${input.operationPrefix}_UPSERT_XUI_SLOT`,
-          requestJson: toJsonSnapshot(requestPayload),
-          status: "ERROR",
-          targetId: slot.id,
-          targetType: "DEVICE_SLOT",
-        });
-      }
-
-      continue;
-    }
-
-    const username = slot.marzbanUsername;
-
-    if (username && isValidXuiUsername(username)) {
-      try {
-        await adapter.revokeVpnUser(username);
-
-        await logIntegrationEvent({
-          operation: `${input.operationPrefix}_REVOKE_XUI_SLOT`,
-          requestJson: toJsonSnapshot({
-            reason: `slot_status_${slot.status.toLowerCase()}`,
-            slotId: slot.id,
-            slotIndex: slot.slotIndex,
-            username,
-          }),
-          status: "SUCCESS",
-          targetId: slot.id,
-          targetType: "DEVICE_SLOT",
-        });
-      } catch (error) {
-        const errorMessage = toSafeErrorMessage(error);
-        errors.push(`slot ${slot.slotIndex}: ${errorMessage}`);
-
-        await prisma.deviceSlot.update({
-          data: {
-            configUrl: null,
-            lastSyncAt: now,
-            lastSyncError: errorMessage,
-            marzbanUsername: null,
-          },
-          where: { id: slot.id },
-        });
-
-        states.push({
-          configUrl: null,
-          errorMessage,
-          marzbanUsername: null,
-          slotId: slot.id,
-          slotIndex: slot.slotIndex,
-          status: slot.status,
-        });
-
-        await logIntegrationEvent({
-          errorMessage,
-          operation: `${input.operationPrefix}_REVOKE_XUI_SLOT`,
-          requestJson: toJsonSnapshot({
-            reason: `slot_status_${slot.status.toLowerCase()}`,
-            slotId: slot.id,
-            slotIndex: slot.slotIndex,
-            username,
-          }),
-          status: "ERROR",
-          targetId: slot.id,
-          targetType: "DEVICE_SLOT",
-        });
-
-        continue;
-      }
-    }
+    const slotCanUseSubscription = slot.status !== "BLOCKED" && Boolean(subscriptionUrl);
+    const slotError = slot.status === "BLOCKED" ? null : subscriptionError;
 
     await prisma.deviceSlot.update({
       data: {
-        configUrl: null,
+        configUrl: slotCanUseSubscription ? subscriptionUrl : null,
         lastSyncAt: now,
-        lastSyncError: null,
+        lastSyncError: slotError,
         marzbanUsername: null,
       },
       where: { id: slot.id },
     });
 
     states.push({
-      configUrl: null,
-      errorMessage: null,
+      configUrl: slotCanUseSubscription ? subscriptionUrl : null,
+      errorMessage: slotError,
       marzbanUsername: null,
+      raw: responseRaw,
       slotId: slot.id,
       slotIndex: slot.slotIndex,
       status: slot.status,
     });
   }
 
-  const activeSlotStates = states
-    .filter((state) => state.status === "ACTIVE" && state.configUrl)
-    .sort((a, b) => a.slotIndex - b.slotIndex);
-  const freeSlotStates = states
-    .filter((state) => state.status === "FREE" && state.configUrl)
-    .sort((a, b) => a.slotIndex - b.slotIndex);
-  const primarySlot = activeSlotStates[0] ?? freeSlotStates[0] ?? null;
-  const subscriptionError = errors.length > 0 ? errors.join("; ").slice(0, 2000) : null;
-  const hasConfig = Boolean(primarySlot);
+  const hasConfig = Boolean(subscriptionUrl);
 
   await prisma.subscription.update({
     data: {
       lastSyncAt: now,
       lastSyncError: subscriptionError,
       marzbanDataJson: toJsonSnapshot({
-        mode: input.includeFreeSlots
-          ? "strict_device_slots_preprovisioned"
-          : "strict_device_slots",
+        limitIp,
+        mode: "single_subscription_link_ip_limit",
         slots: summarizeSlotsForSnapshot(states),
       }),
       marzbanStatus: hasConfig ? "active" : "disabled",
-      marzbanUsername: primarySlot?.marzbanUsername ?? null,
+      marzbanUsername: hasConfig ? username : subscription.marzbanUsername,
       provisionedAt: hasConfig ? subscription.provisionedAt ?? now : subscription.provisionedAt,
-      subscriptionUrl: primarySlot?.configUrl ?? null,
+      subscriptionUrl,
     },
     where: { id: subscription.id },
   });
 
   await logIntegrationEvent({
     errorMessage: subscriptionError,
-    operation: `${input.operationPrefix}_XUI_SLOTS_SYNC`,
+    operation: `${input.operationPrefix}_XUI_SUBSCRIPTION_SYNC`,
     requestJson: toJsonSnapshot({
       activeSlotCount: subscription.deviceSlots.filter((slot) => slot.status === "ACTIVE").length,
       deviceLimit: subscription.deviceLimit,
       freeSlotCount: subscription.deviceSlots.filter((slot) => slot.status === "FREE").length,
       includeFreeSlots: input.includeFreeSlots,
+      limitIp,
       subscriptionId: subscription.id,
     }),
     responseJson: toJsonSnapshot({
       hasConfig,
-      primarySlotIndex: primarySlot?.slotIndex ?? null,
+      subscriptionUrl,
+      username,
       slots: summarizeSlotsForSnapshot(states),
     }),
     status: subscriptionError ? "ERROR" : "SUCCESS",
@@ -471,16 +425,6 @@ export async function issueSubscriptionInXui(
   if (!exists) {
     return { error: "Subscription not found.", ok: false };
   }
-
-  await prisma.deviceSlot.updateMany({
-    data: {
-      status: "ACTIVE",
-    },
-    where: {
-      status: "FREE",
-      subscriptionId,
-    },
-  });
 
   const subscription = await loadManagedSubscription(subscriptionId);
 
@@ -530,18 +474,11 @@ export async function reissueDeviceSlotCredentialInXui(input: {
   const slot = await prisma.deviceSlot.findUnique({
     select: {
       id: true,
-      marzbanUsername: true,
       slotIndex: true,
       status: true,
       subscription: {
         select: {
-          endsAt: true,
           id: true,
-          user: {
-            select: {
-              username: true,
-            },
-          },
         },
       },
     },
@@ -556,102 +493,22 @@ export async function reissueDeviceSlotCredentialInXui(input: {
     return { error: "Blocked slot cannot be reissued.", ok: false };
   }
 
-  const adapter = getXuiAdapter();
-  const now = new Date();
-  const username = resolveSlotUsername({
-    appUsername: slot.subscription.user.username,
-    existing: slot.marzbanUsername,
-    slotIndex: slot.slotIndex,
-    subscriptionId: slot.subscription.id,
+  const result = await syncSubscriptionInXui(slot.subscription.id);
+
+  await logIntegrationEvent({
+    errorMessage: result.error ?? null,
+    operation: "REISSUE_XUI_SUBSCRIPTION_LINK",
+    requestJson: toJsonSnapshot({
+      slotId: slot.id,
+      slotIndex: slot.slotIndex,
+      subscriptionId: slot.subscription.id,
+    }),
+    status: result.ok ? "SUCCESS" : "ERROR",
+    targetId: slot.id,
+    targetType: "DEVICE_SLOT",
   });
 
-  try {
-    if (isValidXuiUsername(username)) {
-      await adapter.revokeVpnUser(username);
-    }
-
-    const user = await adapter.createVpnUser({
-      expireAt: slot.subscription.endsAt,
-      limitIp: SLOT_LIMIT_IP,
-      note: `Pulsar slot ${slot.slotIndex}`,
-      status: "active",
-      username,
-    });
-
-    const configUrl =
-      user.subscriptionUrl ?? (await adapter.getSubscriptionUrl(user.username || username));
-
-    await prisma.deviceSlot.update({
-      data: {
-        configUrl: configUrl ?? null,
-        lastSyncAt: now,
-        lastSyncError: null,
-        marzbanUsername: user.username || username,
-      },
-      where: { id: slot.id },
-    });
-
-    await logIntegrationEvent({
-      operation: "REISSUE_XUI_SLOT",
-      requestJson: toJsonSnapshot({
-        slotId: slot.id,
-        slotIndex: slot.slotIndex,
-        username,
-      }),
-      responseJson: toJsonSnapshot(user.raw),
-      status: "SUCCESS",
-      targetId: slot.id,
-      targetType: "DEVICE_SLOT",
-    });
-  } catch (error) {
-    const errorMessage = toSafeErrorMessage(error);
-
-    await prisma.deviceSlot.update({
-      data: {
-        lastSyncAt: now,
-        lastSyncError: errorMessage,
-      },
-      where: { id: slot.id },
-    });
-
-    await logIntegrationEvent({
-      errorMessage,
-      operation: "REISSUE_XUI_SLOT",
-      requestJson: toJsonSnapshot({
-        slotId: slot.id,
-        slotIndex: slot.slotIndex,
-        username,
-      }),
-      status: "ERROR",
-      targetId: slot.id,
-      targetType: "DEVICE_SLOT",
-    });
-
-    return { error: errorMessage, ok: false };
-  }
-
-  const refreshedSubscription = await loadManagedSubscription(slot.subscription.id);
-  if (refreshedSubscription) {
-    const activeSlot = refreshedSubscription.deviceSlots
-      .filter((item) => item.status === "ACTIVE" && item.configUrl)
-      .sort((a, b) => a.slotIndex - b.slotIndex)[0];
-    const freeSlot = refreshedSubscription.deviceSlots
-      .filter((item) => item.status === "FREE" && item.configUrl)
-      .sort((a, b) => a.slotIndex - b.slotIndex)[0];
-    const primarySlot = activeSlot ?? freeSlot ?? null;
-
-    await prisma.subscription.update({
-      data: {
-        lastSyncAt: now,
-        marzbanStatus: primarySlot ? "active" : "disabled",
-        marzbanUsername: primarySlot?.marzbanUsername ?? null,
-        subscriptionUrl: primarySlot?.configUrl ?? null,
-      },
-      where: { id: refreshedSubscription.id },
-    });
-  }
-
-  return { ok: true };
+  return result;
 }
 
 export async function revokeSubscriptionInXui(
@@ -666,46 +523,52 @@ export async function revokeSubscriptionInXui(
   const now = new Date();
   const adapter = getXuiAdapter();
   const errors: string[] = [];
+  const usernamesToRevoke = new Set<string>();
+
+  if (subscription.marzbanUsername && isValidXuiUsername(subscription.marzbanUsername)) {
+    usernamesToRevoke.add(subscription.marzbanUsername);
+  }
 
   for (const slot of subscription.deviceSlots) {
     const username = slot.marzbanUsername;
-
     if (username && isValidXuiUsername(username)) {
-      try {
-        await adapter.revokeVpnUser(username);
-
-        await logIntegrationEvent({
-          operation: "REVOKE_XUI_SLOT",
-          requestJson: toJsonSnapshot({
-            slotId: slot.id,
-            slotIndex: slot.slotIndex,
-            subscriptionId: subscription.id,
-            username,
-          }),
-          status: "SUCCESS",
-          targetId: slot.id,
-          targetType: "DEVICE_SLOT",
-        });
-      } catch (error) {
-        const errorMessage = toSafeErrorMessage(error);
-        errors.push(`slot ${slot.slotIndex}: ${errorMessage}`);
-
-        await logIntegrationEvent({
-          errorMessage,
-          operation: "REVOKE_XUI_SLOT",
-          requestJson: toJsonSnapshot({
-            slotId: slot.id,
-            slotIndex: slot.slotIndex,
-            subscriptionId: subscription.id,
-            username,
-          }),
-          status: "ERROR",
-          targetId: slot.id,
-          targetType: "DEVICE_SLOT",
-        });
-      }
+      usernamesToRevoke.add(username);
     }
+  }
 
+  for (const username of usernamesToRevoke) {
+    try {
+      await adapter.revokeVpnUser(username);
+
+      await logIntegrationEvent({
+        operation: "REVOKE_XUI_SUBSCRIPTION",
+        requestJson: toJsonSnapshot({
+          subscriptionId: subscription.id,
+          username,
+        }),
+        status: "SUCCESS",
+        targetId: subscription.id,
+        targetType: "SUBSCRIPTION",
+      });
+    } catch (error) {
+      const errorMessage = toSafeErrorMessage(error);
+      errors.push(`${username}: ${errorMessage}`);
+
+      await logIntegrationEvent({
+        errorMessage,
+        operation: "REVOKE_XUI_SUBSCRIPTION",
+        requestJson: toJsonSnapshot({
+          subscriptionId: subscription.id,
+          username,
+        }),
+        status: "ERROR",
+        targetId: subscription.id,
+        targetType: "SUBSCRIPTION",
+      });
+    }
+  }
+
+  for (const slot of subscription.deviceSlots) {
     await prisma.deviceSlot.update({
       data: {
         configUrl: null,
@@ -725,7 +588,7 @@ export async function revokeSubscriptionInXui(
       lastSyncAt: now,
       lastSyncError: errorMessage,
       marzbanDataJson: toJsonSnapshot({
-        mode: "strict_device_slots",
+        mode: "single_subscription_link_ip_limit",
         revokedAt: now.toISOString(),
       }),
       marzbanStatus: "disabled",
@@ -737,7 +600,7 @@ export async function revokeSubscriptionInXui(
 
   await logIntegrationEvent({
     errorMessage,
-    operation: "REVOKE_XUI_SUBSCRIPTION_SLOTS",
+    operation: "REVOKE_XUI_SUBSCRIPTION",
     requestJson: toJsonSnapshot({
       subscriptionId: subscription.id,
     }),

@@ -6,6 +6,8 @@ import {
 
 type ApprovedPaymentSnapshot = PaidPaymentRequestSnapshot & {
   id: string;
+  method?: "CREDITS" | "PLATEGA";
+  status?: "APPROVED" | "CREATED" | "REJECTED";
   userId: string;
 };
 

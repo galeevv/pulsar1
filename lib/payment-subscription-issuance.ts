@@ -18,6 +18,7 @@ export type PaidPaymentRequestSnapshot = {
   id: string;
   monthlyPriceSnapshot: number;
   months: number;
+  periodMonths?: number;
   referralDiscountPercentSnapshot: number;
   tariffName: string;
 };
@@ -28,7 +29,27 @@ export async function createSubscriptionFromPaidRequest(input: {
   tx: Prisma.TransactionClient;
   userId: string;
 }) {
+  await input.tx.userOperationLock.upsert({
+    create: {
+      lockedAt: input.now,
+      operation: "subscription_payment",
+      userId: input.userId,
+    },
+    update: {
+      lockedAt: input.now,
+      operation: "subscription_payment",
+    },
+    where: { userId: input.userId },
+  });
+
   const activeSubscription = await input.tx.subscription.findFirst({
+    include: {
+      deviceSlots: {
+        select: {
+          slotIndex: true,
+        },
+      },
+    },
     orderBy: [{ startsAt: "desc" }, { startedAt: "desc" }],
     where: {
       status: "ACTIVE",
@@ -71,25 +92,72 @@ export async function createSubscriptionFromPaidRequest(input: {
   const nextTotalPaid = (activeSubscription?.totalPaid ?? 0) + input.paymentRequest.amountRub;
 
   if (activeSubscription) {
-    await input.tx.subscription.update({
+    const updatedSubscription = await input.tx.subscription.update({
       data: {
-        marzbanUsername: null,
-        revokedAt: now,
-        status: "REVOKED",
+        baseDeviceMonthlyPriceSnapshot: input.paymentRequest.baseDeviceMonthlyPriceSnapshot,
+        currency: input.paymentRequest.currency,
+        deviceLimit: input.paymentRequest.deviceLimit,
+        devices: input.paymentRequest.devices,
+        durationDiscountPercentSnapshot: input.paymentRequest.durationDiscountPercentSnapshot,
+        endsAt: nextExpiresAt,
+        expiresAt: nextExpiresAt,
+        extraDeviceMonthlyPriceSnapshot: input.paymentRequest.extraDeviceMonthlyPriceSnapshot,
+        monthlyPriceSnapshot: input.paymentRequest.monthlyPriceSnapshot,
+        monthsPurchased: nextMonthsPurchased,
+        pendingDevices: null,
+        periodMonths: input.paymentRequest.months,
+        referralDiscountPercentSnapshot: input.paymentRequest.referralDiscountPercentSnapshot,
+        status: "ACTIVE",
+        tariffName: input.paymentRequest.tariffName,
+        totalPaid: nextTotalPaid,
       },
       where: {
         id: activeSubscription.id,
       },
     });
 
-    await input.tx.deviceSlot.updateMany({
+    await input.tx.subscriptionRenewal.create({
       data: {
-        status: "BLOCKED",
-      },
-      where: {
+        amountRub: input.paymentRequest.amountRub,
+        baseDeviceMonthlyPriceSnapshot: input.paymentRequest.baseDeviceMonthlyPriceSnapshot,
+        currency: input.paymentRequest.currency,
+        durationDiscountPercentSnapshot: input.paymentRequest.durationDiscountPercentSnapshot,
+        extraDeviceMonthlyPriceSnapshot: input.paymentRequest.extraDeviceMonthlyPriceSnapshot,
+        monthlyPriceSnapshot: input.paymentRequest.monthlyPriceSnapshot,
+        months: input.paymentRequest.months,
+        nextDevices: input.paymentRequest.devices,
+        nextExpiresAt,
+        paymentRequestId: input.paymentRequest.id,
+        previousDevices: activeSubscription.devices,
+        previousExpiresAt: activeSubscription.expiresAt ?? activeSubscription.endsAt,
+        referralDiscountPercentSnapshot: input.paymentRequest.referralDiscountPercentSnapshot,
         subscriptionId: activeSubscription.id,
       },
     });
+
+    const existingSlotIndexes = new Set(
+      activeSubscription.deviceSlots.map((slot) => slot.slotIndex)
+    );
+    const missingSlots = Array.from(
+      { length: input.paymentRequest.devices },
+      (_, index) => index + 1
+    ).filter((slotIndex) => !existingSlotIndexes.has(slotIndex));
+
+    if (missingSlots.length > 0) {
+      await input.tx.deviceSlot.createMany({
+        data: missingSlots.map((slotIndex) => ({
+          label: `Device ${slotIndex}`,
+          slotIndex,
+          status: "FREE",
+          subscriptionId: activeSubscription.id,
+        })),
+      });
+    }
+
+    return {
+      createdSubscriptionId: updatedSubscription.id,
+      revokedSubscriptionId: null,
+    };
   }
 
   const createdSubscription = await input.tx.subscription.create({
@@ -117,6 +185,25 @@ export async function createSubscriptionFromPaidRequest(input: {
     },
   });
 
+  await input.tx.subscriptionRenewal.create({
+    data: {
+      amountRub: input.paymentRequest.amountRub,
+      baseDeviceMonthlyPriceSnapshot: input.paymentRequest.baseDeviceMonthlyPriceSnapshot,
+      currency: input.paymentRequest.currency,
+      durationDiscountPercentSnapshot: input.paymentRequest.durationDiscountPercentSnapshot,
+      extraDeviceMonthlyPriceSnapshot: input.paymentRequest.extraDeviceMonthlyPriceSnapshot,
+      monthlyPriceSnapshot: input.paymentRequest.monthlyPriceSnapshot,
+      months: input.paymentRequest.months,
+      nextDevices: input.paymentRequest.devices,
+      nextExpiresAt,
+      paymentRequestId: input.paymentRequest.id,
+      previousDevices: 0,
+      previousExpiresAt: null,
+      referralDiscountPercentSnapshot: input.paymentRequest.referralDiscountPercentSnapshot,
+      subscriptionId: createdSubscription.id,
+    },
+  });
+
   await input.tx.deviceSlot.createMany({
     data: Array.from({ length: input.paymentRequest.devices }, (_, index) => ({
       label: `Device ${index + 1}`,
@@ -128,6 +215,6 @@ export async function createSubscriptionFromPaidRequest(input: {
 
   return {
     createdSubscriptionId: createdSubscription.id,
-    revokedSubscriptionId: activeSubscription?.id ?? null,
+    revokedSubscriptionId: null,
   };
 }

@@ -12,7 +12,7 @@ import {
 import { generateReferralCodeValue } from "@/lib/admin-code-management";
 import { getAppBenefitsData, validatePromoCodeForUser } from "@/lib/app-benefits";
 import { getCurrentSession, normalizeCode } from "@/lib/auth";
-import { parseSelectableDeviceOsValue } from "@/lib/device-os";
+import { detectDeviceOsFromUserAgent, parseSelectableDeviceOsValue } from "@/lib/device-os";
 import {
   assignManagedSlotForUser,
   syncSlotConfigWithRetry,
@@ -131,9 +131,23 @@ function inlineActionResult(
   };
 }
 
-function resolveRequestedDeviceOs(rawDeviceOs: string | null | undefined) {
+function normalizeUserAgent(rawValue: string | null | undefined) {
+  const value = rawValue?.trim() ?? "";
+  return value ? value.slice(0, 1000) : null;
+}
+
+function resolveRequestedDeviceOs(
+  rawDeviceOs: string | null | undefined,
+  rawUserAgent?: string | null | undefined
+) {
   const fromForm = parseSelectableDeviceOsValue(rawDeviceOs, null);
-  return fromForm ? (fromForm as DeviceOS) : null;
+  if (fromForm) {
+    return fromForm as DeviceOS;
+  }
+
+  const fromUserAgent = detectDeviceOsFromUserAgent(rawUserAgent);
+  const selectableFromUserAgent = parseSelectableDeviceOsValue(fromUserAgent, null);
+  return selectableFromUserAgent ? (selectableFromUserAgent as DeviceOS) : null;
 }
 
 type SetupAssignedSlotPayload = {
@@ -279,6 +293,11 @@ function parsePositiveInt(rawValue: FormDataEntryValue | null) {
   }
 
   return parsed;
+}
+
+function getRemainingSubscriptionDays(now: Date, expiresAt: Date) {
+  const remainingMs = Math.max(0, expiresAt.getTime() - now.getTime());
+  return Math.max(1, Math.ceil(remainingMs / 86_400_000));
 }
 
 async function parseAndValidateConstructorSelection(
@@ -728,6 +747,19 @@ export async function payTariffWithCreditsAction(formData: FormData) {
 
   try {
     await prisma.$transaction(async (tx) => {
+      await tx.userOperationLock.upsert({
+        create: {
+          lockedAt: now,
+          operation: "credits_subscription_payment",
+          userId: user.id,
+        },
+        update: {
+          lockedAt: now,
+          operation: "credits_subscription_payment",
+        },
+        where: { userId: user.id },
+      });
+
       await tx.paymentRequest.updateMany({
         data: {
           plategaStatus: "REPLACED_BY_CREDITS_PAYMENT",
@@ -891,6 +923,228 @@ export async function payTariffWithCreditsAction(formData: FormData) {
   );
 }
 
+export async function changeDeviceLimitWithCreditsAction(formData: FormData) {
+  const user = await getUserActor();
+  const nextDevices = parsePositiveInt(formData.get("nextDevices"));
+
+  if (!nextDevices) {
+    redirect(buildRedirectUrl({ tab: "devices", error: "Выберите новый лимит устройств." }));
+  }
+
+  const { pricingSettings } = await getAppSubscriptionConstructorData();
+  const now = new Date();
+  let subscriptionId: string | null = null;
+  let chargedRub = 0;
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.userOperationLock.upsert({
+        create: {
+          lockedAt: now,
+          operation: "device_limit_change",
+          userId: user.id,
+        },
+        update: {
+          lockedAt: now,
+          operation: "device_limit_change",
+        },
+        where: { userId: user.id },
+      });
+
+      const activeSubscription = await tx.subscription.findFirst({
+        include: {
+          deviceSlots: {
+            select: { slotIndex: true },
+          },
+        },
+        orderBy: [{ startsAt: "desc" }, { startedAt: "desc" }],
+        where: {
+          status: "ACTIVE",
+          userId: user.id,
+        },
+      });
+
+      if (!activeSubscription) {
+        throw new Error("NO_ACTIVE_SUBSCRIPTION");
+      }
+
+      if (nextDevices <= activeSubscription.devices) {
+        throw new Error("DEVICE_LIMIT_NOT_INCREASED");
+      }
+
+      if (nextDevices > pricingSettings.maxDevices) {
+        throw new Error("DEVICE_LIMIT_TOO_HIGH");
+      }
+
+      const expiresAt = activeSubscription.expiresAt ?? activeSubscription.endsAt;
+      const remainingDays = getRemainingSubscriptionDays(now, expiresAt);
+      const extraDevices = nextDevices - activeSubscription.devices;
+      chargedRub = Math.ceil(
+        (extraDevices * pricingSettings.extraDeviceMonthlyPrice * remainingDays) / 30
+      );
+
+      const debitResult = await tx.user.updateMany({
+        data: {
+          credits: {
+            decrement: chargedRub,
+          },
+        },
+        where: {
+          credits: {
+            gte: chargedRub,
+          },
+          id: user.id,
+        },
+      });
+
+      if (debitResult.count !== 1) {
+        throw new Error("INSUFFICIENT_CREDITS");
+      }
+
+      const paymentRequest = await tx.paymentRequest.create({
+        data: {
+          amountRub: chargedRub,
+          approvedAt: now,
+          baseDeviceMonthlyPriceSnapshot: activeSubscription.baseDeviceMonthlyPriceSnapshot,
+          currency: activeSubscription.currency,
+          deviceLimit: nextDevices,
+          devices: nextDevices,
+          durationDiscountPercentSnapshot: activeSubscription.durationDiscountPercentSnapshot,
+          extraDeviceMonthlyPriceSnapshot: pricingSettings.extraDeviceMonthlyPrice,
+          markedPaidAt: now,
+          method: "CREDITS",
+          monthlyPriceSnapshot: activeSubscription.monthlyPriceSnapshot,
+          months: 0,
+          periodMonths: 0,
+          referralDiscountPercentSnapshot: activeSubscription.referralDiscountPercentSnapshot,
+          status: "APPROVED",
+          tariffName: `Device limit: ${activeSubscription.devices} -> ${nextDevices}`,
+          totalPriceBeforeDiscountRubSnapshot: chargedRub,
+          userId: user.id,
+        },
+      });
+
+      await tx.subscription.update({
+        data: {
+          deviceLimit: nextDevices,
+          devices: nextDevices,
+          extraDeviceMonthlyPriceSnapshot: pricingSettings.extraDeviceMonthlyPrice,
+          pendingDevices: null,
+        },
+        where: { id: activeSubscription.id },
+      });
+
+      await tx.subscriptionRenewal.create({
+        data: {
+          amountRub: chargedRub,
+          baseDeviceMonthlyPriceSnapshot: activeSubscription.baseDeviceMonthlyPriceSnapshot,
+          currency: activeSubscription.currency,
+          durationDiscountPercentSnapshot: activeSubscription.durationDiscountPercentSnapshot,
+          extraDeviceMonthlyPriceSnapshot: pricingSettings.extraDeviceMonthlyPrice,
+          monthlyPriceSnapshot: activeSubscription.monthlyPriceSnapshot,
+          months: 0,
+          nextDevices,
+          nextExpiresAt: expiresAt,
+          paymentRequestId: paymentRequest.id,
+          previousDevices: activeSubscription.devices,
+          previousExpiresAt: expiresAt,
+          referralDiscountPercentSnapshot: activeSubscription.referralDiscountPercentSnapshot,
+          subscriptionId: activeSubscription.id,
+        },
+      });
+
+      const existingSlotIndexes = new Set(
+        activeSubscription.deviceSlots.map((slot) => slot.slotIndex)
+      );
+      const missingSlots = Array.from({ length: nextDevices }, (_, index) => index + 1).filter(
+        (slotIndex) => !existingSlotIndexes.has(slotIndex)
+      );
+
+      if (missingSlots.length > 0) {
+        await tx.deviceSlot.createMany({
+          data: missingSlots.map((slotIndex) => ({
+            label: `Device ${slotIndex}`,
+            slotIndex,
+            status: "FREE",
+            subscriptionId: activeSubscription.id,
+          })),
+        });
+      }
+
+      subscriptionId = activeSubscription.id;
+    }, { timeout: 15_000 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "";
+
+    if (message === "NO_ACTIVE_SUBSCRIPTION") {
+      redirect(buildRedirectUrl({ tab: "devices", error: "Нет активной подписки." }));
+    }
+
+    if (message === "DEVICE_LIMIT_NOT_INCREASED") {
+      redirect(buildRedirectUrl({ tab: "devices", error: "Новый лимит должен быть больше текущего." }));
+    }
+
+    if (message === "DEVICE_LIMIT_TOO_HIGH") {
+      redirect(buildRedirectUrl({ tab: "devices", error: "Выбранный лимит выше доступного максимума." }));
+    }
+
+    if (message === "INSUFFICIENT_CREDITS") {
+      redirect(buildRedirectUrl({ tab: "devices", error: "Недостаточно кредитов для доплаты." }));
+    }
+
+    throw error;
+  }
+
+  let syncNotice = "";
+  if (subscriptionId) {
+    const syncResult = await syncSubscriptionInXui(subscriptionId);
+    syncNotice = syncResult.ok
+      ? ""
+      : " Лимит обновлен локально, но синхронизация 3x-ui завершилась ошибкой.";
+  }
+
+  revalidatePath("/app");
+  revalidatePath("/admin");
+  redirect(
+    buildRedirectUrl({
+      tab: "devices",
+      notice: `Лимит устройств обновлен. Списано ${chargedRub} credits.${syncNotice}`,
+    })
+  );
+}
+
+export async function syncOwnSubscriptionAction(formData?: FormData) {
+  void formData;
+  const user = await getUserActor();
+
+  const subscription = await prisma.subscription.findFirst({
+    orderBy: [{ startsAt: "desc" }, { startedAt: "desc" }],
+    select: { id: true },
+    where: {
+      status: "ACTIVE",
+      userId: user.id,
+    },
+  });
+
+  if (!subscription) {
+    redirect(buildRedirectUrl({ tab: "devices", error: "Нет активной подписки для синхронизации." }));
+  }
+
+  const result = await syncSubscriptionInXui(subscription.id);
+
+  revalidatePath("/app");
+  revalidatePath("/admin");
+
+  redirect(
+    buildRedirectUrl({
+      tab: "devices",
+      [result.ok ? "notice" : "error"]: result.ok
+        ? "Подписка синхронизирована."
+        : `Не удалось синхронизировать подписку: ${result.error ?? "неизвестная ошибка"}`,
+    })
+  );
+}
+
 async function getManagedSlotForUser(input: { slotId: string; userId: string }) {
   const slot = await prisma.deviceSlot.findUnique({
     include: {
@@ -923,12 +1177,14 @@ async function getManagedSlotForUser(input: { slotId: string; userId: string }) 
 }
 
 export async function assignSetupSlotAction(input: {
+  assignedUserAgent?: string;
   deviceOs?: string;
   slotId?: string;
 }): Promise<AssignSetupSlotActionResult> {
   const user = await getUserActor();
   const slotId = String(input.slotId ?? "").trim();
-  const requestedDeviceOs = resolveRequestedDeviceOs(input.deviceOs);
+  const assignedUserAgent = normalizeUserAgent(input.assignedUserAgent);
+  const requestedDeviceOs = resolveRequestedDeviceOs(input.deviceOs, assignedUserAgent);
 
   if (!slotId) {
     return {
@@ -950,6 +1206,7 @@ export async function assignSetupSlotAction(input: {
   }
 
   const assignmentResult = await assignManagedSlotForUser({
+    assignedUserAgent,
     deviceOs: requestedDeviceOs,
     slotId,
     userId: user.id,
@@ -1009,11 +1266,11 @@ export async function retrySlotSyncAction(formData: FormData) {
     );
   }
 
-  if (slot.status !== "ACTIVE") {
+  if (slot.status === "BLOCKED") {
     redirect(
       buildRedirectUrl({
         tab: "devices",
-        notice: `Слот ${slot.slotIndex} неактивен.`,
+        notice: `Слот ${slot.slotIndex} заблокирован.`,
       })
     );
   }
@@ -1046,8 +1303,10 @@ export async function retrySlotSyncAction(formData: FormData) {
 export async function activateDeviceSlotAction(formData: FormData) {
   const user = await getUserActor();
   const slotId = String(formData.get("slotId") ?? "");
+  const assignedUserAgent = normalizeUserAgent(String(formData.get("assignedUserAgent") ?? ""));
   const requestedDeviceOs = resolveRequestedDeviceOs(
-    String(formData.get("deviceOs") ?? "")
+    String(formData.get("deviceOs") ?? ""),
+    assignedUserAgent
   );
 
   if (!slotId) {
@@ -1099,6 +1358,8 @@ export async function activateDeviceSlotAction(formData: FormData) {
 
   await prisma.deviceSlot.update({
     data: {
+      assignedAt: new Date(),
+      assignedUserAgent,
       deviceOs: requestedDeviceOs,
       status: "ACTIVE",
     },

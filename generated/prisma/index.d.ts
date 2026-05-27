@@ -19,10 +19,10 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
 /**
- * Model InviteCode
+ * Model UserOperationLock
  * 
  */
-export type InviteCode = $Result.DefaultSelection<Prisma.$InviteCodePayload>
+export type UserOperationLock = $Result.DefaultSelection<Prisma.$UserOperationLockPayload>
 /**
  * Model ReferralCode
  * 
@@ -93,6 +93,11 @@ export type PlategaWebhookLog = $Result.DefaultSelection<Prisma.$PlategaWebhookL
  * 
  */
 export type Subscription = $Result.DefaultSelection<Prisma.$SubscriptionPayload>
+/**
+ * Model SubscriptionRenewal
+ * 
+ */
+export type SubscriptionRenewal = $Result.DefaultSelection<Prisma.$SubscriptionRenewalPayload>
 /**
  * Model DeviceSlot
  * 
@@ -165,7 +170,7 @@ export type DeviceOS = (typeof DeviceOS)[keyof typeof DeviceOS]
 
 
 export const IntegrationProvider: {
-  MARZBAN: 'MARZBAN'
+  XUI: 'XUI'
 };
 
 export type IntegrationProvider = (typeof IntegrationProvider)[keyof typeof IntegrationProvider]
@@ -395,14 +400,14 @@ export class PrismaClient<
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
 
   /**
-   * `prisma.inviteCode`: Exposes CRUD operations for the **InviteCode** model.
+   * `prisma.userOperationLock`: Exposes CRUD operations for the **UserOperationLock** model.
     * Example usage:
     * ```ts
-    * // Fetch zero or more InviteCodes
-    * const inviteCodes = await prisma.inviteCode.findMany()
+    * // Fetch zero or more UserOperationLocks
+    * const userOperationLocks = await prisma.userOperationLock.findMany()
     * ```
     */
-  get inviteCode(): Prisma.InviteCodeDelegate<ExtArgs, ClientOptions>;
+  get userOperationLock(): Prisma.UserOperationLockDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.referralCode`: Exposes CRUD operations for the **ReferralCode** model.
@@ -543,6 +548,16 @@ export class PrismaClient<
     * ```
     */
   get subscription(): Prisma.SubscriptionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.subscriptionRenewal`: Exposes CRUD operations for the **SubscriptionRenewal** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SubscriptionRenewals
+    * const subscriptionRenewals = await prisma.subscriptionRenewal.findMany()
+    * ```
+    */
+  get subscriptionRenewal(): Prisma.SubscriptionRenewalDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.deviceSlot`: Exposes CRUD operations for the **DeviceSlot** model.
@@ -1018,7 +1033,7 @@ export namespace Prisma {
 
   export const ModelName: {
     User: 'User',
-    InviteCode: 'InviteCode',
+    UserOperationLock: 'UserOperationLock',
     ReferralCode: 'ReferralCode',
     ReferralCodeUse: 'ReferralCodeUse',
     PromoCode: 'PromoCode',
@@ -1033,6 +1048,7 @@ export namespace Prisma {
     PaymentRequest: 'PaymentRequest',
     PlategaWebhookLog: 'PlategaWebhookLog',
     Subscription: 'Subscription',
+    SubscriptionRenewal: 'SubscriptionRenewal',
     DeviceSlot: 'DeviceSlot',
     IntegrationSyncLog: 'IntegrationSyncLog',
     PayoutRequest: 'PayoutRequest',
@@ -1052,7 +1068,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "inviteCode" | "referralCode" | "referralCodeUse" | "promoCode" | "promoCodeRedemption" | "referralProgramSettings" | "legalDocumentSettings" | "serviceCapacitySettings" | "supportTicket" | "supportMessage" | "subscriptionDurationRule" | "subscriptionPricingSettings" | "paymentRequest" | "plategaWebhookLog" | "subscription" | "deviceSlot" | "integrationSyncLog" | "payoutRequest" | "session"
+      modelProps: "user" | "userOperationLock" | "referralCode" | "referralCodeUse" | "promoCode" | "promoCodeRedemption" | "referralProgramSettings" | "legalDocumentSettings" | "serviceCapacitySettings" | "supportTicket" | "supportMessage" | "subscriptionDurationRule" | "subscriptionPricingSettings" | "paymentRequest" | "plategaWebhookLog" | "subscription" | "subscriptionRenewal" | "deviceSlot" | "integrationSyncLog" | "payoutRequest" | "session"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1130,77 +1146,77 @@ export namespace Prisma {
           }
         }
       }
-      InviteCode: {
-        payload: Prisma.$InviteCodePayload<ExtArgs>
-        fields: Prisma.InviteCodeFieldRefs
+      UserOperationLock: {
+        payload: Prisma.$UserOperationLockPayload<ExtArgs>
+        fields: Prisma.UserOperationLockFieldRefs
         operations: {
           findUnique: {
-            args: Prisma.InviteCodeFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$InviteCodePayload> | null
+            args: Prisma.UserOperationLockFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserOperationLockPayload> | null
           }
           findUniqueOrThrow: {
-            args: Prisma.InviteCodeFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$InviteCodePayload>
+            args: Prisma.UserOperationLockFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserOperationLockPayload>
           }
           findFirst: {
-            args: Prisma.InviteCodeFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$InviteCodePayload> | null
+            args: Prisma.UserOperationLockFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserOperationLockPayload> | null
           }
           findFirstOrThrow: {
-            args: Prisma.InviteCodeFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$InviteCodePayload>
+            args: Prisma.UserOperationLockFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserOperationLockPayload>
           }
           findMany: {
-            args: Prisma.InviteCodeFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$InviteCodePayload>[]
+            args: Prisma.UserOperationLockFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserOperationLockPayload>[]
           }
           create: {
-            args: Prisma.InviteCodeCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$InviteCodePayload>
+            args: Prisma.UserOperationLockCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserOperationLockPayload>
           }
           createMany: {
-            args: Prisma.InviteCodeCreateManyArgs<ExtArgs>
+            args: Prisma.UserOperationLockCreateManyArgs<ExtArgs>
             result: BatchPayload
           }
           createManyAndReturn: {
-            args: Prisma.InviteCodeCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$InviteCodePayload>[]
+            args: Prisma.UserOperationLockCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserOperationLockPayload>[]
           }
           delete: {
-            args: Prisma.InviteCodeDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$InviteCodePayload>
+            args: Prisma.UserOperationLockDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserOperationLockPayload>
           }
           update: {
-            args: Prisma.InviteCodeUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$InviteCodePayload>
+            args: Prisma.UserOperationLockUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserOperationLockPayload>
           }
           deleteMany: {
-            args: Prisma.InviteCodeDeleteManyArgs<ExtArgs>
+            args: Prisma.UserOperationLockDeleteManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateMany: {
-            args: Prisma.InviteCodeUpdateManyArgs<ExtArgs>
+            args: Prisma.UserOperationLockUpdateManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateManyAndReturn: {
-            args: Prisma.InviteCodeUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$InviteCodePayload>[]
+            args: Prisma.UserOperationLockUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserOperationLockPayload>[]
           }
           upsert: {
-            args: Prisma.InviteCodeUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$InviteCodePayload>
+            args: Prisma.UserOperationLockUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserOperationLockPayload>
           }
           aggregate: {
-            args: Prisma.InviteCodeAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateInviteCode>
+            args: Prisma.UserOperationLockAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateUserOperationLock>
           }
           groupBy: {
-            args: Prisma.InviteCodeGroupByArgs<ExtArgs>
-            result: $Utils.Optional<InviteCodeGroupByOutputType>[]
+            args: Prisma.UserOperationLockGroupByArgs<ExtArgs>
+            result: $Utils.Optional<UserOperationLockGroupByOutputType>[]
           }
           count: {
-            args: Prisma.InviteCodeCountArgs<ExtArgs>
-            result: $Utils.Optional<InviteCodeCountAggregateOutputType> | number
+            args: Prisma.UserOperationLockCountArgs<ExtArgs>
+            result: $Utils.Optional<UserOperationLockCountAggregateOutputType> | number
           }
         }
       }
@@ -2240,6 +2256,80 @@ export namespace Prisma {
           }
         }
       }
+      SubscriptionRenewal: {
+        payload: Prisma.$SubscriptionRenewalPayload<ExtArgs>
+        fields: Prisma.SubscriptionRenewalFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SubscriptionRenewalFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SubscriptionRenewalPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SubscriptionRenewalFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SubscriptionRenewalPayload>
+          }
+          findFirst: {
+            args: Prisma.SubscriptionRenewalFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SubscriptionRenewalPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SubscriptionRenewalFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SubscriptionRenewalPayload>
+          }
+          findMany: {
+            args: Prisma.SubscriptionRenewalFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SubscriptionRenewalPayload>[]
+          }
+          create: {
+            args: Prisma.SubscriptionRenewalCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SubscriptionRenewalPayload>
+          }
+          createMany: {
+            args: Prisma.SubscriptionRenewalCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SubscriptionRenewalCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SubscriptionRenewalPayload>[]
+          }
+          delete: {
+            args: Prisma.SubscriptionRenewalDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SubscriptionRenewalPayload>
+          }
+          update: {
+            args: Prisma.SubscriptionRenewalUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SubscriptionRenewalPayload>
+          }
+          deleteMany: {
+            args: Prisma.SubscriptionRenewalDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SubscriptionRenewalUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SubscriptionRenewalUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SubscriptionRenewalPayload>[]
+          }
+          upsert: {
+            args: Prisma.SubscriptionRenewalUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SubscriptionRenewalPayload>
+          }
+          aggregate: {
+            args: Prisma.SubscriptionRenewalAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSubscriptionRenewal>
+          }
+          groupBy: {
+            args: Prisma.SubscriptionRenewalGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SubscriptionRenewalGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SubscriptionRenewalCountArgs<ExtArgs>
+            result: $Utils.Optional<SubscriptionRenewalCountAggregateOutputType> | number
+          }
+        }
+      }
       DeviceSlot: {
         payload: Prisma.$DeviceSlotPayload<ExtArgs>
         fields: Prisma.DeviceSlotFieldRefs
@@ -2645,7 +2735,7 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     user?: UserOmit
-    inviteCode?: InviteCodeOmit
+    userOperationLock?: UserOperationLockOmit
     referralCode?: ReferralCodeOmit
     referralCodeUse?: ReferralCodeUseOmit
     promoCode?: PromoCodeOmit
@@ -2660,6 +2750,7 @@ export namespace Prisma {
     paymentRequest?: PaymentRequestOmit
     plategaWebhookLog?: PlategaWebhookLogOmit
     subscription?: SubscriptionOmit
+    subscriptionRenewal?: SubscriptionRenewalOmit
     deviceSlot?: DeviceSlotOmit
     integrationSyncLog?: IntegrationSyncLogOmit
     payoutRequest?: PayoutRequestOmit
@@ -2744,7 +2835,6 @@ export namespace Prisma {
    */
 
   export type UserCountOutputType = {
-    inviteCodesUsed: number
     referralCodesCreated: number
     paymentRequests: number
     payoutRequests: number
@@ -2757,7 +2847,6 @@ export namespace Prisma {
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    inviteCodesUsed?: boolean | UserCountOutputTypeCountInviteCodesUsedArgs
     referralCodesCreated?: boolean | UserCountOutputTypeCountReferralCodesCreatedArgs
     paymentRequests?: boolean | UserCountOutputTypeCountPaymentRequestsArgs
     payoutRequests?: boolean | UserCountOutputTypeCountPayoutRequestsArgs
@@ -2778,13 +2867,6 @@ export namespace Prisma {
      * Select specific fields to fetch from the UserCountOutputType
      */
     select?: UserCountOutputTypeSelect<ExtArgs> | null
-  }
-
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeCountInviteCodesUsedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: InviteCodeWhereInput
   }
 
   /**
@@ -2981,10 +3063,12 @@ export namespace Prisma {
 
   export type SubscriptionCountOutputType = {
     deviceSlots: number
+    renewals: number
   }
 
   export type SubscriptionCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     deviceSlots?: boolean | SubscriptionCountOutputTypeCountDeviceSlotsArgs
+    renewals?: boolean | SubscriptionCountOutputTypeCountRenewalsArgs
   }
 
   // Custom InputTypes
@@ -3003,6 +3087,13 @@ export namespace Prisma {
    */
   export type SubscriptionCountOutputTypeCountDeviceSlotsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: DeviceSlotWhereInput
+  }
+
+  /**
+   * SubscriptionCountOutputType without action
+   */
+  export type SubscriptionCountOutputTypeCountRenewalsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SubscriptionRenewalWhereInput
   }
 
 
@@ -3236,7 +3327,6 @@ export namespace Prisma {
     reservedCredits?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    inviteCodesUsed?: boolean | User$inviteCodesUsedArgs<ExtArgs>
     referralCodesCreated?: boolean | User$referralCodesCreatedArgs<ExtArgs>
     referralCodeUse?: boolean | User$referralCodeUseArgs<ExtArgs>
     paymentRequests?: boolean | User$paymentRequestsArgs<ExtArgs>
@@ -3246,6 +3336,7 @@ export namespace Prisma {
     supportMessages?: boolean | User$supportMessagesArgs<ExtArgs>
     supportTickets?: boolean | User$supportTicketsArgs<ExtArgs>
     promoCodeRedemptions?: boolean | User$promoCodeRedemptionsArgs<ExtArgs>
+    operationLock?: boolean | User$operationLockArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
@@ -3285,7 +3376,6 @@ export namespace Prisma {
 
   export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "username" | "passwordHash" | "role" | "credits" | "reservedCredits" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    inviteCodesUsed?: boolean | User$inviteCodesUsedArgs<ExtArgs>
     referralCodesCreated?: boolean | User$referralCodesCreatedArgs<ExtArgs>
     referralCodeUse?: boolean | User$referralCodeUseArgs<ExtArgs>
     paymentRequests?: boolean | User$paymentRequestsArgs<ExtArgs>
@@ -3295,6 +3385,7 @@ export namespace Prisma {
     supportMessages?: boolean | User$supportMessagesArgs<ExtArgs>
     supportTickets?: boolean | User$supportTicketsArgs<ExtArgs>
     promoCodeRedemptions?: boolean | User$promoCodeRedemptionsArgs<ExtArgs>
+    operationLock?: boolean | User$operationLockArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -3304,7 +3395,6 @@ export namespace Prisma {
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
     objects: {
-      inviteCodesUsed: Prisma.$InviteCodePayload<ExtArgs>[]
       referralCodesCreated: Prisma.$ReferralCodePayload<ExtArgs>[]
       referralCodeUse: Prisma.$ReferralCodeUsePayload<ExtArgs> | null
       paymentRequests: Prisma.$PaymentRequestPayload<ExtArgs>[]
@@ -3314,6 +3404,7 @@ export namespace Prisma {
       supportMessages: Prisma.$SupportMessagePayload<ExtArgs>[]
       supportTickets: Prisma.$SupportTicketPayload<ExtArgs>[]
       promoCodeRedemptions: Prisma.$PromoCodeRedemptionPayload<ExtArgs>[]
+      operationLock: Prisma.$UserOperationLockPayload<ExtArgs> | null
       sessions: Prisma.$SessionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -3719,7 +3810,6 @@ export namespace Prisma {
    */
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    inviteCodesUsed<T extends User$inviteCodesUsedArgs<ExtArgs> = {}>(args?: Subset<T, User$inviteCodesUsedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InviteCodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     referralCodesCreated<T extends User$referralCodesCreatedArgs<ExtArgs> = {}>(args?: Subset<T, User$referralCodesCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReferralCodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     referralCodeUse<T extends User$referralCodeUseArgs<ExtArgs> = {}>(args?: Subset<T, User$referralCodeUseArgs<ExtArgs>>): Prisma__ReferralCodeUseClient<$Result.GetResult<Prisma.$ReferralCodeUsePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     paymentRequests<T extends User$paymentRequestsArgs<ExtArgs> = {}>(args?: Subset<T, User$paymentRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PaymentRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3729,6 +3819,7 @@ export namespace Prisma {
     supportMessages<T extends User$supportMessagesArgs<ExtArgs> = {}>(args?: Subset<T, User$supportMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SupportMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     supportTickets<T extends User$supportTicketsArgs<ExtArgs> = {}>(args?: Subset<T, User$supportTicketsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SupportTicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     promoCodeRedemptions<T extends User$promoCodeRedemptionsArgs<ExtArgs> = {}>(args?: Subset<T, User$promoCodeRedemptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PromoCodeRedemptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    operationLock<T extends User$operationLockArgs<ExtArgs> = {}>(args?: Subset<T, User$operationLockArgs<ExtArgs>>): Prisma__UserOperationLockClient<$Result.GetResult<Prisma.$UserOperationLockPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     sessions<T extends User$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -4153,30 +4244,6 @@ export namespace Prisma {
   }
 
   /**
-   * User.inviteCodesUsed
-   */
-  export type User$inviteCodesUsedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the InviteCode
-     */
-    select?: InviteCodeSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the InviteCode
-     */
-    omit?: InviteCodeOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: InviteCodeInclude<ExtArgs> | null
-    where?: InviteCodeWhereInput
-    orderBy?: InviteCodeOrderByWithRelationInput | InviteCodeOrderByWithRelationInput[]
-    cursor?: InviteCodeWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: InviteCodeScalarFieldEnum | InviteCodeScalarFieldEnum[]
-  }
-
-  /**
    * User.referralCodesCreated
    */
   export type User$referralCodesCreatedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4388,6 +4455,25 @@ export namespace Prisma {
   }
 
   /**
+   * User.operationLock
+   */
+  export type User$operationLockArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOperationLock
+     */
+    select?: UserOperationLockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserOperationLock
+     */
+    omit?: UserOperationLockOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserOperationLockInclude<ExtArgs> | null
+    where?: UserOperationLockWhereInput
+  }
+
+  /**
    * User.sessions
    */
   export type User$sessionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4431,375 +4517,327 @@ export namespace Prisma {
 
 
   /**
-   * Model InviteCode
+   * Model UserOperationLock
    */
 
-  export type AggregateInviteCode = {
-    _count: InviteCodeCountAggregateOutputType | null
-    _min: InviteCodeMinAggregateOutputType | null
-    _max: InviteCodeMaxAggregateOutputType | null
+  export type AggregateUserOperationLock = {
+    _count: UserOperationLockCountAggregateOutputType | null
+    _min: UserOperationLockMinAggregateOutputType | null
+    _max: UserOperationLockMaxAggregateOutputType | null
   }
 
-  export type InviteCodeMinAggregateOutputType = {
-    id: string | null
-    code: string | null
-    isEnabled: boolean | null
-    expiresAt: Date | null
-    createdAt: Date | null
-    usedAt: Date | null
-    usedByUserId: string | null
+  export type UserOperationLockMinAggregateOutputType = {
+    userId: string | null
+    operation: string | null
+    lockedAt: Date | null
   }
 
-  export type InviteCodeMaxAggregateOutputType = {
-    id: string | null
-    code: string | null
-    isEnabled: boolean | null
-    expiresAt: Date | null
-    createdAt: Date | null
-    usedAt: Date | null
-    usedByUserId: string | null
+  export type UserOperationLockMaxAggregateOutputType = {
+    userId: string | null
+    operation: string | null
+    lockedAt: Date | null
   }
 
-  export type InviteCodeCountAggregateOutputType = {
-    id: number
-    code: number
-    isEnabled: number
-    expiresAt: number
-    createdAt: number
-    usedAt: number
-    usedByUserId: number
+  export type UserOperationLockCountAggregateOutputType = {
+    userId: number
+    operation: number
+    lockedAt: number
     _all: number
   }
 
 
-  export type InviteCodeMinAggregateInputType = {
-    id?: true
-    code?: true
-    isEnabled?: true
-    expiresAt?: true
-    createdAt?: true
-    usedAt?: true
-    usedByUserId?: true
+  export type UserOperationLockMinAggregateInputType = {
+    userId?: true
+    operation?: true
+    lockedAt?: true
   }
 
-  export type InviteCodeMaxAggregateInputType = {
-    id?: true
-    code?: true
-    isEnabled?: true
-    expiresAt?: true
-    createdAt?: true
-    usedAt?: true
-    usedByUserId?: true
+  export type UserOperationLockMaxAggregateInputType = {
+    userId?: true
+    operation?: true
+    lockedAt?: true
   }
 
-  export type InviteCodeCountAggregateInputType = {
-    id?: true
-    code?: true
-    isEnabled?: true
-    expiresAt?: true
-    createdAt?: true
-    usedAt?: true
-    usedByUserId?: true
+  export type UserOperationLockCountAggregateInputType = {
+    userId?: true
+    operation?: true
+    lockedAt?: true
     _all?: true
   }
 
-  export type InviteCodeAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type UserOperationLockAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which InviteCode to aggregate.
+     * Filter which UserOperationLock to aggregate.
      */
-    where?: InviteCodeWhereInput
+    where?: UserOperationLockWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of InviteCodes to fetch.
+     * Determine the order of UserOperationLocks to fetch.
      */
-    orderBy?: InviteCodeOrderByWithRelationInput | InviteCodeOrderByWithRelationInput[]
+    orderBy?: UserOperationLockOrderByWithRelationInput | UserOperationLockOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
      * Sets the start position
      */
-    cursor?: InviteCodeWhereUniqueInput
+    cursor?: UserOperationLockWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` InviteCodes from the position of the cursor.
+     * Take `±n` UserOperationLocks from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` InviteCodes.
+     * Skip the first `n` UserOperationLocks.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Count returned InviteCodes
+     * Count returned UserOperationLocks
     **/
-    _count?: true | InviteCodeCountAggregateInputType
+    _count?: true | UserOperationLockCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the minimum value
     **/
-    _min?: InviteCodeMinAggregateInputType
+    _min?: UserOperationLockMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the maximum value
     **/
-    _max?: InviteCodeMaxAggregateInputType
+    _max?: UserOperationLockMaxAggregateInputType
   }
 
-  export type GetInviteCodeAggregateType<T extends InviteCodeAggregateArgs> = {
-        [P in keyof T & keyof AggregateInviteCode]: P extends '_count' | 'count'
+  export type GetUserOperationLockAggregateType<T extends UserOperationLockAggregateArgs> = {
+        [P in keyof T & keyof AggregateUserOperationLock]: P extends '_count' | 'count'
       ? T[P] extends true
         ? number
-        : GetScalarType<T[P], AggregateInviteCode[P]>
-      : GetScalarType<T[P], AggregateInviteCode[P]>
+        : GetScalarType<T[P], AggregateUserOperationLock[P]>
+      : GetScalarType<T[P], AggregateUserOperationLock[P]>
   }
 
 
 
 
-  export type InviteCodeGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: InviteCodeWhereInput
-    orderBy?: InviteCodeOrderByWithAggregationInput | InviteCodeOrderByWithAggregationInput[]
-    by: InviteCodeScalarFieldEnum[] | InviteCodeScalarFieldEnum
-    having?: InviteCodeScalarWhereWithAggregatesInput
+  export type UserOperationLockGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UserOperationLockWhereInput
+    orderBy?: UserOperationLockOrderByWithAggregationInput | UserOperationLockOrderByWithAggregationInput[]
+    by: UserOperationLockScalarFieldEnum[] | UserOperationLockScalarFieldEnum
+    having?: UserOperationLockScalarWhereWithAggregatesInput
     take?: number
     skip?: number
-    _count?: InviteCodeCountAggregateInputType | true
-    _min?: InviteCodeMinAggregateInputType
-    _max?: InviteCodeMaxAggregateInputType
+    _count?: UserOperationLockCountAggregateInputType | true
+    _min?: UserOperationLockMinAggregateInputType
+    _max?: UserOperationLockMaxAggregateInputType
   }
 
-  export type InviteCodeGroupByOutputType = {
-    id: string
-    code: string
-    isEnabled: boolean
-    expiresAt: Date | null
-    createdAt: Date
-    usedAt: Date | null
-    usedByUserId: string | null
-    _count: InviteCodeCountAggregateOutputType | null
-    _min: InviteCodeMinAggregateOutputType | null
-    _max: InviteCodeMaxAggregateOutputType | null
+  export type UserOperationLockGroupByOutputType = {
+    userId: string
+    operation: string
+    lockedAt: Date
+    _count: UserOperationLockCountAggregateOutputType | null
+    _min: UserOperationLockMinAggregateOutputType | null
+    _max: UserOperationLockMaxAggregateOutputType | null
   }
 
-  type GetInviteCodeGroupByPayload<T extends InviteCodeGroupByArgs> = Prisma.PrismaPromise<
+  type GetUserOperationLockGroupByPayload<T extends UserOperationLockGroupByArgs> = Prisma.PrismaPromise<
     Array<
-      PickEnumerable<InviteCodeGroupByOutputType, T['by']> &
+      PickEnumerable<UserOperationLockGroupByOutputType, T['by']> &
         {
-          [P in ((keyof T) & (keyof InviteCodeGroupByOutputType))]: P extends '_count'
+          [P in ((keyof T) & (keyof UserOperationLockGroupByOutputType))]: P extends '_count'
             ? T[P] extends boolean
               ? number
-              : GetScalarType<T[P], InviteCodeGroupByOutputType[P]>
-            : GetScalarType<T[P], InviteCodeGroupByOutputType[P]>
+              : GetScalarType<T[P], UserOperationLockGroupByOutputType[P]>
+            : GetScalarType<T[P], UserOperationLockGroupByOutputType[P]>
         }
       >
     >
 
 
-  export type InviteCodeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    code?: boolean
-    isEnabled?: boolean
-    expiresAt?: boolean
-    createdAt?: boolean
-    usedAt?: boolean
-    usedByUserId?: boolean
-    usedBy?: boolean | InviteCode$usedByArgs<ExtArgs>
-  }, ExtArgs["result"]["inviteCode"]>
+  export type UserOperationLockSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    userId?: boolean
+    operation?: boolean
+    lockedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["userOperationLock"]>
 
-  export type InviteCodeSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    code?: boolean
-    isEnabled?: boolean
-    expiresAt?: boolean
-    createdAt?: boolean
-    usedAt?: boolean
-    usedByUserId?: boolean
-    usedBy?: boolean | InviteCode$usedByArgs<ExtArgs>
-  }, ExtArgs["result"]["inviteCode"]>
+  export type UserOperationLockSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    userId?: boolean
+    operation?: boolean
+    lockedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["userOperationLock"]>
 
-  export type InviteCodeSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    code?: boolean
-    isEnabled?: boolean
-    expiresAt?: boolean
-    createdAt?: boolean
-    usedAt?: boolean
-    usedByUserId?: boolean
-    usedBy?: boolean | InviteCode$usedByArgs<ExtArgs>
-  }, ExtArgs["result"]["inviteCode"]>
+  export type UserOperationLockSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    userId?: boolean
+    operation?: boolean
+    lockedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["userOperationLock"]>
 
-  export type InviteCodeSelectScalar = {
-    id?: boolean
-    code?: boolean
-    isEnabled?: boolean
-    expiresAt?: boolean
-    createdAt?: boolean
-    usedAt?: boolean
-    usedByUserId?: boolean
+  export type UserOperationLockSelectScalar = {
+    userId?: boolean
+    operation?: boolean
+    lockedAt?: boolean
   }
 
-  export type InviteCodeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "code" | "isEnabled" | "expiresAt" | "createdAt" | "usedAt" | "usedByUserId", ExtArgs["result"]["inviteCode"]>
-  export type InviteCodeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    usedBy?: boolean | InviteCode$usedByArgs<ExtArgs>
+  export type UserOperationLockOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"userId" | "operation" | "lockedAt", ExtArgs["result"]["userOperationLock"]>
+  export type UserOperationLockInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }
-  export type InviteCodeIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    usedBy?: boolean | InviteCode$usedByArgs<ExtArgs>
+  export type UserOperationLockIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }
-  export type InviteCodeIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    usedBy?: boolean | InviteCode$usedByArgs<ExtArgs>
+  export type UserOperationLockIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }
 
-  export type $InviteCodePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "InviteCode"
+  export type $UserOperationLockPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "UserOperationLock"
     objects: {
-      usedBy: Prisma.$UserPayload<ExtArgs> | null
+      user: Prisma.$UserPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
-      id: string
-      code: string
-      isEnabled: boolean
-      expiresAt: Date | null
-      createdAt: Date
-      usedAt: Date | null
-      usedByUserId: string | null
-    }, ExtArgs["result"]["inviteCode"]>
+      userId: string
+      operation: string
+      lockedAt: Date
+    }, ExtArgs["result"]["userOperationLock"]>
     composites: {}
   }
 
-  type InviteCodeGetPayload<S extends boolean | null | undefined | InviteCodeDefaultArgs> = $Result.GetResult<Prisma.$InviteCodePayload, S>
+  type UserOperationLockGetPayload<S extends boolean | null | undefined | UserOperationLockDefaultArgs> = $Result.GetResult<Prisma.$UserOperationLockPayload, S>
 
-  type InviteCodeCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<InviteCodeFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: InviteCodeCountAggregateInputType | true
+  type UserOperationLockCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<UserOperationLockFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: UserOperationLockCountAggregateInputType | true
     }
 
-  export interface InviteCodeDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['InviteCode'], meta: { name: 'InviteCode' } }
+  export interface UserOperationLockDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['UserOperationLock'], meta: { name: 'UserOperationLock' } }
     /**
-     * Find zero or one InviteCode that matches the filter.
-     * @param {InviteCodeFindUniqueArgs} args - Arguments to find a InviteCode
+     * Find zero or one UserOperationLock that matches the filter.
+     * @param {UserOperationLockFindUniqueArgs} args - Arguments to find a UserOperationLock
      * @example
-     * // Get one InviteCode
-     * const inviteCode = await prisma.inviteCode.findUnique({
+     * // Get one UserOperationLock
+     * const userOperationLock = await prisma.userOperationLock.findUnique({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUnique<T extends InviteCodeFindUniqueArgs>(args: SelectSubset<T, InviteCodeFindUniqueArgs<ExtArgs>>): Prisma__InviteCodeClient<$Result.GetResult<Prisma.$InviteCodePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    findUnique<T extends UserOperationLockFindUniqueArgs>(args: SelectSubset<T, UserOperationLockFindUniqueArgs<ExtArgs>>): Prisma__UserOperationLockClient<$Result.GetResult<Prisma.$UserOperationLockPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find one InviteCode that matches the filter or throw an error with `error.code='P2025'`
+     * Find one UserOperationLock that matches the filter or throw an error with `error.code='P2025'`
      * if no matches were found.
-     * @param {InviteCodeFindUniqueOrThrowArgs} args - Arguments to find a InviteCode
+     * @param {UserOperationLockFindUniqueOrThrowArgs} args - Arguments to find a UserOperationLock
      * @example
-     * // Get one InviteCode
-     * const inviteCode = await prisma.inviteCode.findUniqueOrThrow({
+     * // Get one UserOperationLock
+     * const userOperationLock = await prisma.userOperationLock.findUniqueOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUniqueOrThrow<T extends InviteCodeFindUniqueOrThrowArgs>(args: SelectSubset<T, InviteCodeFindUniqueOrThrowArgs<ExtArgs>>): Prisma__InviteCodeClient<$Result.GetResult<Prisma.$InviteCodePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    findUniqueOrThrow<T extends UserOperationLockFindUniqueOrThrowArgs>(args: SelectSubset<T, UserOperationLockFindUniqueOrThrowArgs<ExtArgs>>): Prisma__UserOperationLockClient<$Result.GetResult<Prisma.$UserOperationLockPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find the first InviteCode that matches the filter.
+     * Find the first UserOperationLock that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {InviteCodeFindFirstArgs} args - Arguments to find a InviteCode
+     * @param {UserOperationLockFindFirstArgs} args - Arguments to find a UserOperationLock
      * @example
-     * // Get one InviteCode
-     * const inviteCode = await prisma.inviteCode.findFirst({
+     * // Get one UserOperationLock
+     * const userOperationLock = await prisma.userOperationLock.findFirst({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirst<T extends InviteCodeFindFirstArgs>(args?: SelectSubset<T, InviteCodeFindFirstArgs<ExtArgs>>): Prisma__InviteCodeClient<$Result.GetResult<Prisma.$InviteCodePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    findFirst<T extends UserOperationLockFindFirstArgs>(args?: SelectSubset<T, UserOperationLockFindFirstArgs<ExtArgs>>): Prisma__UserOperationLockClient<$Result.GetResult<Prisma.$UserOperationLockPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find the first InviteCode that matches the filter or
+     * Find the first UserOperationLock that matches the filter or
      * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {InviteCodeFindFirstOrThrowArgs} args - Arguments to find a InviteCode
+     * @param {UserOperationLockFindFirstOrThrowArgs} args - Arguments to find a UserOperationLock
      * @example
-     * // Get one InviteCode
-     * const inviteCode = await prisma.inviteCode.findFirstOrThrow({
+     * // Get one UserOperationLock
+     * const userOperationLock = await prisma.userOperationLock.findFirstOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirstOrThrow<T extends InviteCodeFindFirstOrThrowArgs>(args?: SelectSubset<T, InviteCodeFindFirstOrThrowArgs<ExtArgs>>): Prisma__InviteCodeClient<$Result.GetResult<Prisma.$InviteCodePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    findFirstOrThrow<T extends UserOperationLockFindFirstOrThrowArgs>(args?: SelectSubset<T, UserOperationLockFindFirstOrThrowArgs<ExtArgs>>): Prisma__UserOperationLockClient<$Result.GetResult<Prisma.$UserOperationLockPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find zero or more InviteCodes that matches the filter.
+     * Find zero or more UserOperationLocks that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {InviteCodeFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @param {UserOperationLockFindManyArgs} args - Arguments to filter and select certain fields only.
      * @example
-     * // Get all InviteCodes
-     * const inviteCodes = await prisma.inviteCode.findMany()
+     * // Get all UserOperationLocks
+     * const userOperationLocks = await prisma.userOperationLock.findMany()
      * 
-     * // Get first 10 InviteCodes
-     * const inviteCodes = await prisma.inviteCode.findMany({ take: 10 })
+     * // Get first 10 UserOperationLocks
+     * const userOperationLocks = await prisma.userOperationLock.findMany({ take: 10 })
      * 
-     * // Only select the `id`
-     * const inviteCodeWithIdOnly = await prisma.inviteCode.findMany({ select: { id: true } })
+     * // Only select the `userId`
+     * const userOperationLockWithUserIdOnly = await prisma.userOperationLock.findMany({ select: { userId: true } })
      * 
      */
-    findMany<T extends InviteCodeFindManyArgs>(args?: SelectSubset<T, InviteCodeFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InviteCodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+    findMany<T extends UserOperationLockFindManyArgs>(args?: SelectSubset<T, UserOperationLockFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserOperationLockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
     /**
-     * Create a InviteCode.
-     * @param {InviteCodeCreateArgs} args - Arguments to create a InviteCode.
+     * Create a UserOperationLock.
+     * @param {UserOperationLockCreateArgs} args - Arguments to create a UserOperationLock.
      * @example
-     * // Create one InviteCode
-     * const InviteCode = await prisma.inviteCode.create({
+     * // Create one UserOperationLock
+     * const UserOperationLock = await prisma.userOperationLock.create({
      *   data: {
-     *     // ... data to create a InviteCode
+     *     // ... data to create a UserOperationLock
      *   }
      * })
      * 
      */
-    create<T extends InviteCodeCreateArgs>(args: SelectSubset<T, InviteCodeCreateArgs<ExtArgs>>): Prisma__InviteCodeClient<$Result.GetResult<Prisma.$InviteCodePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    create<T extends UserOperationLockCreateArgs>(args: SelectSubset<T, UserOperationLockCreateArgs<ExtArgs>>): Prisma__UserOperationLockClient<$Result.GetResult<Prisma.$UserOperationLockPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Create many InviteCodes.
-     * @param {InviteCodeCreateManyArgs} args - Arguments to create many InviteCodes.
+     * Create many UserOperationLocks.
+     * @param {UserOperationLockCreateManyArgs} args - Arguments to create many UserOperationLocks.
      * @example
-     * // Create many InviteCodes
-     * const inviteCode = await prisma.inviteCode.createMany({
+     * // Create many UserOperationLocks
+     * const userOperationLock = await prisma.userOperationLock.createMany({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      *     
      */
-    createMany<T extends InviteCodeCreateManyArgs>(args?: SelectSubset<T, InviteCodeCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    createMany<T extends UserOperationLockCreateManyArgs>(args?: SelectSubset<T, UserOperationLockCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Create many InviteCodes and returns the data saved in the database.
-     * @param {InviteCodeCreateManyAndReturnArgs} args - Arguments to create many InviteCodes.
+     * Create many UserOperationLocks and returns the data saved in the database.
+     * @param {UserOperationLockCreateManyAndReturnArgs} args - Arguments to create many UserOperationLocks.
      * @example
-     * // Create many InviteCodes
-     * const inviteCode = await prisma.inviteCode.createManyAndReturn({
+     * // Create many UserOperationLocks
+     * const userOperationLock = await prisma.userOperationLock.createManyAndReturn({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      * 
-     * // Create many InviteCodes and only return the `id`
-     * const inviteCodeWithIdOnly = await prisma.inviteCode.createManyAndReturn({
-     *   select: { id: true },
+     * // Create many UserOperationLocks and only return the `userId`
+     * const userOperationLockWithUserIdOnly = await prisma.userOperationLock.createManyAndReturn({
+     *   select: { userId: true },
      *   data: [
      *     // ... provide data here
      *   ]
@@ -4808,28 +4846,28 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends InviteCodeCreateManyAndReturnArgs>(args?: SelectSubset<T, InviteCodeCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InviteCodePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+    createManyAndReturn<T extends UserOperationLockCreateManyAndReturnArgs>(args?: SelectSubset<T, UserOperationLockCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserOperationLockPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
     /**
-     * Delete a InviteCode.
-     * @param {InviteCodeDeleteArgs} args - Arguments to delete one InviteCode.
+     * Delete a UserOperationLock.
+     * @param {UserOperationLockDeleteArgs} args - Arguments to delete one UserOperationLock.
      * @example
-     * // Delete one InviteCode
-     * const InviteCode = await prisma.inviteCode.delete({
+     * // Delete one UserOperationLock
+     * const UserOperationLock = await prisma.userOperationLock.delete({
      *   where: {
-     *     // ... filter to delete one InviteCode
+     *     // ... filter to delete one UserOperationLock
      *   }
      * })
      * 
      */
-    delete<T extends InviteCodeDeleteArgs>(args: SelectSubset<T, InviteCodeDeleteArgs<ExtArgs>>): Prisma__InviteCodeClient<$Result.GetResult<Prisma.$InviteCodePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    delete<T extends UserOperationLockDeleteArgs>(args: SelectSubset<T, UserOperationLockDeleteArgs<ExtArgs>>): Prisma__UserOperationLockClient<$Result.GetResult<Prisma.$UserOperationLockPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Update one InviteCode.
-     * @param {InviteCodeUpdateArgs} args - Arguments to update one InviteCode.
+     * Update one UserOperationLock.
+     * @param {UserOperationLockUpdateArgs} args - Arguments to update one UserOperationLock.
      * @example
-     * // Update one InviteCode
-     * const inviteCode = await prisma.inviteCode.update({
+     * // Update one UserOperationLock
+     * const userOperationLock = await prisma.userOperationLock.update({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -4839,30 +4877,30 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends InviteCodeUpdateArgs>(args: SelectSubset<T, InviteCodeUpdateArgs<ExtArgs>>): Prisma__InviteCodeClient<$Result.GetResult<Prisma.$InviteCodePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    update<T extends UserOperationLockUpdateArgs>(args: SelectSubset<T, UserOperationLockUpdateArgs<ExtArgs>>): Prisma__UserOperationLockClient<$Result.GetResult<Prisma.$UserOperationLockPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Delete zero or more InviteCodes.
-     * @param {InviteCodeDeleteManyArgs} args - Arguments to filter InviteCodes to delete.
+     * Delete zero or more UserOperationLocks.
+     * @param {UserOperationLockDeleteManyArgs} args - Arguments to filter UserOperationLocks to delete.
      * @example
-     * // Delete a few InviteCodes
-     * const { count } = await prisma.inviteCode.deleteMany({
+     * // Delete a few UserOperationLocks
+     * const { count } = await prisma.userOperationLock.deleteMany({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      * 
      */
-    deleteMany<T extends InviteCodeDeleteManyArgs>(args?: SelectSubset<T, InviteCodeDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    deleteMany<T extends UserOperationLockDeleteManyArgs>(args?: SelectSubset<T, UserOperationLockDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more InviteCodes.
+     * Update zero or more UserOperationLocks.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {InviteCodeUpdateManyArgs} args - Arguments to update one or more rows.
+     * @param {UserOperationLockUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
-     * // Update many InviteCodes
-     * const inviteCode = await prisma.inviteCode.updateMany({
+     * // Update many UserOperationLocks
+     * const userOperationLock = await prisma.userOperationLock.updateMany({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -4872,14 +4910,14 @@ export namespace Prisma {
      * })
      * 
      */
-    updateMany<T extends InviteCodeUpdateManyArgs>(args: SelectSubset<T, InviteCodeUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    updateMany<T extends UserOperationLockUpdateManyArgs>(args: SelectSubset<T, UserOperationLockUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more InviteCodes and returns the data updated in the database.
-     * @param {InviteCodeUpdateManyAndReturnArgs} args - Arguments to update many InviteCodes.
+     * Update zero or more UserOperationLocks and returns the data updated in the database.
+     * @param {UserOperationLockUpdateManyAndReturnArgs} args - Arguments to update many UserOperationLocks.
      * @example
-     * // Update many InviteCodes
-     * const inviteCode = await prisma.inviteCode.updateManyAndReturn({
+     * // Update many UserOperationLocks
+     * const userOperationLock = await prisma.userOperationLock.updateManyAndReturn({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -4888,9 +4926,9 @@ export namespace Prisma {
      *   ]
      * })
      * 
-     * // Update zero or more InviteCodes and only return the `id`
-     * const inviteCodeWithIdOnly = await prisma.inviteCode.updateManyAndReturn({
-     *   select: { id: true },
+     * // Update zero or more UserOperationLocks and only return the `userId`
+     * const userOperationLockWithUserIdOnly = await prisma.userOperationLock.updateManyAndReturn({
+     *   select: { userId: true },
      *   where: {
      *     // ... provide filter here
      *   },
@@ -4902,56 +4940,56 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    updateManyAndReturn<T extends InviteCodeUpdateManyAndReturnArgs>(args: SelectSubset<T, InviteCodeUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InviteCodePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+    updateManyAndReturn<T extends UserOperationLockUpdateManyAndReturnArgs>(args: SelectSubset<T, UserOperationLockUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserOperationLockPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
     /**
-     * Create or update one InviteCode.
-     * @param {InviteCodeUpsertArgs} args - Arguments to update or create a InviteCode.
+     * Create or update one UserOperationLock.
+     * @param {UserOperationLockUpsertArgs} args - Arguments to update or create a UserOperationLock.
      * @example
-     * // Update or create a InviteCode
-     * const inviteCode = await prisma.inviteCode.upsert({
+     * // Update or create a UserOperationLock
+     * const userOperationLock = await prisma.userOperationLock.upsert({
      *   create: {
-     *     // ... data to create a InviteCode
+     *     // ... data to create a UserOperationLock
      *   },
      *   update: {
      *     // ... in case it already exists, update
      *   },
      *   where: {
-     *     // ... the filter for the InviteCode we want to update
+     *     // ... the filter for the UserOperationLock we want to update
      *   }
      * })
      */
-    upsert<T extends InviteCodeUpsertArgs>(args: SelectSubset<T, InviteCodeUpsertArgs<ExtArgs>>): Prisma__InviteCodeClient<$Result.GetResult<Prisma.$InviteCodePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    upsert<T extends UserOperationLockUpsertArgs>(args: SelectSubset<T, UserOperationLockUpsertArgs<ExtArgs>>): Prisma__UserOperationLockClient<$Result.GetResult<Prisma.$UserOperationLockPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
     /**
-     * Count the number of InviteCodes.
+     * Count the number of UserOperationLocks.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {InviteCodeCountArgs} args - Arguments to filter InviteCodes to count.
+     * @param {UserOperationLockCountArgs} args - Arguments to filter UserOperationLocks to count.
      * @example
-     * // Count the number of InviteCodes
-     * const count = await prisma.inviteCode.count({
+     * // Count the number of UserOperationLocks
+     * const count = await prisma.userOperationLock.count({
      *   where: {
-     *     // ... the filter for the InviteCodes we want to count
+     *     // ... the filter for the UserOperationLocks we want to count
      *   }
      * })
     **/
-    count<T extends InviteCodeCountArgs>(
-      args?: Subset<T, InviteCodeCountArgs>,
+    count<T extends UserOperationLockCountArgs>(
+      args?: Subset<T, UserOperationLockCountArgs>,
     ): Prisma.PrismaPromise<
       T extends $Utils.Record<'select', any>
         ? T['select'] extends true
           ? number
-          : GetScalarType<T['select'], InviteCodeCountAggregateOutputType>
+          : GetScalarType<T['select'], UserOperationLockCountAggregateOutputType>
         : number
     >
 
     /**
-     * Allows you to perform aggregations operations on a InviteCode.
+     * Allows you to perform aggregations operations on a UserOperationLock.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {InviteCodeAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @param {UserOperationLockAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
      * // Where email contains prisma.io
@@ -4971,13 +5009,13 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends InviteCodeAggregateArgs>(args: Subset<T, InviteCodeAggregateArgs>): Prisma.PrismaPromise<GetInviteCodeAggregateType<T>>
+    aggregate<T extends UserOperationLockAggregateArgs>(args: Subset<T, UserOperationLockAggregateArgs>): Prisma.PrismaPromise<GetUserOperationLockAggregateType<T>>
 
     /**
-     * Group by InviteCode.
+     * Group by UserOperationLock.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {InviteCodeGroupByArgs} args - Group by arguments.
+     * @param {UserOperationLockGroupByArgs} args - Group by arguments.
      * @example
      * // Group by city, order by createdAt, get count
      * const result = await prisma.user.groupBy({
@@ -4992,14 +5030,14 @@ export namespace Prisma {
      * 
     **/
     groupBy<
-      T extends InviteCodeGroupByArgs,
+      T extends UserOperationLockGroupByArgs,
       HasSelectOrTake extends Or<
         Extends<'skip', Keys<T>>,
         Extends<'take', Keys<T>>
       >,
       OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: InviteCodeGroupByArgs['orderBy'] }
-        : { orderBy?: InviteCodeGroupByArgs['orderBy'] },
+        ? { orderBy: UserOperationLockGroupByArgs['orderBy'] }
+        : { orderBy?: UserOperationLockGroupByArgs['orderBy'] },
       OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
       ByFields extends MaybeTupleToUnion<T['by']>,
       ByValid extends Has<ByFields, OrderFields>,
@@ -5048,22 +5086,22 @@ export namespace Prisma {
             ? never
             : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
         }[OrderFields]
-    >(args: SubsetIntersection<T, InviteCodeGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetInviteCodeGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+    >(args: SubsetIntersection<T, UserOperationLockGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetUserOperationLockGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
   /**
-   * Fields of the InviteCode model
+   * Fields of the UserOperationLock model
    */
-  readonly fields: InviteCodeFieldRefs;
+  readonly fields: UserOperationLockFieldRefs;
   }
 
   /**
-   * The delegate class that acts as a "Promise-like" for InviteCode.
+   * The delegate class that acts as a "Promise-like" for UserOperationLock.
    * Why is this prefixed with `Prisma__`?
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__InviteCodeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__UserOperationLockClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    usedBy<T extends InviteCode$usedByArgs<ExtArgs> = {}>(args?: Subset<T, InviteCode$usedByArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5090,444 +5128,421 @@ export namespace Prisma {
 
 
   /**
-   * Fields of the InviteCode model
+   * Fields of the UserOperationLock model
    */
-  interface InviteCodeFieldRefs {
-    readonly id: FieldRef<"InviteCode", 'String'>
-    readonly code: FieldRef<"InviteCode", 'String'>
-    readonly isEnabled: FieldRef<"InviteCode", 'Boolean'>
-    readonly expiresAt: FieldRef<"InviteCode", 'DateTime'>
-    readonly createdAt: FieldRef<"InviteCode", 'DateTime'>
-    readonly usedAt: FieldRef<"InviteCode", 'DateTime'>
-    readonly usedByUserId: FieldRef<"InviteCode", 'String'>
+  interface UserOperationLockFieldRefs {
+    readonly userId: FieldRef<"UserOperationLock", 'String'>
+    readonly operation: FieldRef<"UserOperationLock", 'String'>
+    readonly lockedAt: FieldRef<"UserOperationLock", 'DateTime'>
   }
     
 
   // Custom InputTypes
   /**
-   * InviteCode findUnique
+   * UserOperationLock findUnique
    */
-  export type InviteCodeFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type UserOperationLockFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the InviteCode
+     * Select specific fields to fetch from the UserOperationLock
      */
-    select?: InviteCodeSelect<ExtArgs> | null
+    select?: UserOperationLockSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the InviteCode
+     * Omit specific fields from the UserOperationLock
      */
-    omit?: InviteCodeOmit<ExtArgs> | null
+    omit?: UserOperationLockOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: InviteCodeInclude<ExtArgs> | null
+    include?: UserOperationLockInclude<ExtArgs> | null
     /**
-     * Filter, which InviteCode to fetch.
+     * Filter, which UserOperationLock to fetch.
      */
-    where: InviteCodeWhereUniqueInput
+    where: UserOperationLockWhereUniqueInput
   }
 
   /**
-   * InviteCode findUniqueOrThrow
+   * UserOperationLock findUniqueOrThrow
    */
-  export type InviteCodeFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type UserOperationLockFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the InviteCode
+     * Select specific fields to fetch from the UserOperationLock
      */
-    select?: InviteCodeSelect<ExtArgs> | null
+    select?: UserOperationLockSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the InviteCode
+     * Omit specific fields from the UserOperationLock
      */
-    omit?: InviteCodeOmit<ExtArgs> | null
+    omit?: UserOperationLockOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: InviteCodeInclude<ExtArgs> | null
+    include?: UserOperationLockInclude<ExtArgs> | null
     /**
-     * Filter, which InviteCode to fetch.
+     * Filter, which UserOperationLock to fetch.
      */
-    where: InviteCodeWhereUniqueInput
+    where: UserOperationLockWhereUniqueInput
   }
 
   /**
-   * InviteCode findFirst
+   * UserOperationLock findFirst
    */
-  export type InviteCodeFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type UserOperationLockFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the InviteCode
+     * Select specific fields to fetch from the UserOperationLock
      */
-    select?: InviteCodeSelect<ExtArgs> | null
+    select?: UserOperationLockSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the InviteCode
+     * Omit specific fields from the UserOperationLock
      */
-    omit?: InviteCodeOmit<ExtArgs> | null
+    omit?: UserOperationLockOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: InviteCodeInclude<ExtArgs> | null
+    include?: UserOperationLockInclude<ExtArgs> | null
     /**
-     * Filter, which InviteCode to fetch.
+     * Filter, which UserOperationLock to fetch.
      */
-    where?: InviteCodeWhereInput
+    where?: UserOperationLockWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of InviteCodes to fetch.
+     * Determine the order of UserOperationLocks to fetch.
      */
-    orderBy?: InviteCodeOrderByWithRelationInput | InviteCodeOrderByWithRelationInput[]
+    orderBy?: UserOperationLockOrderByWithRelationInput | UserOperationLockOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for InviteCodes.
+     * Sets the position for searching for UserOperationLocks.
      */
-    cursor?: InviteCodeWhereUniqueInput
+    cursor?: UserOperationLockWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` InviteCodes from the position of the cursor.
+     * Take `±n` UserOperationLocks from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` InviteCodes.
+     * Skip the first `n` UserOperationLocks.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of InviteCodes.
+     * Filter by unique combinations of UserOperationLocks.
      */
-    distinct?: InviteCodeScalarFieldEnum | InviteCodeScalarFieldEnum[]
+    distinct?: UserOperationLockScalarFieldEnum | UserOperationLockScalarFieldEnum[]
   }
 
   /**
-   * InviteCode findFirstOrThrow
+   * UserOperationLock findFirstOrThrow
    */
-  export type InviteCodeFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type UserOperationLockFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the InviteCode
+     * Select specific fields to fetch from the UserOperationLock
      */
-    select?: InviteCodeSelect<ExtArgs> | null
+    select?: UserOperationLockSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the InviteCode
+     * Omit specific fields from the UserOperationLock
      */
-    omit?: InviteCodeOmit<ExtArgs> | null
+    omit?: UserOperationLockOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: InviteCodeInclude<ExtArgs> | null
+    include?: UserOperationLockInclude<ExtArgs> | null
     /**
-     * Filter, which InviteCode to fetch.
+     * Filter, which UserOperationLock to fetch.
      */
-    where?: InviteCodeWhereInput
+    where?: UserOperationLockWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of InviteCodes to fetch.
+     * Determine the order of UserOperationLocks to fetch.
      */
-    orderBy?: InviteCodeOrderByWithRelationInput | InviteCodeOrderByWithRelationInput[]
+    orderBy?: UserOperationLockOrderByWithRelationInput | UserOperationLockOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for InviteCodes.
+     * Sets the position for searching for UserOperationLocks.
      */
-    cursor?: InviteCodeWhereUniqueInput
+    cursor?: UserOperationLockWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` InviteCodes from the position of the cursor.
+     * Take `±n` UserOperationLocks from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` InviteCodes.
+     * Skip the first `n` UserOperationLocks.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of InviteCodes.
+     * Filter by unique combinations of UserOperationLocks.
      */
-    distinct?: InviteCodeScalarFieldEnum | InviteCodeScalarFieldEnum[]
+    distinct?: UserOperationLockScalarFieldEnum | UserOperationLockScalarFieldEnum[]
   }
 
   /**
-   * InviteCode findMany
+   * UserOperationLock findMany
    */
-  export type InviteCodeFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type UserOperationLockFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the InviteCode
+     * Select specific fields to fetch from the UserOperationLock
      */
-    select?: InviteCodeSelect<ExtArgs> | null
+    select?: UserOperationLockSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the InviteCode
+     * Omit specific fields from the UserOperationLock
      */
-    omit?: InviteCodeOmit<ExtArgs> | null
+    omit?: UserOperationLockOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: InviteCodeInclude<ExtArgs> | null
+    include?: UserOperationLockInclude<ExtArgs> | null
     /**
-     * Filter, which InviteCodes to fetch.
+     * Filter, which UserOperationLocks to fetch.
      */
-    where?: InviteCodeWhereInput
+    where?: UserOperationLockWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of InviteCodes to fetch.
+     * Determine the order of UserOperationLocks to fetch.
      */
-    orderBy?: InviteCodeOrderByWithRelationInput | InviteCodeOrderByWithRelationInput[]
+    orderBy?: UserOperationLockOrderByWithRelationInput | UserOperationLockOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for listing InviteCodes.
+     * Sets the position for listing UserOperationLocks.
      */
-    cursor?: InviteCodeWhereUniqueInput
+    cursor?: UserOperationLockWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` InviteCodes from the position of the cursor.
+     * Take `±n` UserOperationLocks from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` InviteCodes.
+     * Skip the first `n` UserOperationLocks.
      */
     skip?: number
-    distinct?: InviteCodeScalarFieldEnum | InviteCodeScalarFieldEnum[]
+    distinct?: UserOperationLockScalarFieldEnum | UserOperationLockScalarFieldEnum[]
   }
 
   /**
-   * InviteCode create
+   * UserOperationLock create
    */
-  export type InviteCodeCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type UserOperationLockCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the InviteCode
+     * Select specific fields to fetch from the UserOperationLock
      */
-    select?: InviteCodeSelect<ExtArgs> | null
+    select?: UserOperationLockSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the InviteCode
+     * Omit specific fields from the UserOperationLock
      */
-    omit?: InviteCodeOmit<ExtArgs> | null
+    omit?: UserOperationLockOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: InviteCodeInclude<ExtArgs> | null
+    include?: UserOperationLockInclude<ExtArgs> | null
     /**
-     * The data needed to create a InviteCode.
+     * The data needed to create a UserOperationLock.
      */
-    data: XOR<InviteCodeCreateInput, InviteCodeUncheckedCreateInput>
+    data: XOR<UserOperationLockCreateInput, UserOperationLockUncheckedCreateInput>
   }
 
   /**
-   * InviteCode createMany
+   * UserOperationLock createMany
    */
-  export type InviteCodeCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type UserOperationLockCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to create many InviteCodes.
+     * The data used to create many UserOperationLocks.
      */
-    data: InviteCodeCreateManyInput | InviteCodeCreateManyInput[]
+    data: UserOperationLockCreateManyInput | UserOperationLockCreateManyInput[]
   }
 
   /**
-   * InviteCode createManyAndReturn
+   * UserOperationLock createManyAndReturn
    */
-  export type InviteCodeCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type UserOperationLockCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the InviteCode
+     * Select specific fields to fetch from the UserOperationLock
      */
-    select?: InviteCodeSelectCreateManyAndReturn<ExtArgs> | null
+    select?: UserOperationLockSelectCreateManyAndReturn<ExtArgs> | null
     /**
-     * Omit specific fields from the InviteCode
+     * Omit specific fields from the UserOperationLock
      */
-    omit?: InviteCodeOmit<ExtArgs> | null
+    omit?: UserOperationLockOmit<ExtArgs> | null
     /**
-     * The data used to create many InviteCodes.
+     * The data used to create many UserOperationLocks.
      */
-    data: InviteCodeCreateManyInput | InviteCodeCreateManyInput[]
+    data: UserOperationLockCreateManyInput | UserOperationLockCreateManyInput[]
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: InviteCodeIncludeCreateManyAndReturn<ExtArgs> | null
+    include?: UserOperationLockIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
-   * InviteCode update
+   * UserOperationLock update
    */
-  export type InviteCodeUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type UserOperationLockUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the InviteCode
+     * Select specific fields to fetch from the UserOperationLock
      */
-    select?: InviteCodeSelect<ExtArgs> | null
+    select?: UserOperationLockSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the InviteCode
+     * Omit specific fields from the UserOperationLock
      */
-    omit?: InviteCodeOmit<ExtArgs> | null
+    omit?: UserOperationLockOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: InviteCodeInclude<ExtArgs> | null
+    include?: UserOperationLockInclude<ExtArgs> | null
     /**
-     * The data needed to update a InviteCode.
+     * The data needed to update a UserOperationLock.
      */
-    data: XOR<InviteCodeUpdateInput, InviteCodeUncheckedUpdateInput>
+    data: XOR<UserOperationLockUpdateInput, UserOperationLockUncheckedUpdateInput>
     /**
-     * Choose, which InviteCode to update.
+     * Choose, which UserOperationLock to update.
      */
-    where: InviteCodeWhereUniqueInput
+    where: UserOperationLockWhereUniqueInput
   }
 
   /**
-   * InviteCode updateMany
+   * UserOperationLock updateMany
    */
-  export type InviteCodeUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type UserOperationLockUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to update InviteCodes.
+     * The data used to update UserOperationLocks.
      */
-    data: XOR<InviteCodeUpdateManyMutationInput, InviteCodeUncheckedUpdateManyInput>
+    data: XOR<UserOperationLockUpdateManyMutationInput, UserOperationLockUncheckedUpdateManyInput>
     /**
-     * Filter which InviteCodes to update
+     * Filter which UserOperationLocks to update
      */
-    where?: InviteCodeWhereInput
+    where?: UserOperationLockWhereInput
     /**
-     * Limit how many InviteCodes to update.
+     * Limit how many UserOperationLocks to update.
      */
     limit?: number
   }
 
   /**
-   * InviteCode updateManyAndReturn
+   * UserOperationLock updateManyAndReturn
    */
-  export type InviteCodeUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type UserOperationLockUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the InviteCode
+     * Select specific fields to fetch from the UserOperationLock
      */
-    select?: InviteCodeSelectUpdateManyAndReturn<ExtArgs> | null
+    select?: UserOperationLockSelectUpdateManyAndReturn<ExtArgs> | null
     /**
-     * Omit specific fields from the InviteCode
+     * Omit specific fields from the UserOperationLock
      */
-    omit?: InviteCodeOmit<ExtArgs> | null
+    omit?: UserOperationLockOmit<ExtArgs> | null
     /**
-     * The data used to update InviteCodes.
+     * The data used to update UserOperationLocks.
      */
-    data: XOR<InviteCodeUpdateManyMutationInput, InviteCodeUncheckedUpdateManyInput>
+    data: XOR<UserOperationLockUpdateManyMutationInput, UserOperationLockUncheckedUpdateManyInput>
     /**
-     * Filter which InviteCodes to update
+     * Filter which UserOperationLocks to update
      */
-    where?: InviteCodeWhereInput
+    where?: UserOperationLockWhereInput
     /**
-     * Limit how many InviteCodes to update.
+     * Limit how many UserOperationLocks to update.
      */
     limit?: number
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: InviteCodeIncludeUpdateManyAndReturn<ExtArgs> | null
+    include?: UserOperationLockIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
-   * InviteCode upsert
+   * UserOperationLock upsert
    */
-  export type InviteCodeUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type UserOperationLockUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the InviteCode
+     * Select specific fields to fetch from the UserOperationLock
      */
-    select?: InviteCodeSelect<ExtArgs> | null
+    select?: UserOperationLockSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the InviteCode
+     * Omit specific fields from the UserOperationLock
      */
-    omit?: InviteCodeOmit<ExtArgs> | null
+    omit?: UserOperationLockOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: InviteCodeInclude<ExtArgs> | null
+    include?: UserOperationLockInclude<ExtArgs> | null
     /**
-     * The filter to search for the InviteCode to update in case it exists.
+     * The filter to search for the UserOperationLock to update in case it exists.
      */
-    where: InviteCodeWhereUniqueInput
+    where: UserOperationLockWhereUniqueInput
     /**
-     * In case the InviteCode found by the `where` argument doesn't exist, create a new InviteCode with this data.
+     * In case the UserOperationLock found by the `where` argument doesn't exist, create a new UserOperationLock with this data.
      */
-    create: XOR<InviteCodeCreateInput, InviteCodeUncheckedCreateInput>
+    create: XOR<UserOperationLockCreateInput, UserOperationLockUncheckedCreateInput>
     /**
-     * In case the InviteCode was found with the provided `where` argument, update it with this data.
+     * In case the UserOperationLock was found with the provided `where` argument, update it with this data.
      */
-    update: XOR<InviteCodeUpdateInput, InviteCodeUncheckedUpdateInput>
+    update: XOR<UserOperationLockUpdateInput, UserOperationLockUncheckedUpdateInput>
   }
 
   /**
-   * InviteCode delete
+   * UserOperationLock delete
    */
-  export type InviteCodeDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type UserOperationLockDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the InviteCode
+     * Select specific fields to fetch from the UserOperationLock
      */
-    select?: InviteCodeSelect<ExtArgs> | null
+    select?: UserOperationLockSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the InviteCode
+     * Omit specific fields from the UserOperationLock
      */
-    omit?: InviteCodeOmit<ExtArgs> | null
+    omit?: UserOperationLockOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: InviteCodeInclude<ExtArgs> | null
+    include?: UserOperationLockInclude<ExtArgs> | null
     /**
-     * Filter which InviteCode to delete.
+     * Filter which UserOperationLock to delete.
      */
-    where: InviteCodeWhereUniqueInput
+    where: UserOperationLockWhereUniqueInput
   }
 
   /**
-   * InviteCode deleteMany
+   * UserOperationLock deleteMany
    */
-  export type InviteCodeDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type UserOperationLockDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which InviteCodes to delete
+     * Filter which UserOperationLocks to delete
      */
-    where?: InviteCodeWhereInput
+    where?: UserOperationLockWhereInput
     /**
-     * Limit how many InviteCodes to delete.
+     * Limit how many UserOperationLocks to delete.
      */
     limit?: number
   }
 
   /**
-   * InviteCode.usedBy
+   * UserOperationLock without action
    */
-  export type InviteCode$usedByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type UserOperationLockDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the User
+     * Select specific fields to fetch from the UserOperationLock
      */
-    select?: UserSelect<ExtArgs> | null
+    select?: UserOperationLockSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the User
+     * Omit specific fields from the UserOperationLock
      */
-    omit?: UserOmit<ExtArgs> | null
+    omit?: UserOperationLockOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: UserInclude<ExtArgs> | null
-    where?: UserWhereInput
-  }
-
-  /**
-   * InviteCode without action
-   */
-  export type InviteCodeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the InviteCode
-     */
-    select?: InviteCodeSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the InviteCode
-     */
-    omit?: InviteCodeOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: InviteCodeInclude<ExtArgs> | null
+    include?: UserOperationLockInclude<ExtArgs> | null
   }
 
 
@@ -18064,6 +18079,7 @@ export namespace Prisma {
     plategaConfirmedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     subscription?: boolean | PaymentRequest$subscriptionArgs<ExtArgs>
+    subscriptionRenewal?: boolean | PaymentRequest$subscriptionRenewalArgs<ExtArgs>
     plategaWebhookLogs?: boolean | PaymentRequest$plategaWebhookLogsArgs<ExtArgs>
     _count?: boolean | PaymentRequestCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["paymentRequest"]>
@@ -18164,6 +18180,7 @@ export namespace Prisma {
   export type PaymentRequestInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     subscription?: boolean | PaymentRequest$subscriptionArgs<ExtArgs>
+    subscriptionRenewal?: boolean | PaymentRequest$subscriptionRenewalArgs<ExtArgs>
     plategaWebhookLogs?: boolean | PaymentRequest$plategaWebhookLogsArgs<ExtArgs>
     _count?: boolean | PaymentRequestCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -18179,6 +18196,7 @@ export namespace Prisma {
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
       subscription: Prisma.$SubscriptionPayload<ExtArgs> | null
+      subscriptionRenewal: Prisma.$SubscriptionRenewalPayload<ExtArgs> | null
       plategaWebhookLogs: Prisma.$PlategaWebhookLogPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -18605,6 +18623,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     subscription<T extends PaymentRequest$subscriptionArgs<ExtArgs> = {}>(args?: Subset<T, PaymentRequest$subscriptionArgs<ExtArgs>>): Prisma__SubscriptionClient<$Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    subscriptionRenewal<T extends PaymentRequest$subscriptionRenewalArgs<ExtArgs> = {}>(args?: Subset<T, PaymentRequest$subscriptionRenewalArgs<ExtArgs>>): Prisma__SubscriptionRenewalClient<$Result.GetResult<Prisma.$SubscriptionRenewalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     plategaWebhookLogs<T extends PaymentRequest$plategaWebhookLogsArgs<ExtArgs> = {}>(args?: Subset<T, PaymentRequest$plategaWebhookLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlategaWebhookLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -19072,6 +19091,25 @@ export namespace Prisma {
      */
     include?: SubscriptionInclude<ExtArgs> | null
     where?: SubscriptionWhereInput
+  }
+
+  /**
+   * PaymentRequest.subscriptionRenewal
+   */
+  export type PaymentRequest$subscriptionRenewalArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SubscriptionRenewal
+     */
+    select?: SubscriptionRenewalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SubscriptionRenewal
+     */
+    omit?: SubscriptionRenewalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SubscriptionRenewalInclude<ExtArgs> | null
+    where?: SubscriptionRenewalWhereInput
   }
 
   /**
@@ -20732,6 +20770,7 @@ export namespace Prisma {
     user?: boolean | UserDefaultArgs<ExtArgs>
     paymentRequest?: boolean | Subscription$paymentRequestArgs<ExtArgs>
     deviceSlots?: boolean | Subscription$deviceSlotsArgs<ExtArgs>
+    renewals?: boolean | Subscription$renewalsArgs<ExtArgs>
     _count?: boolean | SubscriptionCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["subscription"]>
 
@@ -20846,6 +20885,7 @@ export namespace Prisma {
     user?: boolean | UserDefaultArgs<ExtArgs>
     paymentRequest?: boolean | Subscription$paymentRequestArgs<ExtArgs>
     deviceSlots?: boolean | Subscription$deviceSlotsArgs<ExtArgs>
+    renewals?: boolean | Subscription$renewalsArgs<ExtArgs>
     _count?: boolean | SubscriptionCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type SubscriptionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -20863,6 +20903,7 @@ export namespace Prisma {
       user: Prisma.$UserPayload<ExtArgs>
       paymentRequest: Prisma.$PaymentRequestPayload<ExtArgs> | null
       deviceSlots: Prisma.$DeviceSlotPayload<ExtArgs>[]
+      renewals: Prisma.$SubscriptionRenewalPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -21293,6 +21334,7 @@ export namespace Prisma {
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     paymentRequest<T extends Subscription$paymentRequestArgs<ExtArgs> = {}>(args?: Subset<T, Subscription$paymentRequestArgs<ExtArgs>>): Prisma__PaymentRequestClient<$Result.GetResult<Prisma.$PaymentRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     deviceSlots<T extends Subscription$deviceSlotsArgs<ExtArgs> = {}>(args?: Subset<T, Subscription$deviceSlotsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeviceSlotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    renewals<T extends Subscription$renewalsArgs<ExtArgs> = {}>(args?: Subset<T, Subscription$renewalsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SubscriptionRenewalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -21790,6 +21832,30 @@ export namespace Prisma {
   }
 
   /**
+   * Subscription.renewals
+   */
+  export type Subscription$renewalsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SubscriptionRenewal
+     */
+    select?: SubscriptionRenewalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SubscriptionRenewal
+     */
+    omit?: SubscriptionRenewalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SubscriptionRenewalInclude<ExtArgs> | null
+    where?: SubscriptionRenewalWhereInput
+    orderBy?: SubscriptionRenewalOrderByWithRelationInput | SubscriptionRenewalOrderByWithRelationInput[]
+    cursor?: SubscriptionRenewalWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SubscriptionRenewalScalarFieldEnum | SubscriptionRenewalScalarFieldEnum[]
+  }
+
+  /**
    * Subscription without action
    */
   export type SubscriptionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -21805,6 +21871,1279 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: SubscriptionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SubscriptionRenewal
+   */
+
+  export type AggregateSubscriptionRenewal = {
+    _count: SubscriptionRenewalCountAggregateOutputType | null
+    _avg: SubscriptionRenewalAvgAggregateOutputType | null
+    _sum: SubscriptionRenewalSumAggregateOutputType | null
+    _min: SubscriptionRenewalMinAggregateOutputType | null
+    _max: SubscriptionRenewalMaxAggregateOutputType | null
+  }
+
+  export type SubscriptionRenewalAvgAggregateOutputType = {
+    previousDevices: number | null
+    nextDevices: number | null
+    months: number | null
+    amountRub: number | null
+    baseDeviceMonthlyPriceSnapshot: number | null
+    extraDeviceMonthlyPriceSnapshot: number | null
+    monthlyPriceSnapshot: number | null
+    durationDiscountPercentSnapshot: number | null
+    referralDiscountPercentSnapshot: number | null
+  }
+
+  export type SubscriptionRenewalSumAggregateOutputType = {
+    previousDevices: number | null
+    nextDevices: number | null
+    months: number | null
+    amountRub: number | null
+    baseDeviceMonthlyPriceSnapshot: number | null
+    extraDeviceMonthlyPriceSnapshot: number | null
+    monthlyPriceSnapshot: number | null
+    durationDiscountPercentSnapshot: number | null
+    referralDiscountPercentSnapshot: number | null
+  }
+
+  export type SubscriptionRenewalMinAggregateOutputType = {
+    id: string | null
+    subscriptionId: string | null
+    paymentRequestId: string | null
+    previousExpiresAt: Date | null
+    nextExpiresAt: Date | null
+    previousDevices: number | null
+    nextDevices: number | null
+    months: number | null
+    amountRub: number | null
+    currency: string | null
+    baseDeviceMonthlyPriceSnapshot: number | null
+    extraDeviceMonthlyPriceSnapshot: number | null
+    monthlyPriceSnapshot: number | null
+    durationDiscountPercentSnapshot: number | null
+    referralDiscountPercentSnapshot: number | null
+    createdAt: Date | null
+  }
+
+  export type SubscriptionRenewalMaxAggregateOutputType = {
+    id: string | null
+    subscriptionId: string | null
+    paymentRequestId: string | null
+    previousExpiresAt: Date | null
+    nextExpiresAt: Date | null
+    previousDevices: number | null
+    nextDevices: number | null
+    months: number | null
+    amountRub: number | null
+    currency: string | null
+    baseDeviceMonthlyPriceSnapshot: number | null
+    extraDeviceMonthlyPriceSnapshot: number | null
+    monthlyPriceSnapshot: number | null
+    durationDiscountPercentSnapshot: number | null
+    referralDiscountPercentSnapshot: number | null
+    createdAt: Date | null
+  }
+
+  export type SubscriptionRenewalCountAggregateOutputType = {
+    id: number
+    subscriptionId: number
+    paymentRequestId: number
+    previousExpiresAt: number
+    nextExpiresAt: number
+    previousDevices: number
+    nextDevices: number
+    months: number
+    amountRub: number
+    currency: number
+    baseDeviceMonthlyPriceSnapshot: number
+    extraDeviceMonthlyPriceSnapshot: number
+    monthlyPriceSnapshot: number
+    durationDiscountPercentSnapshot: number
+    referralDiscountPercentSnapshot: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type SubscriptionRenewalAvgAggregateInputType = {
+    previousDevices?: true
+    nextDevices?: true
+    months?: true
+    amountRub?: true
+    baseDeviceMonthlyPriceSnapshot?: true
+    extraDeviceMonthlyPriceSnapshot?: true
+    monthlyPriceSnapshot?: true
+    durationDiscountPercentSnapshot?: true
+    referralDiscountPercentSnapshot?: true
+  }
+
+  export type SubscriptionRenewalSumAggregateInputType = {
+    previousDevices?: true
+    nextDevices?: true
+    months?: true
+    amountRub?: true
+    baseDeviceMonthlyPriceSnapshot?: true
+    extraDeviceMonthlyPriceSnapshot?: true
+    monthlyPriceSnapshot?: true
+    durationDiscountPercentSnapshot?: true
+    referralDiscountPercentSnapshot?: true
+  }
+
+  export type SubscriptionRenewalMinAggregateInputType = {
+    id?: true
+    subscriptionId?: true
+    paymentRequestId?: true
+    previousExpiresAt?: true
+    nextExpiresAt?: true
+    previousDevices?: true
+    nextDevices?: true
+    months?: true
+    amountRub?: true
+    currency?: true
+    baseDeviceMonthlyPriceSnapshot?: true
+    extraDeviceMonthlyPriceSnapshot?: true
+    monthlyPriceSnapshot?: true
+    durationDiscountPercentSnapshot?: true
+    referralDiscountPercentSnapshot?: true
+    createdAt?: true
+  }
+
+  export type SubscriptionRenewalMaxAggregateInputType = {
+    id?: true
+    subscriptionId?: true
+    paymentRequestId?: true
+    previousExpiresAt?: true
+    nextExpiresAt?: true
+    previousDevices?: true
+    nextDevices?: true
+    months?: true
+    amountRub?: true
+    currency?: true
+    baseDeviceMonthlyPriceSnapshot?: true
+    extraDeviceMonthlyPriceSnapshot?: true
+    monthlyPriceSnapshot?: true
+    durationDiscountPercentSnapshot?: true
+    referralDiscountPercentSnapshot?: true
+    createdAt?: true
+  }
+
+  export type SubscriptionRenewalCountAggregateInputType = {
+    id?: true
+    subscriptionId?: true
+    paymentRequestId?: true
+    previousExpiresAt?: true
+    nextExpiresAt?: true
+    previousDevices?: true
+    nextDevices?: true
+    months?: true
+    amountRub?: true
+    currency?: true
+    baseDeviceMonthlyPriceSnapshot?: true
+    extraDeviceMonthlyPriceSnapshot?: true
+    monthlyPriceSnapshot?: true
+    durationDiscountPercentSnapshot?: true
+    referralDiscountPercentSnapshot?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type SubscriptionRenewalAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SubscriptionRenewal to aggregate.
+     */
+    where?: SubscriptionRenewalWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SubscriptionRenewals to fetch.
+     */
+    orderBy?: SubscriptionRenewalOrderByWithRelationInput | SubscriptionRenewalOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SubscriptionRenewalWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SubscriptionRenewals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SubscriptionRenewals.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SubscriptionRenewals
+    **/
+    _count?: true | SubscriptionRenewalCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SubscriptionRenewalAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SubscriptionRenewalSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SubscriptionRenewalMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SubscriptionRenewalMaxAggregateInputType
+  }
+
+  export type GetSubscriptionRenewalAggregateType<T extends SubscriptionRenewalAggregateArgs> = {
+        [P in keyof T & keyof AggregateSubscriptionRenewal]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSubscriptionRenewal[P]>
+      : GetScalarType<T[P], AggregateSubscriptionRenewal[P]>
+  }
+
+
+
+
+  export type SubscriptionRenewalGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SubscriptionRenewalWhereInput
+    orderBy?: SubscriptionRenewalOrderByWithAggregationInput | SubscriptionRenewalOrderByWithAggregationInput[]
+    by: SubscriptionRenewalScalarFieldEnum[] | SubscriptionRenewalScalarFieldEnum
+    having?: SubscriptionRenewalScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SubscriptionRenewalCountAggregateInputType | true
+    _avg?: SubscriptionRenewalAvgAggregateInputType
+    _sum?: SubscriptionRenewalSumAggregateInputType
+    _min?: SubscriptionRenewalMinAggregateInputType
+    _max?: SubscriptionRenewalMaxAggregateInputType
+  }
+
+  export type SubscriptionRenewalGroupByOutputType = {
+    id: string
+    subscriptionId: string
+    paymentRequestId: string
+    previousExpiresAt: Date | null
+    nextExpiresAt: Date
+    previousDevices: number
+    nextDevices: number
+    months: number
+    amountRub: number
+    currency: string
+    baseDeviceMonthlyPriceSnapshot: number
+    extraDeviceMonthlyPriceSnapshot: number
+    monthlyPriceSnapshot: number
+    durationDiscountPercentSnapshot: number
+    referralDiscountPercentSnapshot: number
+    createdAt: Date
+    _count: SubscriptionRenewalCountAggregateOutputType | null
+    _avg: SubscriptionRenewalAvgAggregateOutputType | null
+    _sum: SubscriptionRenewalSumAggregateOutputType | null
+    _min: SubscriptionRenewalMinAggregateOutputType | null
+    _max: SubscriptionRenewalMaxAggregateOutputType | null
+  }
+
+  type GetSubscriptionRenewalGroupByPayload<T extends SubscriptionRenewalGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SubscriptionRenewalGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SubscriptionRenewalGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SubscriptionRenewalGroupByOutputType[P]>
+            : GetScalarType<T[P], SubscriptionRenewalGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SubscriptionRenewalSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    subscriptionId?: boolean
+    paymentRequestId?: boolean
+    previousExpiresAt?: boolean
+    nextExpiresAt?: boolean
+    previousDevices?: boolean
+    nextDevices?: boolean
+    months?: boolean
+    amountRub?: boolean
+    currency?: boolean
+    baseDeviceMonthlyPriceSnapshot?: boolean
+    extraDeviceMonthlyPriceSnapshot?: boolean
+    monthlyPriceSnapshot?: boolean
+    durationDiscountPercentSnapshot?: boolean
+    referralDiscountPercentSnapshot?: boolean
+    createdAt?: boolean
+    subscription?: boolean | SubscriptionDefaultArgs<ExtArgs>
+    paymentRequest?: boolean | PaymentRequestDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["subscriptionRenewal"]>
+
+  export type SubscriptionRenewalSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    subscriptionId?: boolean
+    paymentRequestId?: boolean
+    previousExpiresAt?: boolean
+    nextExpiresAt?: boolean
+    previousDevices?: boolean
+    nextDevices?: boolean
+    months?: boolean
+    amountRub?: boolean
+    currency?: boolean
+    baseDeviceMonthlyPriceSnapshot?: boolean
+    extraDeviceMonthlyPriceSnapshot?: boolean
+    monthlyPriceSnapshot?: boolean
+    durationDiscountPercentSnapshot?: boolean
+    referralDiscountPercentSnapshot?: boolean
+    createdAt?: boolean
+    subscription?: boolean | SubscriptionDefaultArgs<ExtArgs>
+    paymentRequest?: boolean | PaymentRequestDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["subscriptionRenewal"]>
+
+  export type SubscriptionRenewalSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    subscriptionId?: boolean
+    paymentRequestId?: boolean
+    previousExpiresAt?: boolean
+    nextExpiresAt?: boolean
+    previousDevices?: boolean
+    nextDevices?: boolean
+    months?: boolean
+    amountRub?: boolean
+    currency?: boolean
+    baseDeviceMonthlyPriceSnapshot?: boolean
+    extraDeviceMonthlyPriceSnapshot?: boolean
+    monthlyPriceSnapshot?: boolean
+    durationDiscountPercentSnapshot?: boolean
+    referralDiscountPercentSnapshot?: boolean
+    createdAt?: boolean
+    subscription?: boolean | SubscriptionDefaultArgs<ExtArgs>
+    paymentRequest?: boolean | PaymentRequestDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["subscriptionRenewal"]>
+
+  export type SubscriptionRenewalSelectScalar = {
+    id?: boolean
+    subscriptionId?: boolean
+    paymentRequestId?: boolean
+    previousExpiresAt?: boolean
+    nextExpiresAt?: boolean
+    previousDevices?: boolean
+    nextDevices?: boolean
+    months?: boolean
+    amountRub?: boolean
+    currency?: boolean
+    baseDeviceMonthlyPriceSnapshot?: boolean
+    extraDeviceMonthlyPriceSnapshot?: boolean
+    monthlyPriceSnapshot?: boolean
+    durationDiscountPercentSnapshot?: boolean
+    referralDiscountPercentSnapshot?: boolean
+    createdAt?: boolean
+  }
+
+  export type SubscriptionRenewalOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "subscriptionId" | "paymentRequestId" | "previousExpiresAt" | "nextExpiresAt" | "previousDevices" | "nextDevices" | "months" | "amountRub" | "currency" | "baseDeviceMonthlyPriceSnapshot" | "extraDeviceMonthlyPriceSnapshot" | "monthlyPriceSnapshot" | "durationDiscountPercentSnapshot" | "referralDiscountPercentSnapshot" | "createdAt", ExtArgs["result"]["subscriptionRenewal"]>
+  export type SubscriptionRenewalInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    subscription?: boolean | SubscriptionDefaultArgs<ExtArgs>
+    paymentRequest?: boolean | PaymentRequestDefaultArgs<ExtArgs>
+  }
+  export type SubscriptionRenewalIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    subscription?: boolean | SubscriptionDefaultArgs<ExtArgs>
+    paymentRequest?: boolean | PaymentRequestDefaultArgs<ExtArgs>
+  }
+  export type SubscriptionRenewalIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    subscription?: boolean | SubscriptionDefaultArgs<ExtArgs>
+    paymentRequest?: boolean | PaymentRequestDefaultArgs<ExtArgs>
+  }
+
+  export type $SubscriptionRenewalPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SubscriptionRenewal"
+    objects: {
+      subscription: Prisma.$SubscriptionPayload<ExtArgs>
+      paymentRequest: Prisma.$PaymentRequestPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      subscriptionId: string
+      paymentRequestId: string
+      previousExpiresAt: Date | null
+      nextExpiresAt: Date
+      previousDevices: number
+      nextDevices: number
+      months: number
+      amountRub: number
+      currency: string
+      baseDeviceMonthlyPriceSnapshot: number
+      extraDeviceMonthlyPriceSnapshot: number
+      monthlyPriceSnapshot: number
+      durationDiscountPercentSnapshot: number
+      referralDiscountPercentSnapshot: number
+      createdAt: Date
+    }, ExtArgs["result"]["subscriptionRenewal"]>
+    composites: {}
+  }
+
+  type SubscriptionRenewalGetPayload<S extends boolean | null | undefined | SubscriptionRenewalDefaultArgs> = $Result.GetResult<Prisma.$SubscriptionRenewalPayload, S>
+
+  type SubscriptionRenewalCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SubscriptionRenewalFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SubscriptionRenewalCountAggregateInputType | true
+    }
+
+  export interface SubscriptionRenewalDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SubscriptionRenewal'], meta: { name: 'SubscriptionRenewal' } }
+    /**
+     * Find zero or one SubscriptionRenewal that matches the filter.
+     * @param {SubscriptionRenewalFindUniqueArgs} args - Arguments to find a SubscriptionRenewal
+     * @example
+     * // Get one SubscriptionRenewal
+     * const subscriptionRenewal = await prisma.subscriptionRenewal.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SubscriptionRenewalFindUniqueArgs>(args: SelectSubset<T, SubscriptionRenewalFindUniqueArgs<ExtArgs>>): Prisma__SubscriptionRenewalClient<$Result.GetResult<Prisma.$SubscriptionRenewalPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SubscriptionRenewal that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SubscriptionRenewalFindUniqueOrThrowArgs} args - Arguments to find a SubscriptionRenewal
+     * @example
+     * // Get one SubscriptionRenewal
+     * const subscriptionRenewal = await prisma.subscriptionRenewal.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SubscriptionRenewalFindUniqueOrThrowArgs>(args: SelectSubset<T, SubscriptionRenewalFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SubscriptionRenewalClient<$Result.GetResult<Prisma.$SubscriptionRenewalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SubscriptionRenewal that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SubscriptionRenewalFindFirstArgs} args - Arguments to find a SubscriptionRenewal
+     * @example
+     * // Get one SubscriptionRenewal
+     * const subscriptionRenewal = await prisma.subscriptionRenewal.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SubscriptionRenewalFindFirstArgs>(args?: SelectSubset<T, SubscriptionRenewalFindFirstArgs<ExtArgs>>): Prisma__SubscriptionRenewalClient<$Result.GetResult<Prisma.$SubscriptionRenewalPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SubscriptionRenewal that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SubscriptionRenewalFindFirstOrThrowArgs} args - Arguments to find a SubscriptionRenewal
+     * @example
+     * // Get one SubscriptionRenewal
+     * const subscriptionRenewal = await prisma.subscriptionRenewal.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SubscriptionRenewalFindFirstOrThrowArgs>(args?: SelectSubset<T, SubscriptionRenewalFindFirstOrThrowArgs<ExtArgs>>): Prisma__SubscriptionRenewalClient<$Result.GetResult<Prisma.$SubscriptionRenewalPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SubscriptionRenewals that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SubscriptionRenewalFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SubscriptionRenewals
+     * const subscriptionRenewals = await prisma.subscriptionRenewal.findMany()
+     * 
+     * // Get first 10 SubscriptionRenewals
+     * const subscriptionRenewals = await prisma.subscriptionRenewal.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const subscriptionRenewalWithIdOnly = await prisma.subscriptionRenewal.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SubscriptionRenewalFindManyArgs>(args?: SelectSubset<T, SubscriptionRenewalFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SubscriptionRenewalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SubscriptionRenewal.
+     * @param {SubscriptionRenewalCreateArgs} args - Arguments to create a SubscriptionRenewal.
+     * @example
+     * // Create one SubscriptionRenewal
+     * const SubscriptionRenewal = await prisma.subscriptionRenewal.create({
+     *   data: {
+     *     // ... data to create a SubscriptionRenewal
+     *   }
+     * })
+     * 
+     */
+    create<T extends SubscriptionRenewalCreateArgs>(args: SelectSubset<T, SubscriptionRenewalCreateArgs<ExtArgs>>): Prisma__SubscriptionRenewalClient<$Result.GetResult<Prisma.$SubscriptionRenewalPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SubscriptionRenewals.
+     * @param {SubscriptionRenewalCreateManyArgs} args - Arguments to create many SubscriptionRenewals.
+     * @example
+     * // Create many SubscriptionRenewals
+     * const subscriptionRenewal = await prisma.subscriptionRenewal.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SubscriptionRenewalCreateManyArgs>(args?: SelectSubset<T, SubscriptionRenewalCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SubscriptionRenewals and returns the data saved in the database.
+     * @param {SubscriptionRenewalCreateManyAndReturnArgs} args - Arguments to create many SubscriptionRenewals.
+     * @example
+     * // Create many SubscriptionRenewals
+     * const subscriptionRenewal = await prisma.subscriptionRenewal.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SubscriptionRenewals and only return the `id`
+     * const subscriptionRenewalWithIdOnly = await prisma.subscriptionRenewal.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SubscriptionRenewalCreateManyAndReturnArgs>(args?: SelectSubset<T, SubscriptionRenewalCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SubscriptionRenewalPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SubscriptionRenewal.
+     * @param {SubscriptionRenewalDeleteArgs} args - Arguments to delete one SubscriptionRenewal.
+     * @example
+     * // Delete one SubscriptionRenewal
+     * const SubscriptionRenewal = await prisma.subscriptionRenewal.delete({
+     *   where: {
+     *     // ... filter to delete one SubscriptionRenewal
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SubscriptionRenewalDeleteArgs>(args: SelectSubset<T, SubscriptionRenewalDeleteArgs<ExtArgs>>): Prisma__SubscriptionRenewalClient<$Result.GetResult<Prisma.$SubscriptionRenewalPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SubscriptionRenewal.
+     * @param {SubscriptionRenewalUpdateArgs} args - Arguments to update one SubscriptionRenewal.
+     * @example
+     * // Update one SubscriptionRenewal
+     * const subscriptionRenewal = await prisma.subscriptionRenewal.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SubscriptionRenewalUpdateArgs>(args: SelectSubset<T, SubscriptionRenewalUpdateArgs<ExtArgs>>): Prisma__SubscriptionRenewalClient<$Result.GetResult<Prisma.$SubscriptionRenewalPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SubscriptionRenewals.
+     * @param {SubscriptionRenewalDeleteManyArgs} args - Arguments to filter SubscriptionRenewals to delete.
+     * @example
+     * // Delete a few SubscriptionRenewals
+     * const { count } = await prisma.subscriptionRenewal.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SubscriptionRenewalDeleteManyArgs>(args?: SelectSubset<T, SubscriptionRenewalDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SubscriptionRenewals.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SubscriptionRenewalUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SubscriptionRenewals
+     * const subscriptionRenewal = await prisma.subscriptionRenewal.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SubscriptionRenewalUpdateManyArgs>(args: SelectSubset<T, SubscriptionRenewalUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SubscriptionRenewals and returns the data updated in the database.
+     * @param {SubscriptionRenewalUpdateManyAndReturnArgs} args - Arguments to update many SubscriptionRenewals.
+     * @example
+     * // Update many SubscriptionRenewals
+     * const subscriptionRenewal = await prisma.subscriptionRenewal.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SubscriptionRenewals and only return the `id`
+     * const subscriptionRenewalWithIdOnly = await prisma.subscriptionRenewal.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SubscriptionRenewalUpdateManyAndReturnArgs>(args: SelectSubset<T, SubscriptionRenewalUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SubscriptionRenewalPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SubscriptionRenewal.
+     * @param {SubscriptionRenewalUpsertArgs} args - Arguments to update or create a SubscriptionRenewal.
+     * @example
+     * // Update or create a SubscriptionRenewal
+     * const subscriptionRenewal = await prisma.subscriptionRenewal.upsert({
+     *   create: {
+     *     // ... data to create a SubscriptionRenewal
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SubscriptionRenewal we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SubscriptionRenewalUpsertArgs>(args: SelectSubset<T, SubscriptionRenewalUpsertArgs<ExtArgs>>): Prisma__SubscriptionRenewalClient<$Result.GetResult<Prisma.$SubscriptionRenewalPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SubscriptionRenewals.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SubscriptionRenewalCountArgs} args - Arguments to filter SubscriptionRenewals to count.
+     * @example
+     * // Count the number of SubscriptionRenewals
+     * const count = await prisma.subscriptionRenewal.count({
+     *   where: {
+     *     // ... the filter for the SubscriptionRenewals we want to count
+     *   }
+     * })
+    **/
+    count<T extends SubscriptionRenewalCountArgs>(
+      args?: Subset<T, SubscriptionRenewalCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SubscriptionRenewalCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SubscriptionRenewal.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SubscriptionRenewalAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SubscriptionRenewalAggregateArgs>(args: Subset<T, SubscriptionRenewalAggregateArgs>): Prisma.PrismaPromise<GetSubscriptionRenewalAggregateType<T>>
+
+    /**
+     * Group by SubscriptionRenewal.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SubscriptionRenewalGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SubscriptionRenewalGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SubscriptionRenewalGroupByArgs['orderBy'] }
+        : { orderBy?: SubscriptionRenewalGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SubscriptionRenewalGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSubscriptionRenewalGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SubscriptionRenewal model
+   */
+  readonly fields: SubscriptionRenewalFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SubscriptionRenewal.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SubscriptionRenewalClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    subscription<T extends SubscriptionDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SubscriptionDefaultArgs<ExtArgs>>): Prisma__SubscriptionClient<$Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    paymentRequest<T extends PaymentRequestDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PaymentRequestDefaultArgs<ExtArgs>>): Prisma__PaymentRequestClient<$Result.GetResult<Prisma.$PaymentRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SubscriptionRenewal model
+   */
+  interface SubscriptionRenewalFieldRefs {
+    readonly id: FieldRef<"SubscriptionRenewal", 'String'>
+    readonly subscriptionId: FieldRef<"SubscriptionRenewal", 'String'>
+    readonly paymentRequestId: FieldRef<"SubscriptionRenewal", 'String'>
+    readonly previousExpiresAt: FieldRef<"SubscriptionRenewal", 'DateTime'>
+    readonly nextExpiresAt: FieldRef<"SubscriptionRenewal", 'DateTime'>
+    readonly previousDevices: FieldRef<"SubscriptionRenewal", 'Int'>
+    readonly nextDevices: FieldRef<"SubscriptionRenewal", 'Int'>
+    readonly months: FieldRef<"SubscriptionRenewal", 'Int'>
+    readonly amountRub: FieldRef<"SubscriptionRenewal", 'Int'>
+    readonly currency: FieldRef<"SubscriptionRenewal", 'String'>
+    readonly baseDeviceMonthlyPriceSnapshot: FieldRef<"SubscriptionRenewal", 'Int'>
+    readonly extraDeviceMonthlyPriceSnapshot: FieldRef<"SubscriptionRenewal", 'Int'>
+    readonly monthlyPriceSnapshot: FieldRef<"SubscriptionRenewal", 'Int'>
+    readonly durationDiscountPercentSnapshot: FieldRef<"SubscriptionRenewal", 'Int'>
+    readonly referralDiscountPercentSnapshot: FieldRef<"SubscriptionRenewal", 'Int'>
+    readonly createdAt: FieldRef<"SubscriptionRenewal", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SubscriptionRenewal findUnique
+   */
+  export type SubscriptionRenewalFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SubscriptionRenewal
+     */
+    select?: SubscriptionRenewalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SubscriptionRenewal
+     */
+    omit?: SubscriptionRenewalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SubscriptionRenewalInclude<ExtArgs> | null
+    /**
+     * Filter, which SubscriptionRenewal to fetch.
+     */
+    where: SubscriptionRenewalWhereUniqueInput
+  }
+
+  /**
+   * SubscriptionRenewal findUniqueOrThrow
+   */
+  export type SubscriptionRenewalFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SubscriptionRenewal
+     */
+    select?: SubscriptionRenewalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SubscriptionRenewal
+     */
+    omit?: SubscriptionRenewalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SubscriptionRenewalInclude<ExtArgs> | null
+    /**
+     * Filter, which SubscriptionRenewal to fetch.
+     */
+    where: SubscriptionRenewalWhereUniqueInput
+  }
+
+  /**
+   * SubscriptionRenewal findFirst
+   */
+  export type SubscriptionRenewalFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SubscriptionRenewal
+     */
+    select?: SubscriptionRenewalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SubscriptionRenewal
+     */
+    omit?: SubscriptionRenewalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SubscriptionRenewalInclude<ExtArgs> | null
+    /**
+     * Filter, which SubscriptionRenewal to fetch.
+     */
+    where?: SubscriptionRenewalWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SubscriptionRenewals to fetch.
+     */
+    orderBy?: SubscriptionRenewalOrderByWithRelationInput | SubscriptionRenewalOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SubscriptionRenewals.
+     */
+    cursor?: SubscriptionRenewalWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SubscriptionRenewals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SubscriptionRenewals.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SubscriptionRenewals.
+     */
+    distinct?: SubscriptionRenewalScalarFieldEnum | SubscriptionRenewalScalarFieldEnum[]
+  }
+
+  /**
+   * SubscriptionRenewal findFirstOrThrow
+   */
+  export type SubscriptionRenewalFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SubscriptionRenewal
+     */
+    select?: SubscriptionRenewalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SubscriptionRenewal
+     */
+    omit?: SubscriptionRenewalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SubscriptionRenewalInclude<ExtArgs> | null
+    /**
+     * Filter, which SubscriptionRenewal to fetch.
+     */
+    where?: SubscriptionRenewalWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SubscriptionRenewals to fetch.
+     */
+    orderBy?: SubscriptionRenewalOrderByWithRelationInput | SubscriptionRenewalOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SubscriptionRenewals.
+     */
+    cursor?: SubscriptionRenewalWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SubscriptionRenewals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SubscriptionRenewals.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SubscriptionRenewals.
+     */
+    distinct?: SubscriptionRenewalScalarFieldEnum | SubscriptionRenewalScalarFieldEnum[]
+  }
+
+  /**
+   * SubscriptionRenewal findMany
+   */
+  export type SubscriptionRenewalFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SubscriptionRenewal
+     */
+    select?: SubscriptionRenewalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SubscriptionRenewal
+     */
+    omit?: SubscriptionRenewalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SubscriptionRenewalInclude<ExtArgs> | null
+    /**
+     * Filter, which SubscriptionRenewals to fetch.
+     */
+    where?: SubscriptionRenewalWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SubscriptionRenewals to fetch.
+     */
+    orderBy?: SubscriptionRenewalOrderByWithRelationInput | SubscriptionRenewalOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SubscriptionRenewals.
+     */
+    cursor?: SubscriptionRenewalWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SubscriptionRenewals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SubscriptionRenewals.
+     */
+    skip?: number
+    distinct?: SubscriptionRenewalScalarFieldEnum | SubscriptionRenewalScalarFieldEnum[]
+  }
+
+  /**
+   * SubscriptionRenewal create
+   */
+  export type SubscriptionRenewalCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SubscriptionRenewal
+     */
+    select?: SubscriptionRenewalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SubscriptionRenewal
+     */
+    omit?: SubscriptionRenewalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SubscriptionRenewalInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SubscriptionRenewal.
+     */
+    data: XOR<SubscriptionRenewalCreateInput, SubscriptionRenewalUncheckedCreateInput>
+  }
+
+  /**
+   * SubscriptionRenewal createMany
+   */
+  export type SubscriptionRenewalCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SubscriptionRenewals.
+     */
+    data: SubscriptionRenewalCreateManyInput | SubscriptionRenewalCreateManyInput[]
+  }
+
+  /**
+   * SubscriptionRenewal createManyAndReturn
+   */
+  export type SubscriptionRenewalCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SubscriptionRenewal
+     */
+    select?: SubscriptionRenewalSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SubscriptionRenewal
+     */
+    omit?: SubscriptionRenewalOmit<ExtArgs> | null
+    /**
+     * The data used to create many SubscriptionRenewals.
+     */
+    data: SubscriptionRenewalCreateManyInput | SubscriptionRenewalCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SubscriptionRenewalIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SubscriptionRenewal update
+   */
+  export type SubscriptionRenewalUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SubscriptionRenewal
+     */
+    select?: SubscriptionRenewalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SubscriptionRenewal
+     */
+    omit?: SubscriptionRenewalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SubscriptionRenewalInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SubscriptionRenewal.
+     */
+    data: XOR<SubscriptionRenewalUpdateInput, SubscriptionRenewalUncheckedUpdateInput>
+    /**
+     * Choose, which SubscriptionRenewal to update.
+     */
+    where: SubscriptionRenewalWhereUniqueInput
+  }
+
+  /**
+   * SubscriptionRenewal updateMany
+   */
+  export type SubscriptionRenewalUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SubscriptionRenewals.
+     */
+    data: XOR<SubscriptionRenewalUpdateManyMutationInput, SubscriptionRenewalUncheckedUpdateManyInput>
+    /**
+     * Filter which SubscriptionRenewals to update
+     */
+    where?: SubscriptionRenewalWhereInput
+    /**
+     * Limit how many SubscriptionRenewals to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SubscriptionRenewal updateManyAndReturn
+   */
+  export type SubscriptionRenewalUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SubscriptionRenewal
+     */
+    select?: SubscriptionRenewalSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SubscriptionRenewal
+     */
+    omit?: SubscriptionRenewalOmit<ExtArgs> | null
+    /**
+     * The data used to update SubscriptionRenewals.
+     */
+    data: XOR<SubscriptionRenewalUpdateManyMutationInput, SubscriptionRenewalUncheckedUpdateManyInput>
+    /**
+     * Filter which SubscriptionRenewals to update
+     */
+    where?: SubscriptionRenewalWhereInput
+    /**
+     * Limit how many SubscriptionRenewals to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SubscriptionRenewalIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SubscriptionRenewal upsert
+   */
+  export type SubscriptionRenewalUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SubscriptionRenewal
+     */
+    select?: SubscriptionRenewalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SubscriptionRenewal
+     */
+    omit?: SubscriptionRenewalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SubscriptionRenewalInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SubscriptionRenewal to update in case it exists.
+     */
+    where: SubscriptionRenewalWhereUniqueInput
+    /**
+     * In case the SubscriptionRenewal found by the `where` argument doesn't exist, create a new SubscriptionRenewal with this data.
+     */
+    create: XOR<SubscriptionRenewalCreateInput, SubscriptionRenewalUncheckedCreateInput>
+    /**
+     * In case the SubscriptionRenewal was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SubscriptionRenewalUpdateInput, SubscriptionRenewalUncheckedUpdateInput>
+  }
+
+  /**
+   * SubscriptionRenewal delete
+   */
+  export type SubscriptionRenewalDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SubscriptionRenewal
+     */
+    select?: SubscriptionRenewalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SubscriptionRenewal
+     */
+    omit?: SubscriptionRenewalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SubscriptionRenewalInclude<ExtArgs> | null
+    /**
+     * Filter which SubscriptionRenewal to delete.
+     */
+    where: SubscriptionRenewalWhereUniqueInput
+  }
+
+  /**
+   * SubscriptionRenewal deleteMany
+   */
+  export type SubscriptionRenewalDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SubscriptionRenewals to delete
+     */
+    where?: SubscriptionRenewalWhereInput
+    /**
+     * Limit how many SubscriptionRenewals to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SubscriptionRenewal without action
+   */
+  export type SubscriptionRenewalDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SubscriptionRenewal
+     */
+    select?: SubscriptionRenewalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SubscriptionRenewal
+     */
+    omit?: SubscriptionRenewalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SubscriptionRenewalInclude<ExtArgs> | null
   }
 
 
@@ -26392,17 +27731,13 @@ export namespace Prisma {
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
-  export const InviteCodeScalarFieldEnum: {
-    id: 'id',
-    code: 'code',
-    isEnabled: 'isEnabled',
-    expiresAt: 'expiresAt',
-    createdAt: 'createdAt',
-    usedAt: 'usedAt',
-    usedByUserId: 'usedByUserId'
+  export const UserOperationLockScalarFieldEnum: {
+    userId: 'userId',
+    operation: 'operation',
+    lockedAt: 'lockedAt'
   };
 
-  export type InviteCodeScalarFieldEnum = (typeof InviteCodeScalarFieldEnum)[keyof typeof InviteCodeScalarFieldEnum]
+  export type UserOperationLockScalarFieldEnum = (typeof UserOperationLockScalarFieldEnum)[keyof typeof UserOperationLockScalarFieldEnum]
 
 
   export const ReferralCodeScalarFieldEnum: {
@@ -26636,6 +27971,28 @@ export namespace Prisma {
   export type SubscriptionScalarFieldEnum = (typeof SubscriptionScalarFieldEnum)[keyof typeof SubscriptionScalarFieldEnum]
 
 
+  export const SubscriptionRenewalScalarFieldEnum: {
+    id: 'id',
+    subscriptionId: 'subscriptionId',
+    paymentRequestId: 'paymentRequestId',
+    previousExpiresAt: 'previousExpiresAt',
+    nextExpiresAt: 'nextExpiresAt',
+    previousDevices: 'previousDevices',
+    nextDevices: 'nextDevices',
+    months: 'months',
+    amountRub: 'amountRub',
+    currency: 'currency',
+    baseDeviceMonthlyPriceSnapshot: 'baseDeviceMonthlyPriceSnapshot',
+    extraDeviceMonthlyPriceSnapshot: 'extraDeviceMonthlyPriceSnapshot',
+    monthlyPriceSnapshot: 'monthlyPriceSnapshot',
+    durationDiscountPercentSnapshot: 'durationDiscountPercentSnapshot',
+    referralDiscountPercentSnapshot: 'referralDiscountPercentSnapshot',
+    createdAt: 'createdAt'
+  };
+
+  export type SubscriptionRenewalScalarFieldEnum = (typeof SubscriptionRenewalScalarFieldEnum)[keyof typeof SubscriptionRenewalScalarFieldEnum]
+
+
   export const DeviceSlotScalarFieldEnum: {
     id: 'id',
     subscriptionId: 'subscriptionId',
@@ -26851,7 +28208,6 @@ export namespace Prisma {
     reservedCredits?: IntFilter<"User"> | number
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
-    inviteCodesUsed?: InviteCodeListRelationFilter
     referralCodesCreated?: ReferralCodeListRelationFilter
     referralCodeUse?: XOR<ReferralCodeUseNullableScalarRelationFilter, ReferralCodeUseWhereInput> | null
     paymentRequests?: PaymentRequestListRelationFilter
@@ -26861,6 +28217,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageListRelationFilter
     supportTickets?: SupportTicketListRelationFilter
     promoCodeRedemptions?: PromoCodeRedemptionListRelationFilter
+    operationLock?: XOR<UserOperationLockNullableScalarRelationFilter, UserOperationLockWhereInput> | null
     sessions?: SessionListRelationFilter
   }
 
@@ -26873,7 +28230,6 @@ export namespace Prisma {
     reservedCredits?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    inviteCodesUsed?: InviteCodeOrderByRelationAggregateInput
     referralCodesCreated?: ReferralCodeOrderByRelationAggregateInput
     referralCodeUse?: ReferralCodeUseOrderByWithRelationInput
     paymentRequests?: PaymentRequestOrderByRelationAggregateInput
@@ -26883,6 +28239,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageOrderByRelationAggregateInput
     supportTickets?: SupportTicketOrderByRelationAggregateInput
     promoCodeRedemptions?: PromoCodeRedemptionOrderByRelationAggregateInput
+    operationLock?: UserOperationLockOrderByWithRelationInput
     sessions?: SessionOrderByRelationAggregateInput
   }
 
@@ -26898,7 +28255,6 @@ export namespace Prisma {
     reservedCredits?: IntFilter<"User"> | number
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
-    inviteCodesUsed?: InviteCodeListRelationFilter
     referralCodesCreated?: ReferralCodeListRelationFilter
     referralCodeUse?: XOR<ReferralCodeUseNullableScalarRelationFilter, ReferralCodeUseWhereInput> | null
     paymentRequests?: PaymentRequestListRelationFilter
@@ -26908,6 +28264,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageListRelationFilter
     supportTickets?: SupportTicketListRelationFilter
     promoCodeRedemptions?: PromoCodeRedemptionListRelationFilter
+    operationLock?: XOR<UserOperationLockNullableScalarRelationFilter, UserOperationLockWhereInput> | null
     sessions?: SessionListRelationFilter
   }, "id" | "username">
 
@@ -26941,69 +28298,49 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
 
-  export type InviteCodeWhereInput = {
-    AND?: InviteCodeWhereInput | InviteCodeWhereInput[]
-    OR?: InviteCodeWhereInput[]
-    NOT?: InviteCodeWhereInput | InviteCodeWhereInput[]
-    id?: StringFilter<"InviteCode"> | string
-    code?: StringFilter<"InviteCode"> | string
-    isEnabled?: BoolFilter<"InviteCode"> | boolean
-    expiresAt?: DateTimeNullableFilter<"InviteCode"> | Date | string | null
-    createdAt?: DateTimeFilter<"InviteCode"> | Date | string
-    usedAt?: DateTimeNullableFilter<"InviteCode"> | Date | string | null
-    usedByUserId?: StringNullableFilter<"InviteCode"> | string | null
-    usedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  export type UserOperationLockWhereInput = {
+    AND?: UserOperationLockWhereInput | UserOperationLockWhereInput[]
+    OR?: UserOperationLockWhereInput[]
+    NOT?: UserOperationLockWhereInput | UserOperationLockWhereInput[]
+    userId?: StringFilter<"UserOperationLock"> | string
+    operation?: StringFilter<"UserOperationLock"> | string
+    lockedAt?: DateTimeFilter<"UserOperationLock"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
-  export type InviteCodeOrderByWithRelationInput = {
-    id?: SortOrder
-    code?: SortOrder
-    isEnabled?: SortOrder
-    expiresAt?: SortOrderInput | SortOrder
-    createdAt?: SortOrder
-    usedAt?: SortOrderInput | SortOrder
-    usedByUserId?: SortOrderInput | SortOrder
-    usedBy?: UserOrderByWithRelationInput
+  export type UserOperationLockOrderByWithRelationInput = {
+    userId?: SortOrder
+    operation?: SortOrder
+    lockedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
   }
 
-  export type InviteCodeWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
-    code?: string
-    usedByUserId?: string
-    AND?: InviteCodeWhereInput | InviteCodeWhereInput[]
-    OR?: InviteCodeWhereInput[]
-    NOT?: InviteCodeWhereInput | InviteCodeWhereInput[]
-    isEnabled?: BoolFilter<"InviteCode"> | boolean
-    expiresAt?: DateTimeNullableFilter<"InviteCode"> | Date | string | null
-    createdAt?: DateTimeFilter<"InviteCode"> | Date | string
-    usedAt?: DateTimeNullableFilter<"InviteCode"> | Date | string | null
-    usedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
-  }, "id" | "code" | "usedByUserId">
+  export type UserOperationLockWhereUniqueInput = Prisma.AtLeast<{
+    userId?: string
+    AND?: UserOperationLockWhereInput | UserOperationLockWhereInput[]
+    OR?: UserOperationLockWhereInput[]
+    NOT?: UserOperationLockWhereInput | UserOperationLockWhereInput[]
+    operation?: StringFilter<"UserOperationLock"> | string
+    lockedAt?: DateTimeFilter<"UserOperationLock"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "userId">
 
-  export type InviteCodeOrderByWithAggregationInput = {
-    id?: SortOrder
-    code?: SortOrder
-    isEnabled?: SortOrder
-    expiresAt?: SortOrderInput | SortOrder
-    createdAt?: SortOrder
-    usedAt?: SortOrderInput | SortOrder
-    usedByUserId?: SortOrderInput | SortOrder
-    _count?: InviteCodeCountOrderByAggregateInput
-    _max?: InviteCodeMaxOrderByAggregateInput
-    _min?: InviteCodeMinOrderByAggregateInput
+  export type UserOperationLockOrderByWithAggregationInput = {
+    userId?: SortOrder
+    operation?: SortOrder
+    lockedAt?: SortOrder
+    _count?: UserOperationLockCountOrderByAggregateInput
+    _max?: UserOperationLockMaxOrderByAggregateInput
+    _min?: UserOperationLockMinOrderByAggregateInput
   }
 
-  export type InviteCodeScalarWhereWithAggregatesInput = {
-    AND?: InviteCodeScalarWhereWithAggregatesInput | InviteCodeScalarWhereWithAggregatesInput[]
-    OR?: InviteCodeScalarWhereWithAggregatesInput[]
-    NOT?: InviteCodeScalarWhereWithAggregatesInput | InviteCodeScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"InviteCode"> | string
-    code?: StringWithAggregatesFilter<"InviteCode"> | string
-    isEnabled?: BoolWithAggregatesFilter<"InviteCode"> | boolean
-    expiresAt?: DateTimeNullableWithAggregatesFilter<"InviteCode"> | Date | string | null
-    createdAt?: DateTimeWithAggregatesFilter<"InviteCode"> | Date | string
-    usedAt?: DateTimeNullableWithAggregatesFilter<"InviteCode"> | Date | string | null
-    usedByUserId?: StringNullableWithAggregatesFilter<"InviteCode"> | string | null
+  export type UserOperationLockScalarWhereWithAggregatesInput = {
+    AND?: UserOperationLockScalarWhereWithAggregatesInput | UserOperationLockScalarWhereWithAggregatesInput[]
+    OR?: UserOperationLockScalarWhereWithAggregatesInput[]
+    NOT?: UserOperationLockScalarWhereWithAggregatesInput | UserOperationLockScalarWhereWithAggregatesInput[]
+    userId?: StringWithAggregatesFilter<"UserOperationLock"> | string
+    operation?: StringWithAggregatesFilter<"UserOperationLock"> | string
+    lockedAt?: DateTimeWithAggregatesFilter<"UserOperationLock"> | Date | string
   }
 
   export type ReferralCodeWhereInput = {
@@ -27775,6 +29112,7 @@ export namespace Prisma {
     plategaConfirmedAt?: DateTimeNullableFilter<"PaymentRequest"> | Date | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     subscription?: XOR<SubscriptionNullableScalarRelationFilter, SubscriptionWhereInput> | null
+    subscriptionRenewal?: XOR<SubscriptionRenewalNullableScalarRelationFilter, SubscriptionRenewalWhereInput> | null
     plategaWebhookLogs?: PlategaWebhookLogListRelationFilter
   }
 
@@ -27808,6 +29146,7 @@ export namespace Prisma {
     plategaConfirmedAt?: SortOrderInput | SortOrder
     user?: UserOrderByWithRelationInput
     subscription?: SubscriptionOrderByWithRelationInput
+    subscriptionRenewal?: SubscriptionRenewalOrderByWithRelationInput
     plategaWebhookLogs?: PlategaWebhookLogOrderByRelationAggregateInput
   }
 
@@ -27844,6 +29183,7 @@ export namespace Prisma {
     plategaConfirmedAt?: DateTimeNullableFilter<"PaymentRequest"> | Date | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     subscription?: XOR<SubscriptionNullableScalarRelationFilter, SubscriptionWhereInput> | null
+    subscriptionRenewal?: XOR<SubscriptionRenewalNullableScalarRelationFilter, SubscriptionRenewalWhereInput> | null
     plategaWebhookLogs?: PlategaWebhookLogListRelationFilter
   }, "id" | "plategaTransactionId">
 
@@ -28043,6 +29383,7 @@ export namespace Prisma {
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     paymentRequest?: XOR<PaymentRequestNullableScalarRelationFilter, PaymentRequestWhereInput> | null
     deviceSlots?: DeviceSlotListRelationFilter
+    renewals?: SubscriptionRenewalListRelationFilter
   }
 
   export type SubscriptionOrderByWithRelationInput = {
@@ -28080,6 +29421,7 @@ export namespace Prisma {
     user?: UserOrderByWithRelationInput
     paymentRequest?: PaymentRequestOrderByWithRelationInput
     deviceSlots?: DeviceSlotOrderByRelationAggregateInput
+    renewals?: SubscriptionRenewalOrderByRelationAggregateInput
   }
 
   export type SubscriptionWhereUniqueInput = Prisma.AtLeast<{
@@ -28120,6 +29462,7 @@ export namespace Prisma {
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     paymentRequest?: XOR<PaymentRequestNullableScalarRelationFilter, PaymentRequestWhereInput> | null
     deviceSlots?: DeviceSlotListRelationFilter
+    renewals?: SubscriptionRenewalListRelationFilter
   }, "id" | "paymentRequestId" | "marzbanUsername">
 
   export type SubscriptionOrderByWithAggregationInput = {
@@ -28196,6 +29539,121 @@ export namespace Prisma {
     subscriptionUrl?: StringNullableWithAggregatesFilter<"Subscription"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Subscription"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Subscription"> | Date | string
+  }
+
+  export type SubscriptionRenewalWhereInput = {
+    AND?: SubscriptionRenewalWhereInput | SubscriptionRenewalWhereInput[]
+    OR?: SubscriptionRenewalWhereInput[]
+    NOT?: SubscriptionRenewalWhereInput | SubscriptionRenewalWhereInput[]
+    id?: StringFilter<"SubscriptionRenewal"> | string
+    subscriptionId?: StringFilter<"SubscriptionRenewal"> | string
+    paymentRequestId?: StringFilter<"SubscriptionRenewal"> | string
+    previousExpiresAt?: DateTimeNullableFilter<"SubscriptionRenewal"> | Date | string | null
+    nextExpiresAt?: DateTimeFilter<"SubscriptionRenewal"> | Date | string
+    previousDevices?: IntFilter<"SubscriptionRenewal"> | number
+    nextDevices?: IntFilter<"SubscriptionRenewal"> | number
+    months?: IntFilter<"SubscriptionRenewal"> | number
+    amountRub?: IntFilter<"SubscriptionRenewal"> | number
+    currency?: StringFilter<"SubscriptionRenewal"> | string
+    baseDeviceMonthlyPriceSnapshot?: IntFilter<"SubscriptionRenewal"> | number
+    extraDeviceMonthlyPriceSnapshot?: IntFilter<"SubscriptionRenewal"> | number
+    monthlyPriceSnapshot?: IntFilter<"SubscriptionRenewal"> | number
+    durationDiscountPercentSnapshot?: IntFilter<"SubscriptionRenewal"> | number
+    referralDiscountPercentSnapshot?: IntFilter<"SubscriptionRenewal"> | number
+    createdAt?: DateTimeFilter<"SubscriptionRenewal"> | Date | string
+    subscription?: XOR<SubscriptionScalarRelationFilter, SubscriptionWhereInput>
+    paymentRequest?: XOR<PaymentRequestScalarRelationFilter, PaymentRequestWhereInput>
+  }
+
+  export type SubscriptionRenewalOrderByWithRelationInput = {
+    id?: SortOrder
+    subscriptionId?: SortOrder
+    paymentRequestId?: SortOrder
+    previousExpiresAt?: SortOrderInput | SortOrder
+    nextExpiresAt?: SortOrder
+    previousDevices?: SortOrder
+    nextDevices?: SortOrder
+    months?: SortOrder
+    amountRub?: SortOrder
+    currency?: SortOrder
+    baseDeviceMonthlyPriceSnapshot?: SortOrder
+    extraDeviceMonthlyPriceSnapshot?: SortOrder
+    monthlyPriceSnapshot?: SortOrder
+    durationDiscountPercentSnapshot?: SortOrder
+    referralDiscountPercentSnapshot?: SortOrder
+    createdAt?: SortOrder
+    subscription?: SubscriptionOrderByWithRelationInput
+    paymentRequest?: PaymentRequestOrderByWithRelationInput
+  }
+
+  export type SubscriptionRenewalWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    paymentRequestId?: string
+    AND?: SubscriptionRenewalWhereInput | SubscriptionRenewalWhereInput[]
+    OR?: SubscriptionRenewalWhereInput[]
+    NOT?: SubscriptionRenewalWhereInput | SubscriptionRenewalWhereInput[]
+    subscriptionId?: StringFilter<"SubscriptionRenewal"> | string
+    previousExpiresAt?: DateTimeNullableFilter<"SubscriptionRenewal"> | Date | string | null
+    nextExpiresAt?: DateTimeFilter<"SubscriptionRenewal"> | Date | string
+    previousDevices?: IntFilter<"SubscriptionRenewal"> | number
+    nextDevices?: IntFilter<"SubscriptionRenewal"> | number
+    months?: IntFilter<"SubscriptionRenewal"> | number
+    amountRub?: IntFilter<"SubscriptionRenewal"> | number
+    currency?: StringFilter<"SubscriptionRenewal"> | string
+    baseDeviceMonthlyPriceSnapshot?: IntFilter<"SubscriptionRenewal"> | number
+    extraDeviceMonthlyPriceSnapshot?: IntFilter<"SubscriptionRenewal"> | number
+    monthlyPriceSnapshot?: IntFilter<"SubscriptionRenewal"> | number
+    durationDiscountPercentSnapshot?: IntFilter<"SubscriptionRenewal"> | number
+    referralDiscountPercentSnapshot?: IntFilter<"SubscriptionRenewal"> | number
+    createdAt?: DateTimeFilter<"SubscriptionRenewal"> | Date | string
+    subscription?: XOR<SubscriptionScalarRelationFilter, SubscriptionWhereInput>
+    paymentRequest?: XOR<PaymentRequestScalarRelationFilter, PaymentRequestWhereInput>
+  }, "id" | "paymentRequestId">
+
+  export type SubscriptionRenewalOrderByWithAggregationInput = {
+    id?: SortOrder
+    subscriptionId?: SortOrder
+    paymentRequestId?: SortOrder
+    previousExpiresAt?: SortOrderInput | SortOrder
+    nextExpiresAt?: SortOrder
+    previousDevices?: SortOrder
+    nextDevices?: SortOrder
+    months?: SortOrder
+    amountRub?: SortOrder
+    currency?: SortOrder
+    baseDeviceMonthlyPriceSnapshot?: SortOrder
+    extraDeviceMonthlyPriceSnapshot?: SortOrder
+    monthlyPriceSnapshot?: SortOrder
+    durationDiscountPercentSnapshot?: SortOrder
+    referralDiscountPercentSnapshot?: SortOrder
+    createdAt?: SortOrder
+    _count?: SubscriptionRenewalCountOrderByAggregateInput
+    _avg?: SubscriptionRenewalAvgOrderByAggregateInput
+    _max?: SubscriptionRenewalMaxOrderByAggregateInput
+    _min?: SubscriptionRenewalMinOrderByAggregateInput
+    _sum?: SubscriptionRenewalSumOrderByAggregateInput
+  }
+
+  export type SubscriptionRenewalScalarWhereWithAggregatesInput = {
+    AND?: SubscriptionRenewalScalarWhereWithAggregatesInput | SubscriptionRenewalScalarWhereWithAggregatesInput[]
+    OR?: SubscriptionRenewalScalarWhereWithAggregatesInput[]
+    NOT?: SubscriptionRenewalScalarWhereWithAggregatesInput | SubscriptionRenewalScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SubscriptionRenewal"> | string
+    subscriptionId?: StringWithAggregatesFilter<"SubscriptionRenewal"> | string
+    paymentRequestId?: StringWithAggregatesFilter<"SubscriptionRenewal"> | string
+    previousExpiresAt?: DateTimeNullableWithAggregatesFilter<"SubscriptionRenewal"> | Date | string | null
+    nextExpiresAt?: DateTimeWithAggregatesFilter<"SubscriptionRenewal"> | Date | string
+    previousDevices?: IntWithAggregatesFilter<"SubscriptionRenewal"> | number
+    nextDevices?: IntWithAggregatesFilter<"SubscriptionRenewal"> | number
+    months?: IntWithAggregatesFilter<"SubscriptionRenewal"> | number
+    amountRub?: IntWithAggregatesFilter<"SubscriptionRenewal"> | number
+    currency?: StringWithAggregatesFilter<"SubscriptionRenewal"> | string
+    baseDeviceMonthlyPriceSnapshot?: IntWithAggregatesFilter<"SubscriptionRenewal"> | number
+    extraDeviceMonthlyPriceSnapshot?: IntWithAggregatesFilter<"SubscriptionRenewal"> | number
+    monthlyPriceSnapshot?: IntWithAggregatesFilter<"SubscriptionRenewal"> | number
+    durationDiscountPercentSnapshot?: IntWithAggregatesFilter<"SubscriptionRenewal"> | number
+    referralDiscountPercentSnapshot?: IntWithAggregatesFilter<"SubscriptionRenewal"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"SubscriptionRenewal"> | Date | string
   }
 
   export type DeviceSlotWhereInput = {
@@ -28547,7 +30005,6 @@ export namespace Prisma {
     reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    inviteCodesUsed?: InviteCodeCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestCreateNestedManyWithoutUserInput
@@ -28557,6 +30014,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketCreateNestedManyWithoutUserInput
     promoCodeRedemptions?: PromoCodeRedemptionCreateNestedManyWithoutUserInput
+    operationLock?: UserOperationLockCreateNestedOneWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
   }
 
@@ -28569,7 +30027,6 @@ export namespace Prisma {
     reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    inviteCodesUsed?: InviteCodeUncheckedCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeUncheckedCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseUncheckedCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestUncheckedCreateNestedManyWithoutUserInput
@@ -28579,6 +30036,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUncheckedCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketUncheckedCreateNestedManyWithoutUserInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+    operationLock?: UserOperationLockUncheckedCreateNestedOneWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -28591,7 +30049,6 @@ export namespace Prisma {
     reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inviteCodesUsed?: InviteCodeUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUpdateManyWithoutUserNestedInput
@@ -28601,6 +30058,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUpdateManyWithoutUserNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+    operationLock?: UserOperationLockUpdateOneWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
   }
 
@@ -28613,7 +30071,6 @@ export namespace Prisma {
     reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inviteCodesUsed?: InviteCodeUncheckedUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUncheckedUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUncheckedUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUncheckedUpdateManyWithoutUserNestedInput
@@ -28623,6 +30080,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUncheckedUpdateManyWithoutUserNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+    operationLock?: UserOperationLockUncheckedUpdateOneWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -28659,73 +30117,45 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type InviteCodeCreateInput = {
-    id?: string
-    code: string
-    isEnabled?: boolean
-    expiresAt?: Date | string | null
-    createdAt?: Date | string
-    usedAt?: Date | string | null
-    usedBy?: UserCreateNestedOneWithoutInviteCodesUsedInput
+  export type UserOperationLockCreateInput = {
+    operation: string
+    lockedAt?: Date | string
+    user: UserCreateNestedOneWithoutOperationLockInput
   }
 
-  export type InviteCodeUncheckedCreateInput = {
-    id?: string
-    code: string
-    isEnabled?: boolean
-    expiresAt?: Date | string | null
-    createdAt?: Date | string
-    usedAt?: Date | string | null
-    usedByUserId?: string | null
+  export type UserOperationLockUncheckedCreateInput = {
+    userId: string
+    operation: string
+    lockedAt?: Date | string
   }
 
-  export type InviteCodeUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    code?: StringFieldUpdateOperationsInput | string
-    isEnabled?: BoolFieldUpdateOperationsInput | boolean
-    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    usedBy?: UserUpdateOneWithoutInviteCodesUsedNestedInput
+  export type UserOperationLockUpdateInput = {
+    operation?: StringFieldUpdateOperationsInput | string
+    lockedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutOperationLockNestedInput
   }
 
-  export type InviteCodeUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    code?: StringFieldUpdateOperationsInput | string
-    isEnabled?: BoolFieldUpdateOperationsInput | boolean
-    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    usedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+  export type UserOperationLockUncheckedUpdateInput = {
+    userId?: StringFieldUpdateOperationsInput | string
+    operation?: StringFieldUpdateOperationsInput | string
+    lockedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type InviteCodeCreateManyInput = {
-    id?: string
-    code: string
-    isEnabled?: boolean
-    expiresAt?: Date | string | null
-    createdAt?: Date | string
-    usedAt?: Date | string | null
-    usedByUserId?: string | null
+  export type UserOperationLockCreateManyInput = {
+    userId: string
+    operation: string
+    lockedAt?: Date | string
   }
 
-  export type InviteCodeUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    code?: StringFieldUpdateOperationsInput | string
-    isEnabled?: BoolFieldUpdateOperationsInput | boolean
-    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  export type UserOperationLockUpdateManyMutationInput = {
+    operation?: StringFieldUpdateOperationsInput | string
+    lockedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type InviteCodeUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    code?: StringFieldUpdateOperationsInput | string
-    isEnabled?: BoolFieldUpdateOperationsInput | boolean
-    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    usedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+  export type UserOperationLockUncheckedUpdateManyInput = {
+    userId?: StringFieldUpdateOperationsInput | string
+    operation?: StringFieldUpdateOperationsInput | string
+    lockedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ReferralCodeCreateInput = {
@@ -29525,6 +30955,7 @@ export namespace Prisma {
     plategaConfirmedAt?: Date | string | null
     user: UserCreateNestedOneWithoutPaymentRequestsInput
     subscription?: SubscriptionCreateNestedOneWithoutPaymentRequestInput
+    subscriptionRenewal?: SubscriptionRenewalCreateNestedOneWithoutPaymentRequestInput
     plategaWebhookLogs?: PlategaWebhookLogCreateNestedManyWithoutPaymentRequestInput
   }
 
@@ -29557,6 +30988,7 @@ export namespace Prisma {
     plategaPayloadJson?: string | null
     plategaConfirmedAt?: Date | string | null
     subscription?: SubscriptionUncheckedCreateNestedOneWithoutPaymentRequestInput
+    subscriptionRenewal?: SubscriptionRenewalUncheckedCreateNestedOneWithoutPaymentRequestInput
     plategaWebhookLogs?: PlategaWebhookLogUncheckedCreateNestedManyWithoutPaymentRequestInput
   }
 
@@ -29589,6 +31021,7 @@ export namespace Prisma {
     plategaConfirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     user?: UserUpdateOneRequiredWithoutPaymentRequestsNestedInput
     subscription?: SubscriptionUpdateOneWithoutPaymentRequestNestedInput
+    subscriptionRenewal?: SubscriptionRenewalUpdateOneWithoutPaymentRequestNestedInput
     plategaWebhookLogs?: PlategaWebhookLogUpdateManyWithoutPaymentRequestNestedInput
   }
 
@@ -29621,6 +31054,7 @@ export namespace Prisma {
     plategaPayloadJson?: NullableStringFieldUpdateOperationsInput | string | null
     plategaConfirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     subscription?: SubscriptionUncheckedUpdateOneWithoutPaymentRequestNestedInput
+    subscriptionRenewal?: SubscriptionRenewalUncheckedUpdateOneWithoutPaymentRequestNestedInput
     plategaWebhookLogs?: PlategaWebhookLogUncheckedUpdateManyWithoutPaymentRequestNestedInput
   }
 
@@ -29850,6 +31284,7 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutSubscriptionsInput
     paymentRequest?: PaymentRequestCreateNestedOneWithoutSubscriptionInput
     deviceSlots?: DeviceSlotCreateNestedManyWithoutSubscriptionInput
+    renewals?: SubscriptionRenewalCreateNestedManyWithoutSubscriptionInput
   }
 
   export type SubscriptionUncheckedCreateInput = {
@@ -29885,6 +31320,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deviceSlots?: DeviceSlotUncheckedCreateNestedManyWithoutSubscriptionInput
+    renewals?: SubscriptionRenewalUncheckedCreateNestedManyWithoutSubscriptionInput
   }
 
   export type SubscriptionUpdateInput = {
@@ -29920,6 +31356,7 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutSubscriptionsNestedInput
     paymentRequest?: PaymentRequestUpdateOneWithoutSubscriptionNestedInput
     deviceSlots?: DeviceSlotUpdateManyWithoutSubscriptionNestedInput
+    renewals?: SubscriptionRenewalUpdateManyWithoutSubscriptionNestedInput
   }
 
   export type SubscriptionUncheckedUpdateInput = {
@@ -29955,6 +31392,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deviceSlots?: DeviceSlotUncheckedUpdateManyWithoutSubscriptionNestedInput
+    renewals?: SubscriptionRenewalUncheckedUpdateManyWithoutSubscriptionNestedInput
   }
 
   export type SubscriptionCreateManyInput = {
@@ -30055,6 +31493,137 @@ export namespace Prisma {
     subscriptionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SubscriptionRenewalCreateInput = {
+    id?: string
+    previousExpiresAt?: Date | string | null
+    nextExpiresAt: Date | string
+    previousDevices: number
+    nextDevices: number
+    months: number
+    amountRub: number
+    currency?: string
+    baseDeviceMonthlyPriceSnapshot?: number
+    extraDeviceMonthlyPriceSnapshot?: number
+    monthlyPriceSnapshot?: number
+    durationDiscountPercentSnapshot?: number
+    referralDiscountPercentSnapshot?: number
+    createdAt?: Date | string
+    subscription: SubscriptionCreateNestedOneWithoutRenewalsInput
+    paymentRequest: PaymentRequestCreateNestedOneWithoutSubscriptionRenewalInput
+  }
+
+  export type SubscriptionRenewalUncheckedCreateInput = {
+    id?: string
+    subscriptionId: string
+    paymentRequestId: string
+    previousExpiresAt?: Date | string | null
+    nextExpiresAt: Date | string
+    previousDevices: number
+    nextDevices: number
+    months: number
+    amountRub: number
+    currency?: string
+    baseDeviceMonthlyPriceSnapshot?: number
+    extraDeviceMonthlyPriceSnapshot?: number
+    monthlyPriceSnapshot?: number
+    durationDiscountPercentSnapshot?: number
+    referralDiscountPercentSnapshot?: number
+    createdAt?: Date | string
+  }
+
+  export type SubscriptionRenewalUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    previousExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextExpiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    previousDevices?: IntFieldUpdateOperationsInput | number
+    nextDevices?: IntFieldUpdateOperationsInput | number
+    months?: IntFieldUpdateOperationsInput | number
+    amountRub?: IntFieldUpdateOperationsInput | number
+    currency?: StringFieldUpdateOperationsInput | string
+    baseDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    extraDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    monthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    durationDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    referralDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    subscription?: SubscriptionUpdateOneRequiredWithoutRenewalsNestedInput
+    paymentRequest?: PaymentRequestUpdateOneRequiredWithoutSubscriptionRenewalNestedInput
+  }
+
+  export type SubscriptionRenewalUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    subscriptionId?: StringFieldUpdateOperationsInput | string
+    paymentRequestId?: StringFieldUpdateOperationsInput | string
+    previousExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextExpiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    previousDevices?: IntFieldUpdateOperationsInput | number
+    nextDevices?: IntFieldUpdateOperationsInput | number
+    months?: IntFieldUpdateOperationsInput | number
+    amountRub?: IntFieldUpdateOperationsInput | number
+    currency?: StringFieldUpdateOperationsInput | string
+    baseDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    extraDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    monthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    durationDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    referralDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SubscriptionRenewalCreateManyInput = {
+    id?: string
+    subscriptionId: string
+    paymentRequestId: string
+    previousExpiresAt?: Date | string | null
+    nextExpiresAt: Date | string
+    previousDevices: number
+    nextDevices: number
+    months: number
+    amountRub: number
+    currency?: string
+    baseDeviceMonthlyPriceSnapshot?: number
+    extraDeviceMonthlyPriceSnapshot?: number
+    monthlyPriceSnapshot?: number
+    durationDiscountPercentSnapshot?: number
+    referralDiscountPercentSnapshot?: number
+    createdAt?: Date | string
+  }
+
+  export type SubscriptionRenewalUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    previousExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextExpiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    previousDevices?: IntFieldUpdateOperationsInput | number
+    nextDevices?: IntFieldUpdateOperationsInput | number
+    months?: IntFieldUpdateOperationsInput | number
+    amountRub?: IntFieldUpdateOperationsInput | number
+    currency?: StringFieldUpdateOperationsInput | string
+    baseDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    extraDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    monthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    durationDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    referralDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SubscriptionRenewalUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    subscriptionId?: StringFieldUpdateOperationsInput | string
+    paymentRequestId?: StringFieldUpdateOperationsInput | string
+    previousExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextExpiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    previousDevices?: IntFieldUpdateOperationsInput | number
+    nextDevices?: IntFieldUpdateOperationsInput | number
+    months?: IntFieldUpdateOperationsInput | number
+    amountRub?: IntFieldUpdateOperationsInput | number
+    currency?: StringFieldUpdateOperationsInput | string
+    baseDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    extraDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    monthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    durationDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    referralDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type DeviceSlotCreateInput = {
@@ -30481,12 +32050,6 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
-  export type InviteCodeListRelationFilter = {
-    every?: InviteCodeWhereInput
-    some?: InviteCodeWhereInput
-    none?: InviteCodeWhereInput
-  }
-
   export type ReferralCodeListRelationFilter = {
     every?: ReferralCodeWhereInput
     some?: ReferralCodeWhereInput
@@ -30534,14 +32097,15 @@ export namespace Prisma {
     none?: PromoCodeRedemptionWhereInput
   }
 
+  export type UserOperationLockNullableScalarRelationFilter = {
+    is?: UserOperationLockWhereInput | null
+    isNot?: UserOperationLockWhereInput | null
+  }
+
   export type SessionListRelationFilter = {
     every?: SessionWhereInput
     some?: SessionWhereInput
     none?: SessionWhereInput
-  }
-
-  export type InviteCodeOrderByRelationAggregateInput = {
-    _count?: SortOrder
   }
 
   export type ReferralCodeOrderByRelationAggregateInput = {
@@ -30676,6 +32240,29 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type UserScalarRelationFilter = {
+    is?: UserWhereInput
+    isNot?: UserWhereInput
+  }
+
+  export type UserOperationLockCountOrderByAggregateInput = {
+    userId?: SortOrder
+    operation?: SortOrder
+    lockedAt?: SortOrder
+  }
+
+  export type UserOperationLockMaxOrderByAggregateInput = {
+    userId?: SortOrder
+    operation?: SortOrder
+    lockedAt?: SortOrder
+  }
+
+  export type UserOperationLockMinOrderByAggregateInput = {
+    userId?: SortOrder
+    operation?: SortOrder
+    lockedAt?: SortOrder
+  }
+
   export type BoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
@@ -30711,84 +32298,15 @@ export namespace Prisma {
     isNot?: UserWhereInput | null
   }
 
-  export type SortOrderInput = {
-    sort: SortOrder
-    nulls?: NullsOrder
-  }
-
-  export type InviteCodeCountOrderByAggregateInput = {
-    id?: SortOrder
-    code?: SortOrder
-    isEnabled?: SortOrder
-    expiresAt?: SortOrder
-    createdAt?: SortOrder
-    usedAt?: SortOrder
-    usedByUserId?: SortOrder
-  }
-
-  export type InviteCodeMaxOrderByAggregateInput = {
-    id?: SortOrder
-    code?: SortOrder
-    isEnabled?: SortOrder
-    expiresAt?: SortOrder
-    createdAt?: SortOrder
-    usedAt?: SortOrder
-    usedByUserId?: SortOrder
-  }
-
-  export type InviteCodeMinOrderByAggregateInput = {
-    id?: SortOrder
-    code?: SortOrder
-    isEnabled?: SortOrder
-    expiresAt?: SortOrder
-    createdAt?: SortOrder
-    usedAt?: SortOrder
-    usedByUserId?: SortOrder
-  }
-
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
-  }
-
-  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | null
-    notIn?: Date[] | string[] | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
-  }
-
-  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | null
-    notIn?: string[] | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
   export type ReferralCodeUseListRelationFilter = {
     every?: ReferralCodeUseWhereInput
     some?: ReferralCodeUseWhereInput
     none?: ReferralCodeUseWhereInput
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
   }
 
   export type ReferralCodeUseOrderByRelationAggregateInput = {
@@ -30841,14 +32359,48 @@ export namespace Prisma {
     rewardCredits?: SortOrder
   }
 
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | null
+    notIn?: string[] | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
   export type ReferralCodeScalarRelationFilter = {
     is?: ReferralCodeWhereInput
     isNot?: ReferralCodeWhereInput
-  }
-
-  export type UserScalarRelationFilter = {
-    is?: UserWhereInput
-    isNot?: UserWhereInput
   }
 
   export type ReferralCodeUseCountOrderByAggregateInput = {
@@ -31277,6 +32829,11 @@ export namespace Prisma {
     isNot?: SubscriptionWhereInput | null
   }
 
+  export type SubscriptionRenewalNullableScalarRelationFilter = {
+    is?: SubscriptionRenewalWhereInput | null
+    isNot?: SubscriptionRenewalWhereInput | null
+  }
+
   export type PlategaWebhookLogListRelationFilter = {
     every?: PlategaWebhookLogWhereInput
     some?: PlategaWebhookLogWhereInput
@@ -31516,7 +33073,17 @@ export namespace Prisma {
     none?: DeviceSlotWhereInput
   }
 
+  export type SubscriptionRenewalListRelationFilter = {
+    every?: SubscriptionRenewalWhereInput
+    some?: SubscriptionRenewalWhereInput
+    none?: SubscriptionRenewalWhereInput
+  }
+
   export type DeviceSlotOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SubscriptionRenewalOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -31676,6 +33243,97 @@ export namespace Prisma {
     _max?: NestedEnumSubscriptionStatusFilter<$PrismaModel>
   }
 
+  export type SubscriptionScalarRelationFilter = {
+    is?: SubscriptionWhereInput
+    isNot?: SubscriptionWhereInput
+  }
+
+  export type PaymentRequestScalarRelationFilter = {
+    is?: PaymentRequestWhereInput
+    isNot?: PaymentRequestWhereInput
+  }
+
+  export type SubscriptionRenewalCountOrderByAggregateInput = {
+    id?: SortOrder
+    subscriptionId?: SortOrder
+    paymentRequestId?: SortOrder
+    previousExpiresAt?: SortOrder
+    nextExpiresAt?: SortOrder
+    previousDevices?: SortOrder
+    nextDevices?: SortOrder
+    months?: SortOrder
+    amountRub?: SortOrder
+    currency?: SortOrder
+    baseDeviceMonthlyPriceSnapshot?: SortOrder
+    extraDeviceMonthlyPriceSnapshot?: SortOrder
+    monthlyPriceSnapshot?: SortOrder
+    durationDiscountPercentSnapshot?: SortOrder
+    referralDiscountPercentSnapshot?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type SubscriptionRenewalAvgOrderByAggregateInput = {
+    previousDevices?: SortOrder
+    nextDevices?: SortOrder
+    months?: SortOrder
+    amountRub?: SortOrder
+    baseDeviceMonthlyPriceSnapshot?: SortOrder
+    extraDeviceMonthlyPriceSnapshot?: SortOrder
+    monthlyPriceSnapshot?: SortOrder
+    durationDiscountPercentSnapshot?: SortOrder
+    referralDiscountPercentSnapshot?: SortOrder
+  }
+
+  export type SubscriptionRenewalMaxOrderByAggregateInput = {
+    id?: SortOrder
+    subscriptionId?: SortOrder
+    paymentRequestId?: SortOrder
+    previousExpiresAt?: SortOrder
+    nextExpiresAt?: SortOrder
+    previousDevices?: SortOrder
+    nextDevices?: SortOrder
+    months?: SortOrder
+    amountRub?: SortOrder
+    currency?: SortOrder
+    baseDeviceMonthlyPriceSnapshot?: SortOrder
+    extraDeviceMonthlyPriceSnapshot?: SortOrder
+    monthlyPriceSnapshot?: SortOrder
+    durationDiscountPercentSnapshot?: SortOrder
+    referralDiscountPercentSnapshot?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type SubscriptionRenewalMinOrderByAggregateInput = {
+    id?: SortOrder
+    subscriptionId?: SortOrder
+    paymentRequestId?: SortOrder
+    previousExpiresAt?: SortOrder
+    nextExpiresAt?: SortOrder
+    previousDevices?: SortOrder
+    nextDevices?: SortOrder
+    months?: SortOrder
+    amountRub?: SortOrder
+    currency?: SortOrder
+    baseDeviceMonthlyPriceSnapshot?: SortOrder
+    extraDeviceMonthlyPriceSnapshot?: SortOrder
+    monthlyPriceSnapshot?: SortOrder
+    durationDiscountPercentSnapshot?: SortOrder
+    referralDiscountPercentSnapshot?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type SubscriptionRenewalSumOrderByAggregateInput = {
+    previousDevices?: SortOrder
+    nextDevices?: SortOrder
+    months?: SortOrder
+    amountRub?: SortOrder
+    baseDeviceMonthlyPriceSnapshot?: SortOrder
+    extraDeviceMonthlyPriceSnapshot?: SortOrder
+    monthlyPriceSnapshot?: SortOrder
+    durationDiscountPercentSnapshot?: SortOrder
+    referralDiscountPercentSnapshot?: SortOrder
+  }
+
   export type EnumDeviceSlotStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.DeviceSlotStatus | EnumDeviceSlotStatusFieldRefInput<$PrismaModel>
     in?: $Enums.DeviceSlotStatus[]
@@ -31688,11 +33346,6 @@ export namespace Prisma {
     in?: $Enums.DeviceOS[]
     notIn?: $Enums.DeviceOS[]
     not?: NestedEnumDeviceOSFilter<$PrismaModel> | $Enums.DeviceOS
-  }
-
-  export type SubscriptionScalarRelationFilter = {
-    is?: SubscriptionWhereInput
-    isNot?: SubscriptionWhereInput
   }
 
   export type DeviceSlotSubscriptionIdSlotIndexCompoundUniqueInput = {
@@ -31971,13 +33624,6 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
-  export type InviteCodeCreateNestedManyWithoutUsedByInput = {
-    create?: XOR<InviteCodeCreateWithoutUsedByInput, InviteCodeUncheckedCreateWithoutUsedByInput> | InviteCodeCreateWithoutUsedByInput[] | InviteCodeUncheckedCreateWithoutUsedByInput[]
-    connectOrCreate?: InviteCodeCreateOrConnectWithoutUsedByInput | InviteCodeCreateOrConnectWithoutUsedByInput[]
-    createMany?: InviteCodeCreateManyUsedByInputEnvelope
-    connect?: InviteCodeWhereUniqueInput | InviteCodeWhereUniqueInput[]
-  }
-
   export type ReferralCodeCreateNestedManyWithoutOwnerUserInput = {
     create?: XOR<ReferralCodeCreateWithoutOwnerUserInput, ReferralCodeUncheckedCreateWithoutOwnerUserInput> | ReferralCodeCreateWithoutOwnerUserInput[] | ReferralCodeUncheckedCreateWithoutOwnerUserInput[]
     connectOrCreate?: ReferralCodeCreateOrConnectWithoutOwnerUserInput | ReferralCodeCreateOrConnectWithoutOwnerUserInput[]
@@ -32040,18 +33686,17 @@ export namespace Prisma {
     connect?: PromoCodeRedemptionWhereUniqueInput | PromoCodeRedemptionWhereUniqueInput[]
   }
 
+  export type UserOperationLockCreateNestedOneWithoutUserInput = {
+    create?: XOR<UserOperationLockCreateWithoutUserInput, UserOperationLockUncheckedCreateWithoutUserInput>
+    connectOrCreate?: UserOperationLockCreateOrConnectWithoutUserInput
+    connect?: UserOperationLockWhereUniqueInput
+  }
+
   export type SessionCreateNestedManyWithoutUserInput = {
     create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
     createMany?: SessionCreateManyUserInputEnvelope
     connect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
-  }
-
-  export type InviteCodeUncheckedCreateNestedManyWithoutUsedByInput = {
-    create?: XOR<InviteCodeCreateWithoutUsedByInput, InviteCodeUncheckedCreateWithoutUsedByInput> | InviteCodeCreateWithoutUsedByInput[] | InviteCodeUncheckedCreateWithoutUsedByInput[]
-    connectOrCreate?: InviteCodeCreateOrConnectWithoutUsedByInput | InviteCodeCreateOrConnectWithoutUsedByInput[]
-    createMany?: InviteCodeCreateManyUsedByInputEnvelope
-    connect?: InviteCodeWhereUniqueInput | InviteCodeWhereUniqueInput[]
   }
 
   export type ReferralCodeUncheckedCreateNestedManyWithoutOwnerUserInput = {
@@ -32116,6 +33761,12 @@ export namespace Prisma {
     connect?: PromoCodeRedemptionWhereUniqueInput | PromoCodeRedemptionWhereUniqueInput[]
   }
 
+  export type UserOperationLockUncheckedCreateNestedOneWithoutUserInput = {
+    create?: XOR<UserOperationLockCreateWithoutUserInput, UserOperationLockUncheckedCreateWithoutUserInput>
+    connectOrCreate?: UserOperationLockCreateOrConnectWithoutUserInput
+    connect?: UserOperationLockWhereUniqueInput
+  }
+
   export type SessionUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
@@ -32141,20 +33792,6 @@ export namespace Prisma {
 
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
-  }
-
-  export type InviteCodeUpdateManyWithoutUsedByNestedInput = {
-    create?: XOR<InviteCodeCreateWithoutUsedByInput, InviteCodeUncheckedCreateWithoutUsedByInput> | InviteCodeCreateWithoutUsedByInput[] | InviteCodeUncheckedCreateWithoutUsedByInput[]
-    connectOrCreate?: InviteCodeCreateOrConnectWithoutUsedByInput | InviteCodeCreateOrConnectWithoutUsedByInput[]
-    upsert?: InviteCodeUpsertWithWhereUniqueWithoutUsedByInput | InviteCodeUpsertWithWhereUniqueWithoutUsedByInput[]
-    createMany?: InviteCodeCreateManyUsedByInputEnvelope
-    set?: InviteCodeWhereUniqueInput | InviteCodeWhereUniqueInput[]
-    disconnect?: InviteCodeWhereUniqueInput | InviteCodeWhereUniqueInput[]
-    delete?: InviteCodeWhereUniqueInput | InviteCodeWhereUniqueInput[]
-    connect?: InviteCodeWhereUniqueInput | InviteCodeWhereUniqueInput[]
-    update?: InviteCodeUpdateWithWhereUniqueWithoutUsedByInput | InviteCodeUpdateWithWhereUniqueWithoutUsedByInput[]
-    updateMany?: InviteCodeUpdateManyWithWhereWithoutUsedByInput | InviteCodeUpdateManyWithWhereWithoutUsedByInput[]
-    deleteMany?: InviteCodeScalarWhereInput | InviteCodeScalarWhereInput[]
   }
 
   export type ReferralCodeUpdateManyWithoutOwnerUserNestedInput = {
@@ -32279,6 +33916,16 @@ export namespace Prisma {
     deleteMany?: PromoCodeRedemptionScalarWhereInput | PromoCodeRedemptionScalarWhereInput[]
   }
 
+  export type UserOperationLockUpdateOneWithoutUserNestedInput = {
+    create?: XOR<UserOperationLockCreateWithoutUserInput, UserOperationLockUncheckedCreateWithoutUserInput>
+    connectOrCreate?: UserOperationLockCreateOrConnectWithoutUserInput
+    upsert?: UserOperationLockUpsertWithoutUserInput
+    disconnect?: UserOperationLockWhereInput | boolean
+    delete?: UserOperationLockWhereInput | boolean
+    connect?: UserOperationLockWhereUniqueInput
+    update?: XOR<XOR<UserOperationLockUpdateToOneWithWhereWithoutUserInput, UserOperationLockUpdateWithoutUserInput>, UserOperationLockUncheckedUpdateWithoutUserInput>
+  }
+
   export type SessionUpdateManyWithoutUserNestedInput = {
     create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
@@ -32291,20 +33938,6 @@ export namespace Prisma {
     update?: SessionUpdateWithWhereUniqueWithoutUserInput | SessionUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: SessionUpdateManyWithWhereWithoutUserInput | SessionUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: SessionScalarWhereInput | SessionScalarWhereInput[]
-  }
-
-  export type InviteCodeUncheckedUpdateManyWithoutUsedByNestedInput = {
-    create?: XOR<InviteCodeCreateWithoutUsedByInput, InviteCodeUncheckedCreateWithoutUsedByInput> | InviteCodeCreateWithoutUsedByInput[] | InviteCodeUncheckedCreateWithoutUsedByInput[]
-    connectOrCreate?: InviteCodeCreateOrConnectWithoutUsedByInput | InviteCodeCreateOrConnectWithoutUsedByInput[]
-    upsert?: InviteCodeUpsertWithWhereUniqueWithoutUsedByInput | InviteCodeUpsertWithWhereUniqueWithoutUsedByInput[]
-    createMany?: InviteCodeCreateManyUsedByInputEnvelope
-    set?: InviteCodeWhereUniqueInput | InviteCodeWhereUniqueInput[]
-    disconnect?: InviteCodeWhereUniqueInput | InviteCodeWhereUniqueInput[]
-    delete?: InviteCodeWhereUniqueInput | InviteCodeWhereUniqueInput[]
-    connect?: InviteCodeWhereUniqueInput | InviteCodeWhereUniqueInput[]
-    update?: InviteCodeUpdateWithWhereUniqueWithoutUsedByInput | InviteCodeUpdateWithWhereUniqueWithoutUsedByInput[]
-    updateMany?: InviteCodeUpdateManyWithWhereWithoutUsedByInput | InviteCodeUpdateManyWithWhereWithoutUsedByInput[]
-    deleteMany?: InviteCodeScalarWhereInput | InviteCodeScalarWhereInput[]
   }
 
   export type ReferralCodeUncheckedUpdateManyWithoutOwnerUserNestedInput = {
@@ -32429,6 +34062,16 @@ export namespace Prisma {
     deleteMany?: PromoCodeRedemptionScalarWhereInput | PromoCodeRedemptionScalarWhereInput[]
   }
 
+  export type UserOperationLockUncheckedUpdateOneWithoutUserNestedInput = {
+    create?: XOR<UserOperationLockCreateWithoutUserInput, UserOperationLockUncheckedCreateWithoutUserInput>
+    connectOrCreate?: UserOperationLockCreateOrConnectWithoutUserInput
+    upsert?: UserOperationLockUpsertWithoutUserInput
+    disconnect?: UserOperationLockWhereInput | boolean
+    delete?: UserOperationLockWhereInput | boolean
+    connect?: UserOperationLockWhereUniqueInput
+    update?: XOR<XOR<UserOperationLockUpdateToOneWithWhereWithoutUserInput, UserOperationLockUpdateWithoutUserInput>, UserOperationLockUncheckedUpdateWithoutUserInput>
+  }
+
   export type SessionUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
@@ -32443,32 +34086,18 @@ export namespace Prisma {
     deleteMany?: SessionScalarWhereInput | SessionScalarWhereInput[]
   }
 
-  export type UserCreateNestedOneWithoutInviteCodesUsedInput = {
-    create?: XOR<UserCreateWithoutInviteCodesUsedInput, UserUncheckedCreateWithoutInviteCodesUsedInput>
-    connectOrCreate?: UserCreateOrConnectWithoutInviteCodesUsedInput
+  export type UserCreateNestedOneWithoutOperationLockInput = {
+    create?: XOR<UserCreateWithoutOperationLockInput, UserUncheckedCreateWithoutOperationLockInput>
+    connectOrCreate?: UserCreateOrConnectWithoutOperationLockInput
     connect?: UserWhereUniqueInput
   }
 
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
-  }
-
-  export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null
-  }
-
-  export type UserUpdateOneWithoutInviteCodesUsedNestedInput = {
-    create?: XOR<UserCreateWithoutInviteCodesUsedInput, UserUncheckedCreateWithoutInviteCodesUsedInput>
-    connectOrCreate?: UserCreateOrConnectWithoutInviteCodesUsedInput
-    upsert?: UserUpsertWithoutInviteCodesUsedInput
-    disconnect?: UserWhereInput | boolean
-    delete?: UserWhereInput | boolean
+  export type UserUpdateOneRequiredWithoutOperationLockNestedInput = {
+    create?: XOR<UserCreateWithoutOperationLockInput, UserUncheckedCreateWithoutOperationLockInput>
+    connectOrCreate?: UserCreateOrConnectWithoutOperationLockInput
+    upsert?: UserUpsertWithoutOperationLockInput
     connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutInviteCodesUsedInput, UserUpdateWithoutInviteCodesUsedInput>, UserUncheckedUpdateWithoutInviteCodesUsedInput>
-  }
-
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutOperationLockInput, UserUpdateWithoutOperationLockInput>, UserUncheckedUpdateWithoutOperationLockInput>
   }
 
   export type UserCreateNestedOneWithoutReferralCodesCreatedInput = {
@@ -32489,6 +34118,14 @@ export namespace Prisma {
     connectOrCreate?: ReferralCodeUseCreateOrConnectWithoutReferralCodeInput | ReferralCodeUseCreateOrConnectWithoutReferralCodeInput[]
     createMany?: ReferralCodeUseCreateManyReferralCodeInputEnvelope
     connect?: ReferralCodeUseWhereUniqueInput | ReferralCodeUseWhereUniqueInput[]
+  }
+
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
   }
 
   export type UserUpdateOneWithoutReferralCodesCreatedNestedInput = {
@@ -32513,6 +34150,10 @@ export namespace Prisma {
     update?: ReferralCodeUseUpdateWithWhereUniqueWithoutReferralCodeInput | ReferralCodeUseUpdateWithWhereUniqueWithoutReferralCodeInput[]
     updateMany?: ReferralCodeUseUpdateManyWithWhereWithoutReferralCodeInput | ReferralCodeUseUpdateManyWithWhereWithoutReferralCodeInput[]
     deleteMany?: ReferralCodeUseScalarWhereInput | ReferralCodeUseScalarWhereInput[]
+  }
+
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
   }
 
   export type ReferralCodeUseUncheckedUpdateManyWithoutReferralCodeNestedInput = {
@@ -32725,6 +34366,12 @@ export namespace Prisma {
     connect?: SubscriptionWhereUniqueInput
   }
 
+  export type SubscriptionRenewalCreateNestedOneWithoutPaymentRequestInput = {
+    create?: XOR<SubscriptionRenewalCreateWithoutPaymentRequestInput, SubscriptionRenewalUncheckedCreateWithoutPaymentRequestInput>
+    connectOrCreate?: SubscriptionRenewalCreateOrConnectWithoutPaymentRequestInput
+    connect?: SubscriptionRenewalWhereUniqueInput
+  }
+
   export type PlategaWebhookLogCreateNestedManyWithoutPaymentRequestInput = {
     create?: XOR<PlategaWebhookLogCreateWithoutPaymentRequestInput, PlategaWebhookLogUncheckedCreateWithoutPaymentRequestInput> | PlategaWebhookLogCreateWithoutPaymentRequestInput[] | PlategaWebhookLogUncheckedCreateWithoutPaymentRequestInput[]
     connectOrCreate?: PlategaWebhookLogCreateOrConnectWithoutPaymentRequestInput | PlategaWebhookLogCreateOrConnectWithoutPaymentRequestInput[]
@@ -32736,6 +34383,12 @@ export namespace Prisma {
     create?: XOR<SubscriptionCreateWithoutPaymentRequestInput, SubscriptionUncheckedCreateWithoutPaymentRequestInput>
     connectOrCreate?: SubscriptionCreateOrConnectWithoutPaymentRequestInput
     connect?: SubscriptionWhereUniqueInput
+  }
+
+  export type SubscriptionRenewalUncheckedCreateNestedOneWithoutPaymentRequestInput = {
+    create?: XOR<SubscriptionRenewalCreateWithoutPaymentRequestInput, SubscriptionRenewalUncheckedCreateWithoutPaymentRequestInput>
+    connectOrCreate?: SubscriptionRenewalCreateOrConnectWithoutPaymentRequestInput
+    connect?: SubscriptionRenewalWhereUniqueInput
   }
 
   export type PlategaWebhookLogUncheckedCreateNestedManyWithoutPaymentRequestInput = {
@@ -32771,6 +34424,16 @@ export namespace Prisma {
     update?: XOR<XOR<SubscriptionUpdateToOneWithWhereWithoutPaymentRequestInput, SubscriptionUpdateWithoutPaymentRequestInput>, SubscriptionUncheckedUpdateWithoutPaymentRequestInput>
   }
 
+  export type SubscriptionRenewalUpdateOneWithoutPaymentRequestNestedInput = {
+    create?: XOR<SubscriptionRenewalCreateWithoutPaymentRequestInput, SubscriptionRenewalUncheckedCreateWithoutPaymentRequestInput>
+    connectOrCreate?: SubscriptionRenewalCreateOrConnectWithoutPaymentRequestInput
+    upsert?: SubscriptionRenewalUpsertWithoutPaymentRequestInput
+    disconnect?: SubscriptionRenewalWhereInput | boolean
+    delete?: SubscriptionRenewalWhereInput | boolean
+    connect?: SubscriptionRenewalWhereUniqueInput
+    update?: XOR<XOR<SubscriptionRenewalUpdateToOneWithWhereWithoutPaymentRequestInput, SubscriptionRenewalUpdateWithoutPaymentRequestInput>, SubscriptionRenewalUncheckedUpdateWithoutPaymentRequestInput>
+  }
+
   export type PlategaWebhookLogUpdateManyWithoutPaymentRequestNestedInput = {
     create?: XOR<PlategaWebhookLogCreateWithoutPaymentRequestInput, PlategaWebhookLogUncheckedCreateWithoutPaymentRequestInput> | PlategaWebhookLogCreateWithoutPaymentRequestInput[] | PlategaWebhookLogUncheckedCreateWithoutPaymentRequestInput[]
     connectOrCreate?: PlategaWebhookLogCreateOrConnectWithoutPaymentRequestInput | PlategaWebhookLogCreateOrConnectWithoutPaymentRequestInput[]
@@ -32793,6 +34456,16 @@ export namespace Prisma {
     delete?: SubscriptionWhereInput | boolean
     connect?: SubscriptionWhereUniqueInput
     update?: XOR<XOR<SubscriptionUpdateToOneWithWhereWithoutPaymentRequestInput, SubscriptionUpdateWithoutPaymentRequestInput>, SubscriptionUncheckedUpdateWithoutPaymentRequestInput>
+  }
+
+  export type SubscriptionRenewalUncheckedUpdateOneWithoutPaymentRequestNestedInput = {
+    create?: XOR<SubscriptionRenewalCreateWithoutPaymentRequestInput, SubscriptionRenewalUncheckedCreateWithoutPaymentRequestInput>
+    connectOrCreate?: SubscriptionRenewalCreateOrConnectWithoutPaymentRequestInput
+    upsert?: SubscriptionRenewalUpsertWithoutPaymentRequestInput
+    disconnect?: SubscriptionRenewalWhereInput | boolean
+    delete?: SubscriptionRenewalWhereInput | boolean
+    connect?: SubscriptionRenewalWhereUniqueInput
+    update?: XOR<XOR<SubscriptionRenewalUpdateToOneWithWhereWithoutPaymentRequestInput, SubscriptionRenewalUpdateWithoutPaymentRequestInput>, SubscriptionRenewalUncheckedUpdateWithoutPaymentRequestInput>
   }
 
   export type PlategaWebhookLogUncheckedUpdateManyWithoutPaymentRequestNestedInput = {
@@ -32848,11 +34521,25 @@ export namespace Prisma {
     connect?: DeviceSlotWhereUniqueInput | DeviceSlotWhereUniqueInput[]
   }
 
+  export type SubscriptionRenewalCreateNestedManyWithoutSubscriptionInput = {
+    create?: XOR<SubscriptionRenewalCreateWithoutSubscriptionInput, SubscriptionRenewalUncheckedCreateWithoutSubscriptionInput> | SubscriptionRenewalCreateWithoutSubscriptionInput[] | SubscriptionRenewalUncheckedCreateWithoutSubscriptionInput[]
+    connectOrCreate?: SubscriptionRenewalCreateOrConnectWithoutSubscriptionInput | SubscriptionRenewalCreateOrConnectWithoutSubscriptionInput[]
+    createMany?: SubscriptionRenewalCreateManySubscriptionInputEnvelope
+    connect?: SubscriptionRenewalWhereUniqueInput | SubscriptionRenewalWhereUniqueInput[]
+  }
+
   export type DeviceSlotUncheckedCreateNestedManyWithoutSubscriptionInput = {
     create?: XOR<DeviceSlotCreateWithoutSubscriptionInput, DeviceSlotUncheckedCreateWithoutSubscriptionInput> | DeviceSlotCreateWithoutSubscriptionInput[] | DeviceSlotUncheckedCreateWithoutSubscriptionInput[]
     connectOrCreate?: DeviceSlotCreateOrConnectWithoutSubscriptionInput | DeviceSlotCreateOrConnectWithoutSubscriptionInput[]
     createMany?: DeviceSlotCreateManySubscriptionInputEnvelope
     connect?: DeviceSlotWhereUniqueInput | DeviceSlotWhereUniqueInput[]
+  }
+
+  export type SubscriptionRenewalUncheckedCreateNestedManyWithoutSubscriptionInput = {
+    create?: XOR<SubscriptionRenewalCreateWithoutSubscriptionInput, SubscriptionRenewalUncheckedCreateWithoutSubscriptionInput> | SubscriptionRenewalCreateWithoutSubscriptionInput[] | SubscriptionRenewalUncheckedCreateWithoutSubscriptionInput[]
+    connectOrCreate?: SubscriptionRenewalCreateOrConnectWithoutSubscriptionInput | SubscriptionRenewalCreateOrConnectWithoutSubscriptionInput[]
+    createMany?: SubscriptionRenewalCreateManySubscriptionInputEnvelope
+    connect?: SubscriptionRenewalWhereUniqueInput | SubscriptionRenewalWhereUniqueInput[]
   }
 
   export type NullableIntFieldUpdateOperationsInput = {
@@ -32899,6 +34586,20 @@ export namespace Prisma {
     deleteMany?: DeviceSlotScalarWhereInput | DeviceSlotScalarWhereInput[]
   }
 
+  export type SubscriptionRenewalUpdateManyWithoutSubscriptionNestedInput = {
+    create?: XOR<SubscriptionRenewalCreateWithoutSubscriptionInput, SubscriptionRenewalUncheckedCreateWithoutSubscriptionInput> | SubscriptionRenewalCreateWithoutSubscriptionInput[] | SubscriptionRenewalUncheckedCreateWithoutSubscriptionInput[]
+    connectOrCreate?: SubscriptionRenewalCreateOrConnectWithoutSubscriptionInput | SubscriptionRenewalCreateOrConnectWithoutSubscriptionInput[]
+    upsert?: SubscriptionRenewalUpsertWithWhereUniqueWithoutSubscriptionInput | SubscriptionRenewalUpsertWithWhereUniqueWithoutSubscriptionInput[]
+    createMany?: SubscriptionRenewalCreateManySubscriptionInputEnvelope
+    set?: SubscriptionRenewalWhereUniqueInput | SubscriptionRenewalWhereUniqueInput[]
+    disconnect?: SubscriptionRenewalWhereUniqueInput | SubscriptionRenewalWhereUniqueInput[]
+    delete?: SubscriptionRenewalWhereUniqueInput | SubscriptionRenewalWhereUniqueInput[]
+    connect?: SubscriptionRenewalWhereUniqueInput | SubscriptionRenewalWhereUniqueInput[]
+    update?: SubscriptionRenewalUpdateWithWhereUniqueWithoutSubscriptionInput | SubscriptionRenewalUpdateWithWhereUniqueWithoutSubscriptionInput[]
+    updateMany?: SubscriptionRenewalUpdateManyWithWhereWithoutSubscriptionInput | SubscriptionRenewalUpdateManyWithWhereWithoutSubscriptionInput[]
+    deleteMany?: SubscriptionRenewalScalarWhereInput | SubscriptionRenewalScalarWhereInput[]
+  }
+
   export type DeviceSlotUncheckedUpdateManyWithoutSubscriptionNestedInput = {
     create?: XOR<DeviceSlotCreateWithoutSubscriptionInput, DeviceSlotUncheckedCreateWithoutSubscriptionInput> | DeviceSlotCreateWithoutSubscriptionInput[] | DeviceSlotUncheckedCreateWithoutSubscriptionInput[]
     connectOrCreate?: DeviceSlotCreateOrConnectWithoutSubscriptionInput | DeviceSlotCreateOrConnectWithoutSubscriptionInput[]
@@ -32911,6 +34612,48 @@ export namespace Prisma {
     update?: DeviceSlotUpdateWithWhereUniqueWithoutSubscriptionInput | DeviceSlotUpdateWithWhereUniqueWithoutSubscriptionInput[]
     updateMany?: DeviceSlotUpdateManyWithWhereWithoutSubscriptionInput | DeviceSlotUpdateManyWithWhereWithoutSubscriptionInput[]
     deleteMany?: DeviceSlotScalarWhereInput | DeviceSlotScalarWhereInput[]
+  }
+
+  export type SubscriptionRenewalUncheckedUpdateManyWithoutSubscriptionNestedInput = {
+    create?: XOR<SubscriptionRenewalCreateWithoutSubscriptionInput, SubscriptionRenewalUncheckedCreateWithoutSubscriptionInput> | SubscriptionRenewalCreateWithoutSubscriptionInput[] | SubscriptionRenewalUncheckedCreateWithoutSubscriptionInput[]
+    connectOrCreate?: SubscriptionRenewalCreateOrConnectWithoutSubscriptionInput | SubscriptionRenewalCreateOrConnectWithoutSubscriptionInput[]
+    upsert?: SubscriptionRenewalUpsertWithWhereUniqueWithoutSubscriptionInput | SubscriptionRenewalUpsertWithWhereUniqueWithoutSubscriptionInput[]
+    createMany?: SubscriptionRenewalCreateManySubscriptionInputEnvelope
+    set?: SubscriptionRenewalWhereUniqueInput | SubscriptionRenewalWhereUniqueInput[]
+    disconnect?: SubscriptionRenewalWhereUniqueInput | SubscriptionRenewalWhereUniqueInput[]
+    delete?: SubscriptionRenewalWhereUniqueInput | SubscriptionRenewalWhereUniqueInput[]
+    connect?: SubscriptionRenewalWhereUniqueInput | SubscriptionRenewalWhereUniqueInput[]
+    update?: SubscriptionRenewalUpdateWithWhereUniqueWithoutSubscriptionInput | SubscriptionRenewalUpdateWithWhereUniqueWithoutSubscriptionInput[]
+    updateMany?: SubscriptionRenewalUpdateManyWithWhereWithoutSubscriptionInput | SubscriptionRenewalUpdateManyWithWhereWithoutSubscriptionInput[]
+    deleteMany?: SubscriptionRenewalScalarWhereInput | SubscriptionRenewalScalarWhereInput[]
+  }
+
+  export type SubscriptionCreateNestedOneWithoutRenewalsInput = {
+    create?: XOR<SubscriptionCreateWithoutRenewalsInput, SubscriptionUncheckedCreateWithoutRenewalsInput>
+    connectOrCreate?: SubscriptionCreateOrConnectWithoutRenewalsInput
+    connect?: SubscriptionWhereUniqueInput
+  }
+
+  export type PaymentRequestCreateNestedOneWithoutSubscriptionRenewalInput = {
+    create?: XOR<PaymentRequestCreateWithoutSubscriptionRenewalInput, PaymentRequestUncheckedCreateWithoutSubscriptionRenewalInput>
+    connectOrCreate?: PaymentRequestCreateOrConnectWithoutSubscriptionRenewalInput
+    connect?: PaymentRequestWhereUniqueInput
+  }
+
+  export type SubscriptionUpdateOneRequiredWithoutRenewalsNestedInput = {
+    create?: XOR<SubscriptionCreateWithoutRenewalsInput, SubscriptionUncheckedCreateWithoutRenewalsInput>
+    connectOrCreate?: SubscriptionCreateOrConnectWithoutRenewalsInput
+    upsert?: SubscriptionUpsertWithoutRenewalsInput
+    connect?: SubscriptionWhereUniqueInput
+    update?: XOR<XOR<SubscriptionUpdateToOneWithWhereWithoutRenewalsInput, SubscriptionUpdateWithoutRenewalsInput>, SubscriptionUncheckedUpdateWithoutRenewalsInput>
+  }
+
+  export type PaymentRequestUpdateOneRequiredWithoutSubscriptionRenewalNestedInput = {
+    create?: XOR<PaymentRequestCreateWithoutSubscriptionRenewalInput, PaymentRequestUncheckedCreateWithoutSubscriptionRenewalInput>
+    connectOrCreate?: PaymentRequestCreateOrConnectWithoutSubscriptionRenewalInput
+    upsert?: PaymentRequestUpsertWithoutSubscriptionRenewalInput
+    connect?: PaymentRequestWhereUniqueInput
+    update?: XOR<XOR<PaymentRequestUpdateToOneWithWhereWithoutSubscriptionRenewalInput, PaymentRequestUpdateWithoutSubscriptionRenewalInput>, PaymentRequestUncheckedUpdateWithoutSubscriptionRenewalInput>
   }
 
   export type SubscriptionCreateNestedOneWithoutDeviceSlotsInput = {
@@ -33383,33 +35126,6 @@ export namespace Prisma {
     _max?: NestedEnumPayoutRequestStatusFilter<$PrismaModel>
   }
 
-  export type InviteCodeCreateWithoutUsedByInput = {
-    id?: string
-    code: string
-    isEnabled?: boolean
-    expiresAt?: Date | string | null
-    createdAt?: Date | string
-    usedAt?: Date | string | null
-  }
-
-  export type InviteCodeUncheckedCreateWithoutUsedByInput = {
-    id?: string
-    code: string
-    isEnabled?: boolean
-    expiresAt?: Date | string | null
-    createdAt?: Date | string
-    usedAt?: Date | string | null
-  }
-
-  export type InviteCodeCreateOrConnectWithoutUsedByInput = {
-    where: InviteCodeWhereUniqueInput
-    create: XOR<InviteCodeCreateWithoutUsedByInput, InviteCodeUncheckedCreateWithoutUsedByInput>
-  }
-
-  export type InviteCodeCreateManyUsedByInputEnvelope = {
-    data: InviteCodeCreateManyUsedByInput | InviteCodeCreateManyUsedByInput[]
-  }
-
   export type ReferralCodeCreateWithoutOwnerUserInput = {
     id?: string
     code: string
@@ -33494,6 +35210,7 @@ export namespace Prisma {
     plategaPayloadJson?: string | null
     plategaConfirmedAt?: Date | string | null
     subscription?: SubscriptionCreateNestedOneWithoutPaymentRequestInput
+    subscriptionRenewal?: SubscriptionRenewalCreateNestedOneWithoutPaymentRequestInput
     plategaWebhookLogs?: PlategaWebhookLogCreateNestedManyWithoutPaymentRequestInput
   }
 
@@ -33525,6 +35242,7 @@ export namespace Prisma {
     plategaPayloadJson?: string | null
     plategaConfirmedAt?: Date | string | null
     subscription?: SubscriptionUncheckedCreateNestedOneWithoutPaymentRequestInput
+    subscriptionRenewal?: SubscriptionRenewalUncheckedCreateNestedOneWithoutPaymentRequestInput
     plategaWebhookLogs?: PlategaWebhookLogUncheckedCreateNestedManyWithoutPaymentRequestInput
   }
 
@@ -33651,6 +35369,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     paymentRequest?: PaymentRequestCreateNestedOneWithoutSubscriptionInput
     deviceSlots?: DeviceSlotCreateNestedManyWithoutSubscriptionInput
+    renewals?: SubscriptionRenewalCreateNestedManyWithoutSubscriptionInput
   }
 
   export type SubscriptionUncheckedCreateWithoutUserInput = {
@@ -33685,6 +35404,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deviceSlots?: DeviceSlotUncheckedCreateNestedManyWithoutSubscriptionInput
+    renewals?: SubscriptionRenewalUncheckedCreateNestedManyWithoutSubscriptionInput
   }
 
   export type SubscriptionCreateOrConnectWithoutUserInput = {
@@ -33779,6 +35499,21 @@ export namespace Prisma {
     data: PromoCodeRedemptionCreateManyUserInput | PromoCodeRedemptionCreateManyUserInput[]
   }
 
+  export type UserOperationLockCreateWithoutUserInput = {
+    operation: string
+    lockedAt?: Date | string
+  }
+
+  export type UserOperationLockUncheckedCreateWithoutUserInput = {
+    operation: string
+    lockedAt?: Date | string
+  }
+
+  export type UserOperationLockCreateOrConnectWithoutUserInput = {
+    where: UserOperationLockWhereUniqueInput
+    create: XOR<UserOperationLockCreateWithoutUserInput, UserOperationLockUncheckedCreateWithoutUserInput>
+  }
+
   export type SessionCreateWithoutUserInput = {
     id: string
     expiresAt: Date | string
@@ -33800,35 +35535,6 @@ export namespace Prisma {
 
   export type SessionCreateManyUserInputEnvelope = {
     data: SessionCreateManyUserInput | SessionCreateManyUserInput[]
-  }
-
-  export type InviteCodeUpsertWithWhereUniqueWithoutUsedByInput = {
-    where: InviteCodeWhereUniqueInput
-    update: XOR<InviteCodeUpdateWithoutUsedByInput, InviteCodeUncheckedUpdateWithoutUsedByInput>
-    create: XOR<InviteCodeCreateWithoutUsedByInput, InviteCodeUncheckedCreateWithoutUsedByInput>
-  }
-
-  export type InviteCodeUpdateWithWhereUniqueWithoutUsedByInput = {
-    where: InviteCodeWhereUniqueInput
-    data: XOR<InviteCodeUpdateWithoutUsedByInput, InviteCodeUncheckedUpdateWithoutUsedByInput>
-  }
-
-  export type InviteCodeUpdateManyWithWhereWithoutUsedByInput = {
-    where: InviteCodeScalarWhereInput
-    data: XOR<InviteCodeUpdateManyMutationInput, InviteCodeUncheckedUpdateManyWithoutUsedByInput>
-  }
-
-  export type InviteCodeScalarWhereInput = {
-    AND?: InviteCodeScalarWhereInput | InviteCodeScalarWhereInput[]
-    OR?: InviteCodeScalarWhereInput[]
-    NOT?: InviteCodeScalarWhereInput | InviteCodeScalarWhereInput[]
-    id?: StringFilter<"InviteCode"> | string
-    code?: StringFilter<"InviteCode"> | string
-    isEnabled?: BoolFilter<"InviteCode"> | boolean
-    expiresAt?: DateTimeNullableFilter<"InviteCode"> | Date | string | null
-    createdAt?: DateTimeFilter<"InviteCode"> | Date | string
-    usedAt?: DateTimeNullableFilter<"InviteCode"> | Date | string | null
-    usedByUserId?: StringNullableFilter<"InviteCode"> | string | null
   }
 
   export type ReferralCodeUpsertWithWhereUniqueWithoutOwnerUserInput = {
@@ -34133,6 +35839,27 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"PromoCodeRedemption"> | Date | string
   }
 
+  export type UserOperationLockUpsertWithoutUserInput = {
+    update: XOR<UserOperationLockUpdateWithoutUserInput, UserOperationLockUncheckedUpdateWithoutUserInput>
+    create: XOR<UserOperationLockCreateWithoutUserInput, UserOperationLockUncheckedCreateWithoutUserInput>
+    where?: UserOperationLockWhereInput
+  }
+
+  export type UserOperationLockUpdateToOneWithWhereWithoutUserInput = {
+    where?: UserOperationLockWhereInput
+    data: XOR<UserOperationLockUpdateWithoutUserInput, UserOperationLockUncheckedUpdateWithoutUserInput>
+  }
+
+  export type UserOperationLockUpdateWithoutUserInput = {
+    operation?: StringFieldUpdateOperationsInput | string
+    lockedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserOperationLockUncheckedUpdateWithoutUserInput = {
+    operation?: StringFieldUpdateOperationsInput | string
+    lockedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type SessionUpsertWithWhereUniqueWithoutUserInput = {
     where: SessionWhereUniqueInput
     update: XOR<SessionUpdateWithoutUserInput, SessionUncheckedUpdateWithoutUserInput>
@@ -34160,7 +35887,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Session"> | Date | string
   }
 
-  export type UserCreateWithoutInviteCodesUsedInput = {
+  export type UserCreateWithoutOperationLockInput = {
     id?: string
     username: string
     passwordHash: string
@@ -34181,7 +35908,7 @@ export namespace Prisma {
     sessions?: SessionCreateNestedManyWithoutUserInput
   }
 
-  export type UserUncheckedCreateWithoutInviteCodesUsedInput = {
+  export type UserUncheckedCreateWithoutOperationLockInput = {
     id?: string
     username: string
     passwordHash: string
@@ -34202,23 +35929,23 @@ export namespace Prisma {
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithoutInviteCodesUsedInput = {
+  export type UserCreateOrConnectWithoutOperationLockInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutInviteCodesUsedInput, UserUncheckedCreateWithoutInviteCodesUsedInput>
+    create: XOR<UserCreateWithoutOperationLockInput, UserUncheckedCreateWithoutOperationLockInput>
   }
 
-  export type UserUpsertWithoutInviteCodesUsedInput = {
-    update: XOR<UserUpdateWithoutInviteCodesUsedInput, UserUncheckedUpdateWithoutInviteCodesUsedInput>
-    create: XOR<UserCreateWithoutInviteCodesUsedInput, UserUncheckedCreateWithoutInviteCodesUsedInput>
+  export type UserUpsertWithoutOperationLockInput = {
+    update: XOR<UserUpdateWithoutOperationLockInput, UserUncheckedUpdateWithoutOperationLockInput>
+    create: XOR<UserCreateWithoutOperationLockInput, UserUncheckedCreateWithoutOperationLockInput>
     where?: UserWhereInput
   }
 
-  export type UserUpdateToOneWithWhereWithoutInviteCodesUsedInput = {
+  export type UserUpdateToOneWithWhereWithoutOperationLockInput = {
     where?: UserWhereInput
-    data: XOR<UserUpdateWithoutInviteCodesUsedInput, UserUncheckedUpdateWithoutInviteCodesUsedInput>
+    data: XOR<UserUpdateWithoutOperationLockInput, UserUncheckedUpdateWithoutOperationLockInput>
   }
 
-  export type UserUpdateWithoutInviteCodesUsedInput = {
+  export type UserUpdateWithoutOperationLockInput = {
     id?: StringFieldUpdateOperationsInput | string
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
@@ -34239,7 +35966,7 @@ export namespace Prisma {
     sessions?: SessionUpdateManyWithoutUserNestedInput
   }
 
-  export type UserUncheckedUpdateWithoutInviteCodesUsedInput = {
+  export type UserUncheckedUpdateWithoutOperationLockInput = {
     id?: StringFieldUpdateOperationsInput | string
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
@@ -34269,7 +35996,6 @@ export namespace Prisma {
     reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    inviteCodesUsed?: InviteCodeCreateNestedManyWithoutUsedByInput
     referralCodeUse?: ReferralCodeUseCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestCreateNestedManyWithoutUserInput
     payoutRequests?: PayoutRequestCreateNestedManyWithoutUserInput
@@ -34278,6 +36004,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketCreateNestedManyWithoutUserInput
     promoCodeRedemptions?: PromoCodeRedemptionCreateNestedManyWithoutUserInput
+    operationLock?: UserOperationLockCreateNestedOneWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
   }
 
@@ -34290,7 +36017,6 @@ export namespace Prisma {
     reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    inviteCodesUsed?: InviteCodeUncheckedCreateNestedManyWithoutUsedByInput
     referralCodeUse?: ReferralCodeUseUncheckedCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestUncheckedCreateNestedManyWithoutUserInput
     payoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutUserInput
@@ -34299,6 +36025,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUncheckedCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketUncheckedCreateNestedManyWithoutUserInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+    operationLock?: UserOperationLockUncheckedCreateNestedOneWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -34354,7 +36081,6 @@ export namespace Prisma {
     reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inviteCodesUsed?: InviteCodeUpdateManyWithoutUsedByNestedInput
     referralCodeUse?: ReferralCodeUseUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUpdateManyWithoutUserNestedInput
     payoutRequests?: PayoutRequestUpdateManyWithoutUserNestedInput
@@ -34363,6 +36089,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUpdateManyWithoutUserNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+    operationLock?: UserOperationLockUpdateOneWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
   }
 
@@ -34375,7 +36102,6 @@ export namespace Prisma {
     reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inviteCodesUsed?: InviteCodeUncheckedUpdateManyWithoutUsedByNestedInput
     referralCodeUse?: ReferralCodeUseUncheckedUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUncheckedUpdateManyWithoutUserNestedInput
     payoutRequests?: PayoutRequestUncheckedUpdateManyWithoutUserNestedInput
@@ -34384,6 +36110,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUncheckedUpdateManyWithoutUserNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+    operationLock?: UserOperationLockUncheckedUpdateOneWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -34454,7 +36181,6 @@ export namespace Prisma {
     reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    inviteCodesUsed?: InviteCodeCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeCreateNestedManyWithoutOwnerUserInput
     paymentRequests?: PaymentRequestCreateNestedManyWithoutUserInput
     payoutRequests?: PayoutRequestCreateNestedManyWithoutUserInput
@@ -34463,6 +36189,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketCreateNestedManyWithoutUserInput
     promoCodeRedemptions?: PromoCodeRedemptionCreateNestedManyWithoutUserInput
+    operationLock?: UserOperationLockCreateNestedOneWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
   }
 
@@ -34475,7 +36202,6 @@ export namespace Prisma {
     reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    inviteCodesUsed?: InviteCodeUncheckedCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeUncheckedCreateNestedManyWithoutOwnerUserInput
     paymentRequests?: PaymentRequestUncheckedCreateNestedManyWithoutUserInput
     payoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutUserInput
@@ -34484,6 +36210,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUncheckedCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketUncheckedCreateNestedManyWithoutUserInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+    operationLock?: UserOperationLockUncheckedCreateNestedOneWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -34547,7 +36274,6 @@ export namespace Prisma {
     reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inviteCodesUsed?: InviteCodeUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUpdateManyWithoutOwnerUserNestedInput
     paymentRequests?: PaymentRequestUpdateManyWithoutUserNestedInput
     payoutRequests?: PayoutRequestUpdateManyWithoutUserNestedInput
@@ -34556,6 +36282,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUpdateManyWithoutUserNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+    operationLock?: UserOperationLockUpdateOneWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
   }
 
@@ -34568,7 +36295,6 @@ export namespace Prisma {
     reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inviteCodesUsed?: InviteCodeUncheckedUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUncheckedUpdateManyWithoutOwnerUserNestedInput
     paymentRequests?: PaymentRequestUncheckedUpdateManyWithoutUserNestedInput
     payoutRequests?: PayoutRequestUncheckedUpdateManyWithoutUserNestedInput
@@ -34577,6 +36303,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUncheckedUpdateManyWithoutUserNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+    operationLock?: UserOperationLockUncheckedUpdateOneWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -34653,7 +36380,6 @@ export namespace Prisma {
     reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    inviteCodesUsed?: InviteCodeCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestCreateNestedManyWithoutUserInput
@@ -34662,6 +36388,7 @@ export namespace Prisma {
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     supportMessages?: SupportMessageCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketCreateNestedManyWithoutUserInput
+    operationLock?: UserOperationLockCreateNestedOneWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
   }
 
@@ -34674,7 +36401,6 @@ export namespace Prisma {
     reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    inviteCodesUsed?: InviteCodeUncheckedCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeUncheckedCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseUncheckedCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestUncheckedCreateNestedManyWithoutUserInput
@@ -34683,6 +36409,7 @@ export namespace Prisma {
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     supportMessages?: SupportMessageUncheckedCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketUncheckedCreateNestedManyWithoutUserInput
+    operationLock?: UserOperationLockUncheckedCreateNestedOneWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -34744,7 +36471,6 @@ export namespace Prisma {
     reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inviteCodesUsed?: InviteCodeUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUpdateManyWithoutUserNestedInput
@@ -34753,6 +36479,7 @@ export namespace Prisma {
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     supportMessages?: SupportMessageUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUpdateManyWithoutUserNestedInput
+    operationLock?: UserOperationLockUpdateOneWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
   }
 
@@ -34765,7 +36492,6 @@ export namespace Prisma {
     reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inviteCodesUsed?: InviteCodeUncheckedUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUncheckedUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUncheckedUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUncheckedUpdateManyWithoutUserNestedInput
@@ -34774,6 +36500,7 @@ export namespace Prisma {
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     supportMessages?: SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+    operationLock?: UserOperationLockUncheckedUpdateOneWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -34786,7 +36513,6 @@ export namespace Prisma {
     reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    inviteCodesUsed?: InviteCodeCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestCreateNestedManyWithoutUserInput
@@ -34795,6 +36521,7 @@ export namespace Prisma {
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     supportMessages?: SupportMessageCreateNestedManyWithoutSenderInput
     promoCodeRedemptions?: PromoCodeRedemptionCreateNestedManyWithoutUserInput
+    operationLock?: UserOperationLockCreateNestedOneWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
   }
 
@@ -34807,7 +36534,6 @@ export namespace Prisma {
     reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    inviteCodesUsed?: InviteCodeUncheckedCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeUncheckedCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseUncheckedCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestUncheckedCreateNestedManyWithoutUserInput
@@ -34816,6 +36542,7 @@ export namespace Prisma {
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     supportMessages?: SupportMessageUncheckedCreateNestedManyWithoutSenderInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+    operationLock?: UserOperationLockUncheckedCreateNestedOneWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -34868,7 +36595,6 @@ export namespace Prisma {
     reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inviteCodesUsed?: InviteCodeUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUpdateManyWithoutUserNestedInput
@@ -34877,6 +36603,7 @@ export namespace Prisma {
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     supportMessages?: SupportMessageUpdateManyWithoutSenderNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+    operationLock?: UserOperationLockUpdateOneWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
   }
 
@@ -34889,7 +36616,6 @@ export namespace Prisma {
     reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inviteCodesUsed?: InviteCodeUncheckedUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUncheckedUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUncheckedUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUncheckedUpdateManyWithoutUserNestedInput
@@ -34898,6 +36624,7 @@ export namespace Prisma {
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     supportMessages?: SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+    operationLock?: UserOperationLockUncheckedUpdateOneWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -34960,7 +36687,6 @@ export namespace Prisma {
     reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    inviteCodesUsed?: InviteCodeCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestCreateNestedManyWithoutUserInput
@@ -34969,6 +36695,7 @@ export namespace Prisma {
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     supportTickets?: SupportTicketCreateNestedManyWithoutUserInput
     promoCodeRedemptions?: PromoCodeRedemptionCreateNestedManyWithoutUserInput
+    operationLock?: UserOperationLockCreateNestedOneWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
   }
 
@@ -34981,7 +36708,6 @@ export namespace Prisma {
     reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    inviteCodesUsed?: InviteCodeUncheckedCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeUncheckedCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseUncheckedCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestUncheckedCreateNestedManyWithoutUserInput
@@ -34990,6 +36716,7 @@ export namespace Prisma {
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     supportTickets?: SupportTicketUncheckedCreateNestedManyWithoutUserInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+    operationLock?: UserOperationLockUncheckedCreateNestedOneWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -35058,7 +36785,6 @@ export namespace Prisma {
     reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inviteCodesUsed?: InviteCodeUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUpdateManyWithoutUserNestedInput
@@ -35067,6 +36793,7 @@ export namespace Prisma {
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     supportTickets?: SupportTicketUpdateManyWithoutUserNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+    operationLock?: UserOperationLockUpdateOneWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
   }
 
@@ -35079,7 +36806,6 @@ export namespace Prisma {
     reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inviteCodesUsed?: InviteCodeUncheckedUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUncheckedUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUncheckedUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUncheckedUpdateManyWithoutUserNestedInput
@@ -35088,6 +36814,7 @@ export namespace Prisma {
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     supportTickets?: SupportTicketUncheckedUpdateManyWithoutUserNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+    operationLock?: UserOperationLockUncheckedUpdateOneWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -35100,7 +36827,6 @@ export namespace Prisma {
     reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    inviteCodesUsed?: InviteCodeCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseCreateNestedOneWithoutReferredUserInput
     payoutRequests?: PayoutRequestCreateNestedManyWithoutUserInput
@@ -35109,6 +36835,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketCreateNestedManyWithoutUserInput
     promoCodeRedemptions?: PromoCodeRedemptionCreateNestedManyWithoutUserInput
+    operationLock?: UserOperationLockCreateNestedOneWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
   }
 
@@ -35121,7 +36848,6 @@ export namespace Prisma {
     reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    inviteCodesUsed?: InviteCodeUncheckedCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeUncheckedCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseUncheckedCreateNestedOneWithoutReferredUserInput
     payoutRequests?: PayoutRequestUncheckedCreateNestedManyWithoutUserInput
@@ -35130,6 +36856,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUncheckedCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketUncheckedCreateNestedManyWithoutUserInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+    operationLock?: UserOperationLockUncheckedCreateNestedOneWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -35170,6 +36897,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSubscriptionsInput
     deviceSlots?: DeviceSlotCreateNestedManyWithoutSubscriptionInput
+    renewals?: SubscriptionRenewalCreateNestedManyWithoutSubscriptionInput
   }
 
   export type SubscriptionUncheckedCreateWithoutPaymentRequestInput = {
@@ -35204,11 +36932,53 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deviceSlots?: DeviceSlotUncheckedCreateNestedManyWithoutSubscriptionInput
+    renewals?: SubscriptionRenewalUncheckedCreateNestedManyWithoutSubscriptionInput
   }
 
   export type SubscriptionCreateOrConnectWithoutPaymentRequestInput = {
     where: SubscriptionWhereUniqueInput
     create: XOR<SubscriptionCreateWithoutPaymentRequestInput, SubscriptionUncheckedCreateWithoutPaymentRequestInput>
+  }
+
+  export type SubscriptionRenewalCreateWithoutPaymentRequestInput = {
+    id?: string
+    previousExpiresAt?: Date | string | null
+    nextExpiresAt: Date | string
+    previousDevices: number
+    nextDevices: number
+    months: number
+    amountRub: number
+    currency?: string
+    baseDeviceMonthlyPriceSnapshot?: number
+    extraDeviceMonthlyPriceSnapshot?: number
+    monthlyPriceSnapshot?: number
+    durationDiscountPercentSnapshot?: number
+    referralDiscountPercentSnapshot?: number
+    createdAt?: Date | string
+    subscription: SubscriptionCreateNestedOneWithoutRenewalsInput
+  }
+
+  export type SubscriptionRenewalUncheckedCreateWithoutPaymentRequestInput = {
+    id?: string
+    subscriptionId: string
+    previousExpiresAt?: Date | string | null
+    nextExpiresAt: Date | string
+    previousDevices: number
+    nextDevices: number
+    months: number
+    amountRub: number
+    currency?: string
+    baseDeviceMonthlyPriceSnapshot?: number
+    extraDeviceMonthlyPriceSnapshot?: number
+    monthlyPriceSnapshot?: number
+    durationDiscountPercentSnapshot?: number
+    referralDiscountPercentSnapshot?: number
+    createdAt?: Date | string
+  }
+
+  export type SubscriptionRenewalCreateOrConnectWithoutPaymentRequestInput = {
+    where: SubscriptionRenewalWhereUniqueInput
+    create: XOR<SubscriptionRenewalCreateWithoutPaymentRequestInput, SubscriptionRenewalUncheckedCreateWithoutPaymentRequestInput>
   }
 
   export type PlategaWebhookLogCreateWithoutPaymentRequestInput = {
@@ -35268,7 +37038,6 @@ export namespace Prisma {
     reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inviteCodesUsed?: InviteCodeUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUpdateOneWithoutReferredUserNestedInput
     payoutRequests?: PayoutRequestUpdateManyWithoutUserNestedInput
@@ -35277,6 +37046,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUpdateManyWithoutUserNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+    operationLock?: UserOperationLockUpdateOneWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
   }
 
@@ -35289,7 +37059,6 @@ export namespace Prisma {
     reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inviteCodesUsed?: InviteCodeUncheckedUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUncheckedUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUncheckedUpdateOneWithoutReferredUserNestedInput
     payoutRequests?: PayoutRequestUncheckedUpdateManyWithoutUserNestedInput
@@ -35298,6 +37067,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUncheckedUpdateManyWithoutUserNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+    operationLock?: UserOperationLockUncheckedUpdateOneWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -35344,6 +37114,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSubscriptionsNestedInput
     deviceSlots?: DeviceSlotUpdateManyWithoutSubscriptionNestedInput
+    renewals?: SubscriptionRenewalUpdateManyWithoutSubscriptionNestedInput
   }
 
   export type SubscriptionUncheckedUpdateWithoutPaymentRequestInput = {
@@ -35378,6 +37149,54 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deviceSlots?: DeviceSlotUncheckedUpdateManyWithoutSubscriptionNestedInput
+    renewals?: SubscriptionRenewalUncheckedUpdateManyWithoutSubscriptionNestedInput
+  }
+
+  export type SubscriptionRenewalUpsertWithoutPaymentRequestInput = {
+    update: XOR<SubscriptionRenewalUpdateWithoutPaymentRequestInput, SubscriptionRenewalUncheckedUpdateWithoutPaymentRequestInput>
+    create: XOR<SubscriptionRenewalCreateWithoutPaymentRequestInput, SubscriptionRenewalUncheckedCreateWithoutPaymentRequestInput>
+    where?: SubscriptionRenewalWhereInput
+  }
+
+  export type SubscriptionRenewalUpdateToOneWithWhereWithoutPaymentRequestInput = {
+    where?: SubscriptionRenewalWhereInput
+    data: XOR<SubscriptionRenewalUpdateWithoutPaymentRequestInput, SubscriptionRenewalUncheckedUpdateWithoutPaymentRequestInput>
+  }
+
+  export type SubscriptionRenewalUpdateWithoutPaymentRequestInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    previousExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextExpiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    previousDevices?: IntFieldUpdateOperationsInput | number
+    nextDevices?: IntFieldUpdateOperationsInput | number
+    months?: IntFieldUpdateOperationsInput | number
+    amountRub?: IntFieldUpdateOperationsInput | number
+    currency?: StringFieldUpdateOperationsInput | string
+    baseDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    extraDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    monthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    durationDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    referralDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    subscription?: SubscriptionUpdateOneRequiredWithoutRenewalsNestedInput
+  }
+
+  export type SubscriptionRenewalUncheckedUpdateWithoutPaymentRequestInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    subscriptionId?: StringFieldUpdateOperationsInput | string
+    previousExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextExpiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    previousDevices?: IntFieldUpdateOperationsInput | number
+    nextDevices?: IntFieldUpdateOperationsInput | number
+    months?: IntFieldUpdateOperationsInput | number
+    amountRub?: IntFieldUpdateOperationsInput | number
+    currency?: StringFieldUpdateOperationsInput | string
+    baseDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    extraDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    monthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    durationDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    referralDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PlategaWebhookLogUpsertWithWhereUniqueWithoutPaymentRequestInput = {
@@ -35443,6 +37262,7 @@ export namespace Prisma {
     plategaConfirmedAt?: Date | string | null
     user: UserCreateNestedOneWithoutPaymentRequestsInput
     subscription?: SubscriptionCreateNestedOneWithoutPaymentRequestInput
+    subscriptionRenewal?: SubscriptionRenewalCreateNestedOneWithoutPaymentRequestInput
   }
 
   export type PaymentRequestUncheckedCreateWithoutPlategaWebhookLogsInput = {
@@ -35474,6 +37294,7 @@ export namespace Prisma {
     plategaPayloadJson?: string | null
     plategaConfirmedAt?: Date | string | null
     subscription?: SubscriptionUncheckedCreateNestedOneWithoutPaymentRequestInput
+    subscriptionRenewal?: SubscriptionRenewalUncheckedCreateNestedOneWithoutPaymentRequestInput
   }
 
   export type PaymentRequestCreateOrConnectWithoutPlategaWebhookLogsInput = {
@@ -35521,6 +37342,7 @@ export namespace Prisma {
     plategaConfirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     user?: UserUpdateOneRequiredWithoutPaymentRequestsNestedInput
     subscription?: SubscriptionUpdateOneWithoutPaymentRequestNestedInput
+    subscriptionRenewal?: SubscriptionRenewalUpdateOneWithoutPaymentRequestNestedInput
   }
 
   export type PaymentRequestUncheckedUpdateWithoutPlategaWebhookLogsInput = {
@@ -35552,6 +37374,7 @@ export namespace Prisma {
     plategaPayloadJson?: NullableStringFieldUpdateOperationsInput | string | null
     plategaConfirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     subscription?: SubscriptionUncheckedUpdateOneWithoutPaymentRequestNestedInput
+    subscriptionRenewal?: SubscriptionRenewalUncheckedUpdateOneWithoutPaymentRequestNestedInput
   }
 
   export type UserCreateWithoutSubscriptionsInput = {
@@ -35563,7 +37386,6 @@ export namespace Prisma {
     reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    inviteCodesUsed?: InviteCodeCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestCreateNestedManyWithoutUserInput
@@ -35572,6 +37394,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketCreateNestedManyWithoutUserInput
     promoCodeRedemptions?: PromoCodeRedemptionCreateNestedManyWithoutUserInput
+    operationLock?: UserOperationLockCreateNestedOneWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
   }
 
@@ -35584,7 +37407,6 @@ export namespace Prisma {
     reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    inviteCodesUsed?: InviteCodeUncheckedCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeUncheckedCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseUncheckedCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestUncheckedCreateNestedManyWithoutUserInput
@@ -35593,6 +37415,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUncheckedCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketUncheckedCreateNestedManyWithoutUserInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+    operationLock?: UserOperationLockUncheckedCreateNestedOneWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -35629,6 +37452,7 @@ export namespace Prisma {
     plategaPayloadJson?: string | null
     plategaConfirmedAt?: Date | string | null
     user: UserCreateNestedOneWithoutPaymentRequestsInput
+    subscriptionRenewal?: SubscriptionRenewalCreateNestedOneWithoutPaymentRequestInput
     plategaWebhookLogs?: PlategaWebhookLogCreateNestedManyWithoutPaymentRequestInput
   }
 
@@ -35660,6 +37484,7 @@ export namespace Prisma {
     plategaStatus?: string | null
     plategaPayloadJson?: string | null
     plategaConfirmedAt?: Date | string | null
+    subscriptionRenewal?: SubscriptionRenewalUncheckedCreateNestedOneWithoutPaymentRequestInput
     plategaWebhookLogs?: PlategaWebhookLogUncheckedCreateNestedManyWithoutPaymentRequestInput
   }
 
@@ -35709,6 +37534,51 @@ export namespace Prisma {
     data: DeviceSlotCreateManySubscriptionInput | DeviceSlotCreateManySubscriptionInput[]
   }
 
+  export type SubscriptionRenewalCreateWithoutSubscriptionInput = {
+    id?: string
+    previousExpiresAt?: Date | string | null
+    nextExpiresAt: Date | string
+    previousDevices: number
+    nextDevices: number
+    months: number
+    amountRub: number
+    currency?: string
+    baseDeviceMonthlyPriceSnapshot?: number
+    extraDeviceMonthlyPriceSnapshot?: number
+    monthlyPriceSnapshot?: number
+    durationDiscountPercentSnapshot?: number
+    referralDiscountPercentSnapshot?: number
+    createdAt?: Date | string
+    paymentRequest: PaymentRequestCreateNestedOneWithoutSubscriptionRenewalInput
+  }
+
+  export type SubscriptionRenewalUncheckedCreateWithoutSubscriptionInput = {
+    id?: string
+    paymentRequestId: string
+    previousExpiresAt?: Date | string | null
+    nextExpiresAt: Date | string
+    previousDevices: number
+    nextDevices: number
+    months: number
+    amountRub: number
+    currency?: string
+    baseDeviceMonthlyPriceSnapshot?: number
+    extraDeviceMonthlyPriceSnapshot?: number
+    monthlyPriceSnapshot?: number
+    durationDiscountPercentSnapshot?: number
+    referralDiscountPercentSnapshot?: number
+    createdAt?: Date | string
+  }
+
+  export type SubscriptionRenewalCreateOrConnectWithoutSubscriptionInput = {
+    where: SubscriptionRenewalWhereUniqueInput
+    create: XOR<SubscriptionRenewalCreateWithoutSubscriptionInput, SubscriptionRenewalUncheckedCreateWithoutSubscriptionInput>
+  }
+
+  export type SubscriptionRenewalCreateManySubscriptionInputEnvelope = {
+    data: SubscriptionRenewalCreateManySubscriptionInput | SubscriptionRenewalCreateManySubscriptionInput[]
+  }
+
   export type UserUpsertWithoutSubscriptionsInput = {
     update: XOR<UserUpdateWithoutSubscriptionsInput, UserUncheckedUpdateWithoutSubscriptionsInput>
     create: XOR<UserCreateWithoutSubscriptionsInput, UserUncheckedCreateWithoutSubscriptionsInput>
@@ -35729,7 +37599,6 @@ export namespace Prisma {
     reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inviteCodesUsed?: InviteCodeUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUpdateManyWithoutUserNestedInput
@@ -35738,6 +37607,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUpdateManyWithoutUserNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+    operationLock?: UserOperationLockUpdateOneWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
   }
 
@@ -35750,7 +37620,6 @@ export namespace Prisma {
     reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inviteCodesUsed?: InviteCodeUncheckedUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUncheckedUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUncheckedUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUncheckedUpdateManyWithoutUserNestedInput
@@ -35759,6 +37628,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUncheckedUpdateManyWithoutUserNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+    operationLock?: UserOperationLockUncheckedUpdateOneWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -35801,6 +37671,7 @@ export namespace Prisma {
     plategaPayloadJson?: NullableStringFieldUpdateOperationsInput | string | null
     plategaConfirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     user?: UserUpdateOneRequiredWithoutPaymentRequestsNestedInput
+    subscriptionRenewal?: SubscriptionRenewalUpdateOneWithoutPaymentRequestNestedInput
     plategaWebhookLogs?: PlategaWebhookLogUpdateManyWithoutPaymentRequestNestedInput
   }
 
@@ -35832,6 +37703,7 @@ export namespace Prisma {
     plategaStatus?: NullableStringFieldUpdateOperationsInput | string | null
     plategaPayloadJson?: NullableStringFieldUpdateOperationsInput | string | null
     plategaConfirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionRenewal?: SubscriptionRenewalUncheckedUpdateOneWithoutPaymentRequestNestedInput
     plategaWebhookLogs?: PlategaWebhookLogUncheckedUpdateManyWithoutPaymentRequestNestedInput
   }
 
@@ -35871,6 +37743,344 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"DeviceSlot"> | Date | string
   }
 
+  export type SubscriptionRenewalUpsertWithWhereUniqueWithoutSubscriptionInput = {
+    where: SubscriptionRenewalWhereUniqueInput
+    update: XOR<SubscriptionRenewalUpdateWithoutSubscriptionInput, SubscriptionRenewalUncheckedUpdateWithoutSubscriptionInput>
+    create: XOR<SubscriptionRenewalCreateWithoutSubscriptionInput, SubscriptionRenewalUncheckedCreateWithoutSubscriptionInput>
+  }
+
+  export type SubscriptionRenewalUpdateWithWhereUniqueWithoutSubscriptionInput = {
+    where: SubscriptionRenewalWhereUniqueInput
+    data: XOR<SubscriptionRenewalUpdateWithoutSubscriptionInput, SubscriptionRenewalUncheckedUpdateWithoutSubscriptionInput>
+  }
+
+  export type SubscriptionRenewalUpdateManyWithWhereWithoutSubscriptionInput = {
+    where: SubscriptionRenewalScalarWhereInput
+    data: XOR<SubscriptionRenewalUpdateManyMutationInput, SubscriptionRenewalUncheckedUpdateManyWithoutSubscriptionInput>
+  }
+
+  export type SubscriptionRenewalScalarWhereInput = {
+    AND?: SubscriptionRenewalScalarWhereInput | SubscriptionRenewalScalarWhereInput[]
+    OR?: SubscriptionRenewalScalarWhereInput[]
+    NOT?: SubscriptionRenewalScalarWhereInput | SubscriptionRenewalScalarWhereInput[]
+    id?: StringFilter<"SubscriptionRenewal"> | string
+    subscriptionId?: StringFilter<"SubscriptionRenewal"> | string
+    paymentRequestId?: StringFilter<"SubscriptionRenewal"> | string
+    previousExpiresAt?: DateTimeNullableFilter<"SubscriptionRenewal"> | Date | string | null
+    nextExpiresAt?: DateTimeFilter<"SubscriptionRenewal"> | Date | string
+    previousDevices?: IntFilter<"SubscriptionRenewal"> | number
+    nextDevices?: IntFilter<"SubscriptionRenewal"> | number
+    months?: IntFilter<"SubscriptionRenewal"> | number
+    amountRub?: IntFilter<"SubscriptionRenewal"> | number
+    currency?: StringFilter<"SubscriptionRenewal"> | string
+    baseDeviceMonthlyPriceSnapshot?: IntFilter<"SubscriptionRenewal"> | number
+    extraDeviceMonthlyPriceSnapshot?: IntFilter<"SubscriptionRenewal"> | number
+    monthlyPriceSnapshot?: IntFilter<"SubscriptionRenewal"> | number
+    durationDiscountPercentSnapshot?: IntFilter<"SubscriptionRenewal"> | number
+    referralDiscountPercentSnapshot?: IntFilter<"SubscriptionRenewal"> | number
+    createdAt?: DateTimeFilter<"SubscriptionRenewal"> | Date | string
+  }
+
+  export type SubscriptionCreateWithoutRenewalsInput = {
+    id?: string
+    tariffName: string
+    periodMonths: number
+    deviceLimit: number
+    devices?: number
+    pendingDevices?: number | null
+    startsAt?: Date | string | null
+    expiresAt?: Date | string | null
+    monthsPurchased?: number
+    totalPaid?: number
+    currency?: string
+    baseDeviceMonthlyPriceSnapshot?: number
+    extraDeviceMonthlyPriceSnapshot?: number
+    monthlyPriceSnapshot?: number
+    durationDiscountPercentSnapshot?: number
+    referralDiscountPercentSnapshot?: number
+    status?: $Enums.SubscriptionStatus
+    startedAt: Date | string
+    endsAt: Date | string
+    revokedAt?: Date | string | null
+    marzbanUsername?: string | null
+    marzbanStatus?: string | null
+    marzbanDataJson?: string | null
+    provisionedAt?: Date | string | null
+    lastSyncAt?: Date | string | null
+    lastSyncError?: string | null
+    subscriptionUrl?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutSubscriptionsInput
+    paymentRequest?: PaymentRequestCreateNestedOneWithoutSubscriptionInput
+    deviceSlots?: DeviceSlotCreateNestedManyWithoutSubscriptionInput
+  }
+
+  export type SubscriptionUncheckedCreateWithoutRenewalsInput = {
+    id?: string
+    userId: string
+    paymentRequestId?: string | null
+    tariffName: string
+    periodMonths: number
+    deviceLimit: number
+    devices?: number
+    pendingDevices?: number | null
+    startsAt?: Date | string | null
+    expiresAt?: Date | string | null
+    monthsPurchased?: number
+    totalPaid?: number
+    currency?: string
+    baseDeviceMonthlyPriceSnapshot?: number
+    extraDeviceMonthlyPriceSnapshot?: number
+    monthlyPriceSnapshot?: number
+    durationDiscountPercentSnapshot?: number
+    referralDiscountPercentSnapshot?: number
+    status?: $Enums.SubscriptionStatus
+    startedAt: Date | string
+    endsAt: Date | string
+    revokedAt?: Date | string | null
+    marzbanUsername?: string | null
+    marzbanStatus?: string | null
+    marzbanDataJson?: string | null
+    provisionedAt?: Date | string | null
+    lastSyncAt?: Date | string | null
+    lastSyncError?: string | null
+    subscriptionUrl?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deviceSlots?: DeviceSlotUncheckedCreateNestedManyWithoutSubscriptionInput
+  }
+
+  export type SubscriptionCreateOrConnectWithoutRenewalsInput = {
+    where: SubscriptionWhereUniqueInput
+    create: XOR<SubscriptionCreateWithoutRenewalsInput, SubscriptionUncheckedCreateWithoutRenewalsInput>
+  }
+
+  export type PaymentRequestCreateWithoutSubscriptionRenewalInput = {
+    id?: string
+    tariffName: string
+    periodMonths: number
+    deviceLimit: number
+    amountRub: number
+    status?: $Enums.PaymentRequestStatus
+    method?: $Enums.PaymentMethod
+    months?: number
+    devices?: number
+    currency?: string
+    baseDeviceMonthlyPriceSnapshot?: number
+    extraDeviceMonthlyPriceSnapshot?: number
+    monthlyPriceSnapshot?: number
+    durationDiscountPercentSnapshot?: number
+    referralDiscountPercentSnapshot?: number
+    totalPriceBeforeDiscountRubSnapshot?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    markedPaidAt?: Date | string | null
+    approvedAt?: Date | string | null
+    rejectedAt?: Date | string | null
+    plategaTransactionId?: string | null
+    plategaRedirectUrl?: string | null
+    plategaStatus?: string | null
+    plategaPayloadJson?: string | null
+    plategaConfirmedAt?: Date | string | null
+    user: UserCreateNestedOneWithoutPaymentRequestsInput
+    subscription?: SubscriptionCreateNestedOneWithoutPaymentRequestInput
+    plategaWebhookLogs?: PlategaWebhookLogCreateNestedManyWithoutPaymentRequestInput
+  }
+
+  export type PaymentRequestUncheckedCreateWithoutSubscriptionRenewalInput = {
+    id?: string
+    userId: string
+    tariffName: string
+    periodMonths: number
+    deviceLimit: number
+    amountRub: number
+    status?: $Enums.PaymentRequestStatus
+    method?: $Enums.PaymentMethod
+    months?: number
+    devices?: number
+    currency?: string
+    baseDeviceMonthlyPriceSnapshot?: number
+    extraDeviceMonthlyPriceSnapshot?: number
+    monthlyPriceSnapshot?: number
+    durationDiscountPercentSnapshot?: number
+    referralDiscountPercentSnapshot?: number
+    totalPriceBeforeDiscountRubSnapshot?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    markedPaidAt?: Date | string | null
+    approvedAt?: Date | string | null
+    rejectedAt?: Date | string | null
+    plategaTransactionId?: string | null
+    plategaRedirectUrl?: string | null
+    plategaStatus?: string | null
+    plategaPayloadJson?: string | null
+    plategaConfirmedAt?: Date | string | null
+    subscription?: SubscriptionUncheckedCreateNestedOneWithoutPaymentRequestInput
+    plategaWebhookLogs?: PlategaWebhookLogUncheckedCreateNestedManyWithoutPaymentRequestInput
+  }
+
+  export type PaymentRequestCreateOrConnectWithoutSubscriptionRenewalInput = {
+    where: PaymentRequestWhereUniqueInput
+    create: XOR<PaymentRequestCreateWithoutSubscriptionRenewalInput, PaymentRequestUncheckedCreateWithoutSubscriptionRenewalInput>
+  }
+
+  export type SubscriptionUpsertWithoutRenewalsInput = {
+    update: XOR<SubscriptionUpdateWithoutRenewalsInput, SubscriptionUncheckedUpdateWithoutRenewalsInput>
+    create: XOR<SubscriptionCreateWithoutRenewalsInput, SubscriptionUncheckedCreateWithoutRenewalsInput>
+    where?: SubscriptionWhereInput
+  }
+
+  export type SubscriptionUpdateToOneWithWhereWithoutRenewalsInput = {
+    where?: SubscriptionWhereInput
+    data: XOR<SubscriptionUpdateWithoutRenewalsInput, SubscriptionUncheckedUpdateWithoutRenewalsInput>
+  }
+
+  export type SubscriptionUpdateWithoutRenewalsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tariffName?: StringFieldUpdateOperationsInput | string
+    periodMonths?: IntFieldUpdateOperationsInput | number
+    deviceLimit?: IntFieldUpdateOperationsInput | number
+    devices?: IntFieldUpdateOperationsInput | number
+    pendingDevices?: NullableIntFieldUpdateOperationsInput | number | null
+    startsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    monthsPurchased?: IntFieldUpdateOperationsInput | number
+    totalPaid?: IntFieldUpdateOperationsInput | number
+    currency?: StringFieldUpdateOperationsInput | string
+    baseDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    extraDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    monthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    durationDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    referralDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    status?: EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    marzbanUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    marzbanStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    marzbanDataJson?: NullableStringFieldUpdateOperationsInput | string | null
+    provisionedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSyncError?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutSubscriptionsNestedInput
+    paymentRequest?: PaymentRequestUpdateOneWithoutSubscriptionNestedInput
+    deviceSlots?: DeviceSlotUpdateManyWithoutSubscriptionNestedInput
+  }
+
+  export type SubscriptionUncheckedUpdateWithoutRenewalsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    paymentRequestId?: NullableStringFieldUpdateOperationsInput | string | null
+    tariffName?: StringFieldUpdateOperationsInput | string
+    periodMonths?: IntFieldUpdateOperationsInput | number
+    deviceLimit?: IntFieldUpdateOperationsInput | number
+    devices?: IntFieldUpdateOperationsInput | number
+    pendingDevices?: NullableIntFieldUpdateOperationsInput | number | null
+    startsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    monthsPurchased?: IntFieldUpdateOperationsInput | number
+    totalPaid?: IntFieldUpdateOperationsInput | number
+    currency?: StringFieldUpdateOperationsInput | string
+    baseDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    extraDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    monthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    durationDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    referralDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    status?: EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endsAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    marzbanUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    marzbanStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    marzbanDataJson?: NullableStringFieldUpdateOperationsInput | string | null
+    provisionedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSyncError?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deviceSlots?: DeviceSlotUncheckedUpdateManyWithoutSubscriptionNestedInput
+  }
+
+  export type PaymentRequestUpsertWithoutSubscriptionRenewalInput = {
+    update: XOR<PaymentRequestUpdateWithoutSubscriptionRenewalInput, PaymentRequestUncheckedUpdateWithoutSubscriptionRenewalInput>
+    create: XOR<PaymentRequestCreateWithoutSubscriptionRenewalInput, PaymentRequestUncheckedCreateWithoutSubscriptionRenewalInput>
+    where?: PaymentRequestWhereInput
+  }
+
+  export type PaymentRequestUpdateToOneWithWhereWithoutSubscriptionRenewalInput = {
+    where?: PaymentRequestWhereInput
+    data: XOR<PaymentRequestUpdateWithoutSubscriptionRenewalInput, PaymentRequestUncheckedUpdateWithoutSubscriptionRenewalInput>
+  }
+
+  export type PaymentRequestUpdateWithoutSubscriptionRenewalInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tariffName?: StringFieldUpdateOperationsInput | string
+    periodMonths?: IntFieldUpdateOperationsInput | number
+    deviceLimit?: IntFieldUpdateOperationsInput | number
+    amountRub?: IntFieldUpdateOperationsInput | number
+    status?: EnumPaymentRequestStatusFieldUpdateOperationsInput | $Enums.PaymentRequestStatus
+    method?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    months?: IntFieldUpdateOperationsInput | number
+    devices?: IntFieldUpdateOperationsInput | number
+    currency?: StringFieldUpdateOperationsInput | string
+    baseDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    extraDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    monthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    durationDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    referralDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    totalPriceBeforeDiscountRubSnapshot?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    markedPaidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    plategaTransactionId?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaRedirectUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaPayloadJson?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaConfirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    user?: UserUpdateOneRequiredWithoutPaymentRequestsNestedInput
+    subscription?: SubscriptionUpdateOneWithoutPaymentRequestNestedInput
+    plategaWebhookLogs?: PlategaWebhookLogUpdateManyWithoutPaymentRequestNestedInput
+  }
+
+  export type PaymentRequestUncheckedUpdateWithoutSubscriptionRenewalInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    tariffName?: StringFieldUpdateOperationsInput | string
+    periodMonths?: IntFieldUpdateOperationsInput | number
+    deviceLimit?: IntFieldUpdateOperationsInput | number
+    amountRub?: IntFieldUpdateOperationsInput | number
+    status?: EnumPaymentRequestStatusFieldUpdateOperationsInput | $Enums.PaymentRequestStatus
+    method?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    months?: IntFieldUpdateOperationsInput | number
+    devices?: IntFieldUpdateOperationsInput | number
+    currency?: StringFieldUpdateOperationsInput | string
+    baseDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    extraDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    monthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    durationDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    referralDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    totalPriceBeforeDiscountRubSnapshot?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    markedPaidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    plategaTransactionId?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaRedirectUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaPayloadJson?: NullableStringFieldUpdateOperationsInput | string | null
+    plategaConfirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscription?: SubscriptionUncheckedUpdateOneWithoutPaymentRequestNestedInput
+    plategaWebhookLogs?: PlategaWebhookLogUncheckedUpdateManyWithoutPaymentRequestNestedInput
+  }
+
   export type SubscriptionCreateWithoutDeviceSlotsInput = {
     id?: string
     tariffName: string
@@ -35903,6 +38113,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSubscriptionsInput
     paymentRequest?: PaymentRequestCreateNestedOneWithoutSubscriptionInput
+    renewals?: SubscriptionRenewalCreateNestedManyWithoutSubscriptionInput
   }
 
   export type SubscriptionUncheckedCreateWithoutDeviceSlotsInput = {
@@ -35937,6 +38148,7 @@ export namespace Prisma {
     subscriptionUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    renewals?: SubscriptionRenewalUncheckedCreateNestedManyWithoutSubscriptionInput
   }
 
   export type SubscriptionCreateOrConnectWithoutDeviceSlotsInput = {
@@ -35987,6 +38199,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSubscriptionsNestedInput
     paymentRequest?: PaymentRequestUpdateOneWithoutSubscriptionNestedInput
+    renewals?: SubscriptionRenewalUpdateManyWithoutSubscriptionNestedInput
   }
 
   export type SubscriptionUncheckedUpdateWithoutDeviceSlotsInput = {
@@ -36021,6 +38234,7 @@ export namespace Prisma {
     subscriptionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    renewals?: SubscriptionRenewalUncheckedUpdateManyWithoutSubscriptionNestedInput
   }
 
   export type UserCreateWithoutPayoutRequestsInput = {
@@ -36032,7 +38246,6 @@ export namespace Prisma {
     reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    inviteCodesUsed?: InviteCodeCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestCreateNestedManyWithoutUserInput
@@ -36041,6 +38254,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketCreateNestedManyWithoutUserInput
     promoCodeRedemptions?: PromoCodeRedemptionCreateNestedManyWithoutUserInput
+    operationLock?: UserOperationLockCreateNestedOneWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
   }
 
@@ -36053,7 +38267,6 @@ export namespace Prisma {
     reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    inviteCodesUsed?: InviteCodeUncheckedCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeUncheckedCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseUncheckedCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestUncheckedCreateNestedManyWithoutUserInput
@@ -36062,6 +38275,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUncheckedCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketUncheckedCreateNestedManyWithoutUserInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+    operationLock?: UserOperationLockUncheckedCreateNestedOneWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -36079,7 +38293,6 @@ export namespace Prisma {
     reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    inviteCodesUsed?: InviteCodeCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestCreateNestedManyWithoutUserInput
@@ -36088,6 +38301,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketCreateNestedManyWithoutUserInput
     promoCodeRedemptions?: PromoCodeRedemptionCreateNestedManyWithoutUserInput
+    operationLock?: UserOperationLockCreateNestedOneWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
   }
 
@@ -36100,7 +38314,6 @@ export namespace Prisma {
     reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    inviteCodesUsed?: InviteCodeUncheckedCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeUncheckedCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseUncheckedCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestUncheckedCreateNestedManyWithoutUserInput
@@ -36109,6 +38322,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUncheckedCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketUncheckedCreateNestedManyWithoutUserInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+    operationLock?: UserOperationLockUncheckedCreateNestedOneWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -36137,7 +38351,6 @@ export namespace Prisma {
     reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inviteCodesUsed?: InviteCodeUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUpdateManyWithoutUserNestedInput
@@ -36146,6 +38359,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUpdateManyWithoutUserNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+    operationLock?: UserOperationLockUpdateOneWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
   }
 
@@ -36158,7 +38372,6 @@ export namespace Prisma {
     reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inviteCodesUsed?: InviteCodeUncheckedUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUncheckedUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUncheckedUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUncheckedUpdateManyWithoutUserNestedInput
@@ -36167,6 +38380,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUncheckedUpdateManyWithoutUserNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+    operationLock?: UserOperationLockUncheckedUpdateOneWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -36190,7 +38404,6 @@ export namespace Prisma {
     reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inviteCodesUsed?: InviteCodeUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUpdateManyWithoutUserNestedInput
@@ -36199,6 +38412,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUpdateManyWithoutUserNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+    operationLock?: UserOperationLockUpdateOneWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
   }
 
@@ -36211,7 +38425,6 @@ export namespace Prisma {
     reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inviteCodesUsed?: InviteCodeUncheckedUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUncheckedUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUncheckedUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUncheckedUpdateManyWithoutUserNestedInput
@@ -36220,6 +38433,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUncheckedUpdateManyWithoutUserNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
+    operationLock?: UserOperationLockUncheckedUpdateOneWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -36232,7 +38446,6 @@ export namespace Prisma {
     reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    inviteCodesUsed?: InviteCodeCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestCreateNestedManyWithoutUserInput
@@ -36242,6 +38455,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketCreateNestedManyWithoutUserInput
     promoCodeRedemptions?: PromoCodeRedemptionCreateNestedManyWithoutUserInput
+    operationLock?: UserOperationLockCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -36253,7 +38467,6 @@ export namespace Prisma {
     reservedCredits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    inviteCodesUsed?: InviteCodeUncheckedCreateNestedManyWithoutUsedByInput
     referralCodesCreated?: ReferralCodeUncheckedCreateNestedManyWithoutOwnerUserInput
     referralCodeUse?: ReferralCodeUseUncheckedCreateNestedOneWithoutReferredUserInput
     paymentRequests?: PaymentRequestUncheckedCreateNestedManyWithoutUserInput
@@ -36263,6 +38476,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUncheckedCreateNestedManyWithoutSenderInput
     supportTickets?: SupportTicketUncheckedCreateNestedManyWithoutUserInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedCreateNestedManyWithoutUserInput
+    operationLock?: UserOperationLockUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -36290,7 +38504,6 @@ export namespace Prisma {
     reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inviteCodesUsed?: InviteCodeUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUpdateManyWithoutUserNestedInput
@@ -36300,6 +38513,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUpdateManyWithoutUserNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUpdateManyWithoutUserNestedInput
+    operationLock?: UserOperationLockUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -36311,7 +38525,6 @@ export namespace Prisma {
     reservedCredits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inviteCodesUsed?: InviteCodeUncheckedUpdateManyWithoutUsedByNestedInput
     referralCodesCreated?: ReferralCodeUncheckedUpdateManyWithoutOwnerUserNestedInput
     referralCodeUse?: ReferralCodeUseUncheckedUpdateOneWithoutReferredUserNestedInput
     paymentRequests?: PaymentRequestUncheckedUpdateManyWithoutUserNestedInput
@@ -36321,15 +38534,7 @@ export namespace Prisma {
     supportMessages?: SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
     supportTickets?: SupportTicketUncheckedUpdateManyWithoutUserNestedInput
     promoCodeRedemptions?: PromoCodeRedemptionUncheckedUpdateManyWithoutUserNestedInput
-  }
-
-  export type InviteCodeCreateManyUsedByInput = {
-    id?: string
-    code: string
-    isEnabled?: boolean
-    expiresAt?: Date | string | null
-    createdAt?: Date | string
-    usedAt?: Date | string | null
+    operationLock?: UserOperationLockUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type ReferralCodeCreateManyOwnerUserInput = {
@@ -36472,33 +38677,6 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
-  export type InviteCodeUpdateWithoutUsedByInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    code?: StringFieldUpdateOperationsInput | string
-    isEnabled?: BoolFieldUpdateOperationsInput | boolean
-    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  }
-
-  export type InviteCodeUncheckedUpdateWithoutUsedByInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    code?: StringFieldUpdateOperationsInput | string
-    isEnabled?: BoolFieldUpdateOperationsInput | boolean
-    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  }
-
-  export type InviteCodeUncheckedUpdateManyWithoutUsedByInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    code?: StringFieldUpdateOperationsInput | string
-    isEnabled?: BoolFieldUpdateOperationsInput | boolean
-    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  }
-
   export type ReferralCodeUpdateWithoutOwnerUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     code?: StringFieldUpdateOperationsInput | string
@@ -36562,6 +38740,7 @@ export namespace Prisma {
     plategaPayloadJson?: NullableStringFieldUpdateOperationsInput | string | null
     plategaConfirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     subscription?: SubscriptionUpdateOneWithoutPaymentRequestNestedInput
+    subscriptionRenewal?: SubscriptionRenewalUpdateOneWithoutPaymentRequestNestedInput
     plategaWebhookLogs?: PlategaWebhookLogUpdateManyWithoutPaymentRequestNestedInput
   }
 
@@ -36593,6 +38772,7 @@ export namespace Prisma {
     plategaPayloadJson?: NullableStringFieldUpdateOperationsInput | string | null
     plategaConfirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     subscription?: SubscriptionUncheckedUpdateOneWithoutPaymentRequestNestedInput
+    subscriptionRenewal?: SubscriptionRenewalUncheckedUpdateOneWithoutPaymentRequestNestedInput
     plategaWebhookLogs?: PlategaWebhookLogUncheckedUpdateManyWithoutPaymentRequestNestedInput
   }
 
@@ -36753,6 +38933,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     paymentRequest?: PaymentRequestUpdateOneWithoutSubscriptionNestedInput
     deviceSlots?: DeviceSlotUpdateManyWithoutSubscriptionNestedInput
+    renewals?: SubscriptionRenewalUpdateManyWithoutSubscriptionNestedInput
   }
 
   export type SubscriptionUncheckedUpdateWithoutUserInput = {
@@ -36787,6 +38968,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deviceSlots?: DeviceSlotUncheckedUpdateManyWithoutSubscriptionNestedInput
+    renewals?: SubscriptionRenewalUncheckedUpdateManyWithoutSubscriptionNestedInput
   }
 
   export type SubscriptionUncheckedUpdateManyWithoutUserInput = {
@@ -37090,6 +39272,24 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type SubscriptionRenewalCreateManySubscriptionInput = {
+    id?: string
+    paymentRequestId: string
+    previousExpiresAt?: Date | string | null
+    nextExpiresAt: Date | string
+    previousDevices: number
+    nextDevices: number
+    months: number
+    amountRub: number
+    currency?: string
+    baseDeviceMonthlyPriceSnapshot?: number
+    extraDeviceMonthlyPriceSnapshot?: number
+    monthlyPriceSnapshot?: number
+    durationDiscountPercentSnapshot?: number
+    referralDiscountPercentSnapshot?: number
+    createdAt?: Date | string
+  }
+
   export type DeviceSlotUpdateWithoutSubscriptionInput = {
     id?: StringFieldUpdateOperationsInput | string
     slotIndex?: IntFieldUpdateOperationsInput | number
@@ -37136,6 +39336,60 @@ export namespace Prisma {
     lastSyncError?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SubscriptionRenewalUpdateWithoutSubscriptionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    previousExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextExpiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    previousDevices?: IntFieldUpdateOperationsInput | number
+    nextDevices?: IntFieldUpdateOperationsInput | number
+    months?: IntFieldUpdateOperationsInput | number
+    amountRub?: IntFieldUpdateOperationsInput | number
+    currency?: StringFieldUpdateOperationsInput | string
+    baseDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    extraDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    monthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    durationDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    referralDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    paymentRequest?: PaymentRequestUpdateOneRequiredWithoutSubscriptionRenewalNestedInput
+  }
+
+  export type SubscriptionRenewalUncheckedUpdateWithoutSubscriptionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    paymentRequestId?: StringFieldUpdateOperationsInput | string
+    previousExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextExpiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    previousDevices?: IntFieldUpdateOperationsInput | number
+    nextDevices?: IntFieldUpdateOperationsInput | number
+    months?: IntFieldUpdateOperationsInput | number
+    amountRub?: IntFieldUpdateOperationsInput | number
+    currency?: StringFieldUpdateOperationsInput | string
+    baseDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    extraDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    monthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    durationDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    referralDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SubscriptionRenewalUncheckedUpdateManyWithoutSubscriptionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    paymentRequestId?: StringFieldUpdateOperationsInput | string
+    previousExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextExpiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    previousDevices?: IntFieldUpdateOperationsInput | number
+    nextDevices?: IntFieldUpdateOperationsInput | number
+    months?: IntFieldUpdateOperationsInput | number
+    amountRub?: IntFieldUpdateOperationsInput | number
+    currency?: StringFieldUpdateOperationsInput | string
+    baseDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    extraDeviceMonthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    monthlyPriceSnapshot?: IntFieldUpdateOperationsInput | number
+    durationDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    referralDiscountPercentSnapshot?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

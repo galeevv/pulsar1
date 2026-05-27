@@ -90,6 +90,7 @@ async function claimFirstFreeSlot(
   tx: Prisma.TransactionClient,
   input: {
     deviceOs: DeviceOS
+    assignedUserAgent?: string | null
     slotId: string
     subscriptionId: string
   }
@@ -97,6 +98,8 @@ async function claimFirstFreeSlot(
   for (let attempt = 0; attempt < SLOT_ASSIGNMENT_RACE_ATTEMPTS; attempt += 1) {
     const claimed = await tx.deviceSlot.updateMany({
       data: {
+        assignedAt: new Date(),
+        assignedUserAgent: input.assignedUserAgent ?? null,
         deviceOs: input.deviceOs,
         status: "ACTIVE",
       },
@@ -118,6 +121,7 @@ async function claimFirstFreeSlot(
 }
 
 export async function assignManagedSlotForUser(input: {
+  assignedUserAgent?: string | null
   deviceOs: DeviceOS
   slotId: string
   userId: string
@@ -176,6 +180,7 @@ export async function assignManagedSlotForUser(input: {
 
     const claimedFreeSlot = await claimFirstFreeSlot(tx, {
       deviceOs: input.deviceOs,
+      assignedUserAgent: input.assignedUserAgent,
       slotId: targetSlot.id,
       subscriptionId: activeSubscription.id,
     })
@@ -250,7 +255,7 @@ export async function syncSlotConfigWithRetry(input: {
 
     lastKnownSlot = slot
 
-    if (slot.status === "ACTIVE" && slot.configUrl) {
+    if (slot.status !== "BLOCKED" && slot.configUrl) {
       if (slot.lastSyncError) {
         await prisma.deviceSlot.update({
           data: {

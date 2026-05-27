@@ -58,7 +58,7 @@ function buildWebhookHeadersSnapshot(headers: Headers) {
 type TxOutcome =
   | {
       createdSubscriptionId: null;
-      kind: "ALREADY_APPROVED" | "ALREADY_REJECTED" | "NOT_FOUND" | "PENDING";
+      kind: "ALREADY_APPROVED" | "ALREADY_REJECTED" | "DEDUP" | "NOT_FOUND" | "PENDING";
       paymentRequestId: string | null;
       revokedSubscriptionId: null;
     }
@@ -121,40 +121,50 @@ export async function POST(request: Request) {
     transactionId: parsedPayload.transactionId,
   });
 
-  const existingLog = await prisma.plategaWebhookLog.findUnique({
-    where: { dedupKey },
-  });
-
-  if (existingLog && existingLog.processingStatus !== "ERROR") {
-    return NextResponse.json({ dedup: true, ok: true });
-  }
-
-  const webhookLog = existingLog
-    ? await prisma.plategaWebhookLog.update({
-        data: {
-          errorMessage: null,
-          headersJson: webhookHeadersJson,
-          payloadJson: webhookPayloadJson,
-          processedAt: null,
-          processingStatus: "RECEIVED",
-          statusRaw: normalizedStatus,
-          transactionId: parsedPayload.transactionId,
-        },
-        where: { id: existingLog.id },
-      })
-    : await prisma.plategaWebhookLog.create({
-        data: {
-          dedupKey,
-          headersJson: webhookHeadersJson,
-          payloadJson: webhookPayloadJson,
-          processingStatus: "RECEIVED",
-          statusRaw: normalizedStatus,
-          transactionId: parsedPayload.transactionId,
-        },
-      });
+  let webhookLogId: string | null = null;
 
   try {
     const txResult = await prisma.$transaction(async (tx): Promise<TxOutcome> => {
+      const webhookLogModel = tx.plategaWebhookLog ?? prisma.plategaWebhookLog;
+      const existingLog = await webhookLogModel.findUnique({
+        where: { dedupKey },
+      });
+
+      if (existingLog && existingLog.processingStatus !== "ERROR") {
+        webhookLogId = existingLog.id;
+        return {
+          createdSubscriptionId: null,
+          kind: "DEDUP",
+          paymentRequestId: existingLog.paymentRequestId,
+          revokedSubscriptionId: null,
+        };
+      }
+
+      const webhookLog = existingLog
+        ? await webhookLogModel.update({
+            data: {
+              errorMessage: null,
+              headersJson: webhookHeadersJson,
+              payloadJson: webhookPayloadJson,
+              processedAt: null,
+              processingStatus: "RECEIVED",
+              statusRaw: normalizedStatus,
+              transactionId: parsedPayload.transactionId,
+            },
+            where: { id: existingLog.id },
+          })
+        : await webhookLogModel.create({
+            data: {
+              dedupKey,
+              headersJson: webhookHeadersJson,
+              payloadJson: webhookPayloadJson,
+              processingStatus: "RECEIVED",
+              statusRaw: normalizedStatus,
+              transactionId: parsedPayload.transactionId,
+            },
+          });
+      webhookLogId = webhookLog.id;
+
       const paymentRequest = await tx.paymentRequest.findFirst({
         where: {
           plategaTransactionId: parsedPayload.transactionId,
@@ -162,6 +172,15 @@ export async function POST(request: Request) {
       });
 
       if (!paymentRequest) {
+        await webhookLogModel.update({
+          data: {
+            paymentRequestId: null,
+            processedAt: now,
+            processingStatus: "IGNORED",
+          },
+          where: { id: webhookLog.id },
+        });
+
         return {
           createdSubscriptionId: null,
           kind: "NOT_FOUND",
@@ -198,12 +217,23 @@ export async function POST(request: Request) {
             },
           });
 
-          return {
+          const outcome = {
             createdSubscriptionId: null,
             kind: "REJECTED",
             paymentRequestId: paymentRequest.id,
             revokedSubscriptionId: rejectedPostProcessing.revokedSubscriptionId,
-          };
+          } satisfies TxOutcome;
+
+          await webhookLogModel.update({
+            data: {
+              paymentRequestId: outcome.paymentRequestId,
+              processedAt: now,
+              processingStatus: mapOutcomeToLogStatus(outcome.kind),
+            },
+            where: { id: webhookLog.id },
+          });
+
+          return outcome;
         }
 
         if (paymentRequest.status === "CREATED") {
@@ -217,47 +247,102 @@ export async function POST(request: Request) {
             },
           });
 
-          return {
+          const outcome = {
             createdSubscriptionId: null,
             kind: "REJECTED",
             paymentRequestId: paymentRequest.id,
             revokedSubscriptionId: null,
-          };
+          } satisfies TxOutcome;
+
+          await webhookLogModel.update({
+            data: {
+              paymentRequestId: outcome.paymentRequestId,
+              processedAt: now,
+              processingStatus: mapOutcomeToLogStatus(outcome.kind),
+            },
+            where: { id: webhookLog.id },
+          });
+
+          return outcome;
         }
 
-        return {
+        const outcome = {
           createdSubscriptionId: null,
           kind: "ALREADY_REJECTED",
           paymentRequestId: paymentRequest.id,
           revokedSubscriptionId: null,
-        };
+        } satisfies TxOutcome;
+
+        await webhookLogModel.update({
+          data: {
+            paymentRequestId: outcome.paymentRequestId,
+            processedAt: now,
+            processingStatus: mapOutcomeToLogStatus(outcome.kind),
+          },
+          where: { id: webhookLog.id },
+        });
+
+        return outcome;
       }
 
       if (normalizedStatus !== "CONFIRMED") {
-        return {
+        const outcome = {
           createdSubscriptionId: null,
           kind: "PENDING",
           paymentRequestId: paymentRequest.id,
           revokedSubscriptionId: null,
-        };
+        } satisfies TxOutcome;
+
+        await webhookLogModel.update({
+          data: {
+            paymentRequestId: outcome.paymentRequestId,
+            processedAt: now,
+            processingStatus: mapOutcomeToLogStatus(outcome.kind),
+          },
+          where: { id: webhookLog.id },
+        });
+
+        return outcome;
       }
 
       if (paymentRequest.status === "APPROVED") {
-        return {
+        const outcome = {
           createdSubscriptionId: null,
           kind: "ALREADY_APPROVED",
           paymentRequestId: paymentRequest.id,
           revokedSubscriptionId: null,
-        };
+        } satisfies TxOutcome;
+
+        await webhookLogModel.update({
+          data: {
+            paymentRequestId: outcome.paymentRequestId,
+            processedAt: now,
+            processingStatus: mapOutcomeToLogStatus(outcome.kind),
+          },
+          where: { id: webhookLog.id },
+        });
+
+        return outcome;
       }
 
       if (paymentRequest.status === "REJECTED") {
-        return {
+        const outcome = {
           createdSubscriptionId: null,
           kind: "ALREADY_REJECTED",
           paymentRequestId: paymentRequest.id,
           revokedSubscriptionId: null,
-        };
+        } satisfies TxOutcome;
+
+        await webhookLogModel.update({
+          data: {
+            paymentRequestId: outcome.paymentRequestId,
+            processedAt: now,
+            processingStatus: mapOutcomeToLogStatus(outcome.kind),
+          },
+          where: { id: webhookLog.id },
+        });
+
+        return outcome;
       }
 
       try {
@@ -279,12 +364,23 @@ export async function POST(request: Request) {
           tx,
         });
 
-        return {
+        const outcome = {
           createdSubscriptionId: postApprovalResult.createdSubscriptionId,
           kind: "APPROVED",
           paymentRequestId: paymentRequest.id,
           revokedSubscriptionId: postApprovalResult.revokedSubscriptionId,
-        };
+        } satisfies TxOutcome;
+
+        await webhookLogModel.update({
+          data: {
+            paymentRequestId: outcome.paymentRequestId,
+            processedAt: now,
+            processingStatus: mapOutcomeToLogStatus(outcome.kind),
+          },
+          where: { id: webhookLog.id },
+        });
+
+        return outcome;
       } catch (error) {
         const message = error instanceof Error ? error.message : "";
 
@@ -300,17 +396,32 @@ export async function POST(request: Request) {
             },
           });
 
-          return {
+          const outcome = {
             createdSubscriptionId: null,
             kind: "CAPACITY_LIMIT",
             paymentRequestId: paymentRequest.id,
             revokedSubscriptionId: null,
-          };
+          } satisfies TxOutcome;
+
+          await webhookLogModel.update({
+            data: {
+              paymentRequestId: outcome.paymentRequestId,
+              processedAt: now,
+              processingStatus: mapOutcomeToLogStatus(outcome.kind),
+            },
+            where: { id: webhookLog.id },
+          });
+
+          return outcome;
         }
 
         throw error;
       }
     });
+
+    if (txResult.kind === "DEDUP") {
+      return NextResponse.json({ dedup: true, ok: true });
+    }
 
     if (txResult.revokedSubscriptionId) {
       await revokeSubscriptionInXui(txResult.revokedSubscriptionId);
@@ -320,25 +431,18 @@ export async function POST(request: Request) {
       await provisionSubscriptionSlotsInXui(txResult.createdSubscriptionId);
     }
 
-    await prisma.plategaWebhookLog.update({
-      data: {
-        paymentRequestId: txResult.paymentRequestId,
-        processedAt: now,
-        processingStatus: mapOutcomeToLogStatus(txResult.kind),
-      },
-      where: { id: webhookLog.id },
-    });
-
     return NextResponse.json({ ok: true });
   } catch (error) {
-    await prisma.plategaWebhookLog.update({
-      data: {
-        errorMessage: truncate(error instanceof Error ? error.message : "Unknown error", 2000),
-        processedAt: now,
-        processingStatus: "ERROR",
-      },
-      where: { id: webhookLog.id },
-    });
+    if (webhookLogId) {
+      await prisma.plategaWebhookLog.update({
+        data: {
+          errorMessage: truncate(error instanceof Error ? error.message : "Unknown error", 2000),
+          processedAt: now,
+          processingStatus: "ERROR",
+        },
+        where: { id: webhookLogId },
+      });
+    }
 
     return NextResponse.json({ error: "Webhook processing failed" }, { status: 500 });
   }

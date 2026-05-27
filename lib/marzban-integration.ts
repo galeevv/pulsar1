@@ -106,7 +106,7 @@ async function logIntegrationEvent(input: {
     data: {
       errorMessage: input.errorMessage ?? null,
       operation: input.operation,
-      provider: "MARZBAN",
+      provider: "XUI",
       requestJson: input.requestJson ?? null,
       responseJson: input.responseJson ?? null,
       status: input.status,

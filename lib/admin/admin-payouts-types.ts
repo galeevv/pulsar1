@@ -40,7 +40,10 @@ export type AdminPayoutRow = {
     reviewedAt: string | null;
     reviewedByAdminId: string | null;
     reviewedByUsername: string | null;
+    userAvailableCredits: number;
+    userCredits: number;
     userId: string;
+    userReservedCredits: number;
     username: string | null;
   };
 };

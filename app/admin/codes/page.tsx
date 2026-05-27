@@ -6,7 +6,6 @@ export default async function AdminCodesPage() {
 
   return (
     <AdminMarketingSection
-      inviteCodes={dashboardData.inviteCodes}
       promoCodes={dashboardData.promoCodes}
       referralCodes={dashboardData.referralCodes}
       referralProgramSettings={dashboardData.referralProgramSettings}

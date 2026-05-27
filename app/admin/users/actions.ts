@@ -5,17 +5,15 @@ import { redirect } from "next/navigation";
 
 import { getCurrentSession, hashPasswordForStorage } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { syncSubscriptionInXui } from "@/lib/xui-integration";
 
-type ResetUserPasswordActionState = {
+type UserActionState = {
   message: string;
   nonce: number;
   status: "error" | "idle" | "success";
 };
 
-function buildState(
-  status: ResetUserPasswordActionState["status"],
-  message: string
-): ResetUserPasswordActionState {
+function buildState(status: UserActionState["status"], message: string): UserActionState {
   return {
     message,
     nonce: Date.now(),
@@ -46,38 +44,7 @@ async function getAdminActor() {
   return user;
 }
 
-export async function resetUserPasswordAction(
-  _prevState: ResetUserPasswordActionState,
-  formData: FormData
-): Promise<ResetUserPasswordActionState> {
-  void _prevState;
-
-  await getAdminActor();
-
-  const userId = String(formData.get("userId") ?? "").trim();
-  const nextPassword = String(formData.get("nextPassword") ?? "");
-  const nextPasswordConfirmation = String(formData.get("nextPasswordConfirmation") ?? "");
-
-  if (!userId) {
-    return buildState("error", "Не удалось определить пользователя.");
-  }
-
-  if (!nextPassword || !nextPasswordConfirmation) {
-    return buildState("error", "Введите новый пароль и подтверждение.");
-  }
-
-  if (nextPassword.length < 8) {
-    return buildState("error", "Новый пароль должен содержать минимум 8 символов.");
-  }
-
-  if (nextPassword.length > 128) {
-    return buildState("error", "Новый пароль слишком длинный.");
-  }
-
-  if (nextPassword !== nextPasswordConfirmation) {
-    return buildState("error", "Пароль и подтверждение не совпадают.");
-  }
-
+async function getTargetUser(userId: string) {
   const targetUser = await prisma.user.findUnique({
     select: {
       id: true,
@@ -89,7 +56,35 @@ export async function resetUserPasswordAction(
     },
   });
 
-  if (!targetUser || targetUser.role !== "USER") {
+  return targetUser && targetUser.role === "USER" ? targetUser : null;
+}
+
+export async function resetUserPasswordAction(
+  _prevState: UserActionState,
+  formData: FormData
+): Promise<UserActionState> {
+  void _prevState;
+
+  await getAdminActor();
+
+  const userId = String(formData.get("userId") ?? "").trim();
+  const nextPassword = String(formData.get("nextPassword") ?? "");
+
+  if (!userId) {
+    return buildState("error", "Не удалось определить пользователя.");
+  }
+
+  if (!nextPassword) {
+    return buildState("error", "Введите новый пароль.");
+  }
+
+  if (nextPassword.length > 128) {
+    return buildState("error", "Новый пароль слишком длинный.");
+  }
+
+  const targetUser = await getTargetUser(userId);
+
+  if (!targetUser) {
     return buildState("error", "Пользователь не найден.");
   }
 
@@ -113,3 +108,91 @@ export async function resetUserPasswordAction(
   return buildState("success", `Пароль пользователя ${targetUser.username} обновлен.`);
 }
 
+export async function grantUserCreditsAction(
+  _prevState: UserActionState,
+  formData: FormData
+): Promise<UserActionState> {
+  void _prevState;
+
+  await getAdminActor();
+
+  const userId = String(formData.get("userId") ?? "").trim();
+  const amountCredits = Number.parseInt(String(formData.get("amountCredits") ?? ""), 10);
+
+  if (!userId) {
+    return buildState("error", "Не удалось определить пользователя.");
+  }
+
+  if (!Number.isFinite(amountCredits) || amountCredits <= 0) {
+    return buildState("error", "Введите положительное количество кредитов.");
+  }
+
+  const targetUser = await getTargetUser(userId);
+
+  if (!targetUser) {
+    return buildState("error", "Пользователь не найден.");
+  }
+
+  await prisma.user.update({
+    data: {
+      credits: {
+        increment: amountCredits,
+      },
+    },
+    where: {
+      id: targetUser.id,
+    },
+  });
+
+  revalidatePath("/admin/users");
+  return buildState("success", `${amountCredits} credits issued to ${targetUser.username}.`);
+}
+
+export async function syncUserSubscriptionAction(
+  _prevState: UserActionState,
+  formData: FormData
+): Promise<UserActionState> {
+  void _prevState;
+
+  await getAdminActor();
+
+  const userId = String(formData.get("userId") ?? "").trim();
+
+  if (!userId) {
+    return buildState("error", "Не удалось определить пользователя.");
+  }
+
+  const targetUser = await getTargetUser(userId);
+
+  if (!targetUser) {
+    return buildState("error", "Пользователь не найден.");
+  }
+
+  const subscription = await prisma.subscription.findFirst({
+    orderBy: [{ startsAt: "desc" }, { startedAt: "desc" }],
+    select: { id: true },
+    where: {
+      status: "ACTIVE",
+      userId: targetUser.id,
+    },
+  });
+
+  if (!subscription) {
+    return buildState("error", `${targetUser.username} has no active subscription.`);
+  }
+
+  const result = await syncSubscriptionInXui(subscription.id);
+
+  revalidatePath("/admin/users");
+  revalidatePath("/admin");
+  revalidatePath("/app");
+
+  if (!result.ok) {
+    return buildState(
+      "error",
+      `3x-ui sync failed for ${targetUser.username}: ${result.error ?? "unknown error"}`
+    );
+  }
+
+  return buildState("success", `Subscription synced for ${targetUser.username}.`);
+}

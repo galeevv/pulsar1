@@ -1,8 +1,7 @@
-import { RefreshCwIcon } from "lucide-react"
+import { Link2Icon, RefreshCwIcon } from "lucide-react"
 
-import { reissueDeviceSlotLinkAction, retrySlotSyncAction } from "@/app/app/actions"
+import { reissueDeviceSlotLinkAction, retrySlotSyncAction, syncOwnSubscriptionAction } from "@/app/app/actions"
 import { DeviceSlotCopyIconButton } from "@/components/app/device-slot-copy-icon-button"
-import { DeviceSlotOsDialogTrigger } from "@/components/app/device-slot-os-dialog-trigger"
 import { FormSubmitButton } from "@/components/app/form-submit-button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
@@ -17,7 +16,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { getDeviceOsLabel } from "@/lib/device-os"
 
 type DeviceSlotItem = {
   configUrl: string | null
@@ -60,33 +58,29 @@ function formatCompactSlotUrl(url: string | null) {
 }
 
 function getSlotTitle(slot: DeviceSlotItem) {
-  const osLabel = getDeviceOsLabel(slot.deviceOs)
-
-  if (slot.status === "FREE") {
-    return `${osLabel} · Свободно`
-  }
-
-  if (slot.status === "BLOCKED") {
-    return `${osLabel} · Заблокирован`
-  }
-
-  return osLabel
+  void slot
+  return "Подписка"
 }
 
-export function DeviceListItem({ slot }: { slot: DeviceSlotItem }) {
+export function DeviceListItem({
+  slot,
+  subscriptionUrl,
+}: {
+  slot: DeviceSlotItem
+  subscriptionUrl: string | null
+}) {
   const slotTitle = getSlotTitle(slot)
-  const compactSlotUrl = formatCompactSlotUrl(slot.configUrl)
+  const effectiveSubscriptionUrl = subscriptionUrl ?? slot.configUrl
+  const compactSlotUrl = formatCompactSlotUrl(effectiveSubscriptionUrl)
 
   return (
     <Card className="gap-0 border-border/70 bg-card/40 py-0">
       <CardContent className="flex flex-col gap-3 p-3">
         <div className="flex items-center justify-between gap-3">
           <div className="inline-flex min-w-0 items-center gap-3">
-            <DeviceSlotOsDialogTrigger
-              disabled={slot.status === "BLOCKED"}
-              initialDeviceOs={slot.deviceOs}
-              slotId={slot.id}
-            />
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-card border border-border bg-background/60">
+              <Link2Icon className="size-4 text-muted-foreground" />
+            </span>
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold">{slotTitle}</p>
               <p className="truncate text-xs text-muted-foreground">{compactSlotUrl}</p>
@@ -94,7 +88,7 @@ export function DeviceListItem({ slot }: { slot: DeviceSlotItem }) {
           </div>
 
           <div className="inline-flex shrink-0 items-center gap-2">
-            <DeviceSlotCopyIconButton subscriptionUrl={slot.configUrl} />
+            <DeviceSlotCopyIconButton subscriptionUrl={effectiveSubscriptionUrl} />
 
             <Dialog>
               <DialogTrigger asChild>
@@ -143,7 +137,7 @@ export function DeviceListItem({ slot }: { slot: DeviceSlotItem }) {
           </Alert>
         ) : null}
 
-        {slot.status === "ACTIVE" && slot.lastSyncError ? (
+        {slot.status !== "BLOCKED" && slot.lastSyncError ? (
           <form action={retrySlotSyncAction}>
             <input name="slotId" type="hidden" value={slot.id} />
             <FormSubmitButton
@@ -154,6 +148,21 @@ export function DeviceListItem({ slot }: { slot: DeviceSlotItem }) {
             >
               <RefreshCwIcon className="size-4" />
               Повторить синхронизацию
+            </FormSubmitButton>
+          </form>
+        ) : null}
+
+        {slot.status !== "BLOCKED" && !effectiveSubscriptionUrl ? (
+          <form action={syncOwnSubscriptionAction}>
+            <FormSubmitButton
+              className="h-button w-full px-button-x"
+              pendingLabel="Синхронизируем..."
+              radius="card"
+              type="submit"
+              variant="outline"
+            >
+              <RefreshCwIcon className="size-4" />
+              Синхронизировать
             </FormSubmitButton>
           </form>
         ) : null}

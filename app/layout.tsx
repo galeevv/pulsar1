@@ -39,7 +39,7 @@ export default function RootLayout({
       <body className="antialiased">
         <TooltipProvider>
           {children}
-          <Toaster position="top-right" richColors theme="dark" />
+          <Toaster position="top-center" richColors theme="dark" />
         </TooltipProvider>
       </body>
     </html>

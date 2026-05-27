@@ -17,6 +17,14 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import {
   Drawer,
   DrawerContent,
   DrawerDescription,
@@ -27,6 +35,7 @@ import {
 } from "@/components/ui/drawer"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Slider } from "@/components/ui/slider"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { calculateAppSubscriptionPreviewPrice } from "@/lib/subscription-preview"
 
 type DurationRuleItem = {
@@ -44,6 +53,7 @@ type PricingSettings = {
 }
 
 type CheckoutStep = "config" | "payment"
+type PaymentMethod = "CREDITS" | "PLATEGA_SBP"
 
 function getMonthsLabel(months: number) {
   if (months === 1) {
@@ -100,15 +110,15 @@ export function QuickActionsSheet({
   const [step, setStep] = useState<CheckoutStep>("config")
   const [selectedMonths, setSelectedMonths] = useState(sortedRules[0]?.months ?? 1)
   const [selectedDevices, setSelectedDevices] = useState(defaultDevices)
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
-    "CREDITS" | "PLATEGA_CARD" | "PLATEGA_SBP"
-  >("PLATEGA_SBP")
+  const [selectedPaymentMethod, setSelectedPaymentMethod] =
+    useState<PaymentMethod>("PLATEGA_SBP")
   const [isCreatingPlategaPayment, setIsCreatingPlategaPayment] = useState(false)
   const [isCheckingPlategaPayment, setIsCheckingPlategaPayment] = useState(
     Boolean(plategaPaymentRequestId)
   )
   const [isSubmittingCredits, setIsSubmittingCredits] = useState(false)
   const creditsFormRef = useRef<HTMLFormElement | null>(null)
+  const isMobile = useIsMobile()
 
   const selectedRule = sortedRules.find((item) => item.months === selectedMonths) ?? sortedRules[0]
   const effectiveSelectedMonths = selectedRule?.months ?? sortedRules[0]?.months ?? 1
@@ -245,7 +255,7 @@ export function QuickActionsSheet({
     }
   }, [isSubmittingCredits, selectedPaymentMethod])
 
-  async function startPlategaPayment(channel: "CARD" | "SBP") {
+  async function startPlategaPayment() {
     if (!calculatedPrice || checkoutDisabled) {
       return
     }
@@ -259,7 +269,7 @@ export function QuickActionsSheet({
           description: `PulsarVPN ${effectiveSelectedMonths} мес. / ${effectiveSelectedDevices} устройств`,
           devices: effectiveSelectedDevices,
           months: effectiveSelectedMonths,
-          plategaPaymentMethod: channel,
+          plategaPaymentMethod: "SBP",
         }),
         headers: {
           "Content-Type": "application/json",
@@ -283,278 +293,291 @@ export function QuickActionsSheet({
     }
   }
 
-  return (
-    <Drawer onOpenChange={handleOpenChange} open={open}>
-      <DrawerTrigger asChild>
-        <Button
-          className={fullWidthTrigger ? "h-button w-full px-button-x" : "h-button px-button-x"}
-          radius="card"
-        >
-          <CreditCardIcon className="size-4" />
-          {triggerLabel}
-        </Button>
-      </DrawerTrigger>
+  const triggerButton = (
+    <Button
+      className={fullWidthTrigger ? "h-button w-full px-button-x" : "h-button px-button-x"}
+      radius="card"
+    >
+      <CreditCardIcon className="size-4" />
+      {triggerLabel}
+    </Button>
+  )
 
-      <DrawerContent className="before:shadow-none">
-        <DrawerHeader className="sr-only">
-          <DrawerTitle>{triggerLabel}</DrawerTitle>
-          <DrawerDescription>Настройте параметры и выберите способ оплаты.</DrawerDescription>
-        </DrawerHeader>
+  const contentBody = (
+    <div className="min-h-0 flex-1 overflow-y-auto px-4 md:px-1">
+      <div className="space-y-4 pb-6 pt-6">
+        {isCheckingPlategaPayment ? (
+          <Alert>
+            <Loader2Icon className="animate-spin" />
+            <AlertTitle>Проверяем статус платежа</AlertTitle>
+            <AlertDescription>
+              Платеж через Platega обрабатывается. Подождите несколько секунд.
+            </AlertDescription>
+          </Alert>
+        ) : null}
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-4">
-          <div className="space-y-4 pb-6 pt-6">
-            {isCheckingPlategaPayment ? (
-              <Alert>
-                <Loader2Icon className="animate-spin" />
-                <AlertTitle>Проверяем статус платежа</AlertTitle>
-                <AlertDescription>
-                  Платеж через Platega обрабатывается. Подождите несколько секунд.
-                </AlertDescription>
-              </Alert>
-            ) : null}
+        {!canExtendSubscription ? (
+          <Alert>
+            <AlertTitle>Продление временно недоступно</AlertTitle>
+            <AlertDescription>
+              Дождитесь завершения текущего платежа и повторите попытку.
+            </AlertDescription>
+          </Alert>
+        ) : null}
 
-            {!canExtendSubscription ? (
-              <Alert>
-                <AlertTitle>Продление временно недоступно</AlertTitle>
-                <AlertDescription>
-                  Дождитесь завершения текущего платежа и повторите попытку.
-                </AlertDescription>
-              </Alert>
-            ) : null}
+        {isCapacityBlockedForNewSubscriptions ? (
+          <Alert>
+            <AlertTitle>Свободных мест нет</AlertTitle>
+            <AlertDescription>
+              Активных подписок: {currentActiveSubscriptionsCount}
+              {maxActiveSubscriptions > 0 ? ` из ${maxActiveSubscriptions}` : ""}.
+            </AlertDescription>
+          </Alert>
+        ) : null}
 
-            {isCapacityBlockedForNewSubscriptions ? (
-              <Alert>
-                <AlertTitle>Свободных мест нет</AlertTitle>
-                <AlertDescription>
-                  Активных подписок: {currentActiveSubscriptionsCount}
-                  {maxActiveSubscriptions > 0 ? ` из ${maxActiveSubscriptions}` : ""}.
-                </AlertDescription>
-              </Alert>
-            ) : null}
+        {step === "config" ? (
+          <>
+            <div className="flex flex-col gap-2">
+              {sortedRules.map((rule) => {
+                const isActive = selectedMonths === rule.months
+                const itemPrice = calculateAppSubscriptionPreviewPrice({
+                  devices: effectiveSelectedDevices,
+                  firstPurchaseDiscountPct,
+                  pricingSettings: {
+                    baseDeviceMonthlyPrice: pricingSettings.baseDeviceMonthlyPrice,
+                    extraDeviceMonthlyPrice: pricingSettings.extraDeviceMonthlyPrice,
+                  },
+                  rule,
+                })
+                const hasRuleReferralDiscount =
+                  itemPrice.finalTotalRub < itemPrice.totalAfterDurationDiscountRub
 
-            {step === "config" ? (
+                return (
+                  <Button
+                    className="h-auto w-full px-3 py-3"
+                    data-active={isActive}
+                    key={rule.id}
+                    onClick={() => setSelectedMonths(rule.months)}
+                    radius="card"
+                    type="button"
+                    variant={isActive ? "secondary" : "outline"}
+                  >
+                    <span className="grid w-full grid-cols-[1fr_auto] gap-x-3 gap-y-1 text-left">
+                      <span className="text-sm font-medium">{getMonthsLabel(rule.months)}</span>
+                      <span className="text-right text-sm font-semibold">
+                        {itemPrice.finalTotalRub} ₽
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {getPerMonthPrice(itemPrice.finalTotalRub, rule.months)} ₽/мес
+                      </span>
+                      <span className="flex items-center justify-end gap-1.5 text-xs">
+                        <span className="text-muted-foreground">-{rule.discountPercent}%</span>
+                        {hasRuleReferralDiscount ? (
+                          <Badge variant="success">Реф. скидка</Badge>
+                        ) : null}
+                      </span>
+                    </span>
+                  </Button>
+                )
+              })}
+            </div>
+
+            <div className="space-y-3 rounded-card border border-border/70 bg-card/30 p-3">
+              <p className="inline-flex items-center gap-2 text-sm font-medium">
+                <SmartphoneIcon className="size-4 text-muted-foreground" />
+                Устройства: {effectiveSelectedDevices}
+              </p>
+              <Slider
+                max={maximumDevices}
+                min={minimumDevices}
+                onValueChange={(value) => {
+                  const next = Number(value[0] ?? minimumDevices)
+                  setSelectedDevices(Math.min(Math.max(next, minimumDevices), maximumDevices))
+                }}
+                step={1}
+                value={[effectiveSelectedDevices]}
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            <Card className="gap-1 rounded-card border border-border/70 bg-card/30 p-3 shadow-none ring-0">
+              <p className="text-sm text-muted-foreground">
+                Период: <span className="text-foreground">{getMonthsLabel(effectiveSelectedMonths)}</span>
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Устройства: <span className="text-foreground">{effectiveSelectedDevices}</span>
+              </p>
+              <p className="text-sm text-muted-foreground">
+                К оплате: <span className="text-foreground">{calculatedPrice?.finalTotalRub ?? 0} ₽ </span>
+              </p>
+            </Card>
+
+            <RadioGroup
+              className="space-y-0 px-px"
+              onValueChange={(value) => setSelectedPaymentMethod(value as PaymentMethod)}
+              value={selectedPaymentMethod}
+            >
+              <label className="block cursor-pointer" htmlFor="method-sbp">
+                <Card className="rounded-card border border-border/70 bg-card/30 p-3 shadow-none ring-0">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="inline-flex items-center gap-2 text-sm font-medium">
+                        <SmartphoneIcon className="size-4" />
+                        СБП
+                      </p>
+                      <p className="text-xs text-muted-foreground">Система быстрых платежей</p>
+                    </div>
+                    <RadioGroupItem id="method-sbp" value="PLATEGA_SBP" />
+                  </div>
+                </Card>
+              </label>
+
+              <label className="block cursor-pointer" htmlFor="method-credits">
+                <Card className="rounded-card border border-border/70 bg-card/30 p-3 shadow-none ring-0">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="inline-flex items-center gap-2 text-sm font-medium">
+                        <WalletIcon className="size-4" />
+                        Кредитами
+                      </p>
+                      <p className="text-xs text-muted-foreground">Баланс: {credits} credits</p>
+                    </div>
+                    <RadioGroupItem id="method-credits" value="CREDITS" />
+                  </div>
+                </Card>
+              </label>
+            </RadioGroup>
+          </>
+        )}
+      </div>
+    </div>
+  )
+
+  const creditsForm = (
+    <form action={payTariffWithCreditsAction} ref={creditsFormRef}>
+      <input name="devices" type="hidden" value={effectiveSelectedDevices} />
+      <input name="months" type="hidden" value={effectiveSelectedMonths} />
+    </form>
+  )
+
+  const footerContent =
+    step === "config" ? (
+      <Button
+        className="h-button w-full px-button-x"
+        disabled={checkoutDisabled || isCheckingPlategaPayment}
+        onClick={() => setStep("payment")}
+        radius="card"
+        type="button"
+      >
+        Далее
+      </Button>
+    ) : (
+      <>
+        {selectedPaymentMethod === "CREDITS" && !hasEnoughCredits ? (
+          <Alert className="border-amber-500/30 bg-amber-500/10 text-amber-100">
+            <TriangleAlertIcon className="text-amber-300" />
+            <AlertTitle>Недостаточно кредитов</AlertTitle>
+            <AlertDescription className="text-amber-200/90">
+              Выберите СБП для оплаты.
+            </AlertDescription>
+          </Alert>
+        ) : null}
+
+        <div className="flex w-full gap-2">
+          <Button
+            className="h-button px-button-x"
+            onClick={() => setStep("config")}
+            radius="card"
+            type="button"
+            variant="outline"
+          >
+            Назад
+          </Button>
+
+          <Button
+            className="h-button min-w-0 flex-1 px-button-x"
+            disabled={
+              selectedPaymentMethod === "CREDITS"
+                ? paymentActionDisabled || !hasEnoughCredits
+                : paymentActionDisabled
+            }
+            onClick={() => {
+              if (selectedPaymentMethod === "CREDITS") {
+                setIsSubmittingCredits(true)
+                creditsFormRef.current?.requestSubmit()
+                return
+              }
+
+              void startPlategaPayment()
+            }}
+            radius="card"
+            type="button"
+          >
+            {selectedPaymentMethod !== "CREDITS" ? (
+              isCreatingPlategaPayment ? (
+                <>
+                  <Loader2Icon className="size-4 animate-spin" />
+                  Создаем платеж...
+                </>
+              ) : hasReferralDiscount ? (
+                <>
+                  <span className="text-muted-foreground line-through">
+                    {totalAfterDurationDiscountDisplay} ₽
+                  </span>
+                  {totalAfterReferralDiscountDisplay} ₽
+                </>
+              ) : (
+                `${calculatedPrice?.finalTotalRub ?? 0} ₽`
+              )
+            ) : isSubmittingCredits ? (
               <>
-                <div className="flex flex-col gap-2">
-                  {sortedRules.map((rule) => {
-                    const isActive = selectedMonths === rule.months
-                    const itemPrice = calculateAppSubscriptionPreviewPrice({
-                      devices: effectiveSelectedDevices,
-                      firstPurchaseDiscountPct,
-                      pricingSettings: {
-                        baseDeviceMonthlyPrice: pricingSettings.baseDeviceMonthlyPrice,
-                        extraDeviceMonthlyPrice: pricingSettings.extraDeviceMonthlyPrice,
-                      },
-                      rule,
-                    })
-                    const hasRuleReferralDiscount =
-                      itemPrice.finalTotalRub < itemPrice.totalAfterDurationDiscountRub
-
-                    return (
-                      <Button
-                        className="h-auto w-full px-3 py-3"
-                        data-active={isActive}
-                        key={rule.id}
-                        onClick={() => setSelectedMonths(rule.months)}
-                        radius="card"
-                        type="button"
-                        variant={isActive ? "secondary" : "outline"}
-                      >
-                        <span className="grid w-full grid-cols-[1fr_auto] gap-x-3 gap-y-1 text-left">
-                          <span className="text-sm font-medium">{getMonthsLabel(rule.months)}</span>
-                          <span className="text-right text-sm font-semibold">
-                            {itemPrice.finalTotalRub} ₽
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {getPerMonthPrice(itemPrice.finalTotalRub, rule.months)} ₽/мес
-                          </span>
-                          <span className="flex items-center justify-end gap-1.5 text-xs">
-                            <span className="text-muted-foreground">-{rule.discountPercent}%</span>
-                            {hasRuleReferralDiscount ? (
-                              <Badge variant="success">Реф. скидка</Badge>
-                            ) : null}
-                          </span>
-                        </span>
-                      </Button>
-                    )
-                  })}
-                </div>
-
-                <div className="space-y-3 rounded-card border border-border/70 bg-card/30 p-3">
-                  <p className="inline-flex items-center gap-2 text-sm font-medium">
-                    <SmartphoneIcon className="size-4 text-muted-foreground" />
-                    Устройства: {effectiveSelectedDevices}
-                  </p>
-                  <Slider
-                    max={maximumDevices}
-                    min={minimumDevices}
-                    onValueChange={(value) => {
-                      const next = Number(value[0] ?? minimumDevices)
-                      setSelectedDevices(Math.min(Math.max(next, minimumDevices), maximumDevices))
-                    }}
-                    step={1}
-                    value={[effectiveSelectedDevices]}
-                  />
-                </div>
+                <Loader2Icon className="size-4 animate-spin" />
+                Выдаем подписку...
               </>
             ) : (
-              <>
-                <Card className="gap-1 rounded-card border border-border/70 bg-card/30 p-3 shadow-none ring-0">
-                  <p className="text-sm text-muted-foreground">
-                    Период: <span className="text-foreground">{getMonthsLabel(effectiveSelectedMonths)}</span>
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Устройства: <span className="text-foreground">{effectiveSelectedDevices}</span>
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    К оплате: <span className="text-foreground">{calculatedPrice?.finalTotalRub ?? 0} ₽ </span>
-                  </p>
-                </Card>
-
-                <RadioGroup
-                  className="space-y-0 px-px"
-                  onValueChange={(value) =>
-                    setSelectedPaymentMethod(value as "CREDITS" | "PLATEGA_CARD" | "PLATEGA_SBP")
-                  }
-                  value={selectedPaymentMethod}
-                >
-                  <label className="block cursor-pointer" htmlFor="method-sbp">
-                    <Card className="rounded-card border border-border/70 bg-card/30 p-3 shadow-none ring-0">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="inline-flex items-center gap-2 text-sm font-medium">
-                            <SmartphoneIcon className="size-4" />
-                            СБП
-                          </p>
-                          <p className="text-xs text-muted-foreground">Система быстрых платежей</p>
-                        </div>
-                        <RadioGroupItem id="method-sbp" value="PLATEGA_SBP" />
-                      </div>
-                    </Card>
-                  </label>
-
-                  <label className="block cursor-pointer" htmlFor="method-card">
-                    <Card className="rounded-card border border-border/70 bg-card/30 p-3 shadow-none ring-0">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="inline-flex items-center gap-2 text-sm font-medium">
-                            <CreditCardIcon className="size-4" />
-                            Банковская карта
-                          </p>
-                          <p className="text-xs text-muted-foreground">Visa, MasterCard, Мир</p>
-                        </div>
-                        <RadioGroupItem id="method-card" value="PLATEGA_CARD" />
-                      </div>
-                    </Card>
-                  </label>
-
-                  <label className="block cursor-pointer" htmlFor="method-credits">
-                    <Card className="rounded-card border border-border/70 bg-card/30 p-3 shadow-none ring-0">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="inline-flex items-center gap-2 text-sm font-medium">
-                            <WalletIcon className="size-4" />
-                            Кредитами
-                          </p>
-                          <p className="text-xs text-muted-foreground">Баланс: {credits} credits</p>
-                        </div>
-                        <RadioGroupItem id="method-credits" value="CREDITS" />
-                      </div>
-                    </Card>
-                  </label>
-                </RadioGroup>
-              </>
+              "Оплатить кредитами"
             )}
-          </div>
+          </Button>
         </div>
+      </>
+    )
 
-        <form action={payTariffWithCreditsAction} ref={creditsFormRef}>
-          <input name="devices" type="hidden" value={effectiveSelectedDevices} />
-          <input name="months" type="hidden" value={effectiveSelectedMonths} />
-        </form>
+  if (isMobile) {
+    return (
+      <Drawer onOpenChange={handleOpenChange} open={open}>
+        <DrawerTrigger asChild>{triggerButton}</DrawerTrigger>
 
-        <DrawerFooter className="pt-2">
-          {step === "config" ? (
-            <Button
-              className="h-button w-full px-button-x"
-              disabled={checkoutDisabled || isCheckingPlategaPayment}
-              onClick={() => setStep("payment")}
-              radius="card"
-              type="button"
-            >
-              Далее
-            </Button>
-          ) : (
-            <>
-              {selectedPaymentMethod === "CREDITS" && !hasEnoughCredits ? (
-                <Alert className="border-amber-500/30 bg-amber-500/10 text-amber-100">
-                  <TriangleAlertIcon className="text-amber-300" />
-                  <AlertTitle>Недостаточно кредитов</AlertTitle>
-                  <AlertDescription className="text-amber-200/90">
-                    Выберите СБП или банковскую карту для оплаты.
-                  </AlertDescription>
-                </Alert>
-              ) : null}
+        <DrawerContent className="before:shadow-none">
+          <DrawerHeader className="sr-only">
+            <DrawerTitle>{triggerLabel}</DrawerTitle>
+            <DrawerDescription>Настройте параметры и выберите способ оплаты.</DrawerDescription>
+          </DrawerHeader>
 
-              <div className="flex w-full gap-2">
-                <Button
-                  className="h-button px-button-x"
-                  onClick={() => setStep("config")}
-                  radius="card"
-                  type="button"
-                  variant="outline"
-                >
-                  Назад
-                </Button>
+          {contentBody}
+          {creditsForm}
 
-                <Button
-                  className="h-button min-w-0 flex-1 px-button-x"
-                  disabled={
-                    selectedPaymentMethod === "CREDITS"
-                      ? paymentActionDisabled || !hasEnoughCredits
-                      : paymentActionDisabled
-                  }
-                  onClick={() => {
-                    if (selectedPaymentMethod === "CREDITS") {
-                      setIsSubmittingCredits(true)
-                      creditsFormRef.current?.requestSubmit()
-                      return
-                    }
+          <DrawerFooter className="pt-2">{footerContent}</DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    )
+  }
 
-                    void startPlategaPayment(selectedPaymentMethod === "PLATEGA_CARD" ? "CARD" : "SBP")
-                  }}
-                  radius="card"
-                  type="button"
-                >
-                  {selectedPaymentMethod !== "CREDITS" ? (
-                    isCreatingPlategaPayment ? (
-                      <>
-                        <Loader2Icon className="size-4 animate-spin" />
-                        Создаем платеж...
-                      </>
-                    ) : hasReferralDiscount ? (
-                      <>
-                        <span className="text-muted-foreground line-through">
-                          {totalAfterDurationDiscountDisplay} ₽
-                        </span>
-                        {totalAfterReferralDiscountDisplay} ₽
-                      </>
-                    ) : (
-                      `${calculatedPrice?.finalTotalRub ?? 0} ₽`
-                    )
-                  ) : isSubmittingCredits ? (
-                    <>
-                      <Loader2Icon className="size-4 animate-spin" />
-                      Выдаем подписку...
-                    </>
-                  ) : (
-                    "Оплатить кредитами"
-                  )}
-                </Button>
-              </div>
-            </>
-          )}
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+  return (
+    <Dialog onOpenChange={handleOpenChange} open={open}>
+      <DialogTrigger asChild>{triggerButton}</DialogTrigger>
+
+      <DialogContent className="flex max-h-[88svh] flex-col overflow-hidden p-4 sm:max-w-md">
+        <DialogHeader className="sr-only">
+          <DialogTitle>{triggerLabel}</DialogTitle>
+          <DialogDescription>Настройте параметры и выберите способ оплаты.</DialogDescription>
+        </DialogHeader>
+
+        {contentBody}
+        {creditsForm}
+
+        <div className="flex flex-col gap-2 pt-2">{footerContent}</div>
+      </DialogContent>
+    </Dialog>
   )
 }

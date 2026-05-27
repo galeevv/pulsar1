@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 
 import { AdminFeedbackToast } from "@/app/admin/admin-feedback-toast";
 import { AdminAppSidebar } from "@/components/admin/admin-app-sidebar";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AdminHeader } from "@/components/admin/admin-header";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { getCurrentSession } from "@/lib/auth";
 
 export default async function AdminLayout({
@@ -34,10 +35,10 @@ export default async function AdminLayout({
           />
 
           <div className="mx-auto w-full max-w-[1200px] px-0 pb-0 pt-0 md:px-0 md:pb-0 md:pt-0">
-            <div className="mb-2 flex md:hidden">
-              <SidebarTrigger className="size-9 rounded-card border border-border/70 bg-card/70" />
+            <AdminHeader />
+            <div className="px-6">
+              {children}
             </div>
-            {children}
           </div>
         </main>
       </SidebarInset>

@@ -147,6 +147,7 @@ export function AppHomeTab({
                   }
                 : null
             }
+            subscriptionUrl={activeSubscription?.subscriptionUrl ?? null}
             triggerLabel="Настроить VPN"
             triggerVariant="outline"
           />

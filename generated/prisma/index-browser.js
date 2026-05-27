@@ -128,14 +128,10 @@ exports.Prisma.UserScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.InviteCodeScalarFieldEnum = {
-  id: 'id',
-  code: 'code',
-  isEnabled: 'isEnabled',
-  expiresAt: 'expiresAt',
-  createdAt: 'createdAt',
-  usedAt: 'usedAt',
-  usedByUserId: 'usedByUserId'
+exports.Prisma.UserOperationLockScalarFieldEnum = {
+  userId: 'userId',
+  operation: 'operation',
+  lockedAt: 'lockedAt'
 };
 
 exports.Prisma.ReferralCodeScalarFieldEnum = {
@@ -327,6 +323,25 @@ exports.Prisma.SubscriptionScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.SubscriptionRenewalScalarFieldEnum = {
+  id: 'id',
+  subscriptionId: 'subscriptionId',
+  paymentRequestId: 'paymentRequestId',
+  previousExpiresAt: 'previousExpiresAt',
+  nextExpiresAt: 'nextExpiresAt',
+  previousDevices: 'previousDevices',
+  nextDevices: 'nextDevices',
+  months: 'months',
+  amountRub: 'amountRub',
+  currency: 'currency',
+  baseDeviceMonthlyPriceSnapshot: 'baseDeviceMonthlyPriceSnapshot',
+  extraDeviceMonthlyPriceSnapshot: 'extraDeviceMonthlyPriceSnapshot',
+  monthlyPriceSnapshot: 'monthlyPriceSnapshot',
+  durationDiscountPercentSnapshot: 'durationDiscountPercentSnapshot',
+  referralDiscountPercentSnapshot: 'referralDiscountPercentSnapshot',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.DeviceSlotScalarFieldEnum = {
   id: 'id',
   subscriptionId: 'subscriptionId',
@@ -435,7 +450,7 @@ exports.DeviceOS = exports.$Enums.DeviceOS = {
 };
 
 exports.IntegrationProvider = exports.$Enums.IntegrationProvider = {
-  MARZBAN: 'MARZBAN'
+  XUI: 'XUI'
 };
 
 exports.IntegrationTargetType = exports.$Enums.IntegrationTargetType = {
@@ -460,7 +475,7 @@ exports.PayoutRequestStatus = exports.$Enums.PayoutRequestStatus = {
 
 exports.Prisma.ModelName = {
   User: 'User',
-  InviteCode: 'InviteCode',
+  UserOperationLock: 'UserOperationLock',
   ReferralCode: 'ReferralCode',
   ReferralCodeUse: 'ReferralCodeUse',
   PromoCode: 'PromoCode',
@@ -475,6 +490,7 @@ exports.Prisma.ModelName = {
   PaymentRequest: 'PaymentRequest',
   PlategaWebhookLog: 'PlategaWebhookLog',
   Subscription: 'Subscription',
+  SubscriptionRenewal: 'SubscriptionRenewal',
   DeviceSlot: 'DeviceSlot',
   IntegrationSyncLog: 'IntegrationSyncLog',
   PayoutRequest: 'PayoutRequest',

@@ -14,9 +14,10 @@ const createPlategaPaymentSchema = z.object({
   amount: z.number().int().positive().optional(),
   description: z.string().trim().min(1).max(240).optional(),
   devices: z.number().int().positive(),
-  months: z.number().int().positive(),
+  months: z.number().int().min(0),
   orderId: z.string().trim().min(1).max(120).optional(),
   plategaPaymentMethod: z.enum(["CARD", "SBP"]).optional(),
+  purpose: z.enum(["SUBSCRIPTION", "DEVICE_LIMIT_CHANGE"]).optional(),
   userId: z.string().trim().min(1).max(120).optional(),
 });
 
@@ -51,6 +52,11 @@ async function getFirstPurchaseReferralDiscountPct(userId: string) {
 
 function buildConstructorTariffName(months: number, devices: number) {
   return `Constructor: ${months}m / ${devices} devices`;
+}
+
+function getRemainingSubscriptionDays(now: Date, expiresAt: Date) {
+  const remainingMs = Math.max(0, expiresAt.getTime() - now.getTime());
+  return Math.max(1, Math.ceil(remainingMs / 86_400_000));
 }
 
 function buildPlategaRedirectTarget(params: {
@@ -102,6 +108,7 @@ export async function POST(request: Request) {
   }
 
   const { devices, months } = parsedPayload.data;
+  const purpose = parsedPayload.data.purpose ?? "SUBSCRIPTION";
 
   const [{ durationRules, pricingSettings }, referralDiscountPct, activeSubscription] =
     await Promise.all([
@@ -130,6 +137,150 @@ export async function POST(request: Request) {
       },
       { status: 400 }
     );
+  }
+
+  if (purpose === "DEVICE_LIMIT_CHANGE") {
+    if (!activeSubscription) {
+      return NextResponse.json({ error: "Нет активной подписки." }, { status: 400 });
+    }
+
+    if (devices <= activeSubscription.devices) {
+      return NextResponse.json(
+        { error: "Новый лимит должен быть больше текущего." },
+        { status: 400 }
+      );
+    }
+
+    const now = new Date();
+    const expiresAt = activeSubscription.expiresAt ?? activeSubscription.endsAt;
+    const remainingDays = getRemainingSubscriptionDays(now, expiresAt);
+    const extraDevices = devices - activeSubscription.devices;
+    const amountRub = Math.ceil(
+      (extraDevices * pricingSettings.extraDeviceMonthlyPrice * remainingDays) / 30
+    );
+
+    if (
+      typeof parsedPayload.data.amount === "number" &&
+      parsedPayload.data.amount !== amountRub
+    ) {
+      return NextResponse.json({ error: "Сумма платежа устарела, обновите страницу." }, { status: 409 });
+    }
+
+    const selectedPlategaPaymentMethod = parsedPayload.data.plategaPaymentMethod ?? "SBP";
+    const replacementTimestamp = new Date();
+    const paymentRequest = await prisma.$transaction(async (tx) => {
+      await tx.paymentRequest.updateMany({
+        data: {
+          plategaStatus: "REPLACED_BY_NEW_REQUEST",
+          rejectedAt: replacementTimestamp,
+          status: "REJECTED",
+        },
+        where: {
+          status: "CREATED",
+          userId: user.id,
+        },
+      });
+
+      return tx.paymentRequest.create({
+        data: {
+          amountRub,
+          baseDeviceMonthlyPriceSnapshot: activeSubscription.baseDeviceMonthlyPriceSnapshot,
+          currency: activeSubscription.currency,
+          deviceLimit: devices,
+          devices,
+          durationDiscountPercentSnapshot: activeSubscription.durationDiscountPercentSnapshot,
+          extraDeviceMonthlyPriceSnapshot: pricingSettings.extraDeviceMonthlyPrice,
+          method: "PLATEGA",
+          monthlyPriceSnapshot: activeSubscription.monthlyPriceSnapshot,
+          months: 0,
+          periodMonths: 0,
+          referralDiscountPercentSnapshot: activeSubscription.referralDiscountPercentSnapshot,
+          status: "CREATED",
+          tariffName: `Device limit: ${activeSubscription.devices} -> ${devices}`,
+          totalPriceBeforeDiscountRubSnapshot: amountRub,
+          userId: user.id,
+        },
+      });
+    });
+
+    const returnUrl = buildPlategaRedirectTarget({
+      configuredUrl: process.env.PLATEGA_RETURN_URL,
+      fallbackRequestUrl: request.url,
+      paymentRequestId: paymentRequest.id,
+    });
+    const failedUrl = buildPlategaRedirectTarget({
+      configuredUrl: process.env.PLATEGA_FAILED_URL,
+      fallbackRequestUrl: request.url,
+      paymentRequestId: paymentRequest.id,
+    });
+    const payloadJson = JSON.stringify({
+      amountRub,
+      orderId: parsedPayload.data.orderId ?? paymentRequest.id,
+      paymentMethod: selectedPlategaPaymentMethod,
+      paymentRequestId: paymentRequest.id,
+      purpose,
+      userId: parsedPayload.data.userId ?? user.id,
+    });
+    const description =
+      parsedPayload.data.description ??
+      `PulsarVPN: лимит устройств ${activeSubscription.devices} -> ${devices}`;
+
+    try {
+      const transaction = await createPlategaTransaction({
+        amount: amountRub,
+        description,
+        failedUrl,
+        orderId: paymentRequest.id,
+        payload: payloadJson,
+        paymentMethod: selectedPlategaPaymentMethod,
+        returnUrl,
+      });
+
+      await prisma.paymentRequest.update({
+        data: {
+          plategaPayloadJson: payloadJson,
+          plategaRedirectUrl: transaction.redirectUrl,
+          plategaStatus: transaction.status ?? "PENDING",
+          plategaTransactionId: transaction.transactionId,
+        },
+        where: {
+          id: paymentRequest.id,
+        },
+      });
+
+      return NextResponse.json({
+        paymentRequestId: paymentRequest.id,
+        redirectUrl: transaction.redirectUrl,
+      });
+    } catch (error) {
+      const message =
+        error instanceof PlategaApiError
+          ? error.responseBody || error.message
+          : error instanceof Error
+            ? error.message
+            : "Не удалось создать платеж в Platega.";
+
+      await prisma.paymentRequest.update({
+        data: {
+          plategaPayloadJson: JSON.stringify({
+            error: message.slice(0, 2000),
+            payload: payloadJson,
+          }),
+          plategaStatus: "CREATE_FAILED",
+          rejectedAt: new Date(),
+          status: "REJECTED",
+        },
+        where: {
+          id: paymentRequest.id,
+        },
+      });
+
+      return NextResponse.json({ error: "Не удалось создать платеж в Platega." }, { status: 502 });
+    }
+  }
+
+  if (months <= 0) {
+    return NextResponse.json({ error: "Выбранный срок отключен администратором." }, { status: 400 });
   }
 
   const durationRule = durationRules.find((item) => item.months === months);

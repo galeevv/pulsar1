@@ -187,6 +187,9 @@ export function AdminPayoutDetailsSheet({
               <SectionCard icon={CircleUserRound} title="Пользователь">
                 <div className="space-y-3">
                   <KeyValue label="Логин" value={formatNullableText(payout.username)} />
+                  <KeyValue label="Credits" value={formatCredits(payout.details.userCredits)} />
+                  <KeyValue label="Reserved" value={formatCredits(payout.details.userReservedCredits)} />
+                  <KeyValue label="Available" value={formatCredits(payout.details.userAvailableCredits)} />
                   <Button asChild className="w-full sm:w-auto" radius="card" size="sm" type="button" variant="outline">
                     <Link href={`/admin/users?q=${encodeURIComponent(payout.username ?? payout.userId)}`}>
                       Открыть профиль

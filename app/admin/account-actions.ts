@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import {
   getCurrentSession,
   hashPasswordForStorage,
-  isValidMarzbanCompatibleUsername,
+  isValidXuiCompatibleUsername,
   normalizeUsername,
   verifyPasswordAgainstHash,
 } from "@/lib/auth";
@@ -105,7 +105,7 @@ export async function updateAdminCredentialsAction(formData: FormData) {
 
   const nextUsername = normalizeUsername(nextUsernameRaw);
   if (nextUsername && nextUsername !== admin.username) {
-    if (!isValidMarzbanCompatibleUsername(nextUsername)) {
+    if (!isValidXuiCompatibleUsername(nextUsername)) {
       redirect(
         buildRedirectUrl({
           path: returnPath,

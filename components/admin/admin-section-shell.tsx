@@ -19,16 +19,20 @@ export function AdminSectionShell({
 }) {
   return (
     <section
-      className={cn("mx-auto w-full max-w-[1120px] scroll-mt-20 py-12 md:scroll-mt-20 md:py-12", className)}
+      className={cn("mx-auto w-full max-w-[1152px] scroll-mt-20 py-12 md:scroll-mt-20 md:py-12", className)}
       id={id}
     >
-      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <div className="w-full">
-          <h2 className="text-h2 font-semibold tracking-tight">{title}</h2>
+      {title || actions ? (
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          {title ? (
+            <div className="w-full">
+              <h2 className="text-h2 font-semibold tracking-tight">{title}</h2>
+            </div>
+          ) : null}
+          {actions ? <div className="shrink-0">{actions}</div> : null}
         </div>
-        {actions ? <div className="shrink-0">{actions}</div> : null}
-      </div>
-      <div className={cn("mt-4", contentClassName)}>{children}</div>
+      ) : null}
+      <div className={cn(title || actions ? "mt-4" : "mt-0", contentClassName)}>{children}</div>
     </section>
   );
 }

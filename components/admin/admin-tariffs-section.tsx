@@ -17,7 +17,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { applyPercentDiscount } from "@/lib/subscription-pricing";
 import { calculateAdminSubscriptionPreviewPrice } from "@/lib/subscription-preview";
 
 import { AdminSectionShell } from "./admin-section-shell";
@@ -84,9 +83,6 @@ export function AdminTariffsSection({
   const [extraDeviceMonthlyPrice, setExtraDeviceMonthlyPrice] = useState(
     pricingSettings.extraDeviceMonthlyPrice
   );
-  const [durationMonthlyPrice, setDurationMonthlyPrice] = useState(
-    sortedRules[0]?.monthlyPrice ?? pricingSettings.baseDeviceMonthlyPrice
-  );
   const [deviceRange, setDeviceRange] = useState<[number, number]>([
     clamp(pricingSettings.minDevices, 1, 10),
     clamp(Math.max(pricingSettings.maxDevices, pricingSettings.minDevices), 1, 10),
@@ -116,20 +112,16 @@ export function AdminTariffsSection({
         discountPercent: activePreviewRow.discountPercent,
         extraDeviceMonthlyPrice,
         months: activePreviewRow.months,
-        vpnMonthlyPrice: durationMonthlyPrice,
+        vpnMonthlyPrice: 0,
       })
     : null;
   const previewTotal = activePreviewPrice?.finalTotalRub ?? 0;
-  const previewVpnMonthlyWithDiscount = activePreviewRow
-    ? applyPercentDiscount(durationMonthlyPrice, activePreviewRow.discountPercent)
-    : durationMonthlyPrice;
-
   return (
     <AdminSectionShell
-      description="Глобальные правила конструктора подписки: сроки, цены и параметры устройств."
+      description=""
       eyebrow="SUBSCRIPTION RULES"
       id="tariffs"
-      title="Тарифные правила"
+      title=""
     >
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,360px)_minmax(0,360px)]">
         <AdminSurface>
@@ -304,24 +296,6 @@ export function AdminTariffsSection({
               />
             </div>
 
-            <div>
-              <label className="mb-2 block text-sm font-medium" htmlFor="duration-monthly-price">
-                Цена/мес (₽)
-              </label>
-              <Input
-                form="tariff-rules-form"
-                id="duration-monthly-price"
-                min={0}
-                name="durationMonthlyPrice"
-                onChange={(event) => {
-                  setDurationMonthlyPrice(Number.parseInt(event.target.value || "0", 10));
-                }}
-                required
-                type="number"
-                value={durationMonthlyPrice}
-              />
-            </div>
-
             <Button
               className="h-button w-full px-button-x"
               form="tariff-rules-form"
@@ -358,7 +332,7 @@ export function AdminTariffsSection({
                       discountPercent: row.discountPercent,
                       extraDeviceMonthlyPrice,
                       months: row.months,
-                      vpnMonthlyPrice: durationMonthlyPrice,
+                      vpnMonthlyPrice: 0,
                     });
                     const checked = (activePreviewRow?.months ?? previewRows[0].months) === row.months;
 
@@ -397,9 +371,6 @@ export function AdminTariffsSection({
                 </div>
 
                 <div className="rounded-card border border-border bg-background/50 p-card-compact md:p-card-compact-md">
-                  <p className="text-sm text-muted-foreground">
-                    VPN цена/мес: <span className="font-medium text-foreground">{previewVpnMonthlyWithDiscount} ₽</span>
-                  </p>
                   <p className="text-sm text-muted-foreground">
                     Устройства/мес: <span className="font-medium text-foreground">{activePreviewPrice?.devicesMonthlyPrice ?? 0} ₽</span>
                   </p>
