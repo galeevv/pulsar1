@@ -445,9 +445,9 @@ export class HttpXuiAdapter implements XuiAdapter {
 
         clients[state.index] = nextClient;
         state.settings.clients = clients;
-        await this.updateInbound({
-          inbound: state.inbound,
-          settings: state.settings,
+        await this.client.apiPost<null>(`inbounds/updateClient/${nextClient.id}`, {
+          id: state.inbound.id,
+          settings: JSON.stringify({ clients: [nextClient] }),
         });
         state.client = nextClient;
         continue;
