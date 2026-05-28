@@ -1,4 +1,5 @@
 import { DeviceOS, type Prisma } from "@/generated/prisma"
+import { isSlotWithinDeviceLimit } from "@/lib/device-slot-limits"
 import { prisma } from "@/lib/prisma"
 import { provisionSubscriptionSlotsInXui } from "@/lib/xui-integration"
 
@@ -129,7 +130,7 @@ export async function assignManagedSlotForUser(input: {
   const result = await prisma.$transaction(async (tx): Promise<SlotAssignmentResult> => {
     const activeSubscription = await tx.subscription.findFirst({
       orderBy: [{ startsAt: "desc" }, { startedAt: "desc" }],
-      select: { id: true },
+      select: { deviceLimit: true, id: true },
       where: {
         status: "ACTIVE",
         userId: input.userId,
@@ -150,6 +151,17 @@ export async function assignManagedSlotForUser(input: {
     })
 
     if (!targetSlot) {
+      return {
+        type: "NO_FREE_SLOTS",
+      }
+    }
+
+    if (
+      !isSlotWithinDeviceLimit({
+        deviceLimit: activeSubscription.deviceLimit,
+        slotIndex: targetSlot.slotIndex,
+      })
+    ) {
       return {
         type: "NO_FREE_SLOTS",
       }

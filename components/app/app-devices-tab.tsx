@@ -104,7 +104,10 @@ export function AppDevicesTab({
           <CardTitle className="text-lg">Устройства</CardTitle>
 
           {activeSubscription.deviceSlots.length ? (
-            <DeviceList slots={activeSubscription.deviceSlots.slice(0, 1)} subscriptionUrl={activeSubscription.subscriptionUrl} />
+            <DeviceList
+              slots={activeSubscription.deviceSlots.slice(0, activeSubscription.deviceLimit)}
+              subscriptionUrl={activeSubscription.subscriptionUrl}
+            />
           ) : (
             <EmptyStateBlock
               description="Слоты пока не созданы. Повторите позже или обратитесь в поддержку."

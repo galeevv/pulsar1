@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { isSlotWithinDeviceLimit } from "@/lib/device-slot-limits";
 import { getXuiAdapter } from "@/server/services/xui";
 import { XuiHttpError } from "@/server/services/xui/http-client";
 
@@ -141,7 +142,7 @@ function resolveSubscriptionUsername(input: {
 }
 
 function resolveSubscriptionIpLimit(subscription: ManagedSubscription) {
-  return Math.max(1, Math.floor(subscription.deviceLimit));
+  return Math.max(1, Math.floor(subscription.deviceLimit)) + 2;
 }
 
 async function logIntegrationEvent(input: {
@@ -342,8 +343,13 @@ async function syncSubscriptionSlotsInXui(
   }
 
   for (const slot of subscription.deviceSlots) {
-    const slotCanUseSubscription = slot.status !== "BLOCKED" && Boolean(subscriptionUrl);
-    const slotError = slot.status === "BLOCKED" ? null : subscriptionError;
+    const slotIsWithinLimit = isSlotWithinDeviceLimit({
+      deviceLimit: subscription.deviceLimit,
+      slotIndex: slot.slotIndex,
+    });
+    const slotCanUseSubscription =
+      slotIsWithinLimit && slot.status !== "BLOCKED" && Boolean(subscriptionUrl);
+    const slotError = slot.status === "BLOCKED" || !slotIsWithinLimit ? null : subscriptionError;
 
     await prisma.deviceSlot.update({
       data: {
@@ -351,6 +357,7 @@ async function syncSubscriptionSlotsInXui(
         lastSyncAt: now,
         lastSyncError: slotError,
         marzbanUsername: null,
+        status: slotIsWithinLimit ? slot.status : "FREE",
       },
       where: { id: slot.id },
     });
@@ -362,7 +369,7 @@ async function syncSubscriptionSlotsInXui(
       raw: responseRaw,
       slotId: slot.id,
       slotIndex: slot.slotIndex,
-      status: slot.status,
+      status: slotIsWithinLimit ? slot.status : "FREE",
     });
   }
 

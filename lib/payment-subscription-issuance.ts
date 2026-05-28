@@ -1,4 +1,5 @@
 import type { Prisma } from "@/generated/prisma";
+import { reconcileSubscriptionDeviceSlots } from "@/lib/device-slot-limits";
 import { isActiveSubscriptionsLimitReached } from "@/lib/service-capacity";
 
 function addMonths(date: Date, months: number) {
@@ -135,24 +136,10 @@ export async function createSubscriptionFromPaidRequest(input: {
       },
     });
 
-    const existingSlotIndexes = new Set(
-      activeSubscription.deviceSlots.map((slot) => slot.slotIndex)
-    );
-    const missingSlots = Array.from(
-      { length: input.paymentRequest.devices },
-      (_, index) => index + 1
-    ).filter((slotIndex) => !existingSlotIndexes.has(slotIndex));
-
-    if (missingSlots.length > 0) {
-      await input.tx.deviceSlot.createMany({
-        data: missingSlots.map((slotIndex) => ({
-          label: `Device ${slotIndex}`,
-          slotIndex,
-          status: "FREE",
-          subscriptionId: activeSubscription.id,
-        })),
-      });
-    }
+    await reconcileSubscriptionDeviceSlots(input.tx, {
+      deviceLimit: input.paymentRequest.deviceLimit,
+      subscriptionId: activeSubscription.id,
+    });
 
     return {
       createdSubscriptionId: updatedSubscription.id,
@@ -204,13 +191,9 @@ export async function createSubscriptionFromPaidRequest(input: {
     },
   });
 
-  await input.tx.deviceSlot.createMany({
-    data: Array.from({ length: input.paymentRequest.devices }, (_, index) => ({
-      label: `Device ${index + 1}`,
-      slotIndex: index + 1,
-      status: "FREE",
-      subscriptionId: createdSubscription.id,
-    })),
+  await reconcileSubscriptionDeviceSlots(input.tx, {
+    deviceLimit: input.paymentRequest.deviceLimit,
+    subscriptionId: createdSubscription.id,
   });
 
   return {

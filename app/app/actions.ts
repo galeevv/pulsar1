@@ -17,6 +17,10 @@ import {
   assignManagedSlotForUser,
   syncSlotConfigWithRetry,
 } from "@/lib/device-slot-management";
+import {
+  isSlotWithinDeviceLimit,
+  reconcileSubscriptionDeviceSlots,
+} from "@/lib/device-slot-limits";
 import { handleApprovedPaymentPostProcessing } from "@/lib/payment-post-approval-handler";
 import { PayoutDomainError } from "@/lib/payouts/payout-errors";
 import {
@@ -1053,23 +1057,10 @@ export async function changeDeviceLimitWithCreditsAction(formData: FormData) {
         },
       });
 
-      const existingSlotIndexes = new Set(
-        activeSubscription.deviceSlots.map((slot) => slot.slotIndex)
-      );
-      const missingSlots = Array.from({ length: nextDevices }, (_, index) => index + 1).filter(
-        (slotIndex) => !existingSlotIndexes.has(slotIndex)
-      );
-
-      if (missingSlots.length > 0) {
-        await tx.deviceSlot.createMany({
-          data: missingSlots.map((slotIndex) => ({
-            label: `Device ${slotIndex}`,
-            slotIndex,
-            status: "FREE",
-            subscriptionId: activeSubscription.id,
-          })),
-        });
-      }
+      await reconcileSubscriptionDeviceSlots(tx, {
+        deviceLimit: nextDevices,
+        subscriptionId: activeSubscription.id,
+      });
 
       subscriptionId = activeSubscription.id;
     }, { timeout: 15_000 });
@@ -1170,6 +1161,15 @@ async function getManagedSlotForUser(input: { slotId: string; userId: string }) 
   }
 
   if (slot.subscription.status !== "ACTIVE") {
+    return null;
+  }
+
+  if (
+    !isSlotWithinDeviceLimit({
+      deviceLimit: slot.subscription.deviceLimit,
+      slotIndex: slot.slotIndex,
+    })
+  ) {
     return null;
   }
 
