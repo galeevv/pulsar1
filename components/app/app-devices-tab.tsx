@@ -105,7 +105,7 @@ export function AppDevicesTab({
 
           {activeSubscription.deviceSlots.length ? (
             <DeviceList
-              slots={activeSubscription.deviceSlots.slice(0, activeSubscription.deviceLimit)}
+              slots={activeSubscription.deviceSlots.slice(0, 1)}
               subscriptionUrl={activeSubscription.subscriptionUrl}
             />
           ) : (
