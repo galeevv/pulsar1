@@ -79,6 +79,7 @@ export function QuickActionsSheet({
   firstPurchaseDiscountPct,
   isCapacityBlockedForNewSubscriptions,
   maxActiveSubscriptions,
+  plategaPaymentEnabled,
   plategaPaymentRequestId,
   pricingSettings,
   triggerLabel,
@@ -91,6 +92,7 @@ export function QuickActionsSheet({
   firstPurchaseDiscountPct: number
   isCapacityBlockedForNewSubscriptions: boolean
   maxActiveSubscriptions: number
+  plategaPaymentEnabled: boolean
   plategaPaymentRequestId: string | null
   pricingSettings: PricingSettings
   triggerLabel: string
@@ -111,7 +113,7 @@ export function QuickActionsSheet({
   const [selectedMonths, setSelectedMonths] = useState(sortedRules[0]?.months ?? 1)
   const [selectedDevices, setSelectedDevices] = useState(defaultDevices)
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
-    useState<PaymentMethod>("PLATEGA_SBP")
+    useState<PaymentMethod>(plategaPaymentEnabled ? "PLATEGA_SBP" : "CREDITS")
   const [isCreatingPlategaPayment, setIsCreatingPlategaPayment] = useState(false)
   const [isCheckingPlategaPayment, setIsCheckingPlategaPayment] = useState(
     Boolean(plategaPaymentRequestId)
@@ -164,7 +166,7 @@ export function QuickActionsSheet({
       setStep("config")
       setSelectedMonths(sortedRules[0]?.months ?? 1)
       setSelectedDevices(defaultDevices)
-      setSelectedPaymentMethod("PLATEGA_SBP")
+      setSelectedPaymentMethod(plategaPaymentEnabled ? "PLATEGA_SBP" : "CREDITS")
       setIsSubmittingCredits(false)
       setIsCreatingPlategaPayment(false)
     }
@@ -248,6 +250,12 @@ export function QuickActionsSheet({
       }
     }
   }, [plategaPaymentRequestId])
+
+  useEffect(() => {
+    if (!plategaPaymentEnabled && selectedPaymentMethod !== "CREDITS") {
+      setSelectedPaymentMethod("CREDITS")
+    }
+  }, [plategaPaymentEnabled, selectedPaymentMethod])
 
   useEffect(() => {
     if (selectedPaymentMethod !== "CREDITS" && isSubmittingCredits) {
@@ -418,20 +426,22 @@ export function QuickActionsSheet({
               onValueChange={(value) => setSelectedPaymentMethod(value as PaymentMethod)}
               value={selectedPaymentMethod}
             >
-              <label className="block cursor-pointer" htmlFor="method-sbp">
-                <Card className="rounded-card border border-border/70 bg-card/30 p-3 shadow-none ring-0">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="inline-flex items-center gap-2 text-sm font-medium">
-                        <SmartphoneIcon className="size-4" />
-                        СБП
-                      </p>
-                      <p className="text-xs text-muted-foreground">Система быстрых платежей</p>
+              {plategaPaymentEnabled ? (
+                <label className="block cursor-pointer" htmlFor="method-sbp">
+                  <Card className="rounded-card border border-border/70 bg-card/30 p-3 shadow-none ring-0">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="inline-flex items-center gap-2 text-sm font-medium">
+                          <SmartphoneIcon className="size-4" />
+                          СБП
+                        </p>
+                        <p className="text-xs text-muted-foreground">Система быстрых платежей</p>
+                      </div>
+                      <RadioGroupItem id="method-sbp" value="PLATEGA_SBP" />
                     </div>
-                    <RadioGroupItem id="method-sbp" value="PLATEGA_SBP" />
-                  </div>
-                </Card>
-              </label>
+                  </Card>
+                </label>
+              ) : null}
 
               <label className="block cursor-pointer" htmlFor="method-credits">
                 <Card className="rounded-card border border-border/70 bg-card/30 p-3 shadow-none ring-0">
@@ -479,7 +489,9 @@ export function QuickActionsSheet({
             <TriangleAlertIcon className="text-amber-300" />
             <AlertTitle>Недостаточно кредитов</AlertTitle>
             <AlertDescription className="text-amber-200/90">
-              Выберите СБП для оплаты.
+              {plategaPaymentEnabled
+                ? "Выберите СБП для оплаты."
+                : "Оплата Platega отключена, а кредитов не хватает."}
             </AlertDescription>
           </Alert>
         ) : null}
@@ -509,7 +521,9 @@ export function QuickActionsSheet({
                 return
               }
 
-              void startPlategaPayment()
+              if (plategaPaymentEnabled) {
+                void startPlategaPayment()
+              }
             }}
             radius="card"
             type="button"

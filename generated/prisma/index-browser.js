@@ -196,6 +196,9 @@ exports.Prisma.LegalDocumentSettingsScalarFieldEnum = {
 exports.Prisma.ServiceCapacitySettingsScalarFieldEnum = {
   id: 'id',
   maxActiveSubscriptions: 'maxActiveSubscriptions',
+  migrationBannerEnabled: 'migrationBannerEnabled',
+  migrationBannerTitle: 'migrationBannerTitle',
+  migrationBannerText: 'migrationBannerText',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -318,6 +321,7 @@ exports.Prisma.SubscriptionScalarFieldEnum = {
   provisionedAt: 'provisionedAt',
   lastSyncAt: 'lastSyncAt',
   lastSyncError: 'lastSyncError',
+  migrationLinkRefreshRequired: 'migrationLinkRefreshRequired',
   subscriptionUrl: 'subscriptionUrl',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

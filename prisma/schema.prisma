@@ -185,10 +185,13 @@ model LegalDocumentSettings {
 }
 
 model ServiceCapacitySettings {
-  id                     Int      @id @default(1)
-  maxActiveSubscriptions Int      @default(0)
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
+  id                       Int      @id @default(1)
+  maxActiveSubscriptions   Int      @default(0)
+  migrationBannerEnabled   Boolean  @default(false)
+  migrationBannerTitle     String   @default("Обновите ссылку VPN")
+  migrationBannerText      String   @default("После миграции нужно получить новую ссылку подписки и обновить ее в приложении.")
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
 }
 
 model SupportTicket {
@@ -340,6 +343,7 @@ model Subscription {
   provisionedAt                   DateTime?
   lastSyncAt                      DateTime?
   lastSyncError                   String?
+  migrationLinkRefreshRequired    Boolean            @default(false)
   subscriptionUrl                 String?
   createdAt                       DateTime           @default(now())
   updatedAt                       DateTime           @updatedAt

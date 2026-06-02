@@ -636,6 +636,9 @@ export async function updateServiceCapacitySettingsAction(formData: FormData) {
     String(formData.get("maxActiveSubscriptions") ?? ""),
     10
   );
+  const migrationBannerEnabled = String(formData.get("migrationBannerEnabled") ?? "") === "on";
+  const migrationBannerTitle = String(formData.get("migrationBannerTitle") ?? "").trim();
+  const migrationBannerText = String(formData.get("migrationBannerText") ?? "").trim();
 
   if (!Number.isFinite(maxActiveSubscriptions) || maxActiveSubscriptions < 0) {
     redirect(
@@ -655,13 +658,50 @@ export async function updateServiceCapacitySettingsAction(formData: FormData) {
     );
   }
 
+  if (migrationBannerEnabled && !migrationBannerTitle) {
+    redirect(
+      buildRedirectUrl({
+        path: "/admin/operations",
+        error: "Заголовок migration banner не может быть пустым.",
+      })
+    );
+  }
+
+  if (migrationBannerEnabled && !migrationBannerText) {
+    redirect(
+      buildRedirectUrl({
+        path: "/admin/operations",
+        error: "Текст migration banner не может быть пустым.",
+      })
+    );
+  }
+
+  if (migrationBannerTitle.length > 120 || migrationBannerText.length > 600) {
+    redirect(
+      buildRedirectUrl({
+        path: "/admin/operations",
+        error: "Migration banner слишком длинный.",
+      })
+    );
+  }
+
   await prisma.serviceCapacitySettings.upsert({
     create: {
       id: 1,
       maxActiveSubscriptions,
+      migrationBannerEnabled,
+      migrationBannerText:
+        migrationBannerText ||
+        "После миграции нужно получить новую ссылку подписки и обновить ее в приложении.",
+      migrationBannerTitle: migrationBannerTitle || "Обновите ссылку VPN",
     },
     update: {
       maxActiveSubscriptions,
+      migrationBannerEnabled,
+      migrationBannerText:
+        migrationBannerText ||
+        "После миграции нужно получить новую ссылку подписки и обновить ее в приложении.",
+      migrationBannerTitle: migrationBannerTitle || "Обновите ссылку VPN",
     },
     where: { id: 1 },
   });

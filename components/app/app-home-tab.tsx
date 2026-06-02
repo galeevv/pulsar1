@@ -1,7 +1,9 @@
-import { AlertCircleIcon } from "lucide-react"
+import { AlertCircleIcon, RefreshCwIcon } from "lucide-react"
 
+import { syncOwnSubscriptionAction } from "@/app/app/actions"
 import { ActionRow } from "@/components/app/action-row"
 import { AppSetupDialog } from "@/components/app/app-setup-dialog"
+import { FormSubmitButton } from "@/components/app/form-submit-button"
 import { QuickActionsSheet } from "@/components/app/quick-actions-sheet"
 import { StatusHeroCard } from "@/components/app/status-hero-card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -40,6 +42,7 @@ type ActiveSubscriptionItem = {
   startsAt: Date | null
   startedAt: Date
   status: "ACTIVE" | "EXPIRED" | "REVOKED"
+  migrationLinkRefreshRequired: boolean
   subscriptionUrl: string | null
   tariffName: string
 } | null
@@ -88,7 +91,9 @@ export function AppHomeTab({
   firstPurchaseDiscountPct,
   isCapacityBlockedForNewSubscriptions,
   latestSubscriptionStatus,
+  migrationBanner,
   maxActiveSubscriptions,
+  plategaPaymentEnabled,
   plategaPaymentRequestId,
   pricingSettings,
 }: {
@@ -101,7 +106,13 @@ export function AppHomeTab({
   firstPurchaseDiscountPct: number
   isCapacityBlockedForNewSubscriptions: boolean
   latestSubscriptionStatus: LatestSubscriptionStatus
+  migrationBanner: {
+    enabled: boolean
+    text: string
+    title: string
+  }
   maxActiveSubscriptions: number
+  plategaPaymentEnabled: boolean
   plategaPaymentRequestId: string | null
   pricingSettings: PricingSettings
 }) {
@@ -121,6 +132,22 @@ export function AppHomeTab({
         </Alert>
       ) : null}
 
+      {migrationBanner.enabled && activeSubscription?.migrationLinkRefreshRequired ? (
+        <Alert>
+          <AlertCircleIcon />
+          <AlertTitle>{migrationBanner.title}</AlertTitle>
+          <AlertDescription className="flex flex-col gap-3">
+            <p>{migrationBanner.text}</p>
+            <form action={syncOwnSubscriptionAction}>
+              <FormSubmitButton className="h-button px-button-x" radius="card" type="submit">
+                <RefreshCwIcon data-icon="inline-start" />
+                Получить новую ссылку
+              </FormSubmitButton>
+            </form>
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
       <StatusHeroCard balanceCredits={credits} statusLabel={state.label}>
         <ActionRow>
           <QuickActionsSheet
@@ -131,6 +158,7 @@ export function AppHomeTab({
             firstPurchaseDiscountPct={firstPurchaseDiscountPct}
             isCapacityBlockedForNewSubscriptions={isCapacityBlockedForNewSubscriptions}
             maxActiveSubscriptions={maxActiveSubscriptions}
+            plategaPaymentEnabled={plategaPaymentEnabled}
             plategaPaymentRequestId={plategaPaymentRequestId}
             pricingSettings={pricingSettings}
             triggerLabel={state.ctaLabel}

@@ -220,6 +220,8 @@ function seedPaymentRequest(input: {
 
 describe("Platega webhook idempotency", () => {
   beforeEach(() => {
+    process.env.PAYMENT_ENABLED = "true";
+
     hoisted.paymentRequests.clear();
     hoisted.webhookLogs.clear();
 
@@ -230,6 +232,31 @@ describe("Platega webhook idempotency", () => {
     hoisted.validatePlategaWebhookHeadersMock.mockClear();
     hoisted.parsePlategaWebhookPayloadMock.mockClear();
     hoisted.prismaMock.$transaction.mockClear();
+  });
+
+  it("ignores webhook without side effects when Platega payments are disabled", async () => {
+    process.env.PAYMENT_ENABLED = "false";
+
+    seedPaymentRequest({
+      id: "payment_disabled_1",
+      transactionId: "txn_disabled_1",
+    });
+
+    const response = await POST(
+      buildWebhookRequest({
+        id: "txn_disabled_1",
+        status: "CONFIRMED",
+      })
+    );
+    const body = (await response.json()) as { disabled?: boolean; ok?: boolean };
+
+    expect(response.status).toBe(200);
+    expect(body).toEqual({ disabled: true, ok: true });
+    expect(hoisted.validatePlategaWebhookHeadersMock).not.toHaveBeenCalled();
+    expect(hoisted.parsePlategaWebhookPayloadMock).not.toHaveBeenCalled();
+    expect(hoisted.handleApprovedPaymentPostProcessingMock).not.toHaveBeenCalled();
+    expect(hoisted.provisionSubscriptionSlotsInXuiMock).not.toHaveBeenCalled();
+    expect(hoisted.webhookLogs.size).toBe(0);
   });
 
   it("deduplicates identical webhook events by dedup key", async () => {

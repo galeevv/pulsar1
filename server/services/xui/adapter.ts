@@ -1,14 +1,14 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 
 import { XuiConfig, getXuiConfig } from "./config";
-import { XuiHttpClient } from "./http-client";
+import { XuiHttpClient, XuiHttpError } from "./http-client";
 import { XuiAdapter, XuiUserSummary, XuiUserStatus } from "./types";
 
 type XuiDefaultSettingsResponse = {
   subURI?: string;
 };
 
-type XuiManagedRole = "primary" | "backup";
+type XuiManagedRole = "primary" | "secondary" | "backup";
 
 type XuiManagedInboundDefinition = {
   altEmails: string[];
@@ -20,8 +20,16 @@ type XuiManagedInboundDefinition = {
 type XuiManagedInboundState = XuiManagedInboundDefinition & {
   client: XuiInboundClient | null;
   inbound: XuiInboundResponse;
+  inboundIds: number[];
   index: number;
   settings: XuiInboundSettings;
+};
+
+type XuiUnifiedManagedState = {
+  client: XuiInboundClient | null;
+  email: string;
+  inboundIds: number[];
+  inbounds: XuiInboundResponse[];
 };
 
 type XuiInboundClient = {
@@ -36,9 +44,10 @@ type XuiInboundClient = {
   password?: string;
   reset?: number;
   subId?: string;
-  tgId?: string;
+  tgId?: number | string;
   totalGB?: number;
   updated_at?: number;
+  uuid?: string;
 };
 
 type XuiInboundSettings = {
@@ -57,13 +66,41 @@ type XuiInboundResponse = {
   port?: number;
   protocol?: string;
   remark?: string;
-  settings?: string;
-  sniffing?: string;
-  streamSettings?: string;
+  settings?: string | XuiInboundSettings;
+  sniffing?: string | Record<string, unknown>;
+  streamSettings?: string | Record<string, unknown>;
   tag?: string;
   total?: number;
   trafficReset?: string;
   up?: number;
+};
+
+type XuiClientRecord = {
+  auth?: string;
+  comment?: string | null;
+  createdAt?: number;
+  email: string;
+  enable?: boolean;
+  expiryTime?: number;
+  flow?: string;
+  groupName?: string;
+  id?: number;
+  inboundIds?: number[];
+  limitIp?: number;
+  password?: string;
+  reset?: number;
+  reverse?: unknown;
+  security?: string;
+  subId?: string;
+  tgId?: number | string | null;
+  totalGB?: number;
+  updatedAt?: number;
+  uuid?: string;
+};
+
+type XuiClientGetResponse = {
+  client?: XuiClientRecord | null;
+  inboundIds?: number[];
 };
 
 type XuiUserMutationInput = {
@@ -83,12 +120,12 @@ function dateToExpiryMs(date: Date | null | undefined) {
   return Math.max(0, date.getTime());
 }
 
-function bytesToTotalGb(bytes: number | null | undefined) {
+function bytesToTotalBytes(bytes: number | null | undefined) {
   if (!bytes || bytes <= 0) {
     return 0;
   }
 
-  return Math.ceil(bytes / (1024 * 1024 * 1024));
+  return Math.ceil(bytes);
 }
 
 function normalizeLimitIp(limitIp: number | null | undefined) {
@@ -124,9 +161,16 @@ function buildSubscriptionUrl(baseUrl: string | null, subId?: string) {
   return `${normalizeSubscriptionBaseUrl(baseUrl)}/${subId}`;
 }
 
-function parseInboundSettings(raw: string | undefined) {
+function parseInboundSettings(raw: string | XuiInboundSettings | undefined) {
   if (!raw) {
     return { clients: [] } satisfies XuiInboundSettings;
+  }
+
+  if (typeof raw !== "string") {
+    return {
+      ...raw,
+      clients: Array.isArray(raw.clients) ? raw.clients : [],
+    };
   }
 
   try {
@@ -140,14 +184,30 @@ function parseInboundSettings(raw: string | undefined) {
   }
 }
 
-function getClientIdentifier(protocol: string | undefined, client: XuiInboundClient) {
-  const normalizedProtocol = (protocol ?? "").toLowerCase();
+function isXuiRecordNotFoundError(error: unknown) {
+  return (
+    error instanceof XuiHttpError &&
+    error.status === 200 &&
+    /record not found/i.test(error.responseBody)
+  );
+}
 
-  if (normalizedProtocol === "trojan" || normalizedProtocol === "shadowsocks") {
-    return client.password || client.email || "";
-  }
-
-  return client.id || client.email || "";
+function toInboundClient(record: XuiClientRecord, fallback?: XuiInboundClient | null): XuiInboundClient {
+  return {
+    comment: record.comment ?? fallback?.comment ?? "",
+    email: record.email,
+    enable: record.enable ?? fallback?.enable,
+    expiryTime: record.expiryTime ?? fallback?.expiryTime,
+    flow: record.flow || fallback?.flow,
+    id: record.uuid || fallback?.uuid || fallback?.id || record.password || fallback?.password || record.email,
+    limitIp: record.limitIp ?? fallback?.limitIp,
+    password: record.password ?? fallback?.password,
+    reset: record.reset ?? fallback?.reset,
+    subId: record.subId || fallback?.subId,
+    tgId: record.tgId ?? fallback?.tgId ?? 0,
+    totalGB: record.totalGB ?? fallback?.totalGB,
+    uuid: record.uuid || fallback?.uuid,
+  };
 }
 
 function buildSubId() {
@@ -219,6 +279,14 @@ export class HttpXuiAdapter implements XuiAdapter {
     return Boolean(this.config.backupInboundId);
   }
 
+  private get hasUnifiedManagedInbounds() {
+    return this.config.managedInboundIds.length > 0;
+  }
+
+  private get allUnifiedManagedInboundIds() {
+    return this.config.managedInboundIds;
+  }
+
   private getManagedInboundDefinitions(username: string): XuiManagedInboundDefinition[] {
     const emails = deriveManagedEmails({
       hasBackup: this.hasBackupInbound,
@@ -257,6 +325,78 @@ export class HttpXuiAdapter implements XuiAdapter {
     return inbound;
   }
 
+  private async getClientRecord(email: string) {
+    try {
+      const response = await this.client.apiGet<XuiClientGetResponse>(
+        `clients/get/${encodeURIComponent(email)}`
+      );
+      const client = response?.client;
+
+      if (!client?.email) {
+        return null;
+      }
+
+      return {
+        client,
+        inboundIds: Array.isArray(response.inboundIds) ? response.inboundIds : [],
+      };
+    } catch (error) {
+      if (isXuiRecordNotFoundError(error)) {
+        return null;
+      }
+
+      throw error;
+    }
+  }
+
+  private async findClientRecord(definition: XuiManagedInboundDefinition) {
+    for (const email of [definition.email, ...definition.altEmails]) {
+      const record = await this.getClientRecord(email);
+
+      if (!record) {
+        continue;
+      }
+
+      if (!record.inboundIds.includes(definition.inboundId)) {
+        continue;
+      }
+
+      return record;
+    }
+
+    return null;
+  }
+
+  private async getUnifiedManagedState(username: string): Promise<XuiUnifiedManagedState> {
+    const email = normalizeEmail(username);
+    const inbounds = await Promise.all(
+      this.allUnifiedManagedInboundIds.map((inboundId) => this.getInbound(inboundId))
+    );
+    const clientRecord = await this.getClientRecord(email);
+    let client = clientRecord?.client ? toInboundClient(clientRecord.client) : null;
+    let inboundIds = clientRecord?.inboundIds ?? [];
+
+    if (!client) {
+      for (const inbound of inbounds) {
+        const settings = parseInboundSettings(inbound.settings);
+        const settingsClient = settings.clients?.find((item) => item.email === email) ?? null;
+
+        if (settingsClient) {
+          client = settingsClient;
+          inboundIds = [inbound.id];
+          break;
+        }
+      }
+    }
+
+    return {
+      client,
+      email,
+      inboundIds,
+      inbounds,
+    };
+  }
+
   private async findManagedInboundStates(username: string): Promise<XuiManagedInboundState[]> {
     const definitions = this.getManagedInboundDefinitions(username);
 
@@ -265,6 +405,7 @@ export class HttpXuiAdapter implements XuiAdapter {
         const inbound = await this.getInbound(definition.inboundId);
         const settings = parseInboundSettings(inbound.settings);
         const clients = settings.clients ?? [];
+        const clientRecord = await this.findClientRecord(definition);
 
         let index = clients.findIndex((client) => client?.email === definition.email);
         if (index < 0 && definition.altEmails.length > 0) {
@@ -273,10 +414,15 @@ export class HttpXuiAdapter implements XuiAdapter {
           );
         }
 
+        const settingsClient = index >= 0 ? clients[index] : null;
+
         return {
           ...definition,
-          client: index >= 0 ? clients[index] : null,
+          client: clientRecord?.client
+            ? toInboundClient(clientRecord.client, settingsClient)
+            : settingsClient,
           inbound,
+          inboundIds: clientRecord?.inboundIds ?? (index >= 0 ? [definition.inboundId] : []),
           index,
           settings,
         };
@@ -305,30 +451,6 @@ export class HttpXuiAdapter implements XuiAdapter {
     return fromPanel;
   }
 
-  private async updateInbound(input: { inbound: XuiInboundResponse; settings: XuiInboundSettings }) {
-    const inbound = input.inbound;
-    const payload = {
-      allTime: inbound.allTime ?? 0,
-      down: inbound.down ?? 0,
-      enable: inbound.enable ?? true,
-      expiryTime: inbound.expiryTime ?? 0,
-      lastTrafficResetTime: inbound.lastTrafficResetTime ?? 0,
-      listen: inbound.listen ?? "",
-      port: inbound.port ?? 0,
-      protocol: inbound.protocol ?? "",
-      remark: inbound.remark ?? "",
-      settings: JSON.stringify(input.settings),
-      sniffing: inbound.sniffing ?? "{}",
-      streamSettings: inbound.streamSettings ?? "{}",
-      tag: inbound.tag ?? "",
-      total: inbound.total ?? 0,
-      trafficReset: inbound.trafficReset ?? "never",
-      up: inbound.up ?? 0,
-    };
-
-    await this.client.apiPost<XuiInboundResponse>(`inbounds/update/${inbound.id}`, payload);
-  }
-
   private buildNewClient(input: {
     email: string;
     sharedSubId: string;
@@ -347,8 +469,8 @@ export class HttpXuiAdapter implements XuiAdapter {
       limitIp: normalizeLimitIp(input.mutation.limitIp) ?? 0,
       reset: 0,
       subId: input.sharedSubId,
-      tgId: "",
-      totalGB: bytesToTotalGb(input.mutation.dataLimitBytes),
+      tgId: 0,
+      totalGB: bytesToTotalBytes(input.mutation.dataLimitBytes),
       updated_at: Date.now(),
     } satisfies XuiInboundClient;
   }
@@ -371,7 +493,7 @@ export class HttpXuiAdapter implements XuiAdapter {
     }
 
     if (typeof input.mutation.dataLimitBytes !== "undefined") {
-      next.totalGB = bytesToTotalGb(input.mutation.dataLimitBytes);
+      next.totalGB = bytesToTotalBytes(input.mutation.dataLimitBytes);
     }
 
     if (typeof input.mutation.note !== "undefined") {
@@ -388,11 +510,29 @@ export class HttpXuiAdapter implements XuiAdapter {
     next.limitIp = typeof next.limitIp === "number" ? next.limitIp : 0;
     next.reset = typeof next.reset === "number" ? next.reset : 0;
     next.subId = input.sharedSubId;
-    next.tgId = next.tgId ?? "";
+    next.tgId = next.tgId ?? 0;
     next.created_at = typeof next.created_at === "number" ? next.created_at : Date.now();
     next.updated_at = Date.now();
 
     return next;
+  }
+
+  private buildClientPayload(client: XuiInboundClient) {
+    const uuid = client.uuid || client.id || randomUUID();
+    return {
+      comment: client.comment ?? "",
+      email: client.email ?? "",
+      enable: client.enable ?? true,
+      expiryTime: client.expiryTime ?? 0,
+      flow: client.flow || this.config.clientFlow,
+      id: uuid,
+      limitIp: typeof client.limitIp === "number" ? client.limitIp : 0,
+      reset: typeof client.reset === "number" ? client.reset : 0,
+      subId: client.subId ?? buildSubId(),
+      tgId: typeof client.tgId === "number" ? client.tgId : 0,
+      totalGB: typeof client.totalGB === "number" ? client.totalGB : 0,
+      uuid,
+    };
   }
 
   private async buildSummary(username: string, states: XuiManagedInboundState[]) {
@@ -419,6 +559,87 @@ export class HttpXuiAdapter implements XuiAdapter {
     } satisfies XuiUserSummary;
   }
 
+  private async buildUnifiedSummary(username: string, state: XuiUnifiedManagedState) {
+    if (!state.client) {
+      return null;
+    }
+
+    return {
+      raw: {
+        client: state.client,
+        email: state.client.email ?? state.email,
+        inboundIds: state.inboundIds,
+        inbounds: state.inbounds.map((inbound) => ({
+          id: inbound.id,
+          port: inbound.port,
+          remark: inbound.remark,
+          tag: inbound.tag,
+        })),
+        mode: "unified-managed-inbounds",
+      },
+      status: state.client.enable === false ? "disabled" : "active",
+      subscriptionUrl: buildSubscriptionUrl(await this.getSubscriptionBaseUrl(), state.client.subId),
+      username,
+    } satisfies XuiUserSummary;
+  }
+
+  private async upsertUnifiedManagedClient(
+    mutation: XuiUserMutationInput,
+    options: { requireExisting: boolean }
+  ) {
+    const state = await this.getUnifiedManagedState(mutation.username);
+
+    if (options.requireExisting && !state.client) {
+      throw new Error(`x-ui client "${mutation.username}" was not found.`);
+    }
+
+    const sharedSubId = state.client?.subId ?? buildSubId();
+    const inboundIds = this.allUnifiedManagedInboundIds;
+
+    if (state.client) {
+      const currentEmail = state.client.email || state.email;
+      const nextClient = this.patchExistingClient({
+        client: state.client,
+        email: state.email,
+        mutation,
+        sharedSubId,
+      });
+
+      await this.client.apiPostJson<null>(
+        `clients/update/${encodeURIComponent(currentEmail)}`,
+        this.buildClientPayload(nextClient)
+      );
+
+      const attached = new Set(state.inboundIds);
+      const missingInboundIds = inboundIds.filter((inboundId) => !attached.has(inboundId));
+
+      if (missingInboundIds.length > 0) {
+        await this.client.apiPostJson<null>(
+          `clients/${encodeURIComponent(nextClient.email ?? state.email)}/attach`,
+          { inboundIds: missingInboundIds }
+        );
+      }
+    } else {
+      const client = this.buildNewClient({
+        email: state.email,
+        mutation,
+        sharedSubId,
+      });
+
+      await this.client.apiPostJson<null>("clients/add", {
+        client: this.buildClientPayload(client),
+        inboundIds,
+      });
+    }
+
+    const summary = await this.getVpnUser(mutation.username);
+    if (!summary) {
+      throw new Error(`x-ui client "${mutation.username}" disappeared after update.`);
+    }
+
+    return summary;
+  }
+
   private async upsertManagedClients(
     mutation: XuiUserMutationInput,
     options: { requireExisting: boolean }
@@ -434,8 +655,8 @@ export class HttpXuiAdapter implements XuiAdapter {
       existingStates.find((state) => state.client?.subId)?.client?.subId ?? buildSubId();
 
     for (const state of states) {
-      if (state.client && state.index >= 0) {
-        const clients = state.settings.clients ?? [];
+      if (state.client) {
+        const currentEmail = state.client.email || state.email;
         const nextClient = this.patchExistingClient({
           client: state.client,
           email: state.email,
@@ -443,12 +664,10 @@ export class HttpXuiAdapter implements XuiAdapter {
           sharedSubId,
         });
 
-        clients[state.index] = nextClient;
-        state.settings.clients = clients;
-        await this.client.apiPost<null>(`inbounds/updateClient/${nextClient.id}`, {
-          id: state.inbound.id,
-          settings: JSON.stringify({ clients: [nextClient] }),
-        });
+        await this.client.apiPostJson<null>(
+          `clients/update/${encodeURIComponent(currentEmail)}`,
+          this.buildClientPayload(nextClient)
+        );
         state.client = nextClient;
         continue;
       }
@@ -464,9 +683,9 @@ export class HttpXuiAdapter implements XuiAdapter {
         sharedSubId,
       });
 
-      await this.client.apiPost<null>("inbounds/addClient", {
-        id: state.inbound.id,
-        settings: JSON.stringify({ clients: [client] }),
+      await this.client.apiPostJson<null>("clients/add", {
+        client: this.buildClientPayload(client),
+        inboundIds: [state.inbound.id],
       });
       state.client = client;
     }
@@ -480,6 +699,11 @@ export class HttpXuiAdapter implements XuiAdapter {
   }
 
   async healthCheck() {
+    if (this.hasUnifiedManagedInbounds) {
+      await Promise.all(this.allUnifiedManagedInboundIds.map((inboundId) => this.getInbound(inboundId)));
+      return;
+    }
+
     await this.getInbound(this.config.primaryInboundId);
     if (this.config.backupInboundId) {
       await this.getInbound(this.config.backupInboundId);
@@ -494,6 +718,20 @@ export class HttpXuiAdapter implements XuiAdapter {
     note?: string | null;
     status?: XuiUserStatus;
   }) {
+    if (this.hasUnifiedManagedInbounds) {
+      return this.upsertUnifiedManagedClient(
+        {
+          dataLimitBytes: input.dataLimitBytes,
+          expireAt: input.expireAt,
+          limitIp: input.limitIp,
+          note: input.note,
+          status: input.status,
+          username: input.username,
+        },
+        { requireExisting: false }
+      );
+    }
+
     return this.upsertManagedClients(
       {
         dataLimitBytes: input.dataLimitBytes,
@@ -508,6 +746,10 @@ export class HttpXuiAdapter implements XuiAdapter {
   }
 
   async getVpnUser(username: string) {
+    if (this.hasUnifiedManagedInbounds) {
+      return this.buildUnifiedSummary(username, await this.getUnifiedManagedState(username));
+    }
+
     const states = await this.findManagedInboundStates(username);
     return this.buildSummary(username, states);
   }
@@ -520,6 +762,20 @@ export class HttpXuiAdapter implements XuiAdapter {
     status?: XuiUserStatus;
     note?: string | null;
   }) {
+    if (this.hasUnifiedManagedInbounds) {
+      return this.upsertUnifiedManagedClient(
+        {
+          dataLimitBytes: input.dataLimitBytes,
+          expireAt: input.expireAt,
+          limitIp: input.limitIp,
+          note: input.note,
+          status: input.status,
+          username: input.username,
+        },
+        { requireExisting: true }
+      );
+    }
+
     return this.upsertManagedClients(
       {
         dataLimitBytes: input.dataLimitBytes,
@@ -534,6 +790,17 @@ export class HttpXuiAdapter implements XuiAdapter {
   }
 
   async revokeVpnUser(username: string) {
+    if (this.hasUnifiedManagedInbounds) {
+      const state = await this.getUnifiedManagedState(username);
+      const email = state.client?.email || state.email;
+
+      if (state.client && email) {
+        await this.client.apiPost<null>(`clients/del/${encodeURIComponent(email)}`);
+      }
+
+      return;
+    }
+
     const states = await this.findManagedInboundStates(username);
 
     for (const state of states) {
@@ -541,13 +808,13 @@ export class HttpXuiAdapter implements XuiAdapter {
         continue;
       }
 
-      const clientId = getClientIdentifier(state.inbound.protocol, state.client);
-      if (!clientId) {
+      const email = state.client.email || state.email;
+      if (!email) {
         continue;
       }
 
       await this.client.apiPost<null>(
-        `inbounds/${state.inbound.id}/delClient/${encodeURIComponent(clientId)}`
+        `clients/del/${encodeURIComponent(email)}`
       );
     }
   }

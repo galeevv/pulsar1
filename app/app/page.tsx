@@ -11,6 +11,7 @@ import { mapLegacyDialogToAppTab, normalizeAppTab } from "@/lib/app-tabs"
 import { getAppBenefitsData } from "@/lib/app-benefits"
 import { getCurrentSession } from "@/lib/auth"
 import { getLegalDocuments } from "@/lib/legal-documents"
+import { isPlategaPaymentEnabled } from "@/lib/payment-settings"
 import { getServiceCapacityState } from "@/lib/service-capacity"
 import { getAppSubscriptionConstructorData } from "@/lib/subscription-constructor"
 import { getAppSubscriptionData } from "@/lib/subscription-management"
@@ -85,6 +86,7 @@ export default async function AppPage({
   const isCapacityBlockedForNewSubscriptions =
     isNewUserWithoutActiveSubscription && serviceCapacityState.isLimitReached
   const latestSubscriptionStatus = subscriptionData.latestSubscriptions[0]?.status ?? null
+  const plategaPaymentEnabled = isPlategaPaymentEnabled()
 
   return (
     <main className="min-h-screen bg-background text-foreground">
@@ -106,7 +108,9 @@ export default async function AppPage({
             firstPurchaseDiscountPct={benefitsData.firstPurchaseDiscountPct}
             isCapacityBlockedForNewSubscriptions={isCapacityBlockedForNewSubscriptions}
             latestSubscriptionStatus={latestSubscriptionStatus}
+            migrationBanner={serviceCapacityState.migrationBanner}
             maxActiveSubscriptions={serviceCapacityState.maxActiveSubscriptions}
+            plategaPaymentEnabled={plategaPaymentEnabled}
             plategaPaymentRequestId={plategaPaymentRequestId ?? null}
             pricingSettings={constructorData.pricingSettings}
           />
@@ -122,6 +126,8 @@ export default async function AppPage({
             firstPurchaseDiscountPct={benefitsData.firstPurchaseDiscountPct}
             isCapacityBlockedForNewSubscriptions={isCapacityBlockedForNewSubscriptions}
             maxActiveSubscriptions={serviceCapacityState.maxActiveSubscriptions}
+            migrationBanner={serviceCapacityState.migrationBanner}
+            plategaPaymentEnabled={plategaPaymentEnabled}
             plategaPaymentRequestId={plategaPaymentRequestId ?? null}
             pricingSettings={constructorData.pricingSettings}
           />
@@ -138,6 +144,7 @@ export default async function AppPage({
             isCapacityBlockedForNewSubscriptions={isCapacityBlockedForNewSubscriptions}
             maxActiveSubscriptions={serviceCapacityState.maxActiveSubscriptions}
             ownReferralCode={benefitsData.ownReferralCode?.code ?? null}
+            plategaPaymentEnabled={plategaPaymentEnabled}
             plategaPaymentRequestId={plategaPaymentRequestId ?? null}
             payout={benefitsData.payout}
             pricingSettings={constructorData.pricingSettings}

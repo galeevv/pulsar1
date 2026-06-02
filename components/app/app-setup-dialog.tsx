@@ -138,6 +138,9 @@ export function AppSetupDialog({
   const isSetupAvailable = canStartSetup ?? Boolean(previewSlot || subscriptionUrl)
   const effectiveSubscriptionUrl = subscriptionUrl ?? previewSlot?.configUrl ?? null
   const displaySubscriptionUrl = formatCompactSubscriptionUrl(effectiveSubscriptionUrl)
+  const happSubscriptionUrl = effectiveSubscriptionUrl
+    ? `happ://add/${effectiveSubscriptionUrl}`
+    : null
 
   function handleOpenChange(nextOpen: boolean) {
     setOpen(nextOpen)
@@ -361,6 +364,13 @@ export function AppSetupDialog({
                       {displaySubscriptionUrl}
                     </span>
                     <Copy className="size-4 shrink-0" />
+                  </Button>
+
+                  <Button asChild className="h-button w-full px-button-x" radius="card">
+                    <a href={happSubscriptionUrl ?? undefined}>
+                      <Link2 data-icon="inline-start" />
+                      Подключить в Happ
+                    </a>
                   </Button>
 
                   <Button

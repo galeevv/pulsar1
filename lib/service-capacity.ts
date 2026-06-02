@@ -12,6 +12,9 @@ export async function getServiceCapacitySettings() {
     create: {
       id: 1,
       maxActiveSubscriptions: 0,
+      migrationBannerEnabled: false,
+      migrationBannerText: "После миграции нужно получить новую ссылку подписки и обновить ее в приложении.",
+      migrationBannerTitle: "Обновите ссылку VPN",
     },
     update: {},
     where: { id: 1 },
@@ -32,6 +35,11 @@ export async function getServiceCapacityState() {
       activeSubscriptionsCount,
       maxActiveSubscriptions: settings.maxActiveSubscriptions,
     }),
+    migrationBanner: {
+      enabled: settings.migrationBannerEnabled,
+      text: settings.migrationBannerText,
+      title: settings.migrationBannerTitle,
+    },
     maxActiveSubscriptions: settings.maxActiveSubscriptions,
   };
 }

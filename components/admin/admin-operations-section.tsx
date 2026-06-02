@@ -3,6 +3,7 @@ import { Activity, Gauge, Logs, Shield, Smartphone } from "lucide-react";
 import { updateServiceCapacitySettingsAction } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 import { AdminSectionShell } from "./admin-section-shell";
 import { AdminSurface } from "./admin-surface";
@@ -54,6 +55,9 @@ export function AdminOperationsSection({
   recentSubscriptions: SubscriptionPreview[];
   serviceCapacitySettings: {
     maxActiveSubscriptions: number;
+    migrationBannerEnabled: boolean;
+    migrationBannerText: string;
+    migrationBannerTitle: string;
   };
   subscriptionStats: {
     active: number;
@@ -181,6 +185,21 @@ export function AdminOperationsSection({
       <div className="mt-6">
         <AdminSurface>
           <form action={updateServiceCapacitySettingsAction} className="space-y-4">
+            <input
+              name="migrationBannerEnabled"
+              type="hidden"
+              value={serviceCapacitySettings.migrationBannerEnabled ? "on" : ""}
+            />
+            <input
+              name="migrationBannerTitle"
+              type="hidden"
+              value={serviceCapacitySettings.migrationBannerTitle}
+            />
+            <input
+              name="migrationBannerText"
+              type="hidden"
+              value={serviceCapacitySettings.migrationBannerText}
+            />
             <div className="space-y-1">
               <h3 className="text-sm font-semibold">MAX_ACTIVE_SUBSCRIPTIONS</h3>
               <p className="text-sm text-muted-foreground">
@@ -205,6 +224,60 @@ export function AdminOperationsSection({
 
             <Button className="h-button px-button-x" radius="card" type="submit">
               Сохранить лимит
+            </Button>
+          </form>
+        </AdminSurface>
+      </div>
+
+      <div className="mt-6">
+        <AdminSurface>
+          <form action={updateServiceCapacitySettingsAction} className="space-y-4">
+            <input name="maxActiveSubscriptions" type="hidden" value={maxActiveSubscriptions} />
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold">Migration banner</h3>
+              <p className="text-sm text-muted-foreground">
+                Сообщение в кабинете пользователя для перевыпуска VPN-ссылки после миграции.
+              </p>
+            </div>
+
+            <label className="flex items-center gap-3 rounded-card border border-border/70 bg-background/45 p-3 text-sm">
+              <input
+                className="size-4 accent-primary"
+                defaultChecked={serviceCapacitySettings.migrationBannerEnabled}
+                name="migrationBannerEnabled"
+                type="checkbox"
+              />
+              Показывать banner в /app
+            </label>
+
+            <div className="grid gap-3 md:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-sm font-medium" htmlFor="migrationBannerTitle">
+                  Заголовок
+                </label>
+                <Input
+                  defaultValue={serviceCapacitySettings.migrationBannerTitle}
+                  id="migrationBannerTitle"
+                  maxLength={120}
+                  name="migrationBannerTitle"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium" htmlFor="migrationBannerText">
+                  Текст
+                </label>
+                <Textarea
+                  className="min-h-24"
+                  defaultValue={serviceCapacitySettings.migrationBannerText}
+                  id="migrationBannerText"
+                  maxLength={600}
+                  name="migrationBannerText"
+                />
+              </div>
+            </div>
+
+            <Button className="h-button px-button-x" radius="card" type="submit">
+              Сохранить banner
             </Button>
           </form>
         </AdminSurface>

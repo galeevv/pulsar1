@@ -45,11 +45,13 @@ export function DeviceLimitChangeDialog({
   credits,
   currentDevices,
   expiresAt,
+  plategaPaymentEnabled,
   pricingSettings,
 }: {
   credits: number
   currentDevices: number
   expiresAt: string
+  plategaPaymentEnabled: boolean
   pricingSettings: PricingSettings
 }) {
   const maxDevices = Math.max(currentDevices, pricingSettings.maxDevices)
@@ -66,7 +68,7 @@ export function DeviceLimitChangeDialog({
   const isCreditsPayment = selectedPaymentMethod === "CREDITS"
 
   async function startSbpPayment() {
-    if (!canIncrease || proratedAmount <= 0 || isCreatingPayment) {
+    if (!plategaPaymentEnabled || !canIncrease || proratedAmount <= 0 || isCreatingPayment) {
       return
     }
 
@@ -174,23 +176,29 @@ export function DeviceLimitChangeDialog({
               <RadioGroupItem value="CREDITS" />
             </label>
 
-            <label className="flex cursor-pointer items-center justify-between gap-3 rounded-card border border-border/70 bg-background/40 p-3 text-sm">
-              <span className="inline-flex min-w-0 items-center gap-2">
-                <SmartphoneIcon className="size-4 text-muted-foreground" />
-                <span className="min-w-0">
-                  <span className="block font-medium">СБП</span>
-                  <span className="block text-xs text-muted-foreground">Оплата через Platega</span>
+            {plategaPaymentEnabled ? (
+              <label className="flex cursor-pointer items-center justify-between gap-3 rounded-card border border-border/70 bg-background/40 p-3 text-sm">
+                <span className="inline-flex min-w-0 items-center gap-2">
+                  <SmartphoneIcon className="size-4 text-muted-foreground" />
+                  <span className="min-w-0">
+                    <span className="block font-medium">СБП</span>
+                    <span className="block text-xs text-muted-foreground">Оплата через Platega</span>
+                  </span>
                 </span>
-              </span>
-              <RadioGroupItem value="PLATEGA_SBP" />
-            </label>
+                <RadioGroupItem value="PLATEGA_SBP" />
+              </label>
+            ) : null}
           </RadioGroup>
 
           {isCreditsPayment && !hasEnoughCredits ? (
             <Alert>
               <WalletIcon className="size-4" />
               <AlertTitle>Недостаточно credits</AlertTitle>
-              <AlertDescription>Выберите СБП или пополните баланс.</AlertDescription>
+              <AlertDescription>
+                {plategaPaymentEnabled
+                  ? "Выберите СБП или пополните баланс."
+                  : "Оплата Platega отключена, а кредитов не хватает."}
+              </AlertDescription>
             </Alert>
           ) : null}
 

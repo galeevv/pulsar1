@@ -18,6 +18,7 @@ export function AppReferralsTab({
   isCapacityBlockedForNewSubscriptions,
   maxActiveSubscriptions,
   ownReferralCode,
+  plategaPaymentEnabled,
   plategaPaymentRequestId,
   payout,
   pricingSettings,
@@ -40,6 +41,7 @@ export function AppReferralsTab({
   isCapacityBlockedForNewSubscriptions: boolean
   maxActiveSubscriptions: number
   ownReferralCode: string | null
+  plategaPaymentEnabled: boolean
   plategaPaymentRequestId: string | null
   payout: {
     activeRequest: {
@@ -104,6 +106,7 @@ export function AppReferralsTab({
               fullWidthTrigger={false}
               isCapacityBlockedForNewSubscriptions={isCapacityBlockedForNewSubscriptions}
               maxActiveSubscriptions={maxActiveSubscriptions}
+              plategaPaymentEnabled={plategaPaymentEnabled}
               plategaPaymentRequestId={plategaPaymentRequestId}
               pricingSettings={pricingSettings}
               triggerLabel="Купить подписку"

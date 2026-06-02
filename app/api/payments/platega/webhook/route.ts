@@ -6,6 +6,7 @@ import {
   handleApprovedPaymentPostProcessing,
   handleRejectedPaymentPostProcessing,
 } from "@/lib/payment-post-approval-handler";
+import { isPlategaPaymentEnabled } from "@/lib/payment-settings";
 import { prisma } from "@/lib/prisma";
 import {
   provisionSubscriptionSlotsInXui,
@@ -84,6 +85,10 @@ function mapOutcomeToLogStatus(kind: TxOutcome["kind"]) {
 }
 
 export async function POST(request: Request) {
+  if (!isPlategaPaymentEnabled()) {
+    return NextResponse.json({ disabled: true, ok: true });
+  }
+
   let isWebhookAuthorized = false;
   try {
     isWebhookAuthorized = validatePlategaWebhookHeaders(request.headers);

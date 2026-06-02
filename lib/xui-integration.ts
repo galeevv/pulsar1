@@ -21,6 +21,7 @@ type ManagedSubscription = {
   endsAt: Date;
   id: string;
   marzbanUsername: string | null;
+  migrationLinkRefreshRequired: boolean;
   provisionedAt: Date | null;
   subscriptionUrl: string | null;
   user: {
@@ -185,6 +186,7 @@ async function loadManagedSubscription(subscriptionId: string) {
       endsAt: true,
       id: true,
       marzbanUsername: true,
+      migrationLinkRefreshRequired: true,
       provisionedAt: true,
       subscriptionUrl: true,
       user: {
@@ -386,6 +388,9 @@ async function syncSubscriptionSlotsInXui(
       }),
       marzbanStatus: hasConfig ? "active" : "disabled",
       marzbanUsername: hasConfig ? username : subscription.marzbanUsername,
+      migrationLinkRefreshRequired: subscriptionError
+        ? subscription.migrationLinkRefreshRequired
+        : false,
       provisionedAt: hasConfig ? subscription.provisionedAt ?? now : subscription.provisionedAt,
       subscriptionUrl,
     },

@@ -7,6 +7,7 @@ type Envelope<T> = {
 };
 
 type FormPayload = Record<string, boolean | number | string | undefined | null>;
+type JsonPayload = Record<string, unknown>;
 
 function toSafePath(path: string) {
   if (!path) {
@@ -104,15 +105,20 @@ export class XuiHttpClient {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), this.config.timeoutMs);
     const headers = new Headers(init.headers ?? {});
-    const basicAuthorization = this.buildBasicAuthorizationHeader();
 
     headers.set("X-Requested-With", "XMLHttpRequest");
 
-    if (basicAuthorization) {
-      headers.set("Authorization", basicAuthorization);
+    if (this.config.apiToken) {
+      headers.set("Authorization", `Bearer ${this.config.apiToken}`);
+    } else {
+      const basicAuthorization = this.buildBasicAuthorizationHeader();
+
+      if (basicAuthorization) {
+        headers.set("Authorization", basicAuthorization);
+      }
     }
 
-    if (this.sessionCookie) {
+    if (!this.config.apiToken && this.sessionCookie) {
       headers.set("Cookie", this.sessionCookie);
     }
 
@@ -129,9 +135,20 @@ export class XuiHttpClient {
   }
 
   private async login(force = false) {
+    if (this.config.apiToken) {
+      return;
+    }
+
     if (this.sessionCookie && !force) {
       return;
     }
+
+    if (!this.config.username || !this.config.password) {
+      throw new Error("XUI_USERNAME and XUI_PASSWORD are required when XUI_API_TOKEN is not set.");
+    }
+
+    const username = this.config.username;
+    const password = this.config.password;
 
     if (this.loginInFlight) {
       return this.loginInFlight;
@@ -139,8 +156,8 @@ export class XuiHttpClient {
 
     this.loginInFlight = (async () => {
       const body = new URLSearchParams({
-        password: this.config.password,
-        username: this.config.username,
+        password,
+        username,
       });
 
       const response = await this.requestRaw(`/${this.config.webBasePath}/login`, {
@@ -249,6 +266,21 @@ export class XuiHttpClient {
         body: toFormBody(payload),
         headers: {
           "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        },
+        method: "POST",
+      }
+    );
+
+    return response.obj as T;
+  }
+
+  async apiPostJson<T>(path: string, payload?: JsonPayload) {
+    const response = await this.requestEnvelope<T>(
+      `/${this.config.webBasePath}/panel/api/${toSafePath(path)}`,
+      {
+        body: payload ? JSON.stringify(payload) : undefined,
+        headers: {
+          "Content-Type": "application/json",
         },
         method: "POST",
       }

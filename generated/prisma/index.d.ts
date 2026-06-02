@@ -12195,6 +12195,9 @@ export namespace Prisma {
   export type ServiceCapacitySettingsMinAggregateOutputType = {
     id: number | null
     maxActiveSubscriptions: number | null
+    migrationBannerEnabled: boolean | null
+    migrationBannerTitle: string | null
+    migrationBannerText: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -12202,6 +12205,9 @@ export namespace Prisma {
   export type ServiceCapacitySettingsMaxAggregateOutputType = {
     id: number | null
     maxActiveSubscriptions: number | null
+    migrationBannerEnabled: boolean | null
+    migrationBannerTitle: string | null
+    migrationBannerText: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -12209,6 +12215,9 @@ export namespace Prisma {
   export type ServiceCapacitySettingsCountAggregateOutputType = {
     id: number
     maxActiveSubscriptions: number
+    migrationBannerEnabled: number
+    migrationBannerTitle: number
+    migrationBannerText: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -12228,6 +12237,9 @@ export namespace Prisma {
   export type ServiceCapacitySettingsMinAggregateInputType = {
     id?: true
     maxActiveSubscriptions?: true
+    migrationBannerEnabled?: true
+    migrationBannerTitle?: true
+    migrationBannerText?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -12235,6 +12247,9 @@ export namespace Prisma {
   export type ServiceCapacitySettingsMaxAggregateInputType = {
     id?: true
     maxActiveSubscriptions?: true
+    migrationBannerEnabled?: true
+    migrationBannerTitle?: true
+    migrationBannerText?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -12242,6 +12257,9 @@ export namespace Prisma {
   export type ServiceCapacitySettingsCountAggregateInputType = {
     id?: true
     maxActiveSubscriptions?: true
+    migrationBannerEnabled?: true
+    migrationBannerTitle?: true
+    migrationBannerText?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -12336,6 +12354,9 @@ export namespace Prisma {
   export type ServiceCapacitySettingsGroupByOutputType = {
     id: number
     maxActiveSubscriptions: number
+    migrationBannerEnabled: boolean
+    migrationBannerTitle: string
+    migrationBannerText: string
     createdAt: Date
     updatedAt: Date
     _count: ServiceCapacitySettingsCountAggregateOutputType | null
@@ -12362,6 +12383,9 @@ export namespace Prisma {
   export type ServiceCapacitySettingsSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     maxActiveSubscriptions?: boolean
+    migrationBannerEnabled?: boolean
+    migrationBannerTitle?: boolean
+    migrationBannerText?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["serviceCapacitySettings"]>
@@ -12369,6 +12393,9 @@ export namespace Prisma {
   export type ServiceCapacitySettingsSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     maxActiveSubscriptions?: boolean
+    migrationBannerEnabled?: boolean
+    migrationBannerTitle?: boolean
+    migrationBannerText?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["serviceCapacitySettings"]>
@@ -12376,6 +12403,9 @@ export namespace Prisma {
   export type ServiceCapacitySettingsSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     maxActiveSubscriptions?: boolean
+    migrationBannerEnabled?: boolean
+    migrationBannerTitle?: boolean
+    migrationBannerText?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["serviceCapacitySettings"]>
@@ -12383,11 +12413,14 @@ export namespace Prisma {
   export type ServiceCapacitySettingsSelectScalar = {
     id?: boolean
     maxActiveSubscriptions?: boolean
+    migrationBannerEnabled?: boolean
+    migrationBannerTitle?: boolean
+    migrationBannerText?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ServiceCapacitySettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "maxActiveSubscriptions" | "createdAt" | "updatedAt", ExtArgs["result"]["serviceCapacitySettings"]>
+  export type ServiceCapacitySettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "maxActiveSubscriptions" | "migrationBannerEnabled" | "migrationBannerTitle" | "migrationBannerText" | "createdAt" | "updatedAt", ExtArgs["result"]["serviceCapacitySettings"]>
 
   export type $ServiceCapacitySettingsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "ServiceCapacitySettings"
@@ -12395,6 +12428,9 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: number
       maxActiveSubscriptions: number
+      migrationBannerEnabled: boolean
+      migrationBannerTitle: string
+      migrationBannerText: string
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["serviceCapacitySettings"]>
@@ -12822,6 +12858,9 @@ export namespace Prisma {
   interface ServiceCapacitySettingsFieldRefs {
     readonly id: FieldRef<"ServiceCapacitySettings", 'Int'>
     readonly maxActiveSubscriptions: FieldRef<"ServiceCapacitySettings", 'Int'>
+    readonly migrationBannerEnabled: FieldRef<"ServiceCapacitySettings", 'Boolean'>
+    readonly migrationBannerTitle: FieldRef<"ServiceCapacitySettings", 'String'>
+    readonly migrationBannerText: FieldRef<"ServiceCapacitySettings", 'String'>
     readonly createdAt: FieldRef<"ServiceCapacitySettings", 'DateTime'>
     readonly updatedAt: FieldRef<"ServiceCapacitySettings", 'DateTime'>
   }
@@ -20390,6 +20429,7 @@ export namespace Prisma {
     provisionedAt: Date | null
     lastSyncAt: Date | null
     lastSyncError: string | null
+    migrationLinkRefreshRequired: boolean | null
     subscriptionUrl: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -20424,6 +20464,7 @@ export namespace Prisma {
     provisionedAt: Date | null
     lastSyncAt: Date | null
     lastSyncError: string | null
+    migrationLinkRefreshRequired: boolean | null
     subscriptionUrl: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -20458,6 +20499,7 @@ export namespace Prisma {
     provisionedAt: number
     lastSyncAt: number
     lastSyncError: number
+    migrationLinkRefreshRequired: number
     subscriptionUrl: number
     createdAt: number
     updatedAt: number
@@ -20522,6 +20564,7 @@ export namespace Prisma {
     provisionedAt?: true
     lastSyncAt?: true
     lastSyncError?: true
+    migrationLinkRefreshRequired?: true
     subscriptionUrl?: true
     createdAt?: true
     updatedAt?: true
@@ -20556,6 +20599,7 @@ export namespace Prisma {
     provisionedAt?: true
     lastSyncAt?: true
     lastSyncError?: true
+    migrationLinkRefreshRequired?: true
     subscriptionUrl?: true
     createdAt?: true
     updatedAt?: true
@@ -20590,6 +20634,7 @@ export namespace Prisma {
     provisionedAt?: true
     lastSyncAt?: true
     lastSyncError?: true
+    migrationLinkRefreshRequired?: true
     subscriptionUrl?: true
     createdAt?: true
     updatedAt?: true
@@ -20711,6 +20756,7 @@ export namespace Prisma {
     provisionedAt: Date | null
     lastSyncAt: Date | null
     lastSyncError: string | null
+    migrationLinkRefreshRequired: boolean
     subscriptionUrl: string | null
     createdAt: Date
     updatedAt: Date
@@ -20764,6 +20810,7 @@ export namespace Prisma {
     provisionedAt?: boolean
     lastSyncAt?: boolean
     lastSyncError?: boolean
+    migrationLinkRefreshRequired?: boolean
     subscriptionUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -20803,6 +20850,7 @@ export namespace Prisma {
     provisionedAt?: boolean
     lastSyncAt?: boolean
     lastSyncError?: boolean
+    migrationLinkRefreshRequired?: boolean
     subscriptionUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -20839,6 +20887,7 @@ export namespace Prisma {
     provisionedAt?: boolean
     lastSyncAt?: boolean
     lastSyncError?: boolean
+    migrationLinkRefreshRequired?: boolean
     subscriptionUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -20875,12 +20924,13 @@ export namespace Prisma {
     provisionedAt?: boolean
     lastSyncAt?: boolean
     lastSyncError?: boolean
+    migrationLinkRefreshRequired?: boolean
     subscriptionUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type SubscriptionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "paymentRequestId" | "tariffName" | "periodMonths" | "deviceLimit" | "devices" | "pendingDevices" | "startsAt" | "expiresAt" | "monthsPurchased" | "totalPaid" | "currency" | "baseDeviceMonthlyPriceSnapshot" | "extraDeviceMonthlyPriceSnapshot" | "monthlyPriceSnapshot" | "durationDiscountPercentSnapshot" | "referralDiscountPercentSnapshot" | "status" | "startedAt" | "endsAt" | "revokedAt" | "marzbanUsername" | "marzbanStatus" | "marzbanDataJson" | "provisionedAt" | "lastSyncAt" | "lastSyncError" | "subscriptionUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["subscription"]>
+  export type SubscriptionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "paymentRequestId" | "tariffName" | "periodMonths" | "deviceLimit" | "devices" | "pendingDevices" | "startsAt" | "expiresAt" | "monthsPurchased" | "totalPaid" | "currency" | "baseDeviceMonthlyPriceSnapshot" | "extraDeviceMonthlyPriceSnapshot" | "monthlyPriceSnapshot" | "durationDiscountPercentSnapshot" | "referralDiscountPercentSnapshot" | "status" | "startedAt" | "endsAt" | "revokedAt" | "marzbanUsername" | "marzbanStatus" | "marzbanDataJson" | "provisionedAt" | "lastSyncAt" | "lastSyncError" | "migrationLinkRefreshRequired" | "subscriptionUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["subscription"]>
   export type SubscriptionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     paymentRequest?: boolean | Subscription$paymentRequestArgs<ExtArgs>
@@ -20934,6 +20984,7 @@ export namespace Prisma {
       provisionedAt: Date | null
       lastSyncAt: Date | null
       lastSyncError: string | null
+      migrationLinkRefreshRequired: boolean
       subscriptionUrl: string | null
       createdAt: Date
       updatedAt: Date
@@ -21392,6 +21443,7 @@ export namespace Prisma {
     readonly provisionedAt: FieldRef<"Subscription", 'DateTime'>
     readonly lastSyncAt: FieldRef<"Subscription", 'DateTime'>
     readonly lastSyncError: FieldRef<"Subscription", 'String'>
+    readonly migrationLinkRefreshRequired: FieldRef<"Subscription", 'Boolean'>
     readonly subscriptionUrl: FieldRef<"Subscription", 'String'>
     readonly createdAt: FieldRef<"Subscription", 'DateTime'>
     readonly updatedAt: FieldRef<"Subscription", 'DateTime'>
@@ -27820,6 +27872,9 @@ export namespace Prisma {
   export const ServiceCapacitySettingsScalarFieldEnum: {
     id: 'id',
     maxActiveSubscriptions: 'maxActiveSubscriptions',
+    migrationBannerEnabled: 'migrationBannerEnabled',
+    migrationBannerTitle: 'migrationBannerTitle',
+    migrationBannerText: 'migrationBannerText',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -27963,6 +28018,7 @@ export namespace Prisma {
     provisionedAt: 'provisionedAt',
     lastSyncAt: 'lastSyncAt',
     lastSyncError: 'lastSyncError',
+    migrationLinkRefreshRequired: 'migrationLinkRefreshRequired',
     subscriptionUrl: 'subscriptionUrl',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -28748,6 +28804,9 @@ export namespace Prisma {
     NOT?: ServiceCapacitySettingsWhereInput | ServiceCapacitySettingsWhereInput[]
     id?: IntFilter<"ServiceCapacitySettings"> | number
     maxActiveSubscriptions?: IntFilter<"ServiceCapacitySettings"> | number
+    migrationBannerEnabled?: BoolFilter<"ServiceCapacitySettings"> | boolean
+    migrationBannerTitle?: StringFilter<"ServiceCapacitySettings"> | string
+    migrationBannerText?: StringFilter<"ServiceCapacitySettings"> | string
     createdAt?: DateTimeFilter<"ServiceCapacitySettings"> | Date | string
     updatedAt?: DateTimeFilter<"ServiceCapacitySettings"> | Date | string
   }
@@ -28755,6 +28814,9 @@ export namespace Prisma {
   export type ServiceCapacitySettingsOrderByWithRelationInput = {
     id?: SortOrder
     maxActiveSubscriptions?: SortOrder
+    migrationBannerEnabled?: SortOrder
+    migrationBannerTitle?: SortOrder
+    migrationBannerText?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -28765,6 +28827,9 @@ export namespace Prisma {
     OR?: ServiceCapacitySettingsWhereInput[]
     NOT?: ServiceCapacitySettingsWhereInput | ServiceCapacitySettingsWhereInput[]
     maxActiveSubscriptions?: IntFilter<"ServiceCapacitySettings"> | number
+    migrationBannerEnabled?: BoolFilter<"ServiceCapacitySettings"> | boolean
+    migrationBannerTitle?: StringFilter<"ServiceCapacitySettings"> | string
+    migrationBannerText?: StringFilter<"ServiceCapacitySettings"> | string
     createdAt?: DateTimeFilter<"ServiceCapacitySettings"> | Date | string
     updatedAt?: DateTimeFilter<"ServiceCapacitySettings"> | Date | string
   }, "id">
@@ -28772,6 +28837,9 @@ export namespace Prisma {
   export type ServiceCapacitySettingsOrderByWithAggregationInput = {
     id?: SortOrder
     maxActiveSubscriptions?: SortOrder
+    migrationBannerEnabled?: SortOrder
+    migrationBannerTitle?: SortOrder
+    migrationBannerText?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ServiceCapacitySettingsCountOrderByAggregateInput
@@ -28787,6 +28855,9 @@ export namespace Prisma {
     NOT?: ServiceCapacitySettingsScalarWhereWithAggregatesInput | ServiceCapacitySettingsScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"ServiceCapacitySettings"> | number
     maxActiveSubscriptions?: IntWithAggregatesFilter<"ServiceCapacitySettings"> | number
+    migrationBannerEnabled?: BoolWithAggregatesFilter<"ServiceCapacitySettings"> | boolean
+    migrationBannerTitle?: StringWithAggregatesFilter<"ServiceCapacitySettings"> | string
+    migrationBannerText?: StringWithAggregatesFilter<"ServiceCapacitySettings"> | string
     createdAt?: DateTimeWithAggregatesFilter<"ServiceCapacitySettings"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"ServiceCapacitySettings"> | Date | string
   }
@@ -29377,6 +29448,7 @@ export namespace Prisma {
     provisionedAt?: DateTimeNullableFilter<"Subscription"> | Date | string | null
     lastSyncAt?: DateTimeNullableFilter<"Subscription"> | Date | string | null
     lastSyncError?: StringNullableFilter<"Subscription"> | string | null
+    migrationLinkRefreshRequired?: BoolFilter<"Subscription"> | boolean
     subscriptionUrl?: StringNullableFilter<"Subscription"> | string | null
     createdAt?: DateTimeFilter<"Subscription"> | Date | string
     updatedAt?: DateTimeFilter<"Subscription"> | Date | string
@@ -29415,6 +29487,7 @@ export namespace Prisma {
     provisionedAt?: SortOrderInput | SortOrder
     lastSyncAt?: SortOrderInput | SortOrder
     lastSyncError?: SortOrderInput | SortOrder
+    migrationLinkRefreshRequired?: SortOrder
     subscriptionUrl?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -29456,6 +29529,7 @@ export namespace Prisma {
     provisionedAt?: DateTimeNullableFilter<"Subscription"> | Date | string | null
     lastSyncAt?: DateTimeNullableFilter<"Subscription"> | Date | string | null
     lastSyncError?: StringNullableFilter<"Subscription"> | string | null
+    migrationLinkRefreshRequired?: BoolFilter<"Subscription"> | boolean
     subscriptionUrl?: StringNullableFilter<"Subscription"> | string | null
     createdAt?: DateTimeFilter<"Subscription"> | Date | string
     updatedAt?: DateTimeFilter<"Subscription"> | Date | string
@@ -29494,6 +29568,7 @@ export namespace Prisma {
     provisionedAt?: SortOrderInput | SortOrder
     lastSyncAt?: SortOrderInput | SortOrder
     lastSyncError?: SortOrderInput | SortOrder
+    migrationLinkRefreshRequired?: SortOrder
     subscriptionUrl?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -29536,6 +29611,7 @@ export namespace Prisma {
     provisionedAt?: DateTimeNullableWithAggregatesFilter<"Subscription"> | Date | string | null
     lastSyncAt?: DateTimeNullableWithAggregatesFilter<"Subscription"> | Date | string | null
     lastSyncError?: StringNullableWithAggregatesFilter<"Subscription"> | string | null
+    migrationLinkRefreshRequired?: BoolWithAggregatesFilter<"Subscription"> | boolean
     subscriptionUrl?: StringNullableWithAggregatesFilter<"Subscription"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Subscription"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Subscription"> | Date | string
@@ -30577,6 +30653,9 @@ export namespace Prisma {
   export type ServiceCapacitySettingsCreateInput = {
     id?: number
     maxActiveSubscriptions?: number
+    migrationBannerEnabled?: boolean
+    migrationBannerTitle?: string
+    migrationBannerText?: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -30584,6 +30663,9 @@ export namespace Prisma {
   export type ServiceCapacitySettingsUncheckedCreateInput = {
     id?: number
     maxActiveSubscriptions?: number
+    migrationBannerEnabled?: boolean
+    migrationBannerTitle?: string
+    migrationBannerText?: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -30591,6 +30673,9 @@ export namespace Prisma {
   export type ServiceCapacitySettingsUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     maxActiveSubscriptions?: IntFieldUpdateOperationsInput | number
+    migrationBannerEnabled?: BoolFieldUpdateOperationsInput | boolean
+    migrationBannerTitle?: StringFieldUpdateOperationsInput | string
+    migrationBannerText?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -30598,6 +30683,9 @@ export namespace Prisma {
   export type ServiceCapacitySettingsUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     maxActiveSubscriptions?: IntFieldUpdateOperationsInput | number
+    migrationBannerEnabled?: BoolFieldUpdateOperationsInput | boolean
+    migrationBannerTitle?: StringFieldUpdateOperationsInput | string
+    migrationBannerText?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -30605,6 +30693,9 @@ export namespace Prisma {
   export type ServiceCapacitySettingsCreateManyInput = {
     id?: number
     maxActiveSubscriptions?: number
+    migrationBannerEnabled?: boolean
+    migrationBannerTitle?: string
+    migrationBannerText?: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -30612,6 +30703,9 @@ export namespace Prisma {
   export type ServiceCapacitySettingsUpdateManyMutationInput = {
     id?: IntFieldUpdateOperationsInput | number
     maxActiveSubscriptions?: IntFieldUpdateOperationsInput | number
+    migrationBannerEnabled?: BoolFieldUpdateOperationsInput | boolean
+    migrationBannerTitle?: StringFieldUpdateOperationsInput | string
+    migrationBannerText?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -30619,6 +30713,9 @@ export namespace Prisma {
   export type ServiceCapacitySettingsUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
     maxActiveSubscriptions?: IntFieldUpdateOperationsInput | number
+    migrationBannerEnabled?: BoolFieldUpdateOperationsInput | boolean
+    migrationBannerTitle?: StringFieldUpdateOperationsInput | string
+    migrationBannerText?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -31278,6 +31375,7 @@ export namespace Prisma {
     provisionedAt?: Date | string | null
     lastSyncAt?: Date | string | null
     lastSyncError?: string | null
+    migrationLinkRefreshRequired?: boolean
     subscriptionUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -31316,6 +31414,7 @@ export namespace Prisma {
     provisionedAt?: Date | string | null
     lastSyncAt?: Date | string | null
     lastSyncError?: string | null
+    migrationLinkRefreshRequired?: boolean
     subscriptionUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -31350,6 +31449,7 @@ export namespace Prisma {
     provisionedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncError?: NullableStringFieldUpdateOperationsInput | string | null
+    migrationLinkRefreshRequired?: BoolFieldUpdateOperationsInput | boolean
     subscriptionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31388,6 +31488,7 @@ export namespace Prisma {
     provisionedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncError?: NullableStringFieldUpdateOperationsInput | string | null
+    migrationLinkRefreshRequired?: BoolFieldUpdateOperationsInput | boolean
     subscriptionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31424,6 +31525,7 @@ export namespace Prisma {
     provisionedAt?: Date | string | null
     lastSyncAt?: Date | string | null
     lastSyncError?: string | null
+    migrationLinkRefreshRequired?: boolean
     subscriptionUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -31456,6 +31558,7 @@ export namespace Prisma {
     provisionedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncError?: NullableStringFieldUpdateOperationsInput | string | null
+    migrationLinkRefreshRequired?: BoolFieldUpdateOperationsInput | boolean
     subscriptionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31490,6 +31593,7 @@ export namespace Prisma {
     provisionedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncError?: NullableStringFieldUpdateOperationsInput | string | null
+    migrationLinkRefreshRequired?: BoolFieldUpdateOperationsInput | boolean
     subscriptionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32599,6 +32703,9 @@ export namespace Prisma {
   export type ServiceCapacitySettingsCountOrderByAggregateInput = {
     id?: SortOrder
     maxActiveSubscriptions?: SortOrder
+    migrationBannerEnabled?: SortOrder
+    migrationBannerTitle?: SortOrder
+    migrationBannerText?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -32611,6 +32718,9 @@ export namespace Prisma {
   export type ServiceCapacitySettingsMaxOrderByAggregateInput = {
     id?: SortOrder
     maxActiveSubscriptions?: SortOrder
+    migrationBannerEnabled?: SortOrder
+    migrationBannerTitle?: SortOrder
+    migrationBannerText?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -32618,6 +32728,9 @@ export namespace Prisma {
   export type ServiceCapacitySettingsMinOrderByAggregateInput = {
     id?: SortOrder
     maxActiveSubscriptions?: SortOrder
+    migrationBannerEnabled?: SortOrder
+    migrationBannerTitle?: SortOrder
+    migrationBannerText?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -33116,6 +33229,7 @@ export namespace Prisma {
     provisionedAt?: SortOrder
     lastSyncAt?: SortOrder
     lastSyncError?: SortOrder
+    migrationLinkRefreshRequired?: SortOrder
     subscriptionUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -33164,6 +33278,7 @@ export namespace Prisma {
     provisionedAt?: SortOrder
     lastSyncAt?: SortOrder
     lastSyncError?: SortOrder
+    migrationLinkRefreshRequired?: SortOrder
     subscriptionUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -33198,6 +33313,7 @@ export namespace Prisma {
     provisionedAt?: SortOrder
     lastSyncAt?: SortOrder
     lastSyncError?: SortOrder
+    migrationLinkRefreshRequired?: SortOrder
     subscriptionUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -35364,6 +35480,7 @@ export namespace Prisma {
     provisionedAt?: Date | string | null
     lastSyncAt?: Date | string | null
     lastSyncError?: string | null
+    migrationLinkRefreshRequired?: boolean
     subscriptionUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -35400,6 +35517,7 @@ export namespace Prisma {
     provisionedAt?: Date | string | null
     lastSyncAt?: Date | string | null
     lastSyncError?: string | null
+    migrationLinkRefreshRequired?: boolean
     subscriptionUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -35746,6 +35864,7 @@ export namespace Prisma {
     provisionedAt?: DateTimeNullableFilter<"Subscription"> | Date | string | null
     lastSyncAt?: DateTimeNullableFilter<"Subscription"> | Date | string | null
     lastSyncError?: StringNullableFilter<"Subscription"> | string | null
+    migrationLinkRefreshRequired?: BoolFilter<"Subscription"> | boolean
     subscriptionUrl?: StringNullableFilter<"Subscription"> | string | null
     createdAt?: DateTimeFilter<"Subscription"> | Date | string
     updatedAt?: DateTimeFilter<"Subscription"> | Date | string
@@ -36892,6 +37011,7 @@ export namespace Prisma {
     provisionedAt?: Date | string | null
     lastSyncAt?: Date | string | null
     lastSyncError?: string | null
+    migrationLinkRefreshRequired?: boolean
     subscriptionUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -36928,6 +37048,7 @@ export namespace Prisma {
     provisionedAt?: Date | string | null
     lastSyncAt?: Date | string | null
     lastSyncError?: string | null
+    migrationLinkRefreshRequired?: boolean
     subscriptionUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -37109,6 +37230,7 @@ export namespace Prisma {
     provisionedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncError?: NullableStringFieldUpdateOperationsInput | string | null
+    migrationLinkRefreshRequired?: BoolFieldUpdateOperationsInput | boolean
     subscriptionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -37145,6 +37267,7 @@ export namespace Prisma {
     provisionedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncError?: NullableStringFieldUpdateOperationsInput | string | null
+    migrationLinkRefreshRequired?: BoolFieldUpdateOperationsInput | boolean
     subscriptionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -37808,6 +37931,7 @@ export namespace Prisma {
     provisionedAt?: Date | string | null
     lastSyncAt?: Date | string | null
     lastSyncError?: string | null
+    migrationLinkRefreshRequired?: boolean
     subscriptionUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -37845,6 +37969,7 @@ export namespace Prisma {
     provisionedAt?: Date | string | null
     lastSyncAt?: Date | string | null
     lastSyncError?: string | null
+    migrationLinkRefreshRequired?: boolean
     subscriptionUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -37963,6 +38088,7 @@ export namespace Prisma {
     provisionedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncError?: NullableStringFieldUpdateOperationsInput | string | null
+    migrationLinkRefreshRequired?: BoolFieldUpdateOperationsInput | boolean
     subscriptionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -38000,6 +38126,7 @@ export namespace Prisma {
     provisionedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncError?: NullableStringFieldUpdateOperationsInput | string | null
+    migrationLinkRefreshRequired?: BoolFieldUpdateOperationsInput | boolean
     subscriptionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -38108,6 +38235,7 @@ export namespace Prisma {
     provisionedAt?: Date | string | null
     lastSyncAt?: Date | string | null
     lastSyncError?: string | null
+    migrationLinkRefreshRequired?: boolean
     subscriptionUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -38145,6 +38273,7 @@ export namespace Prisma {
     provisionedAt?: Date | string | null
     lastSyncAt?: Date | string | null
     lastSyncError?: string | null
+    migrationLinkRefreshRequired?: boolean
     subscriptionUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -38194,6 +38323,7 @@ export namespace Prisma {
     provisionedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncError?: NullableStringFieldUpdateOperationsInput | string | null
+    migrationLinkRefreshRequired?: BoolFieldUpdateOperationsInput | boolean
     subscriptionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -38231,6 +38361,7 @@ export namespace Prisma {
     provisionedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncError?: NullableStringFieldUpdateOperationsInput | string | null
+    migrationLinkRefreshRequired?: BoolFieldUpdateOperationsInput | boolean
     subscriptionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -38637,6 +38768,7 @@ export namespace Prisma {
     provisionedAt?: Date | string | null
     lastSyncAt?: Date | string | null
     lastSyncError?: string | null
+    migrationLinkRefreshRequired?: boolean
     subscriptionUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -38928,6 +39060,7 @@ export namespace Prisma {
     provisionedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncError?: NullableStringFieldUpdateOperationsInput | string | null
+    migrationLinkRefreshRequired?: BoolFieldUpdateOperationsInput | boolean
     subscriptionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -38964,6 +39097,7 @@ export namespace Prisma {
     provisionedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncError?: NullableStringFieldUpdateOperationsInput | string | null
+    migrationLinkRefreshRequired?: BoolFieldUpdateOperationsInput | boolean
     subscriptionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -38999,6 +39133,7 @@ export namespace Prisma {
     provisionedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncError?: NullableStringFieldUpdateOperationsInput | string | null
+    migrationLinkRefreshRequired?: BoolFieldUpdateOperationsInput | boolean
     subscriptionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string

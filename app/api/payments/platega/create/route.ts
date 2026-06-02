@@ -2,6 +2,7 @@
 import { z } from "zod";
 
 import { getCurrentSession } from "@/lib/auth";
+import { isPlategaPaymentEnabled } from "@/lib/payment-settings";
 import { prisma } from "@/lib/prisma";
 import { isActiveSubscriptionsLimitReached } from "@/lib/service-capacity";
 import {
@@ -81,6 +82,13 @@ function buildPlategaRedirectTarget(params: {
 }
 
 export async function POST(request: Request) {
+  if (!isPlategaPaymentEnabled()) {
+    return NextResponse.json(
+      { error: "Оплата временно приостановлена на время технических работ." },
+      { status: 503 }
+    );
+  }
+
   const session = await getCurrentSession();
   if (!session || session.role !== "USER") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/emil4/AppData/Local/Temp/codex-ssh2-runner/**)",
+      "Bash(node -e ' *)"
+    ]
+  }
+}

@@ -1471,11 +1471,11 @@ export async function reissueDeviceSlotLinkAction(formData: FormData) {
     );
   }
 
-  if (slot.status !== "ACTIVE") {
+  if (slot.status === "BLOCKED") {
     redirect(
       buildRedirectUrl({
         tab: "devices",
-        error: "Перевыпуск доступен только для активного слота.",
+        error: "Заблокированный слот нельзя перевыпустить.",
       })
     );
   }

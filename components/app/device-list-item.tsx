@@ -94,13 +94,12 @@ export function DeviceListItem({
               <DialogTrigger asChild>
                 <Button
                   aria-label="Перевыпустить ссылку"
-                  disabled={slot.status !== "ACTIVE"}
                   radius="card"
                   size="icon-sm"
                   type="button"
                   variant="outline"
                 >
-                  <RefreshCwIcon className="size-4" />
+                  <RefreshCwIcon />
                   <span className="sr-only">Перевыпустить ссылку</span>
                 </Button>
               </DialogTrigger>
@@ -146,7 +145,7 @@ export function DeviceListItem({
               type="submit"
               variant="outline"
             >
-              <RefreshCwIcon className="size-4" />
+              <RefreshCwIcon data-icon="inline-start" />
               Повторить синхронизацию
             </FormSubmitButton>
           </form>
@@ -161,7 +160,7 @@ export function DeviceListItem({
               type="submit"
               variant="outline"
             >
-              <RefreshCwIcon className="size-4" />
+              <RefreshCwIcon data-icon="inline-start" />
               Синхронизировать
             </FormSubmitButton>
           </form>
